@@ -1,0 +1,17 @@
+{
+  "name": "スイム大会運営ボード",
+  "short_name": "スイム運営",
+  "description": "水泳大会のエントリー・組分け・進行・記録・速報・証書・表彰をブラウザだけで運営",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0A2540",
+  "theme_color": "#0A2540",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

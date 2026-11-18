@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>スイム大会運営ボード</title>
 <meta name="description" content="水泳大会のエントリー・組分け・進行・記録・速報・証書・表彰をブラウザだけで運営できる無料ツール">
+<meta name="theme-color" content="#0A2540">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="スイム運営">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmciIGN4PSI1MCUiIGN5PSIxOCUiIHI9Ijg1JSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzE2NDU2RiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwQTI1NDAiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8Y2xpcFBhdGggaWQ9ImRpYWwiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI5MiIgcj0iMTQwIi8+PC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9InVybCgjYmcpIi8+CiAgPGcgY2xpcC1wYXRoPSJ1cmwoI2RpYWwpIj4KICAgIDxwYXRoIGQ9Ik0xMDAgMzE4IEMxNTAgMjkwIDIwMCAyOTAgMjU2IDMxOCBTMzYyIDM0NiA0MTIgMzE4IFY0NjAgSDEwMFoiIGZpbGw9IiMxRTlCRTAiLz4KICAgIDxwYXRoIGQ9Ik0xMDAgMzQ0IEMxNTAgMzE4IDIwMCAzMTggMjU2IDM0NCBTMzYyIDM3MCA0MTIgMzQ0IFY0NjAgSDEwMFoiIGZpbGw9IiMzQ0M4RkYiLz4KICA8L2c+CiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjkyIiByPSIxNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyNiIvPgogIDxyZWN0IHg9IjIyMiIgeT0iNzgiIHdpZHRoPSI2OCIgaGVpZ2h0PSIzNCIgcng9IjkiIGZpbGw9IiNGRkZGRkYiLz4KICA8cmVjdCB4PSIyNDMiIHk9IjEwOCIgd2lkdGg9IjI2IiBoZWlnaHQ9IjQwIiBmaWxsPSIjRkZGRkZGIi8+CiAgPHJlY3QgeD0iMzUyIiB5PSIxMzIiIHdpZHRoPSI0NCIgaGVpZ2h0PSIyNiIgcng9IjciIGZpbGw9IiNGRkZGRkYiIHRyYW5zZm9ybT0icm90YXRlKDQ1IDM3NCAxNDUpIi8+CiAgPGxpbmUgeDE9IjI1NiIgeTE9IjI5MiIgeDI9IjMxOCIgeTI9IjE5NiIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyOTIiIHI9IjE4IiBmaWxsPSIjRkZGRkZGIi8+CiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjkyIiByPSI3IiBmaWxsPSIjRTU0ODREIi8+Cjwvc3ZnPgo=">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <style>/* Layout: 水面のような色の背景の上に、すりガラスのパネル（上部バー・サイドメニュー・カード）を浮かべる。
    スマホでは下部にガラスのタブバー。操作部品は大きめ（最小 40px）で押しやすく。 */
 :root {
@@ -35,6 +44,7 @@
   --font-num: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
   --r-lg: 24px; --r: 16px; --r-sm: 12px;
   --blur: blur(28px) saturate(185%);
+  --drawer: rgba(246, 250, 255, .95);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -44,7 +54,7 @@
     --ink: #eef4fb; --muted: #9fb0c4; --accent: #3d9bff; --accent-ink: #ffffff; --accent-soft: rgba(61, 155, 255, .20);
     --ok: #4cd987; --ok-soft: rgba(48, 209, 88, .18); --warn: #ffbd4a; --warn-soft: rgba(255, 159, 10, .20);
     --err: #ff6b62; --err-soft: rgba(255, 69, 58, .20); --info: #9cc8ff; --info-soft: rgba(61, 155, 255, .14);
-    --focus: rgba(61, 155, 255, .55); color-scheme: dark;
+    --focus: rgba(61, 155, 255, .55); --drawer: rgba(18, 27, 42, .96); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
@@ -54,7 +64,7 @@
   --ink: #eef4fb; --muted: #9fb0c4; --accent: #3d9bff; --accent-ink: #ffffff; --accent-soft: rgba(61, 155, 255, .20);
   --ok: #4cd987; --ok-soft: rgba(48, 209, 88, .18); --warn: #ffbd4a; --warn-soft: rgba(255, 159, 10, .20);
   --err: #ff6b62; --err-soft: rgba(255, 69, 58, .20); --info: #9cc8ff; --info-soft: rgba(61, 155, 255, .14);
-  --focus: rgba(61, 155, 255, .55); color-scheme: dark;
+  --focus: rgba(61, 155, 255, .55); --drawer: rgba(18, 27, 42, .96); color-scheme: dark;
 }
 /* 透明度を下げる設定の人・ガラス非対応のブラウザには、すりガラスでなく不透明な面を使う */
 @media (prefers-reduced-transparency: reduce) { :root { --glass: var(--glass-strong); --blur: none; } }
@@ -87,25 +97,21 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 
 /* ---------- 枠組み ---------- */
-.app { display: grid; grid-template-columns: 236px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 14px;
-  padding: 12px max(14px, env(safe-area-inset-right)) 14px max(14px, env(safe-area-inset-left)); min-height: 100vh; }
-.topbar { grid-column: 1 / -1; position: sticky; top: max(10px, env(safe-area-inset-top)); z-index: 30; display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap;
-  padding: 10px 12px 10px 14px; border-radius: 22px; }
-.brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 280px; }
-.logo { width: 36px; height: 36px; border-radius: 11px; flex: 0 0 auto;
-  background: radial-gradient(120% 120% at 20% 10%, #7fd8ff 0%, #0a7aff 55%, #3b3fd8 100%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 -6px 12px rgba(0,0,0,.15), 0 4px 12px rgba(10,122,255,.35); position: relative; overflow: hidden; }
-.logo::after { content: ""; position: absolute; left: -10%; right: -10%; top: 52%; height: 30%; border-radius: 50%;
-  border-top: 2px solid rgba(255,255,255,.85); }
+.app { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 12px;
+  padding: 10px max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left)); min-height: 100vh; }
+.app.pinned.side-left { grid-template-columns: 244px minmax(0, 1fr); }
+.app.pinned.side-right { grid-template-columns: minmax(0, 1fr) 244px; }
+.topbar { grid-column: 1 / -1; position: sticky; top: max(8px, env(safe-area-inset-top)); z-index: 30; display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap;
+  padding: 8px 10px; border-radius: 22px; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 220px; }
+.logo { width: 36px; height: 36px; border-radius: 9px; flex: 0 0 auto; box-shadow: 0 2px 8px rgba(10, 37, 64, .35); }
 .brand-t { display: flex; flex-direction: column; min-width: 0; }
-.brand small { color: var(--muted); font-size: 11px; letter-spacing: .06em; }
-.brand strong { font: 600 16px/1.3 var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand small { color: var(--muted); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand strong { font: 650 17px/1.25 var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .chips, .tools { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .chip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--hairline);
   background: var(--fill); font-size: 12.5px; font-weight: 500; white-space: nowrap; }
-button.chip { cursor: pointer; transition: background .15s, transform .1s; }
-button.chip:hover { background: var(--fill-hover); }
-button.chip:active { transform: scale(.97); }
+button.chip { cursor: pointer; }
 .chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px var(--ok-soft); }
 .chip.quiet { color: var(--muted); }
 .chip.warn { background: var(--warn-soft); border-color: transparent; color: var(--warn); }
@@ -113,39 +119,88 @@ button.chip:active { transform: scale(.97); }
 .chip.ok { background: var(--ok-soft); border-color: transparent; color: var(--ok); }
 .chip.lock { background: var(--ink); color: var(--bg); border-color: transparent; }
 .ic { width: 20px; height: 20px; flex: 0 0 auto; } .ic.sm { width: 16px; height: 16px; }
+.iconbtn.menu.on { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
 
-.nav { position: sticky; top: 92px; align-self: start; max-height: calc(100vh - 106px); overflow-y: auto; padding: 10px; border-radius: var(--r-lg); }
-.nav h6 { margin: 12px 12px 4px; font-size: 11px; letter-spacing: .12em; color: var(--muted); font-weight: 600; }
-.navgrp:first-child h6 { margin-top: 4px; }
-.nav a { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 8px 12px; border-radius: 14px; color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500; transition: background .15s; }
+/* 画面切り替えパネル: 「常に表示」なら列として並べ、そうでなければ左右から滑り出す */
+.nav { padding: 10px; border-radius: var(--r-lg); display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+.app.pinned .nav { position: sticky; top: 76px; align-self: start; max-height: calc(100vh - 88px); }
+.app.pinned.side-left .nav { grid-column: 1; grid-row: 2; }
+.app.pinned.side-left main { grid-column: 2; grid-row: 2; }
+.app.pinned.side-right .nav { grid-column: 2; grid-row: 2; }
+.app.pinned.side-right main { grid-column: 1; grid-row: 2; }
+.app:not(.pinned) main { grid-column: 1; grid-row: 2; }
+main { position: relative; z-index: 0; }
+.topbar { z-index: 30; }
+.app:not(.pinned) .nav { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.app:not(.pinned) .nav { position: fixed; z-index: 60; top: max(10px, env(safe-area-inset-top)); bottom: max(10px, env(safe-area-inset-bottom)); width: min(300px, calc(100vw - 40px));
+  background: var(--drawer); transition: transform .42s cubic-bezier(.2, .9, .25, 1.05), opacity .3s; opacity: 0; pointer-events: none; }
+.app.side-left:not(.pinned) .nav { left: max(10px, env(safe-area-inset-left)); transform: translateX(calc(-100% - 24px)); }
+.app.side-right:not(.pinned) .nav { right: max(10px, env(safe-area-inset-right)); transform: translateX(calc(100% + 24px)); }
+.app.nav-open .nav { transform: none !important; opacity: 1; pointer-events: auto; }
+.scrim { position: fixed; inset: 0; z-index: 55; background: rgba(8, 18, 32, .38); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity .3s; }
+.app.nav-open .scrim { opacity: 1; pointer-events: auto; }
+.navhead { display: flex; align-items: center; justify-content: space-between; padding: 2px 4px 0 8px; }
+.navhead b { font: 650 15px/1.3 var(--font-display); }
+.navprefs { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 0 2px; }
+.pinbtn { display: inline-flex; align-items: center; gap: 5px; min-height: 32px; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--hairline); background: var(--fill); font-size: 12.5px; cursor: pointer; }
+.pinbtn.on { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.pinbtn[disabled] { opacity: .45; cursor: not-allowed; }
+.nav h6 { margin: 10px 12px 2px; font-size: 11px; letter-spacing: .12em; color: var(--muted); font-weight: 600; }
+.nav .seg.v { display: block; padding: 0; background: none; border: 0; box-shadow: none; border-radius: 0; overflow: visible; max-width: none; }
+.nav a { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 7px 12px; border-radius: 14px; color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500; }
 .nav a .ic { color: var(--accent); }
-.nav a:hover { background: var(--fill); }
-.nav a.on { background: var(--accent); color: var(--accent-ink); font-weight: 600; box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 35%, transparent), inset 0 1px 0 rgba(255,255,255,.35); }
-.nav a.on .ic { color: var(--accent-ink); }
+.nav a.on { color: var(--accent); font-weight: 700; }
 .nav .lb { flex: 1 1 auto; }
-.nav .lbs { display: none; }
 .nav .badge { font-size: 11px; font-weight: 700; min-width: 20px; text-align: center; padding: 1px 6px; border-radius: 999px; background: var(--err); color: #fff; }
-main { min-width: 0; padding-bottom: 40px; }
+main { min-width: 0; padding-bottom: 16px; }
+@media (max-width: 899px) { .hide-sm { display: none; } .brand { flex-basis: 160px; } }
 
-/* スマホ・タブレット: 下部にガラスのタブバー */
-@media (max-width: 900px) {
-  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; padding-bottom: calc(96px + env(safe-area-inset-bottom)); gap: 12px; }
-  .topbar { position: static; }
-  .nav { position: fixed; top: auto; z-index: 40; left: max(10px, env(safe-area-inset-left)); right: max(10px, env(safe-area-inset-right)); bottom: max(10px, env(safe-area-inset-bottom));
-    max-height: none; display: flex; gap: 2px; overflow-x: auto; padding: 6px; border-radius: 26px; scrollbar-width: none; }
-  .nav::-webkit-scrollbar { display: none; }
-  .navgrp { display: contents; }
-  .nav h6 { display: none; }
-  .nav a { flex: 0 0 auto; flex-direction: column; gap: 2px; min-width: 64px; min-height: 54px; padding: 6px 8px; border-radius: 20px; font-size: 10.5px; justify-content: center; position: relative; }
-  .nav .lb { display: none; } .nav .lbs { display: block; white-space: nowrap; }
-  .nav .badge { position: absolute; top: 2px; right: 6px; font-size: 10px; padding: 0 5px; }
-  .brand { flex-basis: 100%; }
-}
+/* ---------- ガラスが滑る切り替え（セグメント） ---------- */
+.seg { position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--fill); border: 1px solid var(--hairline); max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.seg::-webkit-scrollbar { display: none; }
+.seg > .lens { position: absolute; left: 0; top: 0; z-index: 0; border-radius: 999px; pointer-events: none; opacity: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.62));
+  border: 1px solid rgba(255,255,255,.9);
+  box-shadow: inset 0 1px 0 #fff, inset 0 -1px 2px rgba(18,40,72,.08), 0 4px 14px rgba(18, 40, 72, .16), 0 1px 3px rgba(18,40,72,.12);
+  -webkit-backdrop-filter: blur(10px) saturate(200%); backdrop-filter: blur(10px) saturate(200%);
+  transition: transform .5s cubic-bezier(.3, 1.35, .45, 1), width .5s cubic-bezier(.3, 1.35, .45, 1), height .5s cubic-bezier(.3, 1.35, .45, 1), opacity .2s; }
+:root[data-theme="dark"] .seg > .lens { background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.10)); border-color: rgba(255,255,255,.22); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .seg > .lens { background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.10)); border-color: rgba(255,255,255,.22); } }
+.nav .seg.v > .lens { border-radius: 14px; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, rgba(255,255,255,.85)), color-mix(in srgb, var(--accent) 10%, rgba(255,255,255,.55))); }
+.segbtn { position: relative; z-index: 1; border: 0; background: none; min-height: 36px; padding: 6px 16px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.segbtn.on { color: var(--ink); font-weight: 650; }
+.seg.mini .segbtn { min-height: 28px; padding: 3px 11px; font-size: 12.5px; }
+.seg.big .segbtn { min-height: 40px; padding: 8px 18px; font-size: 14px; }
+@media (prefers-reduced-motion: reduce) { .seg > .lens { transition: opacity .2s; } }
+
+/* ---------- すべてのボタン: 光の帯が滑り、押した所からガラスが光る ---------- */
+.btn, .chip, .iconbtn, .segbtn, .nav a, .onboard button, .pinbtn { position: relative; overflow: hidden; isolation: isolate; transition: background .2s, transform .18s cubic-bezier(.3, 1.4, .5, 1), box-shadow .2s, color .2s; }
+.btn::before, button.chip::before, .iconbtn::before, .onboard button::before, .pinbtn::before {
+  content: ""; position: absolute; inset: -1px; z-index: -1; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,.65) 45%, rgba(255,255,255,.2) 55%, transparent 75%);
+  transform: translateX(-130%); transition: transform .75s cubic-bezier(.25, .8, .25, 1); }
+.btn:hover::before, button.chip:hover::before, .iconbtn:hover::before, .onboard button:hover::before, .pinbtn:hover::before { transform: translateX(130%); }
+.pressed::after { content: ""; position: absolute; left: var(--px, 50%); top: var(--py, 50%); width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; z-index: -1; pointer-events: none;
+  background: radial-gradient(circle, rgba(255,255,255,.9), rgba(255,255,255,.35) 45%, transparent 70%); animation: glassPress .55s cubic-bezier(.2, .8, .3, 1) forwards; }
+@keyframes glassPress { from { transform: scale(1); opacity: 1; } to { transform: scale(26); opacity: 0; } }
+.btn:active, button.chip:active, .iconbtn:active, .segbtn:active, .onboard button:active, .pinbtn:active { transform: scale(.95); }
+@media (prefers-reduced-motion: reduce) { .btn::before, button.chip::before, .iconbtn::before { display: none; } .pressed::after { animation: none; } }
+
+/* 説明文は1行に畳む（押すと全文） */
+.lead { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
+.lead::after { content: ""; }
+.lead.open { -webkit-line-clamp: unset; display: block; }
+.vhead { display: flex; align-items: flex-end; gap: 8px 14px; flex-wrap: wrap; margin-bottom: 10px; }
+.vhead > div:first-child { flex: 1 1 320px; min-width: 0; }
+.vhead .lead { margin-bottom: 0; }
+.fill { overflow: auto; }
+.heats { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr)); gap: 12px; align-items: start; }
+.heats .tablewrap { margin: 0 !important; }
 
 /* ---------- 見出し・ボタン・入力 ---------- */
-h1.view { font: 700 28px/1.2 var(--font-display); letter-spacing: -.01em; margin: 6px 4px 6px; text-wrap: balance; }
-.lead { color: var(--muted); margin: 0 4px 18px; max-width: 72ch; font-size: 14px; }
-.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 14px; }
+h1.view { font: 700 24px/1.2 var(--font-display); letter-spacing: -.01em; margin: 2px 4px 4px; text-wrap: balance; }
+.lead { color: var(--muted); margin: 0 4px 12px; max-width: 90ch; font-size: 13.5px; }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 10px; }
 .bar .grow { flex: 1 1 auto; }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 8px 16px; border-radius: 999px;
   border: 1px solid var(--glass-edge); background: var(--fill); cursor: pointer; white-space: nowrap; line-height: 1.25; font-weight: 500;
@@ -162,7 +217,7 @@ h1.view { font: 700 28px/1.2 var(--font-display); letter-spacing: -.01em; margin
 .iconbtn { border: 1px solid var(--hairline); background: var(--fill); border-radius: 50%; width: 38px; height: 38px; cursor: pointer; display: inline-grid; place-items: center; color: var(--ink); transition: background .15s, transform .1s; }
 .iconbtn:hover { background: var(--fill-hover); } .iconbtn:active { transform: scale(.94); }
 .iconbtn[disabled] { opacity: .35; cursor: not-allowed; }
-.card { border-radius: var(--r-lg); padding: 18px 20px; min-width: 0; }
+.card { border-radius: var(--r-lg); padding: 14px 16px; min-width: 0; }
 .card h2 { font: 650 17px/1.3 var(--font-display); margin: 0 0 12px; }
 .card h3 { font-size: 13px; margin: 18px 0 8px; color: var(--muted); font-weight: 600; }
 .grid { display: grid; gap: 14px; }
@@ -244,7 +299,7 @@ tr.off td { color: var(--muted); opacity: .75; }
 .modal .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
 @keyframes fade { from { opacity: 0; } } @keyframes pop { from { opacity: 0; transform: scale(.94) translateY(8px); } }
 .toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(18px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; z-index: 120; width: min(460px, calc(100vw - 32px)); }
-@media (max-width: 900px) { .toasts { bottom: calc(92px + env(safe-area-inset-bottom)); } }
+
 .toast { background: rgba(20, 28, 40, .82); color: #fff; -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255,255,255,.14); border-radius: 18px; padding: 12px 16px; display: flex; gap: 12px; align-items: center; box-shadow: 0 12px 32px rgba(0,0,0,.25); animation: pop .22s ease-out; }
 .toast span { flex: 1 1 auto; }
@@ -267,20 +322,51 @@ details.card > summary::-webkit-details-marker { display: none; }
 .issue button.link:hover { text-decoration: underline; }
 .certprev { border-radius: 6px; background: #fff; color: #000; overflow: hidden; margin: 0 auto; box-shadow: 0 10px 30px var(--glass-shade); }
 
-/* ---------- 印刷 ---------- */
+/* ---------- 印刷（A4 縦 1枚。お客様・選手が離れて見ても読める大きさ） ---------- */
 #print-root { display: none; }
+#print-root.measure { display: block; position: absolute; left: -10000px; top: 0; width: 190mm; }
+#print-root, #print-root * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+#print-root .pg { width: 100%; height: 268mm; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #111; font-family: var(--font-ui); break-inside: avoid; }
+#print-root .pg + .pg { break-before: page; page-break-before: always; }
+.pg-h { display: flex; align-items: center; gap: 4mm; border-bottom: 2.6pt solid #0A2540; padding-bottom: 3mm; margin-bottom: 4mm; }
+.pg-logo { width: 13mm; height: 13mm; border-radius: 3mm; }
+.pg-meet { font-size: 10pt; color: #4a5868; }
+.pg-title { font-size: 21pt; font-weight: 800; line-height: 1.15; letter-spacing: .01em; }
+.pg-sub { font-size: 11.5pt; color: #1d2a38; margin-top: 1mm; }
+.pg-b { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.pg-z.two { column-count: 2; column-gap: 6mm; }
+.pg-f { display: flex; justify-content: space-between; font-size: 8.5pt; color: #687684; border-top: .6pt solid #c9d3dd; padding-top: 1.5mm; margin-top: 2mm; }
+.pp { width: 100%; border-collapse: collapse; font-size: 12pt; }
+.pp th { background: #0A2540; color: #fff; font-size: 9.5pt; font-weight: 700; padding: 1.4mm 2mm; text-align: left; letter-spacing: .04em; }
+.pp td { padding: 1.5mm 2mm; border-bottom: .6pt solid #d6dee6; vertical-align: middle; }
+.pp tbody tr:nth-child(even) td { background: #f3f7fb; }
+.pp .c { text-align: center; }
+.pp .nm { font-weight: 700; font-size: 12.5pt; }
+.pp .sm { font-size: 10pt; color: #34414e; }
+.pp .kana { font-size: 8pt; font-weight: 400; color: #6a7684; }
+.pp .tm { font-family: var(--font-num); font-weight: 700; font-size: 12.5pt; text-align: right; white-space: nowrap; }
+.pp td.c.tm { text-align: center; }
+.pp .rk { font-weight: 800; font-size: 14pt; text-align: center; white-space: nowrap; width: 15mm; }
+.pp tr.m1 td { background: #ffefb0 !important; } .pp tr.m2 td { background: #e8edf2 !important; } .pp tr.m3 td { background: #f7dcc5 !important; }
+.pp tr.brk td { background: #eef3f7 !important; color: #5a6772; font-style: italic; }
+.blk { break-inside: avoid; page-break-inside: avoid; margin-bottom: 4mm; }
+.blk-h { font-size: 13pt; font-weight: 800; padding: 1.2mm 3mm; background: #e2eef9; border-left: 2.2mm solid #0A73C9; margin-bottom: 1.2mm; }
+.lane-c { display: inline-block; width: 7.5mm; height: 7.5mm; line-height: 7.5mm; border-radius: 50%; background: #0A2540; color: #fff; font-weight: 800; font-size: 11pt; text-align: center; }
+.split2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; align-items: start; }
+.pinfo { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2mm; margin-bottom: 4mm; }
+.pinfo div { border: .8pt solid #0A2540; border-radius: 2mm; padding: 1.2mm 1.5mm; text-align: center; }
+.pinfo span { display: block; font-size: 8pt; color: #4a5868; }
+.pinfo b { font-size: 11.5pt; }
+.mvp-p { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; margin-bottom: 6mm; }
+.mvp-p div { border: 1.4pt solid #b98a00; background: #fff6d6; border-radius: 3mm; padding: 4mm 5mm; }
+.mvp-p span { display: block; font-size: 10.5pt; font-weight: 700; color: #7a5a00; }
+.mvp-p b { display: block; font-size: 22pt; margin: 1mm 0; }
+.mvp-p em { font-style: normal; font-size: 10.5pt; color: #333; }
 @media print {
   html, body { height: auto !important; min-height: 0 !important; background: #fff !important; color: #000 !important; }
   body::before { display: none !important; }
   body > *:not(#print-root) { display: none !important; }
-  #print-root { display: block !important; }
-  .pt { border-collapse: collapse; width: 100%; font-size: 10.5pt; font-family: var(--font-ui); }
-  .pt th, .pt td { border: 0.5pt solid #555; padding: 2pt 4pt; }
-  .pt thead { display: table-header-group; }
-  .pt tr { page-break-inside: avoid; }
-  .ph { font-family: var(--font-ui); margin: 0 0 6pt; }
-  .ph h1 { font-size: 15pt; margin: 0; } .ph p { margin: 2pt 0; font-size: 10pt; }
-  .pbreak { page-break-after: always; }
+  #print-root { display: block !important; position: static !important; width: auto !important; }
 }
 .cert { position: relative; color: #000; font-family: var(--font-cert); text-align: center; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
 .cert + .cert { break-before: page; page-break-before: always; }
@@ -288,17 +374,26 @@ details.card > summary::-webkit-details-marker { display: none; }
 .cert .name { font-weight: 700; }
 
 table.t td > b { white-space: nowrap; }
+.dash { display: grid; gap: 12px; margin-top: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); align-items: start; }
+@media (min-width: 1200px) { .dash { grid-template-columns: 1fr 1fr 1.25fr; } }
+.dash .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.dash .card table.t { font-size: 13.5px; }
+
+/* メニューを開いている間は、背面のガラス効果を止めて重なり順を確実にする */
+.app.nav-open main, .app.nav-open main *, .app.nav-open .topbar, .app.nav-open .topbar * { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 </style>
-<style id="page-style">@page { size: A4 portrait; margin: 12mm }</style>
+<style id="page-style">@page { size: A4 portrait; margin: 10mm }</style>
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
   <header class="topbar" id="top"></header>
-  <nav class="nav" id="nav" aria-label="メニュー"></nav>
+  <aside class="nav" id="nav" aria-label="画面の切り替え"></aside>
+  <div class="scrim" id="scrim" data-act="closeNav"></div>
   <main id="main"><noscript>このアプリを使うには JavaScript を有効にしてください。</noscript></main>
 </div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <div id="print-root"></div>
+<script>const APP_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmciIGN4PSI1MCUiIGN5PSIxOCUiIHI9Ijg1JSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzE2NDU2RiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwQTI1NDAiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8Y2xpcFBhdGggaWQ9ImRpYWwiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI5MiIgcj0iMTQwIi8+PC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9InVybCgjYmcpIi8+CiAgPGcgY2xpcC1wYXRoPSJ1cmwoI2RpYWwpIj4KICAgIDxwYXRoIGQ9Ik0xMDAgMzE4IEMxNTAgMjkwIDIwMCAyOTAgMjU2IDMxOCBTMzYyIDM0NiA0MTIgMzE4IFY0NjAgSDEwMFoiIGZpbGw9IiMxRTlCRTAiLz4KICAgIDxwYXRoIGQ9Ik0xMDAgMzQ0IEMxNTAgMzE4IDIwMCAzMTggMjU2IDM0NCBTMzYyIDM3MCA0MTIgMzQ0IFY0NjAgSDEwMFoiIGZpbGw9IiMzQ0M4RkYiLz4KICA8L2c+CiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjkyIiByPSIxNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyNiIvPgogIDxyZWN0IHg9IjIyMiIgeT0iNzgiIHdpZHRoPSI2OCIgaGVpZ2h0PSIzNCIgcng9IjkiIGZpbGw9IiNGRkZGRkYiLz4KICA8cmVjdCB4PSIyNDMiIHk9IjEwOCIgd2lkdGg9IjI2IiBoZWlnaHQ9IjQwIiBmaWxsPSIjRkZGRkZGIi8+CiAgPHJlY3QgeD0iMzUyIiB5PSIxMzIiIHdpZHRoPSI0NCIgaGVpZ2h0PSIyNiIgcng9IjciIGZpbGw9IiNGRkZGRkYiIHRyYW5zZm9ybT0icm90YXRlKDQ1IDM3NCAxNDUpIi8+CiAgPGxpbmUgeDE9IjI1NiIgeTE9IjI5MiIgeDI9IjMxOCIgeTI9IjE5NiIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyOTIiIHI9IjE4IiBmaWxsPSIjRkZGRkZGIi8+CiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjkyIiByPSI3IiBmaWxsPSIjRTU0ODREIi8+Cjwvc3ZnPgo=';</script>
 <script>/* ============================================================================
  * スイム大会運営アプリ — 計算エンジン（DOM非依存）
  *  Excel「大会運営ブック」の数式と「表彰者算出マクロ」のロジックを移植
@@ -1339,6 +1434,28 @@ const ICON_PATHS = {
   unlock: 'M7 11V8a5 5 0 0 1 9.6-2M6 11h12v9H6z'
 };
 const icon = (k, cls) => '<svg class="' + (cls || 'ic') + '" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + ICON_PATHS[k] + '"/></svg>';
+ICON_PATHS.menu = 'M4 7h16M4 12h16M4 17h16';
+ICON_PATHS.pin = 'M9 4h6l-1 6 3 3H7l3-3zM12 13v7';
+ICON_PATHS.close = 'M6 6l12 12M18 6 6 18';
+
+// ---------------------------------------------------------------- 画面切り替えパネル（三本線）の表示設定（端末ごと）
+const NAVPREF_KEY = 'swim-meet-app/navpref';
+let navPref = { side: 'left', pinned: true };
+try { navPref = Object.assign(navPref, JSON.parse(lsGet(NAVPREF_KEY) || '{}')); } catch (e) { /* ignore */ }
+let navOpen = false;
+const isWide = () => window.matchMedia('(min-width: 900px)').matches;
+const navPinnedNow = () => navPref.pinned && isWide();
+function saveNavPref() { try { lsSet(NAVPREF_KEY, JSON.stringify(navPref)); } catch (e) { /* ignore */ } }
+function applyNavLayout() {
+  const app = $('#app');
+  app.classList.toggle('side-right', navPref.side === 'right');
+  app.classList.toggle('side-left', navPref.side !== 'right');
+  app.classList.toggle('pinned', navPinnedNow());
+  app.classList.toggle('nav-open', !navPinnedNow() && navOpen);
+}
+window.addEventListener('resize', () => { applyNavLayout(); sizeFills(); placeLenses(true); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && navOpen) { navOpen = false; applyNavLayout(); } });
+
 let renderQueued = false;
 function scheduleRender() { if (renderQueued) return; renderQueued = true; setTimeout(() => { renderQueued = false; render(); }, 0); }
 function render() {
@@ -1346,13 +1463,20 @@ function render() {
   const fk = act && act.dataset ? act.dataset.k : null;
   const selS = act && 'selectionStart' in act ? (() => { try { return [act.selectionStart, act.selectionEnd]; } catch (e) { return null; } })() : null;
   const scrollY = window.scrollY;
+  const fillScroll = {};
+  document.querySelectorAll('.fill[data-fill-id]').forEach(el => { fillScroll[el.dataset.fillId] = el.scrollTop; });
+  rememberLenses();
   renderTop();
   renderNav();
+  applyNavLayout();
   const fn = VIEWS[view] || VIEWS.home;
   let html;
   try { html = fn(); }
   catch (e) { console.error(e); html = '<div class="notice err">この画面の表示中にエラーが起きました: ' + esc(e.message) + '。<button class="btn sm" data-act="go" data-v="data">データ管理へ</button> でバックアップを書き出してから、ページを再読み込みしてください。</div>'; }
   $('#main').innerHTML = (saveError ? '<div class="notice err"><b>保存エラー</b><span class="grow">' + esc(saveError) + '</span><button class="btn sm" data-act="backup">今すぐ書き出す</button></div>' : '') + backupReminder() + html;
+  sizeFills();
+  document.querySelectorAll('.fill[data-fill-id]').forEach(el => { if (fillScroll[el.dataset.fillId]) el.scrollTop = fillScroll[el.dataset.fillId]; });
+  placeLenses();
   if (fk) {
     const el = document.querySelector('[data-k="' + CSS.escape(fk) + '"]');
     if (el) { el.focus({ preventScroll: true }); if (selS && 'setSelectionRange' in el) { try { el.setSelectionRange(selS[0], selS[1]); } catch (e) { /* ignore */ } } }
@@ -1363,6 +1487,81 @@ function render() {
     if (tr) { tr.classList.add('flash'); tr.scrollIntoView({ block: 'center' }); }
     ui.highlight = null;
   }
+}
+// 画面の下まで使う領域（表など）は、ページ全体ではなく中だけをスクロールさせる
+function sizeFills() {
+  const big = window.innerWidth >= 700 && window.innerHeight >= 560;
+  document.querySelectorAll('.fill').forEach(el => {
+    if (!big) { el.style.maxHeight = ''; return; }
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    el.style.maxHeight = Math.max(260, window.innerHeight - top - 30) + 'px';
+  });
+}
+
+// ---------------------------------------------------------------- ガラスがスライドする選択（.seg の中を .lens が移動）
+const lensMemory = {};
+function rememberLenses() {
+  document.querySelectorAll('.seg[data-seg-id] > .lens').forEach(l => {
+    const id = l.parentNode.dataset.segId;
+    lensMemory[id] = { x: l._x, y: l._y, w: l._w, h: l._h };
+  });
+}
+function moveLens(seg, target, instant) {
+  const lens = seg.querySelector(':scope > .lens');
+  if (!lens) return;
+  if (!target) { lens.style.opacity = '0'; return; }
+  const x = target.offsetLeft, y = target.offsetTop, w = target.offsetWidth, h = target.offsetHeight;
+  if (instant) lens.style.transition = 'none';
+  lens.style.opacity = '1';
+  lens.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+  lens.style.width = w + 'px'; lens.style.height = h + 'px';
+  lens._x = x; lens._y = y; lens._w = w; lens._h = h;
+  if (instant) { void lens.offsetWidth; lens.style.transition = ''; }
+}
+function placeLenses(instant) {
+  document.querySelectorAll('.seg').forEach(seg => {
+    const lens = seg.querySelector(':scope > .lens');
+    if (!lens) return;
+    const active = seg.querySelector('[data-seg].on');
+    const mem = lensMemory[seg.dataset.segId];
+    if (!instant && mem && mem.w && active) {
+      // 前の位置から、選んだ項目までガラスを滑らせる
+      lens.style.transition = 'none';
+      lens.style.opacity = '1';
+      lens.style.transform = 'translate(' + mem.x + 'px,' + mem.y + 'px)'; lens.style.width = mem.w + 'px'; lens.style.height = mem.h + 'px';
+      void lens.offsetWidth; lens.style.transition = '';
+      requestAnimationFrame(() => moveLens(seg, active));
+    } else moveLens(seg, active, true);
+  });
+}
+document.addEventListener('pointerover', e => {
+  const item = e.target.closest && e.target.closest('.seg [data-seg]');
+  if (!item || e.pointerType === 'touch') return;
+  const seg = item.closest('.seg');
+  if (seg.dataset.hover !== 'off') moveLens(seg, item);
+});
+document.addEventListener('pointerout', e => {
+  const seg = e.target.closest && e.target.closest('.seg');
+  if (!seg || (e.relatedTarget && seg.contains(e.relatedTarget))) return;
+  moveLens(seg, seg.querySelector('[data-seg].on'));
+});
+// ボタンを押した位置から光が広がる（すべてのボタン）
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest && e.target.closest('.btn, .chip, .iconbtn, .segbtn, .nav a, .onboard button, .x');
+  if (!b || b.disabled) return;
+  const r = b.getBoundingClientRect();
+  b.style.setProperty('--px', (e.clientX - r.left) + 'px');
+  b.style.setProperty('--py', (e.clientY - r.top) + 'px');
+  b.classList.remove('pressed'); void b.offsetWidth; b.classList.add('pressed');
+  setTimeout(() => b.classList.remove('pressed'), 600);
+});
+// 段落の説明は1行に畳み、押すと全文を表示
+document.addEventListener('click', e => { const l = e.target.closest && e.target.closest('.lead'); if (l) l.classList.toggle('open'); });
+
+// セグメント（ガラスが滑る切り替えボタン）の部品
+function seg(id, items, current, attrs) {
+  return '<div class="seg h" data-seg-id="' + id + '" role="tablist"><span class="lens" aria-hidden="true"></span>' +
+    items.map(([v, label]) => '<button type="button" class="segbtn ' + (String(v) === String(current) ? 'on' : '') + '" data-seg data-act="setui" data-key="' + id + '" data-v="' + esc(v) + '" role="tab" aria-selected="' + (String(v) === String(current)) + '" ' + (attrs || '') + '>' + label + '</button>').join('') + '</div>';
 }
 function backupReminder() {
   if (!state.entries.length && !state.relays.length) return '';
@@ -1376,8 +1575,12 @@ function renderTop() {
   const ch = D.checks || [];
   const ne = ch.filter(c => c.level === 'error').length, nw = ch.filter(c => c.level === 'warn').length;
   const locked = isLocked();
+  const pinned = navPinnedNow();
+  const menuBtn = '<button class="iconbtn menu ' + ((pinned || navOpen) ? 'on' : '') + '" data-act="toggleNav" aria-label="画面の切り替え" aria-expanded="' + (pinned || navOpen) + '" title="画面の切り替え">' + icon('menu') + '</button>';
+  const cur = NAV.flatMap(g => g[1]).find(x => x[0] === view);
   $('#top').innerHTML =
-    '<div class="brand"><span class="logo" aria-hidden="true"></span><div class="brand-t"><small>スイム大会運営ボード</small><strong title="' + esc(state.settings.meetName) + '">' + esc(state.settings.meetName || '（大会名未設定）') + '</strong></div></div>' +
+    (navPref.side !== 'right' ? menuBtn : '') +
+    '<div class="brand"><img class="logo" src="' + APP_ICON + '" alt=""><div class="brand-t"><small>' + esc(state.settings.meetName || 'スイム大会運営ボード') + '</small><strong>' + esc(cur ? cur[1] : '') + '</strong></div></div>' +
     '<div class="chips">' +
     (meta.sample ? '<span class="chip warn">サンプル</span>' : '') +
     (saveError ? '<button class="chip err" data-act="backup"><span class="dot"></span>保存エラー</button>' : '<span class="chip quiet" title="入力のたびにこのブラウザへ自動保存しています"><span class="dot"></span>保存済み</span>') +
@@ -1386,15 +1589,25 @@ function renderTop() {
     '</div>' +
     '<div class="tools"><button class="iconbtn" data-act="undo" title="元に戻す (Ctrl+Z)" aria-label="元に戻す" ' + (undoStack.length ? '' : 'disabled') + '>' + icon('undo') + '</button>' +
     '<button class="iconbtn" data-act="redo" title="やり直し (Ctrl+Y)" aria-label="やり直し" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '</button>' +
-    '<button class="btn sm tinted" data-act="backup">' + icon('save', 'ic sm') + 'バックアップ</button></div>';
+    '<button class="btn sm tinted" data-act="backup">' + icon('save', 'ic sm') + '<span class="hide-sm">バックアップ</span></button></div>' +
+    (navPref.side === 'right' ? menuBtn : '');
 }
 function renderNav() {
   const ch = D.checks || [];
   const ne = ch.filter(c => c.level === 'error').length;
-  $('#nav').innerHTML = NAV.map(([h, items]) => '<div class="navgrp"><h6>' + h + '</h6>' + items.map(([v, label, short]) =>
-    '<a href="#' + v + '" class="' + (view === v ? 'on' : '') + '" data-act="go" data-v="' + v + '"' + (view === v ? ' aria-current="page"' : '') + '>' + icon(v) +
-    '<span class="lb">' + label + '</span><span class="lbs">' + short + '</span>' +
-    (v === 'check' && ne ? '<span class="badge">' + ne + '</span>' : '') + '</a>').join('') + '</div>').join('');
+  const wide = isWide();
+  $('#nav').innerHTML =
+    '<div class="navhead"><b>画面の切り替え</b><button class="iconbtn sm" data-act="closeNav" aria-label="閉じる" title="閉じる">' + icon('close') + '</button></div>' +
+    '<div class="navprefs">' +
+    '<div class="seg h mini" data-seg-id="navside"><span class="lens" aria-hidden="true"></span>' +
+    [['left', '左に表示'], ['right', '右に表示']].map(([v, l]) => '<button type="button" class="segbtn ' + (navPref.side === v ? 'on' : '') + '" data-seg data-act="navSide" data-v="' + v + '">' + l + '</button>').join('') + '</div>' +
+    '<button type="button" class="pinbtn ' + (navPref.pinned ? 'on' : '') + '" data-act="navPin" aria-pressed="' + navPref.pinned + '" ' + (wide ? '' : 'disabled title="画面の幅が広いときに使えます"') + '>' + icon('pin', 'ic sm') + '常に表示</button>' +
+    '</div>' +
+    '<div class="seg v" data-seg-id="nav"><span class="lens" aria-hidden="true"></span>' +
+    NAV.map(([h, items]) => '<div class="navgrp"><h6>' + h + '</h6>' + items.map(([v, label]) =>
+      '<a href="#' + v + '" class="' + (view === v ? 'on' : '') + '" data-seg data-act="go" data-v="' + v + '"' + (view === v ? ' aria-current="page"' : '') + '>' + icon(v) +
+      '<span class="lb">' + label + '</span>' + (v === 'check' && ne ? '<span class="badge">' + ne + '</span>' : '') + '</a>').join('') + '</div>').join('') +
+    '</div>';
 }
 
 // ---------------------------------------------------------------- 入力部品
@@ -1438,7 +1651,7 @@ VIEWS.home = () => {
     '<div class="stat"><span>個人エントリー／リレー</span><b>' + d.entries + '／' + d.relays + '</b><span>記録入力済み ' + d.done + ' 件</span></div>' +
     '<div class="stat"><span>競技終了予定</span><b>' + (D.sched.end !== null ? C.fmtClock(D.sched.end) : '—') + '</b><span>競技開始 ' + esc(S.schedule.start) + '・閉会式 ' + esc(S.schedule.closing) + '</span></div>' +
     '</div>' +
-    '<div class="grid g2" style="margin-top:14px">' +
+    '<div class="dash">' +
     '<div class="card"><h2>売上・集客管理</h2><div class="fields">' +
     field('定員（名）', inp('set:dashboard.capacity', S.dashboard.capacity, 'inputmode="numeric"')) +
     field('申込目標（名）', inp('set:dashboard.target', S.dashboard.target, 'inputmode="numeric"')) +
@@ -1451,12 +1664,11 @@ VIEWS.home = () => {
     '<tr><td>目標との売上差</td><td class="num">' + yen(d.salesDiff) + '</td></tr></tbody></table></div>' +
     '<div class="card"><h2>メダル発注シミュレーター</h2><p class="small muted">区分×種目ごとに、申込が1名以上なら金、2名以上なら銀、3名以上なら銅を1つ。リレーは泳者の人数分を数えます。</p>' +
     '<div class="stats"><div class="stat"><span>金メダル</span><b>' + d.medals.gold + '</b></div><div class="stat"><span>銀メダル</span><b>' + d.medals.silver + '</b></div><div class="stat"><span>銅メダル</span><b>' + d.medals.bronze + '</b></div></div></div>' +
-    '</div>' +
-    '<div class="card" style="margin-top:14px"><h2>クラブ別 申込状況・総合得点</h2>' +
+    '<div class="card clubs"><h2>クラブ別 申込状況・総合得点</h2>' +
     (d.otherClubs.length ? '<div class="notice warn"><span class="grow">クラブリストにないチーム名があります: ' + esc(d.otherClubs.join('、')) + '（集計されません）</span><button class="btn sm" data-act="fix" data-f="clubs">クラブリストに追加</button></div>' : '') +
-    '<div class="tablewrap"><table class="t"><thead><tr><th>クラブ名</th><th class="num">目標</th><th class="num">実績</th><th class="num">差</th><th class="num">割合</th><th class="num">総合得点</th><th class="num">チーム順位</th></tr></thead><tbody>' +
+    '<div class="tablewrap fill" data-fill-id="club"><table class="t"><thead><tr><th>クラブ名</th><th class="num">目標</th><th class="num">実績</th><th class="num">差</th><th class="num">割合</th><th class="num">総合得点</th><th class="num">チーム順位</th></tr></thead><tbody>' +
     d.clubs.map((c, i) => '<tr><td>' + esc(c.name) + '</td><td class="num">' + inp('clubt:' + c.name, (S.clubs.find(x => x.name === c.name) || {}).target,'style="width:70px;text-align:right" inputmode="numeric"') + '</td><td class="num">' + c.actual + '</td><td class="num">' + (c.diff === null ? '' : (c.diff > 0 ? '+' : '') + c.diff) + '</td><td class="num">' + (c.share === null ? '' : (c.share * 100).toFixed(1) + '%') + '</td><td class="num"><b>' + c.score + '</b></td><td class="num">' + c.rank + '</td></tr>').join('') +
-    '</tbody></table></div></div>';
+    '</tbody></table></div></div></div>';
 };
 const field = (label, control, cls) => '<label class="field ' + (cls || '') + '"><span>' + esc(label) + '</span>' + control + '</label>';
 const yen = n => (Math.round(n) || 0).toLocaleString('ja-JP') + ' 円';
@@ -1467,8 +1679,12 @@ VIEWS.settings = () => {
   const events = S.events, cats = S.categories;
   const lanes = S.lanes.slice(); while (lanes.length < 5) lanes.push('');
   const comb = (S.combined || []).slice(); while (comb.length < Math.max(3, (S.combined || []).length + 1)) comb.push({ name: '', pairs: [{}, {}, {}] });
-  return '<h1 class="view">大会設定</h1><p class="lead">ここで決めた種目・区分・クラブがエントリーの選択肢になります。名前を変えるときは「名前の一括変更」を使うと、入力済みのエントリーやスケジュールもまとめて書き換わります。</p>' +
-    (isLocked() ? '<div class="notice warn">当日モード中のため、設定は変更できません。</div>' : '') +
+  const T = ui.setTab || 'basic';
+  const top = '<div class="vhead"><div><h1 class="view">大会設定</h1><p class="lead">ここで決めた種目・区分・クラブがエントリーの選択肢になります。名前を変えるときは「名前の一括変更」を使うと、入力済みのエントリーやスケジュールもまとめて書き換わります。</p></div>' +
+    seg('setTab', [['basic', '基本・レーン'], ['lists', '種目・区分・クラブ'], ['comb', '合同レース'], ['time', '時間・得点']], T, '') + '</div>' +
+    (isLocked() ? '<div class="notice warn">当日モード中のため、設定は変更できません。</div>' : '');
+  const parts = {};
+  parts.basic =
     '<div class="grid g2">' +
     '<div class="card"><h2>大会の基本</h2><div class="fields" style="grid-template-columns:1fr">' +
     field('大会名', inp('set:meetName', S.meetName, L)) + '</div><div class="fields" style="margin-top:10px">' +
@@ -1485,23 +1701,26 @@ VIEWS.settings = () => {
     field('個人 1組最低人数', inp('set:minPerHeatInd', S.minPerHeatInd, 'inputmode="numeric" ' + L)) +
     field('リレー 1組最低チーム数', inp('set:minPerHeatRelay', S.minPerHeatRelay, 'inputmode="numeric" ' + L)) +
     '</div></div>' +
-    '</div>' +
-    '<div class="grid g3" style="margin-top:14px">' +
+    '</div>';
+  parts.lists =
+    '<div class="grid g3">' +
     listCard('events', '種目リスト', events, '例: 男子 25M 自由形。リレーは名前に「リレー」を含めます') +
     listCard('categories', '区分リスト（年齢区分）', cats, '上から順に組が編成されます') +
     listCard('clubs', 'クラブリスト', S.clubs.map(c => c.name), 'エントリーのチーム名の選択肢になります') +
     '</div>' +
-    '<div class="card" style="margin-top:14px"><h2>名前の一括変更</h2><p class="small muted">種目・区分・クラブの名前を変えると、エントリー・リレー・スケジュール・合同レースの入力もまとめて書き換えます。</p>' +
+    '<div class="card" style="margin-top:12px"><h2>名前の一括変更</h2><p class="small muted">種目・区分・クラブの名前を変えると、エントリー・リレー・スケジュール・合同レースの入力もまとめて書き換えます。</p>' +
     '<div class="bar">' + sel('ui:renKind', ui.renKind || 'events', [['events', '種目'], ['categories', '区分'], ['clubs', 'クラブ']], L) +
     sel('ui:renFrom', ui.renFrom || '', blankOpt('変更前の名前').concat(renameCandidates(ui.renKind || 'events')), L) +
-    '<span>→</span>' + inp('ui:renTo', ui.renTo || '', 'placeholder="新しい名前" ' + L) + '<button class="btn primary" data-act="rename" ' + L + '>変更する</button></div></div>' +
-    '<div class="card" style="margin-top:14px"><h2>合同レース</h2><p class="small muted">人数の少ない区分どうしを1つのレースにまとめます。順位は区分ごとに付きます。プログラム表示名を進行スケジュールに入れてください。</p>' +
+    '<span>→</span>' + inp('ui:renTo', ui.renTo || '', 'placeholder="新しい名前" ' + L) + '<button class="btn primary" data-act="rename" ' + L + '>変更する</button></div></div>';
+  parts.comb =
+    '<div class="card"><h2>合同レース</h2><p class="small muted">人数の少ない区分どうしを1つのレースにまとめます。順位は区分ごとに付きます。プログラム表示名を進行スケジュールに入れてください。</p>' +
     '<div class="tablewrap"><table class="t"><thead><tr><th>プログラム表示名</th><th>種目1</th><th>区分1</th><th>種目2</th><th>区分2</th><th>種目3</th><th>区分3</th><th></th></tr></thead><tbody>' +
     comb.map((r, i) => '<tr><td>' + inp('comb:' + i + ':name', r.name, 'placeholder="例: 合同 25M 自由形" ' + L) + '</td>' +
       [0, 1, 2].map(p => { const pr = (r.pairs || [])[p] || {}; return '<td>' + sel('comb:' + i + ':' + p + ':event', pr.event || '', blankOpt().concat(events.filter(Boolean)), L) + '</td><td>' + sel('comb:' + i + ':' + p + ':cat', pr.cat || '', blankOpt().concat(cats.filter(Boolean)), L) + '</td>'; }).join('') +
       '<td>' + (r.name || (r.pairs || []).some(p => p && (p.event || p.cat)) ? '<button class="x" data-act="delcomb" data-i="' + i + '" title="この行を削除" ' + L + '>×</button>' : '') + '</td></tr>').join('') +
-    '</tbody></table></div></div>' +
-    '<div class="grid g2" style="margin-top:14px">' +
+    '</tbody></table></div></div>';
+  parts.time =
+    '<div class="grid g2">' +
     '<div class="card"><h2>進行スケジュールの時間</h2><div class="fields">' +
     field('スケジュール表の題名', inp('set:schedule.title', sc.title, L)) +
     field('入館開始', inp('set:schedule.doorOpen', sc.doorOpen, L)) + field('W-up', inp('set:schedule.warmup', sc.warmup, L)) +
@@ -1518,10 +1737,11 @@ VIEWS.settings = () => {
     field('完泳点', inp('set:points.indFinish', S.points.indFinish, 'inputmode="numeric" ' + L)) +
     field('リレー倍率', sel('set:points.relayMult', String(S.points.relayMult), [['2', '2倍'], ['1', '1倍']], L)) +
     '</div></div></div>';
+  return top + (parts[T] || parts.basic);
 };
 function listCard(kind, title, arr, hint) {
   return '<div class="card"><h2>' + title + '（' + arr.filter(x => C.str(x)).length + '）</h2><p class="small muted">' + esc(hint) + '。1行に1つ。</p>' +
-    '<textarea rows="12" data-k="list:' + kind + '" ' + lockAttr() + '>' + esc(arr.join('\n')) + '</textarea></div>';
+    '<textarea rows="' + Math.min(11, Math.max(6, arr.length + 1)) + '" data-k="list:' + kind + '" ' + lockAttr() + '>' + esc(arr.join('\n')) + '</textarea></div>';
 }
 function renameCandidates(kind) {
   const S = state.settings;
@@ -1558,9 +1778,9 @@ VIEWS.entries = () => {
     sel('ui:entCat', ui.entCat || '', blankOpt('すべての区分').concat(cats), 'style="max-width:150px"') +
     sel('ui:entEvent', ui.entEvent || '', blankOpt('すべての種目').concat(evs), 'style="max-width:200px"') +
     '<label class="small"><input type="checkbox" data-k="ui:entOnlyIssue" ' + (ui.entOnlyIssue ? 'checked' : '') + '> 要確認の行だけ（' + nIssue + '）</label>' +
-    '<span class="grow"></span><span class="muted small">' + rows.length + ' / ' + D.ind.length + ' 件</span>' +
+    '<span class="grow"></span>' + pager(pages) + '<span class="muted small">' + rows.length + ' / ' + D.ind.length + ' 件</span>' +
     '<button class="btn" data-act="pasteEntries" ' + L + '>Excelから貼り付け</button><button class="btn primary" data-act="addEntry" ' + L + '>＋ 1行追加</button></div>' +
-    (D.ind.length ? '<div class="tablewrap"><table class="t"><thead><tr><th class="num">No</th><th>氏名</th><th>チーム</th><th>区分</th><th>種目</th><th>エントリー</th><th>公式タイム</th><th>判定</th><th class="c">組</th><th class="c">レーン</th><th class="num">順位</th><th class="num">得点</th><th>状態</th><th></th></tr></thead><tbody>' +
+    (D.ind.length ? '<div class="tablewrap fill" data-fill-id="ent"><table class="t"><thead><tr><th class="num">No</th><th>氏名</th><th>チーム</th><th>区分</th><th>種目</th><th>エントリー</th><th>公式タイム</th><th>判定</th><th class="c">組</th><th class="c">レーン</th><th class="num">順位</th><th class="num">得点</th><th>状態</th><th></th></tr></thead><tbody>' +
       show.map(it => {
         const e = it.e, iss = D.issuesById.get(it.id) || [];
         const cls = iss.some(x => x.level === 'error') ? 'err' : iss.some(x => x.level === 'warn') ? 'warn' : '';
@@ -1576,7 +1796,7 @@ VIEWS.entries = () => {
           '<td class="c">' + (it.heat || '') + '</td><td class="c">' + (it.lane ? '<span class="lane">' + it.lane + '</span>' : '') + '</td>' +
           '<td class="num">' + (it.rank || '') + '</td><td class="num">' + (it.points === null ? '' : it.points) + '</td><td>' + pillStatus(it.status) + '</td>' +
           '<td><button class="x" data-act="delEntry" data-id="' + e.id + '" title="この行を削除" aria-label="削除" ' + L + '>×</button></td></tr>';
-      }).join('') + '</tbody></table></div>' + pager(pages) :
+      }).join('') + '</tbody></table></div>' :
       '<div class="card empty">まだエントリーがありません。「＋ 1行追加」か「Excelから貼り付け」で入力するか、データ管理からExcelファイルを読み込んでください。</div>');
 };
 function pager(pages) {
@@ -1595,7 +1815,7 @@ VIEWS.relays = () => {
   return '<h1 class="view">リレーエントリー</h1><p class="lead">同じチームから複数出るときは記号（A・B…）で区別します。泳者の重複や、同じ種目で別チームに入っている泳者は自動で警告します。</p>' +
     '<div class="bar"><input data-k="ui:relQ" value="' + esc(ui.relQ || '') + '" placeholder="チーム・泳者で検索" style="max-width:240px"><span class="grow"></span><span class="muted small">' + rows.length + ' チーム</span>' +
     '<button class="btn primary" data-act="addRelay" ' + L + '>＋ 1チーム追加</button></div>' +
-    (rows.length ? '<div class="tablewrap"><table class="t"><thead><tr><th class="num">No</th><th>チーム</th><th>記号</th><th>区分</th><th>種目</th><th>第1泳者</th><th>第2泳者</th><th>第3泳者</th><th>第4泳者</th><th>エントリー</th><th>公式タイム</th><th>判定</th><th class="c">組</th><th class="c">レーン</th><th class="num">順位</th><th class="num">得点</th><th></th></tr></thead><tbody>' +
+    (rows.length ? '<div class="tablewrap fill" data-fill-id="rel"><table class="t"><thead><tr><th class="num">No</th><th>チーム</th><th>記号</th><th>区分</th><th>種目</th><th>第1泳者</th><th>第2泳者</th><th>第3泳者</th><th>第4泳者</th><th>エントリー</th><th>公式タイム</th><th>判定</th><th class="c">組</th><th class="c">レーン</th><th class="num">順位</th><th class="num">得点</th><th></th></tr></thead><tbody>' +
       rows.map(it => {
         const r = it.r, iss = D.issuesById.get(it.id) || [], k = 'rel:' + r.id + ':';
         const cls = iss.some(x => x.level === 'error') ? 'err' : iss.some(x => x.level === 'warn') ? 'warn' : '';
@@ -1623,7 +1843,7 @@ VIEWS.schedule = () => {
       .map(([a, b]) => '<div class="field"><span>' + a + '</span><b class="num">' + esc(b) + '</b></div>').join('') + '</div></div>' +
     (missing.length ? '<div class="notice err"><span class="grow">エントリーがあるのにスケジュールにない種目: <b>' + esc(missing.join('、')) + '</b></span><button class="btn sm" data-act="fix" data-f="sched" ' + L + '>末尾に追加する</button></div>' : '') +
     '<div class="bar"><button class="btn" data-act="addSched" data-n="" ' + L + '>＋ 行を追加</button><button class="btn" data-act="addSched" data-n="休憩" ' + L + '>＋ 休憩を追加</button><span class="grow"></span><button class="btn" data-act="printSched">スケジュールを印刷</button></div>' +
-    '<div class="tablewrap"><table class="t"><thead><tr><th class="num">競技No</th><th>種目名</th><th class="num">参加数</th><th class="num">組数</th><th class="num">所要時間</th><th class="num">開始時刻</th><th class="num">終了時刻</th><th class="num">調整(分)</th><th></th></tr></thead><tbody>' +
+    '<div class="tablewrap fill" data-fill-id="sch"><table class="t"><thead><tr><th class="num">競技No</th><th>種目名</th><th class="num">参加数</th><th class="num">組数</th><th class="num">所要時間</th><th class="num">開始時刻</th><th class="num">終了時刻</th><th class="num">調整(分)</th><th></th></tr></thead><tbody>' +
     D.sched.rows.map((o, i) => {
       const r = o.row, k = 'sch:' + r.id + ':';
       const dupe = state.schedule.filter(x => C.str(x.name) === o.name && o.name && o.name !== '休憩').length > 1;
@@ -1670,7 +1890,7 @@ VIEWS.program = () => {
       '<div class="field"><span>参加数</span><b>' + p.items.length + (p.relay ? ' チーム' : ' 名') + '</b></div>' +
       '<div class="field"><span>組数</span><b>' + p.heats.length + '</b></div>' +
       '<div class="field"><span>記録入力</span><b>' + p.done + ' / ' + p.items.length + '</b></div></div></div>' +
-      (p.items.length ? p.heats.map(h => {
+      (p.items.length ? '<div class="heats fill" data-fill-id="prog">' + p.heats.map(h => {
         const byLane = new Map(h.items.map(it => [it.lane, it]));
         const noLane = h.items.filter(it => !it.lane);
         return '<div class="tablewrap" style="margin-bottom:10px"><table class="t"><thead><tr><th colspan="9" style="font-size:13px;color:var(--ink)">第 ' + h.heat + ' 組</th></tr><tr><th class="c">レーン</th><th>' + (p.relay ? 'チーム' : '氏名') + '</th><th>' + (p.relay ? '出場メンバー' : 'チーム') + '</th><th>区分</th><th>エントリー</th><th>公式タイム</th><th>判定</th><th class="num">順位</th><th>状態</th></tr></thead><tbody>' +
@@ -1682,7 +1902,7 @@ VIEWS.program = () => {
               '<td class="num muted">' + (it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '') + '</td><td>' + timeCell(pre + 'officialTime', src.officialTime, '', 'data-col="prog"') + '</td>' +
               '<td>' + sel(pre + 'judge', src.judge, [['', '—'], ['棄権', '棄権'], ['失格', '失格']]) + '</td><td class="num"><b>' + (it.rank ? it.rank + '位' : '') + '</b></td><td>' + pillStatus(it.status) + '</td></tr>';
           }).join('') + '</tbody></table></div>';
-      }).join('') : '<div class="card empty">この種目のエントリーはありません。</div>'));
+      }).join('') + '</div>' : '<div class="card empty">この種目のエントリーはありません。</div>'));
 };
 
 /* ---------------------------------------------------------------- 画面: 速報 */
@@ -1696,7 +1916,7 @@ VIEWS.flash = () => {
   return '<h1 class="view">速報</h1><p class="lead">年齢区分ごとに「順位 → 失格 → 棄権 → 未入力」の順に並びます。記録入力に合わせて自動で更新されます。</p>' +
     '<div class="bar">' + sel('ui:flash', ui.flash, opts) + '<span class="grow"></span><label class="small"><input type="checkbox" data-k="ui:big" ' + (ui.big ? 'checked' : '') + '> 大きな文字で表示</label><button class="btn" data-act="printFlash">速報を印刷</button></div>' +
     '<div class="' + (ui.big ? 'big' : '') + '"><div class="card" style="margin-bottom:10px"><b style="font-size:' + (ui.big ? 26 : 17) + 'px">' + esc(ui.flash || '') + '</b>' + (sch ? '<span class="muted">　競技No.' + sch.no + '　開始予定 ' + C.fmtClock(sch.start) + '</span>' : '') + '<span class="muted">　対象 ' + list.length + (relay ? 'チーム' : '名') + '</span></div>' +
-    (list.length ? '<div class="tablewrap"><table class="t"><thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ名') + '</th><th>年齢区分</th><th class="num">公式タイム</th></tr></thead><tbody>' +
+    (list.length ? '<div class="tablewrap fill" data-fill-id="flash"><table class="t"><thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ名') + '</th><th>年齢区分</th><th class="num">公式タイム</th></tr></thead><tbody>' +
       list.map(x => { const g = x.it.cat !== prevCat; prevCat = x.it.cat; return (g ? '<tr class="grp"><td colspan="5">' + esc(x.it.cat) + '</td></tr>' : '') + '<tr><td class="c"><b>' + esc(x.rank) + '</b></td><td>' + esc(x.name) + '</td><td>' + esc(x.club) + '</td><td>' + esc(x.cat) + '</td><td class="num">' + esc(x.time) + '</td></tr>'; }).join('') +
       '</tbody></table></div>' : '<div class="card empty">この種目のエントリーはありません。</div>') + '</div>';
 };
@@ -1716,7 +1936,7 @@ VIEWS.ranking = () => {
   }).join('');
   return '<h1 class="view">公式ランキング</h1><p class="lead">種目・区分ごとの公式順位です。同タイムは同順位になります。</p>' +
     '<div class="bar">' + sel('ui:rankEv', ui.rankEv, evs) + sel('ui:rankCat', ui.rankCat || '', blankOpt('記録のある全区分').concat(S.categories.filter(Boolean))) + '<span class="grow"></span><button class="btn" data-act="printRank">ランキングを印刷</button></div>' +
-    (body || '<div class="card empty">この種目のエントリーはありません。</div>');
+    (body ? '<div class="heats fill" data-fill-id="rank">' + body + '</div>' : '<div class="card empty">この種目のエントリーはありません。</div>');
 };
 
 /* ---------------------------------------------------------------- 記録証・賞状 */
@@ -1770,14 +1990,14 @@ VIEWS.certs = () => {
   const list = certList();
   const f = ui.certFilter || {};
   const from = Math.max(1, parseInt(ui.certFrom, 10) || 1), to = Math.min(list.length, parseInt(ui.certTo, 10) || list.length);
-  const P = PAPER[ui.certPaper];
-  const pv = 0.42;
+  ui.certPaper = 'A4';
+  const P = PAPER.A4;
+  const pv = 0.34;
   const clubs = relay ? S.clubs.map(c => c.name) : S.clubs.map(c => c.name);
   return '<h1 class="view">記録証・賞状</h1><p class="lead">対象者を絞り込んでまとめて印刷します。記録が未入力の人は「　分　秒」の手書き用になります。用紙の印刷位置がずれる場合は、下の「位置の調整」で直せます。最初は1枚だけテスト印刷すると安心です。</p>' +
-    '<div class="card" style="margin-bottom:12px"><div class="fields">' +
-    field('種類', sel('ui:certKind', ui.certKind, [['record', '記録証（全員）'], ['prize', '賞状（' + (S.prizeMaxRank || 10) + '位以内の完泳者）']])) +
-    field('対象', sel('ui:certTarget', ui.certTarget, [['ind', '個人'], ['rel', 'リレー']])) +
-    field('用紙', sel('ui:certPaper', ui.certPaper, [['A4', 'A4 縦'], ['B5', 'B5 横']])) +
+    '<div class="card" style="margin-bottom:12px"><div class="bar">' +
+    seg('certKind', [['record', '記録証（全員）'], ['prize', '賞状（' + (S.prizeMaxRank || 10) + '位以内）']], ui.certKind) +
+    seg('certTarget', [['ind', '個人'], ['rel', 'リレー']], ui.certTarget) + '<span class="pill info">用紙 A4 縦・1人1枚</span></div><div class="fields">' +
     field('種目', sel('cf:event', f.event || '', blankOpt('すべて').concat(programOptions().filter(n => C.isRelayName(n) === relay)))) +
     field('区分', sel('cf:cat', f.cat || '', blankOpt('すべて').concat(S.categories.filter(Boolean)))) +
     field(relay ? 'チーム' : 'クラブ', sel('cf:club', f.club || '', blankOpt('すべて').concat(clubs.filter(Boolean)))) +
@@ -1785,9 +2005,9 @@ VIEWS.certs = () => {
     '</div><div class="bar" style="margin-top:12px"><b>対象 ' + list.length + ' 枚</b><span class="muted">印刷する範囲</span>' +
     '<input data-k="ui:certFrom" value="' + from + '" style="width:64px" inputmode="numeric"> 〜 <input data-k="ui:certTo" value="' + (list.length ? to : '') + '" style="width:64px" inputmode="numeric"> 枚目<span class="grow"></span>' +
     '<button class="btn" data-act="printCert" data-test="1" ' + (list.length ? '' : 'disabled') + '>1枚だけテスト印刷</button><button class="btn primary" data-act="printCert" ' + (list.length ? '' : 'disabled') + '>印刷する（' + (list.length ? to - from + 1 : 0) + '枚）</button></div></div>' +
-    '<div class="grid g2"><div class="card"><h2>プレビュー（1枚目）</h2>' +
+    '<div class="grid g2" style="align-items:start"><div class="card fill" data-fill-id="cprev"><h2>プレビュー（1枚目）</h2>' +
     (list.length ? '<div class="certprev" style="width:' + (P.w * pv) + 'mm;height:' + (P.h * pv) + 'mm">' + certHTML(list[from - 1] || list[0], relay, prize, ui.certPaper, pv) + '</div>' : '<div class="empty">対象者がいません。絞り込み条件を確認してください。</div>') +
-    '</div><div class="card"><h2>' + (prize ? '賞状' : '記録証') + 'の文言</h2><div class="fields" style="grid-template-columns:1fr">' +
+    '</div><div class="card fill" data-fill-id="cword"><h2>' + (prize ? '賞状' : '記録証') + 'の文言</h2><div class="fields" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))">' +
     field('タイトル', inp('set:' + wk + '.title', W.title)) +
     W.lines.map((t, i) => field('文言' + '①②③④'[i], inp('set:' + wk + '.lines.' + i, t))).join('') +
     field('日付', '<input type="date" data-k="set:' + wk + '.date" value="' + esc(/^\d{4}-\d{2}-\d{2}$/.test(W.date) ? W.date : '') + '">') +
@@ -1809,20 +2029,20 @@ VIEWS.awards = () => {
   const nE = m.ev.length;
   const statusCls = kind => kind === 'ok' ? 'st-ok' : kind === 'up' ? 'st-up' : kind === 'off' ? 'st-off' : 'st-none';
   const rate = r => r === null || r === undefined ? '' : (r * 100).toFixed(2) + '%';
-  return '<h1 class="view">最優秀・優秀選手</h1><p class="lead">基準タイムに対する達成率（基準÷記録）で選びます。最優秀選手は男女各1名。優秀選手は区分×男女ごとに1位を選び、最優秀選手と重なったら2位を繰り上げます。入力は自動で再計算されます。</p>' +
-    '<div class="bar"><button class="btn primary" data-act="awImport">大会結果（1〜3位）から取り込む</button><button class="btn" data-act="awCopyMaster">区分・種目を大会設定からコピー</button><span class="grow"></span><button class="btn" data-act="printAwards">表彰ボードを印刷</button><button class="btn danger" data-act="awClear">入力をクリア</button></div>' +
-    (R.warnings.length ? '<div class="notice warn"><div class="grow"><b>確認してください</b><ul style="margin:4px 0 0;padding-left:18px">' + R.warnings.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul></div></div>' :
+  const AT = ui.awTab || 'board';
+  const parts = {};
+  parts.board = (R.warnings.length ? '<div class="notice warn"><div class="grow"><b>確認してください</b><ul style="margin:4px 0 0;padding-left:18px">' + R.warnings.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul></div></div>' :
       (R.sum.entered ? '<div class="notice ok">入力ミスの可能性がある記録はありません。</div>' : '')) +
     '<div class="mvp">' + R.mvp.map(o => '<div class="card ' + (o.kind === 'ok' ? 'ok' : '') + '"><span class="muted small">★ 最優秀選手（' + o.sexName + '）</span><div class="who">' + esc(o.name || '—') + '</div>' +
       (o.kind === 'ok' ? '<div>' + esc(o.catName) + '・' + esc(o.club) + '・' + esc(o.event) + '　<b>' + rate(o.rate) + '</b></div>' : '') +
       '<div class="small ' + statusCls(o.kind) + '">' + esc(o.status) + '</div></div>').join('') + '</div>' +
-    '<div class="card" style="margin-top:12px"><h2>優秀選手（区分×男女）</h2><div class="tablewrap"><table class="t"><thead><tr><th>区分枠</th><th>年齢区分</th><th>性別</th><th>クラブ</th><th>選手名</th><th>種目</th><th class="num">達成率</th><th>選出内訳</th></tr></thead><tbody>' +
+    '<div class="card" style="margin-top:12px"><h2>優秀選手（区分×男女）</h2><div class="tablewrap fill" data-fill-id="awexc"><table class="t"><thead><tr><th>区分枠</th><th>年齢区分</th><th>性別</th><th>クラブ</th><th>選手名</th><th>種目</th><th class="num">達成率</th><th>選出内訳</th></tr></thead><tbody>' +
     R.exc.map(o => '<tr class="' + (o.kind === 'off' ? 'off' : '') + '"><td>' + o.slot + '</td><td><b>' + esc(o.catName) + '</b></td><td>' + o.sexName + '</td><td>' + esc(o.club || '') + '</td><td><b>' + esc(o.name || '') + '</b></td><td>' + esc(o.event || '') + '</td><td class="num">' + rate(o.rate) + '</td><td class="' + statusCls(o.kind) + '">' + esc(o.status) + '</td></tr>').join('') +
-    '</tbody></table></div><p class="small muted">入力進捗: 有効入力枠 ' + R.progress.slots + ' 枠（全8区分枠: ' + R.progress.all + '枠）／入力済み ' + R.progress.entered + ' 名／' + R.progress.pct.toFixed(1) + '% 完了</p></div>' +
-    '<details class="card" style="margin-top:12px"><summary>各年齢区分の上位候補リスト（1位・2位）</summary><div class="tablewrap" style="margin-top:8px"><table class="t"><thead><tr><th>区分・順位</th><th>年齢区分</th><th>性別</th><th>クラブ</th><th>選手名</th><th>種目</th><th class="num">達成率</th><th class="num">記録</th></tr></thead><tbody>' +
+    '</tbody></table></div><p class="small muted">入力進捗: 有効入力枠 ' + R.progress.slots + ' 枠（全8区分枠: ' + R.progress.all + '枠）／入力済み ' + R.progress.entered + ' 名／' + R.progress.pct.toFixed(1) + '% 完了</p></div>';
+  parts.cand = '<div class="card"><h2>各年齢区分の上位候補リスト（1位・2位）</h2><div class="tablewrap fill" data-fill-id="awcand"><table class="t"><thead><tr><th>区分・順位</th><th>年齢区分</th><th>性別</th><th>クラブ</th><th>選手名</th><th>種目</th><th class="num">達成率</th><th class="num">記録</th></tr></thead><tbody>' +
     R.cand.map(o => '<tr class="' + (o.on ? '' : 'off') + '"><td>' + o.slot + '</td><td>' + esc(o.catName) + '</td><td>' + o.sexName + '</td><td>' + esc(o.club || '') + '</td><td>' + esc(o.name || '') + '</td><td>' + esc(o.event || '') + '</td><td class="num">' + rate(o.rate) + '</td><td class="num">' + (o.time ? C.fmtTime(o.time) : '') + '</td></tr>').join('') +
-    '</tbody></table></div></details>' +
-    '<details class="card" style="margin-top:12px" ' + (ui.awMasterOpen ? 'open' : '') + ' data-det="awMasterOpen"><summary>マスタ設定（選出範囲・年齢区分・種目と基準タイム）</summary>' +
+    '</tbody></table></div></div>';
+  parts.master = '<div class="card fill" data-fill-id="awmaster"><h2>マスタ設定</h2>' +
     '<h3>① 最優秀選手の選出範囲</h3><div class="fields">' +
     field('対象区分（開始No）', sel('awm:cStart', String(A.cStart), ['1', '2', '3', '4', '5', '6', '7', '8'])) +
     field('対象区分（終了No）', sel('awm:cEnd', String(A.cEnd), ['1', '2', '3', '4', '5', '6', '7', '8'])) +
@@ -1833,11 +2053,11 @@ VIEWS.awards = () => {
     A.cats.map((c, i) => '<tr><td>' + (i + 1) + '</td><td>' + inp('awc:' + i + ':name', c.name, 'placeholder="未使用"') + '</td><td>' + sel('awc:' + i + ':mvp', C.isMark(c.mvp) ? '○' : '対象外', ['○', '対象外']) + '</td><td>' + sel('awc:' + i + ':exc', C.isMark(c.exc) ? '○' : '対象外', ['○', '対象外']) + '</td><td class="small">' + (m.cat[i].on ? '<span class="pill ok">有効</span>' : '<span class="pill mute">未使用</span>') + '</td></tr>').join('') +
     '</tbody></table></div><h3>③ 種目・基準タイム（最大15種目）</h3><div class="tablewrap"><table class="t"><thead><tr><th>No</th><th>種目名</th><th>男子基準タイム</th><th>女子基準タイム</th><th>最優秀対象</th></tr></thead><tbody>' +
     A.events.map((e, i) => '<tr><td>' + (i + 1) + '</td><td>' + inp('awe:' + e.id + ':name', e.name, 'placeholder="未使用"') + '</td><td>' + timeCell('awe:' + e.id + ':baseM', e.baseM, e.name && C.parseTime(e.baseM).kind !== 'time' ? 'bad' : '') + '</td><td>' + timeCell('awe:' + e.id + ':baseF', e.baseF, e.name && C.parseTime(e.baseF).kind !== 'time' ? 'bad' : '') + '</td><td>' + sel('awe:' + e.id + ':mvp', C.isMark(e.mvp) ? '○' : '対象外', ['○', '対象外']) + '</td></tr>').join('') +
-    '</tbody></table></div></details>' +
-    '<div class="card" style="margin-top:12px"><h2>記録入力表</h2><p class="small muted">区分ごとに、男女×種目の1〜3位のクラブ・選手名・タイムを入れます。タイムは 28.78 / 132.22 / 1:32.22 のどれでも可。オレンジは達成率が極端（打ち間違いの可能性）です。</p>' +
-    '<div class="bar">' + catsShown.map(c => '<button class="btn sm ' + (c.k === k ? 'primary' : '') + '" data-act="awCat" data-k2="' + c.k + '">' + esc(c.name) + '</button>').join('') +
+    '</tbody></table></div></div>';
+  parts.input = '<div class="card"><h2>記録入力表</h2><p class="small muted">区分ごとに、男女×種目の1〜3位のクラブ・選手名・タイムを入れます。タイムは 28.78 / 132.22 / 1:32.22 のどれでも可。オレンジは達成率が極端（打ち間違いの可能性）です。</p>' +
+    '<div class="bar">' + seg('awCat', catsShown.map(c => [c.k, esc(c.name)]), k) +
     '<label class="small"><input type="checkbox" data-k="ui:awShowOff" ' + (ui.awShowOff ? 'checked' : '') + '> 未設定の区分も表示</label></div>' +
-    (nE ? '<div class="tablewrap"><table class="t"><thead><tr><th>No</th><th>性別</th><th>種目</th><th>順位</th><th>クラブ</th><th>選手名</th><th>タイム</th><th class="num">基準</th><th class="num">達成率</th></tr></thead><tbody>' +
+    (nE ? '<div class="tablewrap fill" data-fill-id="awin"><table class="t"><thead><tr><th>No</th><th>性別</th><th>種目</th><th>順位</th><th>クラブ</th><th>選手名</th><th>タイム</th><th class="num">基準</th><th class="num">達成率</th></tr></thead><tbody>' +
       R.rows.filter(r => r.k === k).map((r, j) => {
         const kk = 'awi:' + r.key + ':', inpv = A.inputs[r.key] || {};
         const cls = r.state === 'error' ? 'bad' : r.odd ? 'odd' : '';
@@ -1845,6 +2065,10 @@ VIEWS.awards = () => {
           '<tr class="' + (r.live ? '' : 'off') + '"><td class="muted">' + r.i + '</td><td>' + C.SEX[r.sx] + '</td><td>' + esc(r.ev.name) + '</td><td class="c">' + r.rk + '</td><td>' + inp(kk + 'club', inpv.club) + '</td><td>' + inp(kk + 'name', inpv.name) + '</td><td>' + timeCell(kk + 'time', inpv.time, cls, 'data-col="aw"') + '</td>' +
           '<td class="num muted">' + (r.base > 0 ? C.fmtTime(r.base) : '<span class="pill err">未設定</span>') + '</td><td class="num">' + (r.state === 'nobase' ? '基準未設定' : r.state === 'error' ? '入力エラー' : rate(r.rate)) + '</td></tr>';
       }).join('') + '</tbody></table></div>' : '<div class="empty">種目が1つも設定されていません。マスタ設定③で種目名を入れてください。</div>') + '</div>';
+  return '<div class="vhead"><div><h1 class="view">最優秀・優秀選手</h1><p class="lead">基準タイムに対する達成率（基準÷記録）で選びます。最優秀選手は男女各1名。優秀選手は区分×男女ごとに1位を選び、最優秀選手と重なったら2位を繰り上げます。入力は自動で再計算されます。</p></div>' +
+    seg('awTab', [['board', '表彰ボード'], ['cand', '上位候補'], ['input', '記録入力'], ['master', 'マスタ設定']], AT) + '</div>' +
+    '<div class="bar"><button class="btn primary" data-act="awImport">大会結果（1〜3位）から取り込む</button><button class="btn" data-act="awCopyMaster">区分・種目を大会設定からコピー</button><span class="grow"></span><button class="btn" data-act="printAwards">表彰ボードを印刷（A4）</button><button class="btn danger" data-act="awClear">入力をクリア</button></div>' +
+    (parts[AT] || parts.board);
 };
 
 /* ---------------------------------------------------------------- 入力チェック */
@@ -1865,10 +2089,10 @@ VIEWS.check = () => {
   if (unkCat.length) fixes.push(['cats', '未登録の区分を区分リストに追加（' + unkCat.join('、') + '）']);
   if (missingSched.length) fixes.push(['sched', 'スケジュールにない種目を末尾に追加（' + missingSched.join('、') + '）']);
   return '<h1 class="view">入力チェック</h1><p class="lead">打ち間違い・二重登録・リストにない名前・極端なタイムなどを、入力のたびに自動で点検しています。項目を押すと該当の行へ移動します。</p>' +
-    '<div class="stats" style="margin-bottom:12px"><div class="stat"><span>エラー（結果がずれる）</span><b style="color:var(--err)">' + cnt('error') + '</b></div><div class="stat"><span>注意（確認が必要）</span><b style="color:var(--warn)">' + cnt('warn') + '</b></div><div class="stat"><span>参考</span><b>' + cnt('info') + '</b></div><div class="stat"><span>計算時間</span><b>' + Math.round(D.ms) + ' ms</b></div></div>' +
+    '<div class="stats" style="margin-bottom:10px"><div class="stat"><span>エラー（結果がずれる）</span><b style="color:var(--err)">' + cnt('error') + '</b></div><div class="stat"><span>注意（確認が必要）</span><b style="color:var(--warn)">' + cnt('warn') + '</b></div><div class="stat"><span>参考</span><b>' + cnt('info') + '</b></div><div class="stat"><span>計算時間</span><b>' + Math.round(D.ms) + ' ms</b></div></div>' +
     (fixes.length ? '<div class="card" style="margin-bottom:12px"><h2>ワンクリック修正</h2><p class="small muted">修正後も上部の「↶」で元に戻せます。</p><div class="bar">' + fixes.map(([f, l]) => '<button class="btn" data-act="fix" data-f="' + f + '" ' + (isLocked() && f !== 'time' ? 'disabled' : '') + '>' + esc(l) + '</button>').join('') + '</div></div>' : '') +
-    '<div class="bar">' + [['', 'すべて'], ['error', 'エラー'], ['warn', '注意'], ['info', '参考']].map(([v, l]) => '<button class="btn sm ' + (lv === v ? 'primary' : '') + '" data-act="chkLevel" data-v="' + v + '">' + l + '</button>').join('') + '</div>' +
-    (shown.length ? '<div class="card" style="padding:4px 8px">' + shown.slice(0, 500).map((c, i) => '<div class="issue"><span class="pill ' + (c.level === 'error' ? 'err' : c.level === 'warn' ? 'warn' : 'info') + '">' + (c.level === 'error' ? 'エラー' : c.level === 'warn' ? '注意' : '参考') + '</span><span class="pill mute">' + esc(c.area) + '</span>' +
+    '<div class="bar">' + seg('chkLevel', [['', 'すべて（' + ch.length + '）'], ['error', 'エラー（' + cnt('error') + '）'], ['warn', '注意（' + cnt('warn') + '）'], ['info', '参考（' + cnt('info') + '）']], lv) + '</div>' +
+    (shown.length ? '<div class="card fill" data-fill-id="chk" style="padding:4px 10px">' + shown.slice(0, 500).map((c, i) => '<div class="issue"><span class="pill ' + (c.level === 'error' ? 'err' : c.level === 'warn' ? 'warn' : 'info') + '">' + (c.level === 'error' ? 'エラー' : c.level === 'warn' ? '注意' : '参考') + '</span><span class="pill mute">' + esc(c.area) + '</span>' +
       (c.ref ? '<button class="link" data-act="jump" data-i="' + ch.indexOf(c) + '">' + esc(c.msg) + '</button>' : '<span>' + esc(c.msg) + '</span>') + '</div>').join('') +
       (shown.length > 500 ? '<div class="issue muted">ほか ' + (shown.length - 500) + ' 件</div>' : '') + '</div>' : '<div class="card empty">問題は見つかりませんでした。</div>');
 };
@@ -1912,19 +2136,20 @@ function setPath(obj, path, val) {
 }
 function getPath(obj, path) { return path.split('.').reduce((o, k) => (o === undefined || o === null) ? undefined : o[k], obj); }
 const ENT_LOCK_OK = ['officialTime', 'judge'];
+function setUI(f, val) {
+  if (f === 'awCat') val = +val;
+  ui[f] = val;
+  if (f.indexOf('ent') === 0 && f !== 'entPage') ui.entPage = 0;
+  if (f === 'certKind' || f === 'certTarget') { ui.certFilter = {}; ui.certFrom = 1; ui.certTo = ''; }
+  if (f === 'renKind') ui.renFrom = '';
+  save(); render();
+}
 function handleValue(el) {
   const k = el.dataset.k;
   if (!k) return;
   const val = el.type === 'checkbox' ? el.checked : el.value;
   const [kind, ...rest] = k.split(':');
-  if (kind === 'ui') {
-    const f = rest[0];
-    ui[f] = val;
-    if (f.indexOf('ent') === 0 && f !== 'entPage') ui.entPage = 0;
-    if (f === 'certKind' || f === 'certTarget') { ui.certFilter = {}; ui.certFrom = 1; ui.certTo = ''; }
-    if (f === 'renKind') ui.renFrom = '';
-    save(); render(); return;
-  }
+  if (kind === 'ui') { setUI(rest[0], val); return; }
   if (kind === 'cf') { ui.certFilter = Object.assign({}, ui.certFilter, { [rest[0]]: val }); ui.certFrom = 1; ui.certTo = ''; render(); return; }
   if (kind === 'set') {
     const path = rest.join(':');
@@ -2029,8 +2254,17 @@ function changeList(kind, text, el) {
 
 /* ---------------------------------------------------------------- ボタン */
 const ACTIONS = {
-  go: t => { location.hash = t.dataset.v; },
+  go: t => { navOpen = false; applyNavLayout(); if (location.hash === '#' + t.dataset.v) render(); else location.hash = t.dataset.v; },
   undo, redo,
+  toggleNav: () => {
+    if (navPinnedNow()) { navPref.pinned = false; saveNavPref(); navOpen = false; }
+    else navOpen = !navOpen;
+    render();
+  },
+  closeNav: () => { if (navPinnedNow()) { navPref.pinned = false; saveNavPref(); } navOpen = false; render(); },
+  navSide: t => { navPref.side = t.dataset.v; saveNavPref(); render(); },
+  navPin: () => { navPref.pinned = !navPref.pinned; saveNavPref(); navOpen = !navPref.pinned; render(); },
+  setui: t => setUI(t.dataset.key, t.dataset.v),
   lock: () => {
     const on = !isLocked();
     undoStack.push({ label: '当日モードの切替', data: serialize() });
@@ -2200,74 +2434,130 @@ function openPaste() {
   });
 }
 
-/* ---------------------------------------------------------------- 印刷 */
+/* ---------------------------------------------------------------- 印刷（すべて A4 縦・1枚に収める） */
 function doPrint(html, pageCss) {
   $('#print-root').innerHTML = html;
   $('#page-style').textContent = '@page { ' + pageCss + ' }';
   setTimeout(() => { try { window.print(); } catch (e) { toast('印刷を開始できませんでした: ' + e.message, 'err'); } }, 60);
 }
 window.addEventListener('afterprint', () => { $('#print-root').innerHTML = ''; });
-const ptHead = (title, sub) => '<div class="ph"><h1>' + esc(title) + '</h1>' + (sub ? '<p>' + sub + '</p>' : '') + '</div>';
+const pnow = () => { const d = new Date(); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
+// 1ページ分の枠: 見出し（大会名・題名・補足）＋本文＋フッター
+function pPage(title, sub, body, label) {
+  return '<section class="pg"><header class="pg-h"><img class="pg-logo" src="' + APP_ICON + '" alt=""><div><div class="pg-meet">' + esc(state.settings.meetName) + '</div>' +
+    '<div class="pg-title">' + esc(title) + '</div>' + (sub ? '<div class="pg-sub">' + sub + '</div>' : '') + '</div></header>' +
+    '<div class="pg-b"><div class="pg-z">' + body + '</div></div>' +
+    '<footer class="pg-f"><span>' + esc(label || title) + '</span><span>印刷 ' + pnow() + '</span></footer></section>';
+}
+const medalCls = r => r === 1 ? 'm1' : r === 2 ? 'm2' : r === 3 ? 'm3' : '';
+const rankNum = s => { const m = String(s || '').match(/^(\d+)/); return m ? +m[1] : 0; };
+// 本文が1ページに入りきらなければ、2段組み → 縮小 の順で必ず1ページに収める
+function fitPages() {
+  const root = $('#print-root');
+  root.classList.add('measure');
+  root.querySelectorAll('.pg').forEach(pg => {
+    const b = pg.querySelector('.pg-b'), z = pg.querySelector('.pg-z');
+    const avail = b.clientHeight;
+    const h = () => z.getBoundingClientRect().height;
+    z.style.zoom = 1;
+    const h1 = h();
+    if (h1 <= avail) return;
+    // 少し縮めれば入るなら1段のまま（読みやすさ優先）。大きくはみ出すときだけ2段組みを試し、文字が大きく残る方を選ぶ
+    if (avail / h1 < 0.75) {
+      const t = z.querySelector('table.split');
+      let undo = null;
+      if (t && t.tBodies[0] && t.tBodies[0].rows.length > 10) {
+        const rows = [...t.tBodies[0].rows], half = Math.ceil(rows.length / 2);
+        const t2 = t.cloneNode(true);
+        rows.slice(half).forEach(r => r.remove());
+        [...t2.tBodies[0].rows].slice(0, half).forEach(r => r.remove());
+        const wrap = document.createElement('div'); wrap.className = 'split2';
+        t.parentNode.insertBefore(wrap, t); wrap.appendChild(t); wrap.appendChild(t2);
+        undo = () => { wrap.parentNode.insertBefore(t, wrap); [...t2.tBodies[0].rows].forEach(r => t.tBodies[0].appendChild(r)); wrap.remove(); };
+      } else if (z.querySelectorAll('.blk').length > 1) { z.classList.add('two'); undo = () => z.classList.remove('two'); }
+      if (undo && avail / h() < (avail / h1) * 1.2) undo();
+    }
+    for (let i = 0; i < 4; i++) {
+      const cur = h();
+      if (cur <= avail) break;
+      const zz = (parseFloat(z.style.zoom) || 1) * (avail / cur) * 0.985;
+      z.style.zoom = Math.max(0.3, zz);
+    }
+  });
+  root.classList.remove('measure');
+}
+function doPrintPages(html, msg) {
+  $('#print-root').innerHTML = html;
+  $('#page-style').textContent = '@page { size: A4 portrait; margin: 10mm }';
+  fitPages();
+  setTimeout(() => { try { window.print(); } catch (e) { toast('印刷を開始できませんでした: ' + e.message, 'err'); } }, 80);
+  if (msg) toast(msg);
+}
 function printSchedule() {
   const S = state.settings, sc = S.schedule;
-  const html = ptHead(S.meetName + ' ' + sc.title, '入館開始 ' + esc(sc.doorOpen) + '　W-up ' + esc(sc.warmup) + '　開会式 ' + esc(sc.opening) + '　競技開始 ' + esc(sc.start) + '　競技終了 ' + (D.sched.end !== null ? C.fmtClock(D.sched.end) : '') + '　閉会式 ' + esc(sc.closing) + '　最終退館 ' + esc(sc.exit)) +
-    '<table class="pt"><thead><tr><th>競技No</th><th>種目名</th><th>参加数</th><th>組数</th><th>所要時間</th><th>開始時刻</th><th>終了時刻</th></tr></thead><tbody>' +
-    D.sched.rows.map(o => '<tr><td>' + o.no + '</td><td>' + esc(o.name) + '</td><td>' + (o.n === undefined ? '' : o.n) + '</td><td>' + (o.heats === undefined ? '' : o.heats) + '</td><td>' + (o.dur !== undefined ? C.fmtDuration(o.dur) : '') + '</td><td>' + (o.start !== undefined && o.start !== null ? C.fmtClock(o.start) : '') + '</td><td>' + (o.end !== undefined && o.end !== null ? C.fmtClock(o.end) : '') + '</td></tr>').join('') + '</tbody></table>';
-  doPrint(html, 'size: A4 portrait; margin: 12mm');
+  const info = [['入館開始', sc.doorOpen], ['W-up', sc.warmup], ['開会式', sc.opening], ['競技開始', sc.start], ['競技終了', D.sched.end !== null ? C.fmtClock(D.sched.end) : ''], ['閉会式', sc.closing], ['最終退館', sc.exit]];
+  const body = '<div class="pinfo">' + info.map(([k, v]) => '<div><span>' + k + '</span><b>' + esc(v) + '</b></div>').join('') + '</div>' +
+    '<table class="pp split"><thead><tr><th class="c">No</th><th>種目</th><th class="c">参加</th><th class="c">組</th><th class="c">開始</th><th class="c">終了</th></tr></thead><tbody>' +
+    D.sched.rows.filter(o => o.name).map(o => '<tr class="' + (o.isBreak ? 'brk' : '') + '"><td class="c">' + o.no + '</td><td class="nm">' + esc(o.name) + '</td><td class="c">' + (o.n === undefined ? '' : o.n) + '</td><td class="c">' + (o.heats === undefined ? '' : o.heats) + '</td><td class="c tm">' + (o.start !== undefined && o.start !== null ? C.fmtClock(o.start) : '') + '</td><td class="c tm sm">' + (o.end !== undefined && o.end !== null ? C.fmtClock(o.end) : '') + '</td></tr>').join('') + '</tbody></table>';
+  doPrintPages(pPage(sc.title || '競技進行スケジュール', '', body), 'スケジュールをA4 1枚で印刷します');
 }
-function programPrintHTML(name, pageBreak) {
+function programPage(name) {
   const p = programData(name), lanes = C.laneList(state.settings).slice().sort((a, b) => a - b);
   const anyRes = p.items.some(it => it.status !== '未入力');
-  let h = '<div class="' + (pageBreak ? 'pbreak' : '') + '">' + ptHead(state.settings.meetName + (anyRes ? '　速報' : '　大会プログラム'), (p.sch ? '競技No.' + p.sch.no + '　' : '') + '<b>' + esc(name) + '</b>' + (p.sch && p.sch.start !== null ? '　開始予定時刻: ' + C.fmtClock(p.sch.start) : ''));
-  h += '<table class="pt"><thead><tr><th>組</th><th>レーン</th><th>' + (p.relay ? 'チーム名' : '氏名') + '</th><th>' + (p.relay ? '出場メンバー' : 'チーム名') + '</th><th>区分</th><th>公式タイム</th><th>順位</th></tr></thead><tbody>';
-  p.heats.forEach(hh => {
+  const sub = (p.sch ? '競技No.' + p.sch.no + '　' : '') + (p.sch && p.sch.start !== null ? '開始予定 ' + C.fmtClock(p.sch.start) + '　' : '') + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組';
+  const body = p.heats.map(hh => {
     const byLane = new Map(hh.items.map(it => [it.lane, it]));
-    lanes.forEach((ln, j) => {
-      const it = byLane.get(ln);
-      h += '<tr' + (j === 0 ? ' style="border-top:1.5pt solid #000"' : '') + '><td>' + (j === 0 ? hh.heat : '') + '</td><td>' + ln + '</td><td>' + (it ? esc(p.relay ? it.teamDisp : it.name) : '') + '</td><td>' + (it ? esc(p.relay ? it.memberText : it.club) : '') + '</td><td>' + (it ? esc(it.cat) : '') + '</td><td>' + (it ? esc(it.flashTime) : '') + '</td><td>' + (it ? esc(it.flashRank) : '') + '</td></tr>';
-    });
-  });
-  return h + '</tbody></table></div>';
+    return '<div class="blk"><div class="blk-h">第 ' + hh.heat + ' 組</div><table class="pp"><thead><tr><th class="c">レーン</th><th>' + (p.relay ? 'チーム' : '氏名') + '</th><th>' + (p.relay ? '泳者' : 'クラブ') + '</th><th>区分</th>' + (anyRes ? '<th class="c">記録</th><th class="c">順位</th>' : '') + '</tr></thead><tbody>' +
+      lanes.map(ln => {
+        const it = byLane.get(ln);
+        return '<tr class="' + (it && anyRes ? medalCls(it.rank) : '') + '"><td class="c"><span class="lane-c">' + ln + '</span></td><td class="nm">' + (it ? esc(p.relay ? it.teamDisp : it.name.split('　').slice(0, 2).join('　')) : '') + (it && !p.relay && it.name.split('　').length > 2 ? '<div class="kana">' + esc(it.name.split('　').slice(2).join('　')) + '</div>' : '') + '</td>' +
+          '<td class="sm">' + (it ? esc(p.relay ? it.memberText : it.club) : '') + '</td><td class="sm">' + (it ? esc(it.cat) : '') + '</td>' +
+          (anyRes ? '<td class="tm">' + (it ? esc(it.flashTime) : '') + '</td><td class="rk">' + (it ? esc(it.flashRank) : '') + '</td>' : '') + '</tr>';
+      }).join('') + '</tbody></table></div>';
+  }).join('');
+  return pPage(name, sub, body || '<p>エントリーはありません。</p>', (anyRes ? '速報' : '大会プログラム') + '　' + name);
 }
 function printProgram(all) {
   const names = all ? programOptions().filter(n => programData(n).items.length) : [ui.prog];
   if (!names.length || !names[0]) { toast('印刷する種目がありません', 'err'); return; }
-  doPrint(names.map((n, i) => programPrintHTML(n, i < names.length - 1)).join(''), 'size: A4 portrait; margin: 12mm');
+  doPrintPages(names.map(programPage).join(''), all ? names.length + '種目を、1種目ずつA4 1枚で印刷します' : 'この種目をA4 1枚で印刷します');
 }
 function printFlash() {
   const list = C.flashList(state, D.ind, D.rel, ui.flash), relay = C.isRelayName(ui.flash);
+  if (!list.length) { toast('この種目のエントリーはありません', 'err'); return; }
   const sch = D.sched.rows.find(r => r.name === ui.flash);
-  const html = ptHead(state.settings.meetName + '　【速報】', '<b>' + esc(ui.flash) + '</b>' + (sch ? '　競技No.' + sch.no + '　開始予定時刻 ' + C.fmtClock(sch.start) : '')) +
-    '<table class="pt"><thead><tr><th>順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ名') + '</th><th>年齢区分</th><th>公式タイム</th></tr></thead><tbody>' +
-    list.map((x, i) => '<tr' + (i > 0 && list[i - 1].it.cat !== x.it.cat ? ' style="border-top:1.5pt solid #000"' : '') + '><td>' + esc(x.rank) + '</td><td>' + esc(x.name) + '</td><td>' + esc(x.club) + '</td><td>' + esc(x.cat) + '</td><td>' + esc(x.time) + '</td></tr>').join('') + '</tbody></table>';
-  doPrint(html, 'size: A4 portrait; margin: 12mm');
+  const groups = [];
+  list.forEach(x => { const g = groups[groups.length - 1]; if (g && g.cat === x.it.cat) g.rows.push(x); else groups.push({ cat: x.it.cat, rows: [x] }); });
+  const body = groups.map(g => '<div class="blk"><div class="blk-h">' + esc(g.cat) + '</div><table class="pp"><thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ') + '</th><th class="c">記録</th></tr></thead><tbody>' +
+    g.rows.map(x => '<tr class="' + medalCls(rankNum(x.rank)) + '"><td class="rk">' + esc(x.rank) + '</td><td class="nm">' + esc(relay ? x.name : x.name.split('　').slice(0, 2).join('　')) + '</td><td class="sm">' + esc(x.club) + (x.cat !== x.it.cat ? '<div class="kana">' + esc(x.cat) + '</div>' : '') + '</td><td class="tm">' + esc(x.time) + '</td></tr>').join('') + '</tbody></table></div>').join('');
+  doPrintPages(pPage('【速報】' + ui.flash, (sch ? '競技No.' + sch.no + '　' : '') + list.length + (relay ? 'チーム' : '名'), body), '速報をA4 1枚で印刷します');
 }
 function printRanking() {
   const S = state.settings, relay = C.isRelayName(ui.rankEv), src = relay ? D.rel : D.ind;
   const cats = ui.rankCat ? [ui.rankCat] : S.categories.filter(c => src.some(it => it.event === ui.rankEv && it.cat === c));
-  const html = ptHead(' ' + S.meetName + '  公式' + (relay ? 'リレー' : '') + 'ランキング表', '') + cats.map(c => {
+  const body = cats.map(c => {
     const list = src.filter(it => it.event === ui.rankEv && it.cat === c && it.rank).sort((a, b) => a.rankOrder - b.rankOrder);
-    return '<p class="ph"><b>' + esc(ui.rankEv) + '　' + esc(c) + '</b></p><table class="pt" style="margin-bottom:10pt"><thead><tr><th>順位</th><th>' + (relay ? 'チーム名' : '氏名') + '</th><th>' + (relay ? '出場メンバー' : 'チーム名') + '</th><th>区分</th><th>公式タイム</th></tr></thead><tbody>' +
-      list.map(it => '<tr><td>' + it.rank + '</td><td>' + esc(relay ? it.teamDisp : it.name) + '</td><td>' + esc(relay ? it.memberText : it.club) + '</td><td>' + esc(it.cat) + '</td><td>' + esc(it.officialText) + '</td></tr>').join('') + '</tbody></table>';
+    return '<div class="blk"><div class="blk-h">' + esc(c) + '</div><table class="pp"><thead><tr><th class="c">順位</th><th>' + (relay ? 'チーム' : '氏名') + '</th><th>' + (relay ? '泳者' : 'クラブ') + '</th><th class="c">記録</th></tr></thead><tbody>' +
+      (list.length ? list.map(it => '<tr class="' + medalCls(it.rank) + '"><td class="rk">' + it.rank + '</td><td class="nm">' + esc(relay ? it.teamDisp : it.name.split('　').slice(0, 2).join('　')) + '</td><td class="sm">' + esc(relay ? it.memberText : it.club) + '</td><td class="tm">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="4" class="sm">記録がまだありません</td></tr>') + '</tbody></table></div>';
   }).join('');
-  doPrint(html, 'size: A4 portrait; margin: 12mm');
+  doPrintPages(pPage('公式' + (relay ? 'リレー' : '') + 'ランキング　' + ui.rankEv, '', body || '<p>記録がありません。</p>'), 'ランキングをA4 1枚で印刷します');
 }
 function printCerts(test) {
   const list = certList(), relay = ui.certTarget === 'rel', prize = ui.certKind === 'prize';
   const from = Math.max(1, parseInt(ui.certFrom, 10) || 1), to = Math.min(list.length, parseInt(ui.certTo, 10) || list.length);
   const pick = test ? [list[from - 1]] : list.slice(from - 1, to);
   if (!pick.length || !pick[0]) { toast('印刷する証書がありません', 'err'); return; }
-  const P = PAPER[ui.certPaper];
-  doPrint(pick.map(it => certHTML(it, relay, prize, ui.certPaper)).join(''), 'size: ' + P.size + '; margin: 0');
-  toast((test ? 'テスト印刷: ' : '') + pick.length + '枚を印刷に送りました（' + P.label + '）');
+  ui.certPaper = 'A4';
+  doPrint(pick.map(it => certHTML(it, relay, prize, 'A4')).join(''), 'size: A4 portrait; margin: 0');
+  toast((test ? 'テスト印刷: ' : '') + pick.length + '枚を印刷に送りました（A4 縦・1人1枚）');
 }
 function printAwards() {
   const R = D.aw, rate = r => r === null || r === undefined ? '' : (r * 100).toFixed(2) + '%';
-  const html = ptHead(state.settings.meetName + '　最優秀・優秀選手', '選出範囲: ' + esc(R.master.cond)) +
-    '<table class="pt"><thead><tr><th>表彰区分</th><th>年齢区分</th><th>性別</th><th>クラブ</th><th>選手名</th><th>種目</th><th>達成率</th><th>判定</th></tr></thead><tbody>' +
-    R.mvp.map(o => '<tr><td>最優秀選手</td><td>' + esc(o.catName || '') + '</td><td>' + o.sexName + '</td><td>' + esc(o.club || '') + '</td><td><b>' + esc(o.name || '') + '</b></td><td>' + esc(o.event || '') + '</td><td>' + rate(o.rate) + '</td><td>' + esc(o.status) + '</td></tr>').join('') +
-    R.exc.filter(o => o.kind !== 'off').map(o => '<tr><td>優秀選手（' + o.slot + '）</td><td>' + esc(o.catName) + '</td><td>' + o.sexName + '</td><td>' + esc(o.club || '') + '</td><td><b>' + esc(o.name || '') + '</b></td><td>' + esc(o.event || '') + '</td><td>' + rate(o.rate) + '</td><td>' + esc(o.status) + '</td></tr>').join('') + '</tbody></table>';
-  doPrint(html, 'size: A4 portrait; margin: 12mm');
+  const body = '<div class="mvp-p">' + R.mvp.map(o => '<div><span>最優秀選手（' + o.sexName + '）</span><b>' + esc(o.kind === 'ok' ? o.name : '該当なし') + '</b>' +
+      (o.kind === 'ok' ? '<em>' + esc(o.catName) + '・' + esc(o.club) + '・' + esc(o.event) + '　達成率 ' + rate(o.rate) + '</em>' : '') + '</div>').join('') + '</div>' +
+    '<div class="blk"><div class="blk-h">優秀選手</div><table class="pp"><thead><tr><th>年齢区分</th><th class="c">性別</th><th>選手名</th><th>クラブ</th><th>種目</th><th class="c">達成率</th><th>備考</th></tr></thead><tbody>' +
+    R.exc.filter(o => o.kind !== 'off').map(o => '<tr><td class="nm">' + esc(o.catName) + '</td><td class="c">' + o.sexName + '</td><td class="nm">' + esc(o.name || '—') + '</td><td class="sm">' + esc(o.club || '') + '</td><td class="sm">' + esc(o.event || '') + '</td><td class="tm">' + rate(o.rate) + '</td><td class="sm">' + esc(o.kind === 'up' ? '2位繰り上げ' : o.kind === 'ok' ? '' : o.status) + '</td></tr>').join('') + '</tbody></table></div>';
+  doPrintPages(pPage('最優秀選手・優秀選手', '選出範囲: ' + esc(R.master.cond), body), '表彰ボードをA4 1枚で印刷します');
 }
 
 /* ---------------------------------------------------------------- ファイル入出力 */
@@ -2630,6 +2920,8 @@ function makeSample() {
   recompute();
   render();
   if (state.entries.length) snapshot('起動時');
+  // ホーム画面・デスクトップに追加したアプリとして、オフラインでも開けるようにする
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
 </script>
 </body>

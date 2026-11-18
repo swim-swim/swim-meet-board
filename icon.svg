@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="18%" r="85%">
+      <stop offset="0" stop-color="#16456F"/>
+      <stop offset="1" stop-color="#0A2540"/>
+    </radialGradient>
+    <clipPath id="dial"><circle cx="256" cy="292" r="140"/></clipPath>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <g clip-path="url(#dial)">
+    <path d="M100 318 C150 290 200 290 256 318 S362 346 412 318 V460 H100Z" fill="#1E9BE0"/>
+    <path d="M100 344 C150 318 200 318 256 344 S362 370 412 344 V460 H100Z" fill="#3CC8FF"/>
+  </g>
+  <circle cx="256" cy="292" r="148" fill="none" stroke="#FFFFFF" stroke-width="26"/>
+  <rect x="222" y="78" width="68" height="34" rx="9" fill="#FFFFFF"/>
+  <rect x="243" y="108" width="26" height="40" fill="#FFFFFF"/>
+  <rect x="352" y="132" width="44" height="26" rx="7" fill="#FFFFFF" transform="rotate(45 374 145)"/>
+  <line x1="256" y1="292" x2="318" y2="196" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round"/>
+  <circle cx="256" cy="292" r="18" fill="#FFFFFF"/>
+  <circle cx="256" cy="292" r="7" fill="#E5484D"/>
+</svg>
