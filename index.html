@@ -1,0 +1,2529 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>スイム大会運営ボード</title>
+<meta name="description" content="水泳大会のエントリー・組分け・進行・記録・速報・証書・表彰をブラウザだけで運営できる無料ツール">
+<style>/* Layout: 左にナビ・上に状態バー・右に作業面。プールの水色を軸に、コースロープの赤白をアクセントに使う */
+:root {
+  --bg: #f3f7fa;
+  --surface: #ffffff;
+  --surface-2: #eef4f8;
+  --ink: #10222f;
+  --muted: #586a78;
+  --line: #d6e1e9;
+  --accent: #0a69ad;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcecf8;
+  --rope: #d23b3b;
+  --ok: #1d7a4b; --ok-soft: #e1f3e8;
+  --warn: #a35d00; --warn-soft: #fff1d6;
+  --err: #c0322b; --err-soft: #fde5e3;
+  --info: #3b5f86; --info-soft: #e5edf6;
+  --focus: #f0a400;
+  --font-ui: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", "Meiryo", "Noto Sans JP", system-ui, sans-serif;
+  --font-cert: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", "MS PMincho", serif;
+  --font-num: "SF Mono", "Menlo", "Consolas", "Roboto Mono", monospace;
+  --r: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1620; --surface: #13212e; --surface-2: #182a3a; --ink: #e4edf4; --muted: #9db0bf; --line: #2a3e50;
+    --accent: #4fa6e6; --accent-ink: #06121c; --accent-soft: #163650; --rope: #ff6b6b;
+    --ok: #5fd39a; --ok-soft: #12352a; --warn: #f2b45a; --warn-soft: #3a2a10; --err: #ff7a70; --err-soft: #3d1715; --info: #9cc2ea; --info-soft: #1a2d42;
+    --focus: #ffc94a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c1620; --surface: #13212e; --surface-2: #182a3a; --ink: #e4edf4; --muted: #9db0bf; --line: #2a3e50;
+  --accent: #4fa6e6; --accent-ink: #06121c; --accent-soft: #163650; --rope: #ff6b6b;
+  --ok: #5fd39a; --ok-soft: #12352a; --warn: #f2b45a; --warn-soft: #3a2a10; --err: #ff7a70; --err-soft: #3d1715; --info: #9cc2ea; --info-soft: #1a2d42;
+  --focus: #ffc94a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.6 var(--font-ui); -webkit-font-smoothing: antialiased; }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+.num, td.num, .t { font-variant-numeric: tabular-nums; }
+
+/* ---------- 枠組み ---------- */
+.app { display: grid; grid-template-columns: 208px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); min-height: 100%; }
+.topbar { grid-column: 1 / -1; position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 8px max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left)); background: var(--surface); border-bottom: 1px solid var(--line); }
+.topbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 3px;
+  background: repeating-linear-gradient(90deg, var(--rope) 0 14px, var(--surface) 14px 22px, var(--accent) 22px 36px, var(--surface) 36px 44px); opacity: .85; }
+.brand { display: flex; flex-direction: column; min-width: 0; flex: 1 1 260px; }
+.brand small { color: var(--muted); font-size: 11px; letter-spacing: .08em; }
+.brand strong { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chips { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2); font-size: 12px; cursor: default; white-space: nowrap; }
+button.chip { cursor: pointer; }
+.chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.chip.warn { background: var(--warn-soft); border-color: transparent; color: var(--warn); } .chip.warn .dot { background: var(--warn); }
+.chip.err { background: var(--err-soft); border-color: transparent; color: var(--err); } .chip.err .dot { background: var(--err); }
+.chip.ok { background: var(--ok-soft); border-color: transparent; color: var(--ok); }
+.chip.lock { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.nav { background: var(--surface); border-right: 1px solid var(--line); padding: 14px 8px; position: sticky; top: 58px; align-self: start; height: calc(100vh - 58px); overflow-y: auto; }
+.nav h6 { margin: 14px 10px 4px; font-size: 10.5px; letter-spacing: .14em; color: var(--muted); font-weight: 600; }
+.nav a { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 7px 10px; border-radius: 6px; color: var(--ink); text-decoration: none; font-size: 13.5px; }
+.nav a:hover { background: var(--surface-2); }
+.nav a.on { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.nav .badge { font-size: 11px; min-width: 20px; text-align: center; padding: 0 6px; border-radius: 999px; background: var(--err); color: #fff; }
+.nav a.on .badge { background: var(--accent-ink); color: var(--accent); }
+main { padding: 20px max(16px, env(safe-area-inset-right)) 60px max(16px, env(safe-area-inset-left)); min-width: 0; }
+@media (max-width: 900px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .nav { position: static; height: auto; display: flex; overflow-x: auto; gap: 4px; padding: 8px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .nav h6 { display: none; }
+  .nav a { white-space: nowrap; flex: 0 0 auto; }
+}
+
+/* ---------- 部品 ---------- */
+h1.view { font-size: 20px; margin: 0 0 4px; text-wrap: balance; }
+.lead { color: var(--muted); margin: 0 0 16px; max-width: 75ch; }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 12px; }
+.bar .grow { flex: 1 1 auto; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; white-space: nowrap; line-height: 1.3; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.btn.danger { color: var(--err); border-color: color-mix(in srgb, var(--err) 40%, var(--line)); }
+.btn.danger.solid { background: var(--err); color: #fff; border-color: var(--err); }
+.btn.sm { padding: 3px 8px; font-size: 12.5px; }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+.iconbtn { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; width: 32px; height: 32px; cursor: pointer; display: inline-grid; place-items: center; }
+.iconbtn[disabled] { opacity: .4; cursor: not-allowed; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; min-width: 0; }
+.card h2 { font-size: 15px; margin: 0 0 10px; }
+.card h3 { font-size: 13.5px; margin: 14px 0 6px; color: var(--muted); }
+.grid { display: grid; gap: 14px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; }
+.stat b { display: block; font-size: 24px; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.stat span { color: var(--muted); font-size: 12px; }
+.stat.hl { border-color: var(--accent); box-shadow: inset 4px 0 0 var(--accent); }
+.field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.field > span { font-size: 12px; color: var(--muted); }
+.fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px 12px; }
+input[type=text], input[type=number], input[type=date], input:not([type]), select, textarea {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 5px; padding: 5px 7px; min-width: 0; width: 100%; }
+input:disabled, select:disabled, textarea:disabled { background: var(--surface-2); color: var(--muted); }
+textarea { resize: vertical; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); } .pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.err { background: var(--err-soft); color: var(--err); } .pill.info { background: var(--info-soft); color: var(--info); }
+.pill.mute { background: var(--surface-2); color: var(--muted); }
+.notice { border-radius: var(--r); padding: 10px 14px; margin: 0 0 12px; display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
+.notice.warn { background: var(--warn-soft); color: var(--warn); } .notice.err { background: var(--err-soft); color: var(--err); }
+.notice.info { background: var(--info-soft); color: var(--info); } .notice.ok { background: var(--ok-soft); color: var(--ok); }
+.notice .grow { flex: 1 1 260px; }
+
+/* ---------- 表 ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+table.t { border-collapse: collapse; width: 100%; font-size: 13px; }
+table.t th, table.t td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: left; vertical-align: middle; }
+table.t th { background: var(--surface-2); font-size: 12px; color: var(--muted); font-weight: 600; position: sticky; top: 0; z-index: 1; white-space: nowrap; }
+table.t td.num, table.t th.num { text-align: right; }
+table.t td.c, table.t th.c { text-align: center; }
+table.t tr.err td { background: var(--err-soft); }
+table.t tr.warn td { background: var(--warn-soft); }
+table.t tr.flash td { animation: flash 1.6s ease-out; }
+@keyframes flash { 0% { background: var(--focus); } 100% { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { table.t tr.flash td { animation: none; outline: 2px solid var(--focus); } }
+table.t input, table.t select { padding: 3px 5px; font-size: 13px; }
+table.t select { min-width: 96px; }
+table.t tr.grp td { background: var(--accent-soft); font-weight: 700; }
+table.t tbody tr:hover td { background: color-mix(in srgb, var(--accent-soft) 45%, transparent); }
+.tin { min-width: 84px; font-family: var(--font-num); }
+.tin.bad { border-color: var(--err); background: var(--err-soft); color: var(--err); }
+.tin.odd { border-color: var(--warn); background: var(--warn-soft); }
+.prev { display: block; font-size: 10.5px; color: var(--muted); font-family: var(--font-num); min-height: 1em; }
+.prev.bad { color: var(--err); }
+.x { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 0 4px; }
+.x:hover { color: var(--err); }
+.lane { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 12px; }
+.pager { display: flex; gap: 6px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+
+/* ---------- 表彰ボード ---------- */
+.mvp { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.mvp .card { border-width: 2px; }
+.mvp .card.ok { border-color: var(--ok); }
+.mvp .who { font-size: 20px; font-weight: 700; }
+.st-ok { color: var(--ok); font-weight: 700; } .st-up { color: var(--warn); font-weight: 700; } .st-none, .st-off { color: var(--muted); }
+tr.off td { color: var(--muted); background: var(--surface-2); }
+
+/* ---------- モーダル・トースト ---------- */
+.modal-bg { position: fixed; inset: 0; background: rgba(5, 15, 25, .45); display: grid; place-items: center; z-index: 100; padding: 16px; }
+.modal { background: var(--surface); border-radius: 10px; width: min(720px, 100%); max-height: calc(100vh - 32px); overflow: auto; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.modal h2 { margin: 0 0 8px; font-size: 17px; }
+.modal .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+.toasts { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; z-index: 120; max-width: min(420px, calc(100vw - 32px)); }
+.toast { background: var(--ink); color: var(--bg); border-radius: 8px; padding: 10px 14px; display: flex; gap: 12px; align-items: center; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+.toast.err { background: var(--err); color: #fff; }
+.toast button { background: none; border: 1px solid currentColor; color: inherit; border-radius: 5px; padding: 2px 8px; cursor: pointer; }
+.empty { text-align: center; padding: 36px 16px; color: var(--muted); }
+.onboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
+.onboard button { text-align: left; padding: 16px; border-radius: var(--r); border: 1px solid var(--line); background: var(--surface); cursor: pointer; }
+.onboard button:hover { border-color: var(--accent); }
+.onboard b { display: block; font-size: 15px; margin-bottom: 4px; }
+details.card > summary { cursor: pointer; font-weight: 700; }
+.kbd { font-family: var(--font-num); font-size: 11px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; }
+.big .t { font-size: 22px; } .big .t td { padding: 8px 10px; }
+.listcheck li { margin: 4px 0; }
+.issue { display: flex; gap: 8px; align-items: flex-start; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.issue:last-child { border-bottom: 0; }
+.issue button.link { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; text-align: left; }
+.certprev { border: 1px solid var(--line); background: #fff; color: #000; overflow: hidden; margin: 0 auto; }
+
+/* ---------- 印刷 ---------- */
+#print-root { display: none; }
+@media print {
+  body { background: #fff !important; color: #000 !important; }
+  body > *:not(#print-root) { display: none !important; }
+  #print-root { display: block !important; }
+  .pt { border-collapse: collapse; width: 100%; font-size: 10.5pt; font-family: var(--font-ui); }
+  .pt th, .pt td { border: 0.5pt solid #555; padding: 2pt 4pt; }
+  .pt thead { display: table-header-group; }
+  .pt tr { page-break-inside: avoid; }
+  .ph { font-family: var(--font-ui); margin: 0 0 6pt; }
+  .ph h1 { font-size: 15pt; margin: 0; } .ph p { margin: 2pt 0; font-size: 10pt; }
+  .pbreak { page-break-after: always; }
+}
+.cert { position: relative; color: #000; font-family: var(--font-cert); text-align: center; overflow: hidden; page-break-after: always; break-after: page; }
+.cert:last-child { page-break-after: auto; break-after: auto; }
+.cert .in { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; }
+.cert .title { font-weight: 700; letter-spacing: .3em; }
+.cert .name { font-weight: 700; }
+.cert .lines p { margin: 0; }
+.cert .date { align-self: stretch; text-align: center; }
+</style>
+<style id="page-style">@page { size: A4 portrait; margin: 12mm }</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar" id="top"></header>
+  <nav class="nav" id="nav" aria-label="メニュー"></nav>
+  <main id="main"><noscript>このアプリを使うには JavaScript を有効にしてください。</noscript></main>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div id="print-root"></div>
+<script>/* ============================================================================
+ * スイム大会運営アプリ — 計算エンジン（DOM非依存）
+ *  Excel「大会運営ブック」の数式と「表彰者算出マクロ」のロジックを移植
+ * ========================================================================== */
+const Core = (() => {
+  'use strict';
+
+  // ---------------------------------------------------------------- 文字の正規化
+  function toHalf(s) {
+    return String(s)
+      .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+      .replace(/[．。]/g, '.').replace(/[：]/g, ':').replace(/[，、]/g, '.')
+      .replace(/　/g, ' ')
+      .replace(/[Ａ-Ｚａ-ｚ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+  }
+  // Excel の文字列比較（JIS順）に近い日本語照合
+  const JA = (typeof Intl !== 'undefined' && Intl.Collator) ? new Intl.Collator('ja', { sensitivity: 'accent' }) : { compare: (a, b) => a < b ? -1 : a > b ? 1 : 0 };
+  const str = v => (v === null || v === undefined) ? '' : String(v).trim();
+  // 照合用キー（全角/半角・空白・波ダッシュ・m/M の違いを吸収）
+  function normKey(s) {
+    let t = str(s);
+    try { t = t.normalize('NFKC'); } catch (e) { /* ignore */ }
+    return t.replace(/[\s　]+/g, '').replace(/[〜～~]/g, '~').replace(/[ー－−‐-]/g, '-').toLowerCase();
+  }
+  const SPECIAL = { 'DNS': 'DNS', 'DSQ': 'DSQ', '棄権': '棄権', '失格': '失格' };
+
+  // ---------------------------------------------------------------- タイム
+  /**
+   * 入力されたタイムを秒に変換する。
+   *  28.78 / 1:32.22 / 1.32.22 / 00.30.00 / 1分32秒22 / 132.22(=1:32.22) / Excel時刻値 / 全角
+   *  返り値 {kind:'empty'|'time'|'special'|'error', sec, special, msg}
+   */
+  function parseTime(raw, opt) {
+    const rule = (opt && opt.threeDigit) || 'mss';
+    if (raw === null || raw === undefined) return { kind: 'empty' };
+    if (typeof raw === 'number') {
+      if (!isFinite(raw) || raw <= 0) return { kind: 'error', msg: '0以下の数値です' };
+      let sec;
+      if (raw < 1) sec = raw * 86400;
+      else if (raw >= 100 && rule === 'mss') {
+        const m = Math.floor(raw / 100), r = raw - m * 100;
+        if (r >= 60) return { kind: 'error', msg: '秒が60以上です' };
+        sec = m * 60 + r;
+      } else sec = raw;
+      return finish(sec);
+    }
+    let s = toHalf(str(raw)).replace(/\s+/g, '');
+    if (!s) return { kind: 'empty' };
+    const up = s.toUpperCase();
+    if (SPECIAL[up] || SPECIAL[s]) return { kind: 'special', special: SPECIAL[up] || SPECIAL[s] };
+    // 1分32秒22 / 32秒22 / 32秒
+    s = s.replace(/["”″]/g, '.').replace(/['’′]/g, ':');
+    let m = s.match(/^(?:(\d+)分)?(\d+(?:\.\d+)?)秒(\d*)$/);
+    if (m) {
+      const min = m[1] ? +m[1] : 0, sc = +m[2], cs = m[3] ? +('0.' + m[3]) : 0;
+      if (sc >= 60 && m[1]) return { kind: 'error', msg: '秒が60以上です' };
+      return finish(min * 60 + sc + cs);
+    }
+    if (s.indexOf(':') >= 0) {
+      const p = s.split(':');
+      if (p.length === 2 && /^\d+$/.test(p[0]) && /^\d+(\.\d+)?$/.test(p[1])) {
+        const sec = +p[1];
+        if (sec >= 60) return { kind: 'error', msg: '秒が60以上です' };
+        return finish(+p[0] * 60 + sec);
+      }
+      if (p.length === 3 && p.every(x => /^\d+$/.test(x))) { // 1:32:22 → 1分32秒22
+        if (+p[1] >= 60) return { kind: 'error', msg: '秒が60以上です' };
+        return finish(+p[0] * 60 + +p[1] + +('0.' + p[2]));
+      }
+      return { kind: 'error', msg: '読み取れない形式です' };
+    }
+    const parts = s.split('.');
+    if (!parts.every(x => /^\d+$/.test(x))) return { kind: 'error', msg: '数字以外の文字があります' };
+    if (parts.length === 3) { // 00.30.00 / 1.05.32
+      if (+parts[1] >= 60) return { kind: 'error', msg: '秒が60以上です' };
+      return finish(+parts[0] * 60 + +parts[1] + +('0.' + parts[2]));
+    }
+    if (parts.length > 3) return { kind: 'error', msg: '区切りが多すぎます' };
+    const n = +s;
+    if (n <= 0) return { kind: 'error', msg: '0以下です' };
+    if (n >= 100 && rule === 'mss') {
+      const mm = Math.floor(+parts[0] / 100), r = n - mm * 100;
+      if (r >= 60) return { kind: 'error', msg: '秒が60以上です（例: 1:32.22 は 132.22）' };
+      return finish(mm * 60 + r);
+    }
+    return finish(n);
+
+    function finish(sec) {
+      sec = Math.round(sec * 100) / 100;
+      if (!(sec > 0)) return { kind: 'error', msg: '0以下です' };
+      if (sec >= 3600) return { kind: 'error', msg: '60分以上です' };
+      return { kind: 'time', sec };
+    }
+  }
+  const cs = sec => Math.round(sec * 100);
+  function fmtTime(sec) { // 1:32.22 / 28.78
+    if (sec === null || sec === undefined || !(sec > 0)) return '';
+    const c = cs(sec), m = Math.floor(c / 6000), r = c - m * 6000;
+    const ss = Math.floor(r / 100), cc = r % 100;
+    return (m > 0 ? m + ':' + String(ss).padStart(2, '0') : String(ss)) + '.' + String(cc).padStart(2, '0');
+  }
+  function fmtTimeJa(sec) { // Excel と同じ「0分28秒78」
+    if (!(sec > 0)) return '';
+    const c = cs(sec), m = Math.floor(c / 6000), r = c - m * 6000;
+    return m + '分' + String(Math.floor(r / 100)).padStart(2, '0') + '秒' + String(r % 100).padStart(2, '0');
+  }
+  function fmtClock(sec) { // 秒(0時起点) → h:mm
+    if (sec === null || sec === undefined || isNaN(sec)) return '';
+    const t = Math.round(sec / 60), h = Math.floor(t / 60), m = t % 60;
+    return h + ':' + String(m).padStart(2, '0');
+  }
+  function parseClock(v) { // "8:45" / 0.364 → 秒
+    if (typeof v === 'number') return v < 1 ? Math.round(v * 86400) : null;
+    const m = toHalf(str(v)).match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+    return m ? (+m[1]) * 3600 + (+m[2]) * 60 + (m[3] ? +m[3] : 0) : null;
+  }
+  function parseDuration(v) { // "1:30" (分:秒) / 90 → 秒
+    if (typeof v === 'number') return v < 1 ? Math.round(v * 86400) : v;
+    const s = toHalf(str(v));
+    let m = s.match(/^(\d+):(\d{1,2})$/);
+    if (m) return (+m[1]) * 60 + (+m[2]);
+    if (/^\d+(\.\d+)?$/.test(s)) return +s;
+    return null;
+  }
+  function fmtDuration(sec) { if (!(sec >= 0)) return ''; const m = Math.floor(sec / 60), s = Math.round(sec - m * 60); return m + ':' + String(s).padStart(2, '0'); }
+
+  // ---------------------------------------------------------------- 既定設定
+  function defaultSettings() {
+    return {
+      meetName: 'ジュニアスイムフェスティバル',
+      events: ['女子 25M 板キック', '男子 25M 板キック', '女子 25M 自由形', '男子 25M 自由形', '女子 50M 自由形', '男子 50M 自由形',
+        '女子 25M 背泳ぎ', '男子 25M 背泳ぎ', '女子 50M 背泳ぎ', '男子 50M 背泳ぎ', '女子 25M 平泳ぎ', '男子 25M 平泳ぎ',
+        '女子 50M 平泳ぎ', '男子 50M 平泳ぎ', '女子 25M バタフライ', '男子 25M バタフライ', '女子 50M バタフライ', '男子 50M バタフライ',
+        '女子 4×25M フリーリレー', '男子 4×25M フリーリレー', '混合 4×25M フリーリレー'],
+      categories: ['6歳以下', '7〜8歳', '9〜10歳', '11〜12歳', '13〜14歳', '15〜16歳', '17〜18歳'],
+      clubs: [{ name: 'Aクラブ', target: '' }, { name: 'Bクラブ', target: '' }, { name: 'Cクラブ', target: '' }],
+      lanes: [3, 2, 4, 1, 5],
+      laneOrder: 'excel',      // excel: Excelと同じ（組内の遅い順に優先レーン） / fast: 組内の速い順に優先レーン
+      minPerHeatInd: 3, minPerHeatRelay: 3,
+      combined: [],            // [{name, pairs:[{event,cat}×3]}]
+      threeDigit: 'mss',
+      schedule: {
+        title: '競技進行スケジュール',
+        doorOpen: '7:30', warmup: '7:55 ～ 8:25', opening: '8:30', start: '8:45', closing: '10:50 (予定)', exit: '11:15',
+        cycleSec: 0, intervalMin: 2, breakMin: 45,
+        heat25: 60, heat50: 90, heat100: 120, heat200: 210, heatRelay: 120
+      },
+      points: { ind: [6, 5, 4, 3, 2, 1, '', '', '', ''], indFinish: '', relayMult: 2 },
+      prizeMaxRank: 10,
+      maxEventsPerPerson: 2,
+      cert: { title: '記　録　証', lines: ['あなたは本大会において', '最後まで力強い泳ぎを見せ', '見事完泳されました', 'よってその健闘を讃えこれを証します'], date: '', organizer: '大会主催者名　印', printRecord: true },
+      award: { title: '賞　状', lines: ['あなたは本大会において', '極めて優秀な成績を収められました', 'よってその健闘と栄誉を讃え', 'これを賞します'], date: '', organizer: '大会主催者名　印' },
+      print: { scale: 100, offsetTop: 0, offsetLeft: 0 },
+      dashboard: { capacity: 90, target: 80, price: 3000, tax: 10 }
+    };
+  }
+  function defaultAward() {
+    const ev = [['25m板キック', 18, 20], ['25mバタフライ', 19, 21], ['25m背泳ぎ', 21, 22], ['25m平泳ぎ', 23, 25], ['25m自由形', 18, 20],
+      ['50mバタフライ', 39.1, 43.6], ['50m背泳ぎ', 40.5, 45.1], ['50m平泳ぎ', 45.5, 50.6], ['50m自由形', 36.6, 40.7],
+      ['100m個人メドレー', 110, 110], ['200m個人メドレー', 192.9, 214.7]];
+    const events = [];
+    for (let i = 0; i < 15; i++) {
+      const d = ev[i];
+      events.push({ id: 'ae' + (i + 1), name: d ? d[0] : '', baseM: d ? fmtTime(d[1]) : '', baseF: d ? fmtTime(d[2]) : '', mvp: true });
+    }
+    const cn = ['8歳以下', '9～10歳', '11～12歳', '13歳以上'];
+    const cats = [];
+    for (let k = 0; k < 8; k++) cats.push({ name: cn[k] || '', mvp: true, exc: true });
+    return { cStart: 1, cEnd: 8, rankMode: '1〜3位すべて', minRate: 0, fold: '枠を残して表示', cats, events, inputs: {} };
+  }
+  function emptyState() {
+    return { app: 'swim-meet', schema: 1, rev: 0, settings: defaultSettings(), entries: [], relays: [], schedule: [], award: defaultAward(), ui: {} };
+  }
+
+  // ---------------------------------------------------------------- 共通
+  const isRelayName = s => str(s).indexOf('リレー') >= 0;
+  function laneList(S) {
+    const out = [];
+    (S.lanes || []).forEach(v => { const n = parseInt(toHalf(str(v)), 10); if (n > 0 && out.indexOf(n) < 0) out.push(n); });
+    return out.length ? out : [1];
+  }
+  function combinedOf(S, event, cat) {
+    const rules = S.combined || [];
+    for (let p = 0; p < 3; p++) {
+      for (const r of rules) {
+        const pr = (r.pairs || [])[p];
+        if (r.name && pr && str(pr.event) === event && str(pr.cat) === cat && event && cat) return str(r.name);
+      }
+    }
+    return '';
+  }
+  const evSex = name => { const m = str(name).match(/^(男子|女子|混合)/); return m ? m[1] : ''; };
+
+  // ---------------------------------------------------------------- 組・レーン編成（Excel AC〜AN 列）
+  function assignHeats(items, S, minPer) {
+    const lanes = laneList(S), L = lanes.length;
+    minPer = Math.max(1, Math.min(parseInt(minPer, 10) || 1, L));
+    const catOrder = c => { const i = S.categories.indexOf(c); return i >= 0 ? i + 1 : 99; };
+    const groups = new Map();
+    items.forEach(it => {
+      if (!it.event) return;
+      const key = it.combined ? it.combined : it.event + '_' + it.cat;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(it);
+    });
+    const ginfo = new Map();
+    groups.forEach((arr, key) => {
+      arr.sort((a, b) => (b.H - a.H) || a.tie(b));
+      const AD = arr.length, AF = Math.ceil(AD / L), AJ = ((AD - 1) % L) + 1;
+      const AK = AF > 1 ? Math.max(AJ, minPer) : AD;
+      const it0 = arr[0];
+      ginfo.set(key, { arr, AD, AF, AK, combined: !!it0.combined, event: it0.event, AG: it0.combined ? 99 : catOrder(it0.cat), cat: it0.cat });
+    });
+    // 同じ種目の中で、区分順（AG）の小さい区分の組数を前に積む
+    ginfo.forEach(g => {
+      let AI = 0;
+      if (!g.combined) {
+        ginfo.forEach(o => {
+          if (o === g || o.combined || o.event !== g.event) return;
+          if (o.AG < g.AG || (o.AG === g.AG && g.AG === 99 && o.cat < g.cat)) AI += o.AF;
+        });
+      }
+      g.AI = AI;
+      const heatsLocal = {};
+      g.arr.forEach((it, idx) => {
+        const AE = idx + 1;
+        const AL = AE <= g.AK ? 1 : 1 + Math.ceil((AE - g.AK) / L);
+        const AM = AE <= g.AK ? AE : ((AE - g.AK - 1) % L) + 1;
+        it.heat = AI + AL; it._AM = AM;
+        (heatsLocal[AL] = heatsLocal[AL] || []).push(it);
+      });
+      Object.keys(heatsLocal).forEach(k => {
+        const hs = heatsLocal[k], n = hs.length;
+        hs.forEach(it => {
+          const pos = S.laneOrder === 'fast' ? (n - it._AM + 1) : it._AM;
+          it.lane = lanes[pos - 1] || null;
+        });
+      });
+    });
+  }
+
+  // 公式順位（同じ種目・区分の中で） Excel P/Q 列
+  function assignRanks(items) {
+    const g = new Map();
+    items.forEach(it => {
+      it.rank = null; it.rankOrder = null;
+      if (!(it.I < 9999)) return;
+      const k = it.event + '\u0001' + it.cat;
+      if (!g.has(k)) g.set(k, []);
+      g.get(k).push(it);
+    });
+    g.forEach(arr => {
+      arr.sort((a, b) => (a.I - b.I) || a.tie(b));
+      arr.forEach((it, i) => {
+        let r = i + 1;
+        if (i > 0 && cs(arr[i - 1].I) === cs(it.I)) r = arr[i - 1].rank;
+        it.rank = r; it.rankOrder = i + 1;
+      });
+    });
+  }
+
+  function statusOf(judge, officialParse, hasOfficialRaw) {
+    if (judge === '棄権' || (officialParse.kind === 'special' && (officialParse.special === 'DNS' || officialParse.special === '棄権'))) return '棄権';
+    if (judge === '失格' || (officialParse.kind === 'special' && (officialParse.special === 'DSQ' || officialParse.special === '失格'))) return '失格';
+    if (!hasOfficialRaw) return '未入力';
+    return '完泳';
+  }
+
+  // ---------------------------------------------------------------- 個人
+  function computeIndividuals(state) {
+    const S = state.settings, opt = { threeDigit: S.threeDigit };
+    const pts = S.points || {};
+    const rows = state.entries.map((e, idx) => {
+      const event = str(e.event), cat = str(e.cat);
+      const pe = parseTime(e.entryTime, opt), pf = parseTime(e.officialTime, opt);
+      const judge = str(e.judge);
+      const hasF = !(pf.kind === 'empty');
+      const status = str(e.name) ? statusOf(judge, pf, hasF) : '';
+      const H = pe.kind === 'time' ? pe.sec : 9999;
+      const I = (pf.kind === 'time' && !judge) ? pf.sec : 9999;
+      const it = {
+        e, idx, id: e.id, event, cat, name: str(e.name), club: str(e.club), judge, pe, pf, H, I, status,
+        combined: event && cat ? combinedOf(S, event, cat) : '',
+        tie(o) { return this.idx - o.idx; }
+      };
+      it.program = it.combined || event;
+      // 表示用タイム（Excel S列）
+      it.officialText = pf.kind === 'time' ? fmtTimeJa(pf.sec) : (pf.kind === 'special' ? pf.special : (hasF ? str(e.officialTime) : ''));
+      return it;
+    });
+    assignHeats(rows, S, S.minPerHeatInd);
+    assignRanks(rows);
+    const medalCount = new Map();
+    rows.forEach(it => {
+      // 得点（Excel W列）
+      if (it.rank) {
+        const p = num(pts.ind && pts.ind[it.rank - 1]);
+        it.points = p + num(pts.indFinish);
+      } else it.points = null;
+      // 速報用
+      it.flashTime = it.status === '棄権' ? '棄権' : (it.pf.kind === 'special' ? '' : (it.pf.kind === 'time' ? fmtTimeJa(it.pf.sec) : it.officialText));
+      it.flashRank = it.status === '失格' ? '失格' : (it.rank ? it.rank + '位' : '');
+      // メダル発注用（Excel X列: 区分×種目ごとの申込順）
+      if (it.name && it.cat && it.event) {
+        const k = it.cat + '\u0001' + it.event;
+        medalCount.set(k, (medalCount.get(k) || 0) + 1);
+        it.medalOrder = medalCount.get(k);
+      } else it.medalOrder = null;
+    });
+    return rows;
+  }
+  const num = v => { const n = parseFloat(toHalf(str(v))); return isFinite(n) ? n : 0; };
+
+  // ---------------------------------------------------------------- リレー
+  function computeRelays(state) {
+    const S = state.settings, opt = { threeDigit: S.threeDigit };
+    const pts = S.points || {}, mult = num(pts.relayMult) || 1;
+    const rows = state.relays.map((r, idx) => {
+      const event = str(r.event), cat = str(r.cat);
+      const pe = parseTime(r.entryTime, opt), pf = parseTime(r.officialTime, opt);
+      const judge = str(r.judge);
+      const hasF = pf.kind !== 'empty';
+      const team = str(r.team), mark = str(r.mark);
+      const members = (r.members || []).map(str);
+      const it = {
+        r, idx, id: r.id, event, cat, team, mark, judge, pe, pf, members,
+        teamDisp: team ? team + (mark ? ' ' + mark : '') : '',
+        H: pe.kind === 'time' ? pe.sec : 9999,
+        I: (pf.kind === 'time' && !judge) ? pf.sec : 9999,
+        status: team ? statusOf(judge, pf, hasF) : '',
+        combined: event && cat ? combinedOf(S, event, cat) : '',
+        tie(o) { return JA.compare(this.teamDisp, o.teamDisp) || this.idx - o.idx; }
+      };
+      it.program = it.combined || event;
+      it.memberText = members[0] ? members.join(' / ') : '';
+      it.memberFlash = team ? members.filter(Boolean).join('・').replace(/　/g, '') : '';
+      it.officialText = pf.kind === 'time' ? fmtTimeJa(pf.sec) : (pf.kind === 'special' ? pf.special : (hasF ? str(r.officialTime) : ''));
+      return it;
+    });
+    assignHeats(rows, S, S.minPerHeatRelay);
+    assignRanks(rows);
+    const medal = new Map();
+    rows.forEach(it => {
+      if (it.rank) it.points = it.status !== '完泳' ? 0 : num(pts.ind && pts.ind[it.rank - 1]) * mult + num(pts.indFinish) * mult;
+      else it.points = null;
+      it.flashTime = it.status === '棄権' ? '棄権' : (it.pf.kind === 'special' ? '' : (it.pf.kind === 'time' ? fmtTimeJa(it.pf.sec) : it.officialText));
+      it.flashRank = it.status === '失格' ? '失格' : (it.rank ? it.rank + '位' : '');
+      if (it.team && it.cat && it.event) {
+        const k = it.cat + '\u0001' + it.event;
+        medal.set(k, (medal.get(k) || 0) + 1);
+        it.medalOrder = medal.get(k);
+        it.swimmers = Math.max(1, it.members.filter(Boolean).length);
+      } else { it.medalOrder = null; it.swimmers = 0; }
+    });
+    return rows;
+  }
+
+  // ---------------------------------------------------------------- プログラム一覧
+  function programNames(state) {
+    const S = state.settings, set = [];
+    S.events.forEach(e => { if (str(e) && set.indexOf(str(e)) < 0) set.push(str(e)); });
+    (S.combined || []).forEach(r => { if (str(r.name) && set.indexOf(str(r.name)) < 0) set.push(str(r.name)); });
+    return set;
+  }
+
+  // ---------------------------------------------------------------- 進行スケジュール（Excel 04）
+  function computeSchedule(state, ind, rel) {
+    const S = state.settings, sc = S.schedule;
+    const start = parseClock(sc.start);
+    const heatsOf = name => {
+      const src = isRelayName(name) ? rel : ind;
+      let n = 0, h = 0;
+      src.forEach(it => { if (it.program === name) { n++; if (it.heat > h) h = it.heat; } });
+      return { n, h };
+    };
+    const perHeat = name => {
+      const u = name.toUpperCase();
+      if (isRelayName(name)) return num(sc.heatRelay);
+      if (u.indexOf('200M') >= 0) return num(sc.heat200) || num(sc.heat50);
+      if (u.indexOf('100M') >= 0) return num(sc.heat100);
+      if (u.indexOf('50M') >= 0) return num(sc.heat50);
+      if (u.indexOf('25M') >= 0) return num(sc.heat25);
+      return num(sc.heat50);
+    };
+    const out = [];
+    let maxEnd = null;
+    state.schedule.forEach((row, i) => {
+      const name = str(row.name), adj = num(row.adj);
+      const o = { row, no: i + 1, name, adj: row.adj, isBreak: name === '休憩' };
+      if (!name) { out.push(o); return; }
+      if (o.isBreak) { o.n = '-'; o.heats = '-'; o.dur = num(sc.breakMin) * 60 + adj * 60; }
+      else {
+        const x = heatsOf(name); o.n = x.n; o.heats = x.h;
+        o.dur = Math.max(0, x.h * (perHeat(name) + num(sc.cycleSec)) + adj * 60);
+      }
+      if (start === null) { o.start = null; o.end = null; }
+      else if (maxEnd === null) o.start = start;
+      else {
+        const prev = out.length ? out[out.length - 1] : null;
+        const noGap = o.isBreak || (prev && prev.isBreak) || !(o.heats > 0);
+        o.start = maxEnd + (noGap ? 0 : num(sc.intervalMin) * 60);
+      }
+      if (o.start !== null && o.start !== undefined) { o.end = o.start + o.dur; maxEnd = maxEnd === null ? o.end : Math.max(maxEnd, o.end); }
+      out.push(o);
+    });
+    return { rows: out, end: maxEnd };
+  }
+
+  // ---------------------------------------------------------------- 速報（Excel 18）
+  function flashList(state, ind, rel, program) {
+    if (!program) return [];
+    const S = state.settings, relay = isRelayName(program);
+    const src = relay ? rel : ind;
+    const catI = c => { const i = S.categories.indexOf(c); return i >= 0 ? i + 1 : 99; };
+    const evI = e => { const i = S.events.indexOf(e); return i >= 0 ? i + 1 : 99; };
+    const list = src.filter(it => (relay ? it.team : it.name) && it.event && (it.event === program || (it.combined && it.combined === program)))
+      .map(it => {
+        const place = (it.status === '完泳' && it.rank) ? Math.min(99, it.rank) * 1000 : it.status === '失格' ? 100000 : it.status === '棄権' ? 200000 : 300000;
+        return { it, key: catI(it.cat) * 1e8 + evI(it.event) * 1e6 + place + it.idx };
+      }).sort((a, b) => a.key - b.key).map(x => x.it);
+    return list.map(it => ({
+      it,
+      rank: it.status === '棄権' ? '棄権' : it.flashRank,
+      name: relay ? it.memberFlash : it.name,
+      club: relay ? it.teamDisp : it.club,
+      cat: it.cat + (it.event !== program ? '（' + (str(it.event).split(' ')[0]) + '）' : ''),
+      time: it.status === '棄権' ? '' : it.flashTime
+    }));
+  }
+
+  // ---------------------------------------------------------------- ダッシュボード（Excel 00）
+  function computeDashboard(state, ind, rel) {
+    const S = state.settings, d = S.dashboard;
+    const uniq = new Set(); ind.forEach(it => { if (it.name) uniq.add(it.name); });
+    const applicants = uniq.size;
+    const priceIn = num(d.price) * (1 + num(d.tax) / 100);
+    const clubs = S.clubs.filter(c => str(c.name)).map(c => {
+      const nm = str(c.name), u = new Set();
+      let score = 0;
+      ind.forEach(it => { if (it.club === nm) { if (it.name) u.add(it.name); if (typeof it.points === 'number') score += it.points; } });
+      rel.forEach(it => { if (it.team === nm && typeof it.points === 'number') score += it.points; });
+      const tgt = str(c.target) === '' ? null : num(c.target);
+      return { name: nm, target: tgt, actual: u.size, diff: tgt === null ? null : u.size - tgt, share: applicants ? u.size / applicants : null, score };
+    });
+    clubs.forEach(c => { c.rank = 1 + clubs.filter(o => o.score > c.score).length; });
+    const medal = k => ind.filter(it => it.medalOrder === k).length + rel.filter(it => it.medalOrder === k).reduce((a, it) => a + it.swimmers, 0);
+    const otherClubs = new Set();
+    ind.forEach(it => { if (it.club && !S.clubs.some(c => str(c.name) === it.club)) otherClubs.add(it.club); });
+    return {
+      capacity: num(d.capacity), target: num(d.target), applicants,
+      diffTarget: applicants - num(d.target), vacancy: num(d.capacity) - applicants,
+      priceIn, targetSales: num(d.target) * priceIn, sales: applicants * priceIn, salesDiff: applicants * priceIn - num(d.target) * priceIn,
+      medals: { gold: medal(1), silver: medal(2), bronze: medal(3) },
+      clubs, otherClubs: [...otherClubs],
+      entries: ind.filter(it => it.name).length, relays: rel.filter(it => it.team).length,
+      done: ind.filter(it => it.status && it.status !== '未入力').length + rel.filter(it => it.status && it.status !== '未入力').length
+    };
+  }
+
+  // ---------------------------------------------------------------- 証書対象（Excel AR〜AU）
+  function certTargets(state, rows, relay, filter, prize) {
+    const S = state.settings, f = filter || {};
+    const maxR = parseInt(S.prizeMaxRank, 10) || 10;
+    return rows.filter(it => {
+      if (!(relay ? it.team : it.name)) return false;
+      if (f.event && !(it.event === f.event || it.combined === f.event)) return false;
+      if (f.cat && it.cat !== f.cat) return false;
+      if (f.club && (relay ? it.team : it.club) !== f.club) return false;
+      if (f.status && it.status !== f.status) return false;
+      if (prize) return it.rank && it.status === '完泳' && it.rank <= maxR;
+      return true;
+    });
+  }
+  function reiwa(dateStr) {
+    const m = str(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return str(dateStr);
+    return '令和' + (+m[1] - 2018) + '年' + (+m[2]) + '月' + (+m[3]) + '日';
+  }
+
+  // ---------------------------------------------------------------- 入力チェック
+  function validate(state, ind, rel, sched) {
+    const S = state.settings, out = [];
+    const add = (level, area, msg, ref, fix) => out.push({ level, area, msg, ref, fix });
+    const evSet = new Set(S.events.map(str)), catSet = new Set(S.categories.map(str)), clubSet = new Set(S.clubs.map(c => str(c.name)));
+    const progs = new Set(programNames(state));
+    const schedNames = new Map();
+    state.schedule.forEach((r, i) => { const n = str(r.name); if (n) schedNames.set(n, (schedNames.get(n) || []).concat(i + 1)); });
+    const opt = { threeDigit: S.threeDigit };
+
+    // ---- 個人エントリー
+    const byNameEv = new Map(), byName = new Map();
+    ind.forEach(it => {
+      const e = it.e, ref = { type: 'entry', id: e.id }, no = '個人' + (it.idx + 1) + '行目';
+      const any = it.name || it.club || it.cat || it.event || str(e.entryTime) || str(e.officialTime);
+      if (!any) return;
+      const who = it.name || '（氏名なし）';
+      if (!it.name) add('error', '個人', no + ': 氏名が空欄です', ref);
+      if (!it.event) add('error', '個人', no + ' ' + who + ': 種目が空欄です', ref);
+      else if (!evSet.has(it.event)) add('error', '個人', no + ' ' + who + ': 種目「' + it.event + '」が大会設定の種目リストにありません', ref);
+      if (!it.cat) add('error', '個人', no + ' ' + who + ': 区分が空欄です', ref);
+      else if (!catSet.has(it.cat)) add('error', '個人', no + ' ' + who + ': 区分「' + it.cat + '」が大会設定の区分リストにありません（組分けがずれます）', ref);
+      if (!it.club) add('warn', '個人', no + ' ' + who + ': チーム名が空欄です', ref);
+      else if (!clubSet.has(it.club)) add('warn', '個人', no + ' ' + who + ': チーム「' + it.club + '」が大会設定のクラブリストにありません', ref);
+      if (it.event && isRelayName(it.event)) add('error', '個人', no + ' ' + who + ': リレー種目が個人エントリーに入っています', ref);
+      if (it.name) {
+        const raw = str(e.name);
+        const fixed = fixName(raw);
+        if (fixed !== raw) add('info', '個人', no + ' ' + who + ': 氏名の空白をそろえられます（全角空白1つ）', ref, 'name');
+        else if (fixed.split('　').length !== 4) add('info', '個人', no + ' ' + who + ': 氏名が「苗字　名前　ミョウジ　ナマエ」の形ではありません', ref);
+        const k = it.name + '\u0001' + it.event;
+        if (it.event) { if (byNameEv.has(k)) add('error', '個人', no + ' ' + who + ': 同じ種目に二重エントリーしています（' + (byNameEv.get(k) + 1) + '行目と重複）', ref); else byNameEv.set(k, it.idx); }
+        if (!byName.has(it.name)) byName.set(it.name, []);
+        byName.get(it.name).push(it);
+      }
+      if (it.pe.kind === 'error') add('error', '個人', no + ' ' + who + ': エントリータイム「' + str(e.entryTime) + '」を読み取れません（' + it.pe.msg + '）', ref);
+      if (it.pf.kind === 'error') add('error', '個人', no + ' ' + who + ': 公式タイム「' + str(e.officialTime) + '」を読み取れません（' + it.pf.msg + '）', ref);
+      if (it.judge === '棄権' && it.pf.kind === 'time') add('warn', '個人', no + ' ' + who + ': 棄権なのに公式タイムが入っています', ref);
+      if (it.pe.kind === 'time' && it.pf.kind === 'time') {
+        const r = it.pf.sec / it.pe.sec;
+        if (r < 0.6 || r > 1.7) add('warn', '個人', no + ' ' + who + ': 公式タイム ' + fmtTime(it.pf.sec) + ' がエントリータイム ' + fmtTime(it.pe.sec) + ' と大きく違います。打ち間違いがないか確認してください', ref);
+      }
+      if (hasLooseChars(e.entryTime) || hasLooseChars(e.officialTime)) add('info', '個人', no + ' ' + who + ': タイムに全角文字があります（読み取りはできています）', ref, 'time');
+      if (it.event && !schedNames.has(it.program)) add('error', '進行', '「' + it.program + '」が進行スケジュールにありません（' + who + ' ほか）', { type: 'view', view: 'schedule' }, null, it.program);
+    });
+    byName.forEach((arr, nm) => {
+      const cats = new Set(arr.map(a => a.cat).filter(Boolean)), clubs = new Set(arr.map(a => a.club).filter(Boolean));
+      if (cats.size > 1) add('warn', '個人', nm + ': 区分が行によって違います（' + [...cats].join('／') + '）', { type: 'entry', id: arr[0].e.id });
+      if (clubs.size > 1) add('warn', '個人', nm + ': チームが行によって違います（' + [...clubs].join('／') + '）。同姓同名の別人なら問題ありません', { type: 'entry', id: arr[0].e.id });
+      const mx = parseInt(S.maxEventsPerPerson, 10);
+      if (mx > 0 && arr.filter(a => a.event).length > mx) add('warn', '個人', nm + ': ' + arr.length + '種目にエントリーしています（上限 ' + mx + '種目）', { type: 'entry', id: arr[0].e.id });
+    });
+    // 同じ種目・区分の中で極端なタイム
+    const grp = new Map();
+    ind.forEach(it => { if (it.pf.kind === 'time' && !it.judge) { const k = it.event + '\u0001' + it.cat; if (!grp.has(k)) grp.set(k, []); grp.get(k).push(it); } });
+    grp.forEach(arr => {
+      if (arr.length < 3) return;
+      const s = arr.map(a => a.pf.sec).sort((a, b) => a - b), med = s[Math.floor(s.length / 2)];
+      arr.forEach(it => {
+        if (it.pf.sec < med * 0.5 || it.pf.sec > med * 2.2) add('warn', '個人', it.name + '（' + it.event + ' ' + it.cat + '）: 公式タイム ' + fmtTime(it.pf.sec) + ' が同じ組の中央値 ' + fmtTime(med) + ' から大きく外れています', { type: 'entry', id: it.e.id });
+      });
+    });
+    const dash = computeDashboard(state, ind, rel);
+    if (dash.capacity > 0 && dash.applicants > dash.capacity) add('warn', '申込', '申込者数 ' + dash.applicants + '名が定員 ' + dash.capacity + '名を超えています', { type: 'view', view: 'dashboard' });
+
+    // ---- リレー
+    const relKey = new Map(), memberEv = new Map();
+    rel.forEach(it => {
+      const r = it.r, ref = { type: 'relay', id: r.id }, no = 'リレー' + (it.idx + 1) + '行目';
+      const any = it.team || it.cat || it.event || it.members.some(Boolean);
+      if (!any) return;
+      const who = it.teamDisp || '（チーム名なし）';
+      if (!it.team) add('error', 'リレー', no + ': チーム名が空欄です', ref);
+      else if (!clubSet.has(it.team)) add('warn', 'リレー', no + ' ' + who + ': チーム「' + it.team + '」がクラブリストにありません（得点がクラブに加算されません）', ref);
+      if (!it.event) add('error', 'リレー', no + ' ' + who + ': 種目が空欄です', ref);
+      else if (!evSet.has(it.event)) add('error', 'リレー', no + ' ' + who + ': 種目「' + it.event + '」が種目リストにありません', ref);
+      else if (!isRelayName(it.event)) add('error', 'リレー', no + ' ' + who + ': 「' + it.event + '」はリレー種目ではありません', ref);
+      if (!it.cat) add('error', 'リレー', no + ' ' + who + ': 区分が空欄です', ref);
+      else if (!catSet.has(it.cat)) add('error', 'リレー', no + ' ' + who + ': 区分「' + it.cat + '」が区分リストにありません', ref);
+      const mem = it.members.filter(Boolean);
+      if (mem.length < 4) add('warn', 'リレー', no + ' ' + who + ': 泳者が' + mem.length + '名です（4名必要）', ref);
+      const ms = new Set();
+      mem.forEach(m => { const k = normKey(m); if (ms.has(k)) add('error', 'リレー', no + ' ' + who + ': 泳者「' + m + '」が2回入っています', ref); ms.add(k); });
+      if (it.event) {
+        mem.forEach(m => {
+          const k = normKey(m) + '\u0001' + it.event;
+          if (memberEv.has(k) && memberEv.get(k) !== it.idx) add('error', 'リレー', no + ' ' + who + ': 泳者「' + m + '」が同じ種目の別チーム（' + (memberEv.get(k) + 1) + '行目）にも入っています', ref);
+          else memberEv.set(k, it.idx);
+        });
+        const k = it.teamDisp + '\u0001' + it.event + '\u0001' + it.cat;
+        if (relKey.has(k)) add('error', 'リレー', no + ' ' + who + ': 同じチーム・記号・種目・区分が二重に登録されています。記号（A・B）で区別してください', ref);
+        else relKey.set(k, it.idx);
+        if (!schedNames.has(it.program)) add('error', '進行', '「' + it.program + '」が進行スケジュールにありません（' + who + ' ほか）', { type: 'view', view: 'schedule' }, null, it.program);
+      }
+      if (it.pe.kind === 'error') add('error', 'リレー', no + ' ' + who + ': エントリータイムを読み取れません（' + it.pe.msg + '）', ref);
+      if (it.pf.kind === 'error') add('error', 'リレー', no + ' ' + who + ': 公式タイムを読み取れません（' + it.pf.msg + '）', ref);
+      if (it.judge === '棄権' && it.pf.kind === 'time') add('warn', 'リレー', no + ' ' + who + ': 棄権なのに公式タイムが入っています', ref);
+    });
+
+    // ---- 大会設定
+    const dup = (arr, label) => { const s = new Set(); arr.forEach(x => { x = str(x); if (!x) return; if (s.has(x)) add('error', '設定', label + '「' + x + '」が重複しています', { type: 'view', view: 'settings' }); s.add(x); }); };
+    dup(S.events, '種目'); dup(S.categories, '区分'); dup(S.clubs.map(c => c.name), 'クラブ');
+    const lanesRaw = (S.lanes || []).map(v => str(v)).filter(Boolean);
+    const lanes = laneList(S);
+    if (lanesRaw.length !== lanes.length) add('error', '設定', '使用レーンの番号が重複しているか、数字ではありません', { type: 'view', view: 'settings' });
+    if (!lanesRaw.length) add('error', '設定', '使用レーンが1つも設定されていません', { type: 'view', view: 'settings' });
+    if ((parseInt(S.minPerHeatInd, 10) || 0) > lanes.length) add('warn', '設定', '個人の1組最低人数（' + S.minPerHeatInd + '）がレーン数（' + lanes.length + '）を超えています。レーン数に合わせて計算します', { type: 'view', view: 'settings' });
+    if ((parseInt(S.minPerHeatRelay, 10) || 0) > lanes.length) add('warn', '設定', 'リレーの1組最低チーム数がレーン数を超えています。レーン数に合わせて計算します', { type: 'view', view: 'settings' });
+    const pairSeen = new Map();
+    (S.combined || []).forEach((r, i) => {
+      if (!str(r.name)) { if ((r.pairs || []).some(p => p && (p.event || p.cat))) add('error', '設定', '合同レース' + (i + 1) + '行目: プログラム表示名が空欄です', { type: 'view', view: 'settings' }); return; }
+      if (evSet.has(str(r.name))) add('error', '設定', '合同レース名「' + r.name + '」が通常の種目名と同じです。別の名前にしてください', { type: 'view', view: 'settings' });
+      (r.pairs || []).forEach(p => {
+        if (!p || (!p.event && !p.cat)) return;
+        if (p.event && !evSet.has(str(p.event))) add('error', '設定', '合同レース「' + r.name + '」の種目「' + p.event + '」が種目リストにありません', { type: 'view', view: 'settings' });
+        if (p.cat && !catSet.has(str(p.cat))) add('error', '設定', '合同レース「' + r.name + '」の区分「' + p.cat + '」が区分リストにありません', { type: 'view', view: 'settings' });
+        if (!p.event || !p.cat) add('warn', '設定', '合同レース「' + r.name + '」で種目か区分の片方だけが入っています', { type: 'view', view: 'settings' });
+        const k = p.event + '\u0001' + p.cat;
+        if (pairSeen.has(k)) add('warn', '設定', '「' + p.event + '・' + p.cat + '」が複数の合同レース（' + pairSeen.get(k) + '／' + r.name + '）に入っています。先の方が使われます', { type: 'view', view: 'settings' });
+        else pairSeen.set(k, r.name);
+      });
+    });
+    if (parseClock(S.schedule.start) === null) add('error', '設定', '競技開始の時刻「' + S.schedule.start + '」を読み取れません（例 8:45）', { type: 'view', view: 'settings' });
+
+    // ---- スケジュール
+    schedNames.forEach((rows, n) => {
+      if (n === '休憩') return;
+      if (rows.length > 1) add('warn', '進行', '「' + n + '」がスケジュールに' + rows.length + '回入っています（' + rows.join('・') + '番）。時間が二重に計上されます', { type: 'view', view: 'schedule' });
+      if (!progs.has(n)) add('warn', '進行', 'スケジュールの「' + n + '」は種目リスト・合同レースにありません', { type: 'view', view: 'schedule' });
+    });
+    if (sched && sched.end !== null) {
+      const cl = parseClock(S.schedule.closing);
+      if (cl !== null && sched.end > cl) add('warn', '進行', '競技終了予定 ' + fmtClock(sched.end) + ' が閉会式 ' + S.schedule.closing + ' より後です', { type: 'view', view: 'schedule' });
+    }
+    // 重複メッセージをまとめる
+    const seen = new Set();
+    return out.filter(x => { const k = x.level + x.msg; if (seen.has(k)) return false; seen.add(k); return true; });
+  }
+  function hasLooseChars(v) { return typeof v === 'string' && /[０-９．：，　]/.test(v); }
+  function fixName(s) {
+    return str(s).replace(/[ 　\t]+/g, '　').replace(/^　|　$/g, '');
+  }
+  function fixTimeText(v) { return typeof v === 'string' ? toHalf(v).trim() : v; }
+
+  // ============================================================================
+  //  表彰者算出（JFS表彰者算出マクロ Recalc の移植）
+  // ============================================================================
+  const N_CAT = 8, N_RANK = 3, EPS = 1e-9, ODD_LOW = 0.5, ODD_HIGH = 1.5;
+  const SEX = ['男子', '女子'];
+  const isMark = v => v === true || ['○', '〇', '◯'].indexOf(str(v)) >= 0;
+  function awardMaster(A) {
+    const m = { warn: [] };
+    m.cat = A.cats.slice(0, N_CAT).map((c, i) => {
+      let name = str(c.name), on = name.length > 0 && name.indexOf('（未設定') !== 0;
+      if (!on) name = '（未設定' + (i + 1) + '）';
+      return { k: i + 1, name, on, mvp: isMark(c.mvp), exc: isMark(c.exc) };
+    });
+    m.ev = [];
+    A.events.forEach(e => {
+      const name = str(e.name);
+      if (!name) return;
+      const base = [0, 0];
+      ['baseM', 'baseF'].forEach((f, sx) => {
+        const p = parseTime(e[f], { threeDigit: 'mss' });
+        if (p.kind === 'time') base[sx] = p.sec;
+        else m.warn.push('「' + name + '」の' + SEX[sx] + '基準タイムが未設定です（達成率を計算できません）');
+      });
+      m.ev.push({ id: e.id, name, base, mvp: isMark(e.mvp) });
+    });
+    const clamp = (v, d) => { const n = parseInt(toHalf(str(v)), 10); if (!isFinite(n)) return d; return Math.max(1, Math.min(N_CAT, n)); };
+    m.cStart = clamp(A.cStart, 1); m.cEnd = clamp(A.cEnd, N_CAT);
+    if (m.cStart > m.cEnd) { const t = m.cStart; m.cStart = m.cEnd; m.cEnd = t; }
+    const rm = str(A.rankMode);
+    m.rankMax = rm.indexOf('のみ') >= 0 ? 1 : (rm.indexOf('2位') >= 0 && rm.indexOf('3位') < 0 ? 2 : 3);
+    let mr = parseFloat(toHalf(str(A.minRate)));
+    if (!isFinite(mr)) mr = 0;
+    if (mr > 5) mr = mr / 100;
+    m.minRate = Math.max(0, mr);
+    m.fold = str(A.fold).indexOf('折りたた') >= 0;
+    for (let a = 0; a < N_CAT; a++) for (let b = a + 1; b < N_CAT; b++)
+      if (m.cat[a].on && m.cat[b].on && m.cat[a].name === m.cat[b].name) m.warn.push('年齢区分名「' + m.cat[a].name + '」が重複しています（区分' + (a + 1) + 'と区分' + (b + 1) + '）');
+    for (let a = 0; a < m.ev.length; a++) for (let b = a + 1; b < m.ev.length; b++)
+      if (m.ev[a].name === m.ev[b].name) m.warn.push('種目名「' + m.ev[a].name + '」が重複しています');
+    if (!m.cat.some(c => c.on)) m.warn.push('年齢区分が1つも設定されていません');
+    const TL = '〜';
+    m.cond = '区分' + m.cStart + TL + m.cEnd + '・' + (m.rankMax === 1 ? '1位のみ' : m.rankMax === 2 ? '1' + TL + '2位' : '1' + TL + '3位すべて') +
+      (m.minRate > 0 ? '・達成率' + (m.minRate * 100).toFixed(1) + '%以上' : '');
+    return m;
+  }
+  const awardKey = (k, sx, evId, rk) => k + '|' + sx + '|' + evId + '|' + rk;
+
+  function computeAwards(A) {
+    const m = awardMaster(A);
+    const E = m.ev.length, perBlock = E * N_RANK;
+    const R = { master: m, rows: [], errRows: [], oddRows: [], sum: { entered: 0, err: 0, noName: 0, offInput: 0, odd: 0, slots: 0, excOk: 0, excNone: 0 } };
+    const sum = R.sum;
+    const agg = []; // {key,k,sx,rate,i}
+    const mvp = [{ i: -1, rate: 0, tie: 0, key: '' }, { i: -1, rate: 0, tie: 0, key: '' }];
+    let i = 0;
+    for (let k = 1; k <= N_CAT; k++) {
+      const cat = m.cat[k - 1];
+      for (let sx = 0; sx < 2; sx++) {
+        for (let e = 0; e < E; e++) {
+          const ev = m.ev[e];
+          for (let rk = 1; rk <= N_RANK; rk++) {
+            i++;
+            const key = awardKey(k, sx, ev.id, rk);
+            const inp = A.inputs[key] || {};
+            const row = { i, k, sx, e, rk, key, cat, ev, club: str(inp.club), name: str(inp.name), timeRaw: inp.time, base: ev.base[sx], live: cat.on, rate: null, state: '' };
+            if (cat.on) sum.slots++;
+            const has = str(inp.time) !== '';
+            if (has) {
+              const p = parseTime(inp.time, { threeDigit: 'mss' });
+              if (p.kind !== 'time') { row.state = 'error'; sum.err++; R.errRows.push(i); }
+              else {
+                row.sec = p.sec;
+                if (!cat.on) { sum.offInput++; row.state = 'off'; }
+                else if (!(ev.base[sx] > 0)) { row.state = 'nobase'; sum.entered++; }
+                else {
+                  sum.entered++;
+                  const rate = ev.base[sx] / p.sec;
+                  row.rate = rate;
+                  if (rate < ODD_LOW || rate > ODD_HIGH) { sum.odd++; row.odd = true; R.oddRows.push(i); }
+                  let pk;
+                  if (!row.name) { sum.noName++; pk = '#' + i; } else pk = row.club + '|' + row.name;
+                  row.pkey = pk;
+                  if (k >= m.cStart && k <= m.cEnd && cat.mvp && ev.mvp && rk <= m.rankMax && rate >= m.minRate - EPS) {
+                    const M = mvp[sx];
+                    if (M.i < 0 || rate > M.rate + EPS) { M.i = i; M.rate = rate; M.tie = 0; M.key = pk; M.row = row; }
+                    else if (Math.abs(rate - M.rate) <= EPS && M.key !== pk) M.tie++;
+                  }
+                  const f = agg.find(a => a.k === k && a.sx === sx && a.key === pk);
+                  if (f) { if (rate > f.rate + EPS) { f.rate = rate; f.row = row; } }
+                  else agg.push({ key: pk, k, sx, rate, row });
+                }
+              }
+            }
+            R.rows.push(row);
+          }
+        }
+      }
+    }
+    // 最優秀
+    R.mvp = [0, 1].map(sx => {
+      const M = mvp[sx], o = { sx, label: '最優秀選手', sexName: SEX[sx] };
+      if (M.i > 0) {
+        Object.assign(o, entryOf(M.row, M.rate));
+        o.status = '選出（' + m.cond + '）' + (M.tie > 0 ? ' ※同率' + (M.tie + 1) + '名' : '');
+        o.kind = 'ok'; o.tie = M.tie;
+        o.summary = o.name + '（' + o.catName + '・' + o.event + ' ' + (M.rate * 100).toFixed(2) + '%）' + (M.tie > 0 ? ' ※同率' + (M.tie + 1) + '名あり' : '') + (M.rate > ODD_HIGH ? ' ※達成率が極端なので要確認' : '');
+      } else if (sum.entered === 0) { o.status = '未入力（' + m.cond + '）'; o.kind = 'none'; o.summary = '未入力'; }
+      else { o.status = '該当者なし（' + m.cond + '）'; o.kind = 'none'; o.summary = '該当者なし（選出範囲の条件を満たす記録がありません）'; }
+      return o;
+    });
+    // 表示する区分
+    const disp = [];
+    m.cat.forEach(c => { if (c.on || !m.fold) disp.push(c.k); });
+    R.disp = disp;
+    const better = (a, b) => a.rate > b.rate + EPS || (Math.abs(a.rate - b.rate) <= EPS && a.row.i < b.row.i);
+    const top = {};
+    agg.forEach(a => {
+      const t = top[a.k + '|' + a.sx] = top[a.k + '|' + a.sx] || [null, null];
+      if (!t[0]) t[0] = a;
+      else if (better(a, t[0])) { t[1] = t[0]; t[0] = a; }
+      else if (!t[1]) t[1] = a;
+      else if (better(a, t[1])) t[1] = a;
+    });
+    R.top = top;
+    R.exc = [];
+    disp.forEach(k => {
+      const cat = m.cat[k - 1];
+      [0, 1].forEach(sx => {
+        const o = { slot: '区分' + k, catName: cat.name, sexName: SEX[sx], k, sx };
+        const t = top[k + '|' + sx] || [null, null];
+        if (!cat.on) { o.status = '区分未設定（マスタ入力で有効化）'; o.kind = 'off'; }
+        else if (!cat.exc) { o.status = '優秀選手の対象外（マスタ設定）'; o.kind = 'off'; }
+        else if (!t[0]) { o.status = '未入力'; o.kind = 'none'; sum.excNone++; }
+        else {
+          let pick = t[0], s = '区分1位選出', kind = 'ok';
+          const M = mvp[sx];
+          if (M.i > 0 && pick.key === M.key && k === M.row.k) {
+            pick = t[1];
+            if (!pick) { s = '該当者なし（1位が最優秀選手）'; kind = 'none'; } else { s = '2位繰り上げ（1位が最優秀選手）'; kind = 'up'; }
+          }
+          if (pick) { Object.assign(o, entryOf(pick.row, pick.rate)); sum.excOk++; } else sum.excNone++;
+          o.status = s; o.kind = kind;
+        }
+        R.exc.push(o);
+      });
+    });
+    R.cand = [];
+    [0, 1].forEach(sx => disp.forEach(k => {
+      const t = top[k + '|' + sx] || [null, null];
+      [0, 1].forEach(p => {
+        const o = { slot: '区分' + k + '・' + (p + 1) + '位', catName: m.cat[k - 1].name, sexName: SEX[sx], on: m.cat[k - 1].on };
+        if (t[p]) { Object.assign(o, entryOf(t[p].row, t[p].rate)); o.time = t[p].row.sec; }
+        R.cand.push(o);
+      });
+    }));
+    R.progress = { slots: sum.slots, all: N_CAT * 2 * perBlock, entered: sum.entered, pct: sum.slots ? sum.entered / sum.slots * 100 : 0 };
+    R.warnings = [];
+    if (sum.err) R.warnings.push('タイムを読み取れない入力: ' + sum.err + '件 → 28.78 / 132.22 / 1:32.22 の形で入れ直してください');
+    if (sum.odd) R.warnings.push('達成率が極端（50%未満または150%超）: ' + sum.odd + '件 → タイムの打ち間違いがないか確認してください');
+    if (sum.noName) R.warnings.push('選手名が空欄の記録: ' + sum.noName + '件');
+    if (sum.offInput) R.warnings.push('未設定の区分に入った記録: ' + sum.offInput + '件（集計対象外）');
+    m.warn.forEach(w => R.warnings.push(w));
+    return R;
+    function entryOf(row, rate) {
+      return { catName: row.cat.name, club: row.club, name: row.name || '（氏名未入力）', event: row.ev.name, rate, rowNo: row.i };
+    }
+  }
+  // 大会結果（個人の公式順位1〜3位）→ 表彰入力へ
+  function awardImportFromResults(state, ind) {
+    const A = state.award, m = awardMaster(A);
+    const catMap = new Map(), evMap = new Map();
+    m.cat.forEach(c => { if (c.on) catMap.set(normKey(c.name), c.k); });
+    m.ev.forEach(e => evMap.set(normKey(e.name), e.id));
+    const inputs = {}, skipped = new Map();
+    let n = 0;
+    ind.forEach(it => {
+      if (!(it.rank && it.rank <= 3 && it.status === '完泳')) return;
+      const sex = evSex(it.event), sx = sex === '男子' ? 0 : sex === '女子' ? 1 : -1;
+      const evName = str(it.event).replace(/^(男子|女子|混合)\s*/, '');
+      const k = catMap.get(normKey(it.cat)), evId = evMap.get(normKey(evName));
+      if (sx < 0 || !k || !evId) {
+        const why = sx < 0 ? '性別を判定できない種目 ' + it.event : !k ? '区分「' + it.cat + '」が表彰マスタにない' : '種目「' + evName + '」が表彰マスタにない';
+        skipped.set(why, (skipped.get(why) || 0) + 1); return;
+      }
+      let rk = it.rank;
+      while (rk <= 3 && inputs[awardKey(k, sx, evId, rk)]) rk++; // 同順位は次の枠へ
+      if (rk > 3) { skipped.set('同順位で3枠を超えた記録', (skipped.get('同順位で3枠を超えた記録') || 0) + 1); return; }
+      inputs[awardKey(k, sx, evId, rk)] = { club: it.club, name: it.name.split('　').slice(0, 2).join('　'), time: fmtTime(it.pf.sec) };
+      n++;
+    });
+    return { inputs, n, skipped: [...skipped].map(([k, v]) => k + '：' + v + '件') };
+  }
+
+  return {
+    toHalf, normKey, str, parseTime, fmtTime, fmtTimeJa, fmtClock, parseClock, parseDuration, fmtDuration, num,
+    defaultSettings, defaultAward, emptyState, isRelayName, laneList, combinedOf, evSex,
+    computeIndividuals, computeRelays, computeSchedule, programNames, flashList, computeDashboard, certTargets, reiwa,
+    validate, fixName, fixTimeText, computeAwards, awardMaster, awardKey, awardImportFromResults, isMark, SEX
+  };
+})();
+
+
+/* ============================================================================
+ * スイム大会運営アプリ — 画面・保存・取り消し
+ * ========================================================================== */
+'use strict';
+const C = Core;
+const KEY = 'swim-meet-app/state', SNAP_KEY = 'swim-meet-app/snapshots', META_KEY = 'swim-meet-app/meta';
+const TAB_ID = Math.random().toString(36).slice(2);
+const esc = s => String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const $ = (sel, root) => (root || document).querySelector(sel);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+let state = C.emptyState();
+let D = {};                 // 計算結果
+let undoStack = [], redoStack = [];
+let view = 'home';
+let ui = { entPage: 0, entQ: '', entClub: '', entCat: '', entEvent: '', entOnlyIssue: false, relQ: '', prog: '', flash: '', rankEv: '', rankCat: '', certKind: 'record', certTarget: 'ind', certPaper: 'A4', certFilter: {}, certFrom: 1, certTo: '', awShowOff: false, awCat: 0, highlight: null, big: false };
+let meta = { lastBackup: 0, lastSnap: 0, sample: false, changesSinceBackup: 0 };
+let saveError = '';
+let commitsSinceSnap = 0;
+
+// ---------------------------------------------------------------- 保存
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { localStorage.setItem(k, v); }
+function load() {
+  const raw = lsGet(KEY);
+  if (raw) {
+    try { state = migrate(JSON.parse(raw)); }
+    catch (e) {
+      // 壊れていたら最新のスナップショットから戻す
+      const snaps = getSnaps();
+      if (snaps.length) { state = migrate(JSON.parse(snaps[0].data)); toast('保存データが壊れていたため、' + fmtDT(snaps[0].t) + ' の自動バックアップから復元しました', 'err', 10000); }
+    }
+  }
+  try { meta = Object.assign(meta, JSON.parse(lsGet(META_KEY) || '{}')); } catch (e) { /* ignore */ }
+  try { ui = Object.assign(ui, (state.ui || {})); } catch (e) { /* ignore */ }
+}
+function migrate(s) {
+  const base = C.emptyState();
+  if (!s || typeof s !== 'object') return base;
+  s.settings = Object.assign(base.settings, s.settings || {});
+  ['schedule', 'points', 'cert', 'award', 'print', 'dashboard'].forEach(k => { s.settings[k] = Object.assign(C.defaultSettings()[k], (s.settings[k] || {})); });
+  s.entries = Array.isArray(s.entries) ? s.entries : [];
+  s.relays = Array.isArray(s.relays) ? s.relays : [];
+  s.schedule = Array.isArray(s.schedule) ? s.schedule : [];
+  s.entries.forEach(e => { if (!e.id) e.id = uid(); });
+  s.relays.forEach(r => { if (!r.id) r.id = uid(); if (!Array.isArray(r.members)) r.members = ['', '', '', '']; while (r.members.length < 4) r.members.push(''); });
+  s.schedule.forEach(r => { if (!r.id) r.id = uid(); });
+  s.award = Object.assign(C.defaultAward(), s.award || {});
+  while (s.award.cats.length < 8) s.award.cats.push({ name: '', mvp: true, exc: true });
+  while (s.award.events.length < 15) s.award.events.push({ id: 'ae' + uid(), name: '', baseM: '', baseF: '', mvp: true });
+  s.app = 'swim-meet'; s.schema = 1; s.rev = s.rev || 0;
+  return s;
+}
+function serialize() { state.ui = { prog: ui.prog, flash: ui.flash, rankEv: ui.rankEv, rankCat: ui.rankCat, certKind: ui.certKind, certTarget: ui.certTarget, certPaper: ui.certPaper }; return JSON.stringify(state); }
+function save() {
+  const json = serialize();
+  try {
+    lsSet(KEY, json);
+    saveError = '';
+  } catch (e) {
+    // 容量不足 → 古い自動バックアップを消して再試行
+    try { const sn = getSnaps(); while (sn.length > 1) { sn.pop(); lsSet(SNAP_KEY, JSON.stringify(sn)); } lsSet(KEY, json); saveError = ''; }
+    catch (e2) { saveError = 'ブラウザに保存できませんでした（' + (e2.name || e2.message) + '）。すぐに「データ管理 → バックアップを書き出す」でファイルに保存してください。'; }
+  }
+  try { bc && bc.postMessage({ type: 'saved', rev: state.rev, tab: TAB_ID }); } catch (e) { /* ignore */ }
+  saveMeta();
+}
+function saveMeta() { try { lsSet(META_KEY, JSON.stringify(meta)); } catch (e) { /* ignore */ } }
+function getSnaps() { try { return JSON.parse(lsGet(SNAP_KEY) || '[]'); } catch (e) { return []; } }
+function snapshot(label, force) {
+  const now = Date.now();
+  if (!force && now - meta.lastSnap < 5 * 60 * 1000 && commitsSinceSnap < 40) return;
+  const sn = getSnaps();
+  sn.unshift({ t: now, label: label || '自動', data: serialize(), n: state.entries.length });
+  while (sn.length > 15) sn.pop();
+  try { lsSet(SNAP_KEY, JSON.stringify(sn)); }
+  catch (e) { while (sn.length > 2) { sn.pop(); try { lsSet(SNAP_KEY, JSON.stringify(sn)); break; } catch (e2) { /* keep trimming */ } } }
+  meta.lastSnap = now; commitsSinceSnap = 0; saveMeta();
+}
+
+// 複数タブ対策
+let bc = null;
+try { bc = new BroadcastChannel('swim-meet-app'); } catch (e) { bc = null; }
+function onOtherTabSaved() {
+  const raw = lsGet(KEY);
+  if (!raw) return;
+  try {
+    const s = JSON.parse(raw);
+    if (s.rev !== state.rev || raw !== serialize()) {
+      state = migrate(s); recompute(); render();
+      toast('別のタブ（ウィンドウ）で変更された内容を読み込みました。同時に2か所で編集すると後の保存が優先されます', 'info', 7000);
+    }
+  } catch (e) { /* ignore */ }
+}
+if (bc) bc.onmessage = ev => { if (ev.data && ev.data.tab !== TAB_ID) onOtherTabSaved(); };
+window.addEventListener('storage', ev => { if (ev.key === KEY && !bc) onOtherTabSaved(); });
+
+// ---------------------------------------------------------------- 変更・取り消し
+function isLocked() { return !!state.settings.locked; }
+function commit(label, fn, opt) {
+  opt = opt || {};
+  if (isLocked() && !opt.allowLocked) { toast('当日モード（設定ロック）中です。上部の「当日モード」を解除してから変更してください', 'err'); render(); return false; }
+  undoStack.push({ label, data: serialize() });
+  if (undoStack.length > 60) undoStack.shift();
+  redoStack = [];
+  try { fn(state); }
+  catch (e) { const u = undoStack.pop(); state = migrate(JSON.parse(u.data)); toast('変更を適用できませんでした: ' + e.message, 'err'); }
+  state.rev++;
+  meta.changesSinceBackup++; commitsSinceSnap++;
+  if (opt.snap) snapshot(opt.snap, true); else snapshot();
+  save(); recompute();
+  if (opt.render !== false) scheduleRender();
+  return true;
+}
+function undo() {
+  if (!undoStack.length) return;
+  const u = undoStack.pop();
+  redoStack.push({ label: u.label, data: serialize() });
+  state = migrate(JSON.parse(u.data)); state.rev++;
+  save(); recompute(); render();
+  toast('取り消しました: ' + u.label);
+}
+function redo() {
+  if (!redoStack.length) return;
+  const r = redoStack.pop();
+  undoStack.push({ label: r.label, data: serialize() });
+  state = migrate(JSON.parse(r.data)); state.rev++;
+  save(); recompute(); render();
+  toast('やり直しました: ' + r.label);
+}
+
+function recompute() {
+  const t0 = performance.now();
+  const ind = C.computeIndividuals(state), rel = C.computeRelays(state);
+  const sched = C.computeSchedule(state, ind, rel);
+  const dash = C.computeDashboard(state, ind, rel);
+  const checks = C.validate(state, ind, rel, sched);
+  const aw = C.computeAwards(state.award);
+  const byId = new Map(); ind.forEach(it => byId.set(it.id, it)); rel.forEach(it => byId.set(it.id, it));
+  const issuesById = new Map();
+  checks.forEach(c => { if (c.ref && c.ref.id) { const a = issuesById.get(c.ref.id) || []; a.push(c); issuesById.set(c.ref.id, a); } });
+  D = { ind, rel, sched, dash, checks, aw, byId, issuesById, ms: performance.now() - t0 };
+}
+
+// ---------------------------------------------------------------- トースト・モーダル
+function toast(msg, kind, ms, action) {
+  const box = $('#toasts');
+  const el = document.createElement('div');
+  el.className = 'toast' + (kind === 'err' ? ' err' : '');
+  el.setAttribute('role', 'status');
+  el.innerHTML = '<span>' + esc(msg) + '</span>';
+  if (action) {
+    const b = document.createElement('button'); b.textContent = action.label;
+    b.onclick = () => { action.fn(); el.remove(); };
+    el.appendChild(b);
+  }
+  box.appendChild(el);
+  setTimeout(() => el.remove(), ms || (action ? 7000 : 3500));
+}
+function modal(html, onMount) {
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = '<div class="modal" role="dialog" aria-modal="true">' + html + '</div>';
+  document.body.appendChild(bg);
+  const close = () => { bg.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  bg.addEventListener('click', e => { if (e.target === bg) close(); });
+  bg.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', close));
+  if (onMount) onMount(bg.querySelector('.modal'), close);
+  const f = bg.querySelector('[autofocus]') || bg.querySelector('button.primary');
+  if (f) f.focus();
+  return close;
+}
+function confirmBox(title, body, okLabel, onOk, opt) {
+  opt = opt || {};
+  modal('<h2>' + esc(title) + '</h2><div>' + body + '</div>' +
+    (opt.typeWord ? '<p class="small">確認のため「<b>' + esc(opt.typeWord) + '</b>」と入力してください</p><input id="cf-word" autofocus>' : '') +
+    '<div class="actions"><button class="btn" data-close>キャンセル</button><button class="btn ' + (opt.danger ? 'danger solid' : 'primary') + '" id="cf-ok">' + esc(okLabel) + '</button></div>',
+    (m, close) => {
+      const ok = m.querySelector('#cf-ok');
+      if (opt.typeWord) { ok.disabled = true; m.querySelector('#cf-word').addEventListener('input', e => { ok.disabled = e.target.value.trim() !== opt.typeWord; }); }
+      ok.addEventListener('click', () => { close(); onOk(); });
+    });
+}
+function fmtDT(t) { const d = new Date(t); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function ago(t) { if (!t) return 'まだありません'; const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'たった今' : m < 60 ? m + '分前' : m < 1440 ? Math.round(m / 60) + '時間前' : Math.round(m / 1440) + '日前'; }
+
+// ---------------------------------------------------------------- 描画
+const NAV = [
+  ['準備', [['home', 'ダッシュボード'], ['settings', '大会設定'], ['entries', '個人エントリー'], ['relays', 'リレーエントリー'], ['schedule', '進行スケジュール']]],
+  ['当日', [['program', 'プログラム・記録入力'], ['flash', '速報'], ['ranking', 'ランキング'], ['certs', '記録証・賞状']]],
+  ['表彰', [['awards', '最優秀・優秀選手']]],
+  ['管理', [['check', '入力チェック'], ['data', 'データ管理・Excel']]]
+];
+let renderQueued = false;
+function scheduleRender() { if (renderQueued) return; renderQueued = true; setTimeout(() => { renderQueued = false; render(); }, 0); }
+function render() {
+  const act = document.activeElement;
+  const fk = act && act.dataset ? act.dataset.k : null;
+  const selS = act && 'selectionStart' in act ? (() => { try { return [act.selectionStart, act.selectionEnd]; } catch (e) { return null; } })() : null;
+  const scrollY = window.scrollY;
+  renderTop();
+  renderNav();
+  const fn = VIEWS[view] || VIEWS.home;
+  let html;
+  try { html = fn(); }
+  catch (e) { console.error(e); html = '<div class="notice err">この画面の表示中にエラーが起きました: ' + esc(e.message) + '。<button class="btn sm" data-act="go" data-v="data">データ管理へ</button> でバックアップを書き出してから、ページを再読み込みしてください。</div>'; }
+  $('#main').innerHTML = (saveError ? '<div class="notice err"><b>保存エラー</b><span class="grow">' + esc(saveError) + '</span><button class="btn sm" data-act="backup">今すぐ書き出す</button></div>' : '') + backupReminder() + html;
+  if (fk) {
+    const el = document.querySelector('[data-k="' + CSS.escape(fk) + '"]');
+    if (el) { el.focus({ preventScroll: true }); if (selS && 'setSelectionRange' in el) { try { el.setSelectionRange(selS[0], selS[1]); } catch (e) { /* ignore */ } } }
+  }
+  window.scrollTo(0, scrollY);
+  if (ui.highlight) {
+    const tr = document.querySelector('[data-row="' + CSS.escape(ui.highlight) + '"]');
+    if (tr) { tr.classList.add('flash'); tr.scrollIntoView({ block: 'center' }); }
+    ui.highlight = null;
+  }
+}
+function backupReminder() {
+  if (!state.entries.length && !state.relays.length) return '';
+  const age = Date.now() - (meta.lastBackup || 0);
+  if (meta.lastBackup ? (meta.changesSinceBackup > 0 && age > 60 * 60 * 1000) : meta.changesSinceBackup >= 30) {
+    return '<div class="notice info"><span class="grow">最後にファイルへバックアップしてから ' + (meta.lastBackup ? ago(meta.lastBackup) : '一度も書き出していません') + '（変更 ' + meta.changesSinceBackup + '回）。パソコンの故障やブラウザの履歴削除に備えて、書き出しておくと安心です。</span><button class="btn sm primary" data-act="backup">バックアップを書き出す</button></div>';
+  }
+  return '';
+}
+function renderTop() {
+  const ch = D.checks || [];
+  const ne = ch.filter(c => c.level === 'error').length, nw = ch.filter(c => c.level === 'warn').length;
+  const locked = isLocked();
+  $('#top').innerHTML =
+    '<div class="brand"><small>スイム大会運営</small><strong title="' + esc(state.settings.meetName) + '">' + esc(state.settings.meetName || '（大会名未設定）') + '</strong></div>' +
+    '<div class="chips">' +
+    (meta.sample ? '<span class="chip warn">サンプルデータ</span>' : '') +
+    (saveError ? '<button class="chip err" data-act="backup"><span class="dot"></span>保存エラー</button>' : '<span class="chip" title="入力のたびにこのブラウザへ自動保存しています"><span class="dot"></span>自動保存済み</span>') +
+    '<button class="chip ' + (ne ? 'err' : nw ? 'warn' : 'ok') + '" data-act="go" data-v="check">' + (ne ? 'エラー ' + ne : nw ? '' : '問題なし') + (nw ? (ne ? '・' : '') + '注意 ' + nw : '') + '</button>' +
+    '<button class="chip ' + (locked ? 'lock' : '') + '" data-act="lock" title="大会当日は設定・エントリーを誤って変えないようにロックできます。記録入力はできます">' + (locked ? '当日モード中（設定ロック）' : '当日モード: オフ') + '</button>' +
+    '</div>' +
+    '<div class="chips"><button class="iconbtn" data-act="undo" title="元に戻す (Ctrl+Z)" aria-label="元に戻す" ' + (undoStack.length ? '' : 'disabled') + '>↶</button>' +
+    '<button class="iconbtn" data-act="redo" title="やり直し (Ctrl+Y)" aria-label="やり直し" ' + (redoStack.length ? '' : 'disabled') + '>↷</button>' +
+    '<button class="btn sm" data-act="backup">バックアップ</button></div>';
+}
+function renderNav() {
+  const ch = D.checks || [];
+  const ne = ch.filter(c => c.level === 'error').length;
+  $('#nav').innerHTML = NAV.map(([h, items]) => '<h6>' + h + '</h6>' + items.map(([v, label]) =>
+    '<a href="#' + v + '" class="' + (view === v ? 'on' : '') + '" data-act="go" data-v="' + v + '">' + label +
+    (v === 'check' && ne ? '<span class="badge">' + ne + '</span>' : '') + '</a>').join('')).join('');
+}
+
+// ---------------------------------------------------------------- 入力部品
+const sel = (k, val, opts, attrs) => {
+  const v = val === null || val === undefined ? '' : String(val);
+  let has = opts.some(o => (Array.isArray(o) ? o[0] : o) === v);
+  return '<select data-k="' + esc(k) + '" ' + (attrs || '') + '>' +
+    (has || !v ? '' : '<option value="' + esc(v) + '" selected>⚠ ' + esc(v) + '（リスト外）</option>') +
+    opts.map(o => { const [ov, ol] = Array.isArray(o) ? o : [o, o]; return '<option value="' + esc(ov) + '"' + (ov === v ? ' selected' : '') + '>' + esc(ol) + '</option>'; }).join('') + '</select>';
+};
+const inp = (k, val, attrs) => '<input data-k="' + esc(k) + '" value="' + esc(val === null || val === undefined ? '' : val) + '" ' + (attrs || '') + '>';
+function timeCell(k, raw, extraClass, attrs) {
+  const p = C.parseTime(raw, { threeDigit: k.indexOf('aw') === 0 ? 'mss' : state.settings.threeDigit });
+  const bad = p.kind === 'error';
+  const prev = p.kind === 'time' ? C.fmtTime(p.sec) : p.kind === 'special' ? p.special : bad ? p.msg : '';
+  return '<input class="tin ' + (bad ? 'bad ' : '') + (extraClass || '') + '" data-k="' + esc(k) + '" value="' + esc(raw === null || raw === undefined ? '' : raw) + '" inputmode="decimal" autocomplete="off" ' + (attrs || '') + '><span class="prev' + (bad ? ' bad' : '') + '" data-prev="' + esc(k) + '">' + esc(prev) + '</span>';
+}
+const pillStatus = s => s === '完泳' ? '<span class="pill ok">完泳</span>' : s === '失格' ? '<span class="pill err">失格</span>' : s === '棄権' ? '<span class="pill warn">棄権</span>' : s ? '<span class="pill mute">' + esc(s) + '</span>' : '';
+const blankOpt = label => [['', label || '—']];
+function lockAttr() { return isLocked() ? 'disabled' : ''; }
+
+// ---------------------------------------------------------------- 画面: ダッシュボード
+const VIEWS = {};
+VIEWS.home = () => {
+  const d = D.dash, S = state.settings;
+  if (!state.entries.length && !state.relays.length) {
+    return '<h1 class="view">はじめましょう</h1><p class="lead">エントリーを取り込むと、組・レーン編成、進行スケジュール、プログラム、速報、ランキング、記録証・賞状、表彰者選出までが自動で計算されます。データはこのブラウザの中だけに保存され、外部には送信されません。</p>' +
+      '<div class="onboard">' +
+      '<button data-act="go" data-v="data"><b>Excelファイルから始める</b><span class="muted">今お使いの大会運営ブック（.xlsx）や表彰者算出ブック（.xlsm）をそのまま読み込めます</span></button>' +
+      '<button data-act="sample"><b>サンプルで試す</b><span class="muted">架空の選手データで、すべての機能を試せます。あとで消せます</span></button>' +
+      '<button data-act="go" data-v="settings"><b>新しい大会を一から作る</b><span class="muted">大会名・種目・区分・クラブを設定してから、エントリーを入力します</span></button>' +
+      '</div>';
+  }
+  const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
+  const nextUp = (D.sched.rows || []).find(r => !r.isBreak && r.name && (D.ind.concat(D.rel)).some(it => it.program === r.name && it.status === '未入力'));
+  return '<h1 class="view">ダッシュボード</h1><p class="lead">申込状況・売上・メダル数・クラブ別得点をまとめて表示します。数値は入力に合わせて自動で更新されます。</p>' +
+    (nextUp ? '<div class="notice info"><span class="grow">記録入力の次の種目: <b>競技No.' + nextUp.no + ' ' + esc(nextUp.name) + '</b>（開始予定 ' + C.fmtClock(nextUp.start) + '）</span><button class="btn sm primary" data-act="openprog" data-p="' + esc(nextUp.name) + '">記録入力を開く</button></div>' : '') +
+    '<div class="stats">' +
+    '<div class="stat hl"><span>現在の申込者数</span><b>' + d.applicants + ' 名</b><span>定員 ' + d.capacity + ' 名・空き ' + d.vacancy + ' 名</span></div>' +
+    '<div class="stat"><span>申込目標との差</span><b>' + (d.diffTarget > 0 ? '+' : '') + d.diffTarget + ' 名</b><span>目標 ' + d.target + ' 名（' + pct(d.applicants, d.target) + '）</span></div>' +
+    '<div class="stat"><span>個人エントリー／リレー</span><b>' + d.entries + '／' + d.relays + '</b><span>記録入力済み ' + d.done + ' 件</span></div>' +
+    '<div class="stat"><span>競技終了予定</span><b>' + (D.sched.end !== null ? C.fmtClock(D.sched.end) : '—') + '</b><span>競技開始 ' + esc(S.schedule.start) + '・閉会式 ' + esc(S.schedule.closing) + '</span></div>' +
+    '</div>' +
+    '<div class="grid g2" style="margin-top:14px">' +
+    '<div class="card"><h2>売上・集客管理</h2><div class="fields">' +
+    field('定員（名）', inp('set:dashboard.capacity', S.dashboard.capacity, 'inputmode="numeric"')) +
+    field('申込目標（名）', inp('set:dashboard.target', S.dashboard.target, 'inputmode="numeric"')) +
+    field('参加単価（税抜・円）', inp('set:dashboard.price', S.dashboard.price, 'inputmode="numeric"')) +
+    field('消費税率（%）', inp('set:dashboard.tax', S.dashboard.tax, 'inputmode="decimal"')) +
+    '</div><table class="t" style="margin-top:10px"><tbody>' +
+    '<tr><td>参加単価（税込）</td><td class="num">' + yen(d.priceIn) + '</td></tr>' +
+    '<tr><td>目標売上（税込）</td><td class="num">' + yen(d.targetSales) + '</td></tr>' +
+    '<tr><td>現在の売上（税込）</td><td class="num"><b>' + yen(d.sales) + '</b></td></tr>' +
+    '<tr><td>目標との売上差</td><td class="num">' + yen(d.salesDiff) + '</td></tr></tbody></table></div>' +
+    '<div class="card"><h2>メダル発注シミュレーター</h2><p class="small muted">区分×種目ごとに、申込が1名以上なら金、2名以上なら銀、3名以上なら銅を1つ。リレーは泳者の人数分を数えます。</p>' +
+    '<div class="stats"><div class="stat"><span>金メダル</span><b>' + d.medals.gold + '</b></div><div class="stat"><span>銀メダル</span><b>' + d.medals.silver + '</b></div><div class="stat"><span>銅メダル</span><b>' + d.medals.bronze + '</b></div></div></div>' +
+    '</div>' +
+    '<div class="card" style="margin-top:14px"><h2>クラブ別 申込状況・総合得点</h2>' +
+    (d.otherClubs.length ? '<div class="notice warn"><span class="grow">クラブリストにないチーム名があります: ' + esc(d.otherClubs.join('、')) + '（集計されません）</span><button class="btn sm" data-act="fix" data-f="clubs">クラブリストに追加</button></div>' : '') +
+    '<div class="tablewrap"><table class="t"><thead><tr><th>クラブ名</th><th class="num">目標</th><th class="num">実績</th><th class="num">差</th><th class="num">割合</th><th class="num">総合得点</th><th class="num">チーム順位</th></tr></thead><tbody>' +
+    d.clubs.map((c, i) => '<tr><td>' + esc(c.name) + '</td><td class="num">' + inp('clubt:' + c.name, (S.clubs.find(x => x.name === c.name) || {}).target,'style="width:70px;text-align:right" inputmode="numeric"') + '</td><td class="num">' + c.actual + '</td><td class="num">' + (c.diff === null ? '' : (c.diff > 0 ? '+' : '') + c.diff) + '</td><td class="num">' + (c.share === null ? '' : (c.share * 100).toFixed(1) + '%') + '</td><td class="num"><b>' + c.score + '</b></td><td class="num">' + c.rank + '</td></tr>').join('') +
+    '</tbody></table></div></div>';
+};
+const field = (label, control, cls) => '<label class="field ' + (cls || '') + '"><span>' + esc(label) + '</span>' + control + '</label>';
+const yen = n => (Math.round(n) || 0).toLocaleString('ja-JP') + ' 円';
+
+/* ---------------------------------------------------------------- 画面: 大会設定 */
+VIEWS.settings = () => {
+  const S = state.settings, sc = S.schedule, L = lockAttr();
+  const events = S.events, cats = S.categories;
+  const lanes = S.lanes.slice(); while (lanes.length < 5) lanes.push('');
+  const comb = (S.combined || []).slice(); while (comb.length < Math.max(3, (S.combined || []).length + 1)) comb.push({ name: '', pairs: [{}, {}, {}] });
+  return '<h1 class="view">大会設定</h1><p class="lead">ここで決めた種目・区分・クラブがエントリーの選択肢になります。名前を変えるときは「名前の一括変更」を使うと、入力済みのエントリーやスケジュールもまとめて書き換わります。</p>' +
+    (isLocked() ? '<div class="notice warn">当日モード中のため、設定は変更できません。</div>' : '') +
+    '<div class="grid g2">' +
+    '<div class="card"><h2>大会の基本</h2><div class="fields" style="grid-template-columns:1fr">' +
+    field('大会名', inp('set:meetName', S.meetName, L)) + '</div><div class="fields" style="margin-top:10px">' +
+    field('「132.22」のような3桁の数字', sel('set:threeDigit', S.threeDigit, [['mss', '1分32秒22 と読む'], ['sec', '132.22秒 と読む']], L)) +
+    field('レーンの割り当て', sel('set:laneOrder', S.laneOrder, [['excel', '従来のExcelと同じ'], ['fast', '組内で速い順に優先レーン']], L)) +
+    field('1人あたりの上限種目数（注意表示）', inp('set:maxEventsPerPerson', S.maxEventsPerPerson, 'inputmode="numeric" ' + L)) +
+    field('賞状の対象（何位まで）', inp('set:prizeMaxRank', S.prizeMaxRank, 'inputmode="numeric" ' + L)) +
+    '</div></div>' +
+    '<div class="card"><h2>使用レーン・組分け</h2><p class="small muted">優先順にレーン番号を入れます。使わない欄は空欄にします。組の中で優先①から順に割り当てます。</p><div class="fields">' +
+    lanes.map((v, i) => field('優先' + '①②③④⑤⑥⑦⑧⑨⑩'[i], inp('set:lanes.' + i, v, 'inputmode="numeric" ' + L))).join('') +
+    (lanes.length < 10 ? '<div class="field"><span>&nbsp;</span><button class="btn sm" data-act="addlane" ' + L + '>＋ レーンを増やす</button></div>' : '') +
+    '</div><div class="fields" style="margin-top:10px">' +
+    field('使用レーン数', '<input value="' + C.laneList(S).length + '" disabled>') +
+    field('個人 1組最低人数', inp('set:minPerHeatInd', S.minPerHeatInd, 'inputmode="numeric" ' + L)) +
+    field('リレー 1組最低チーム数', inp('set:minPerHeatRelay', S.minPerHeatRelay, 'inputmode="numeric" ' + L)) +
+    '</div></div>' +
+    '</div>' +
+    '<div class="grid g3" style="margin-top:14px">' +
+    listCard('events', '種目リスト', events, '例: 男子 25M 自由形。リレーは名前に「リレー」を含めます') +
+    listCard('categories', '区分リスト（年齢区分）', cats, '上から順に組が編成されます') +
+    listCard('clubs', 'クラブリスト', S.clubs.map(c => c.name), 'エントリーのチーム名の選択肢になります') +
+    '</div>' +
+    '<div class="card" style="margin-top:14px"><h2>名前の一括変更</h2><p class="small muted">種目・区分・クラブの名前を変えると、エントリー・リレー・スケジュール・合同レースの入力もまとめて書き換えます。</p>' +
+    '<div class="bar">' + sel('ui:renKind', ui.renKind || 'events', [['events', '種目'], ['categories', '区分'], ['clubs', 'クラブ']], L) +
+    sel('ui:renFrom', ui.renFrom || '', blankOpt('変更前の名前').concat(renameCandidates(ui.renKind || 'events')), L) +
+    '<span>→</span>' + inp('ui:renTo', ui.renTo || '', 'placeholder="新しい名前" ' + L) + '<button class="btn primary" data-act="rename" ' + L + '>変更する</button></div></div>' +
+    '<div class="card" style="margin-top:14px"><h2>合同レース</h2><p class="small muted">人数の少ない区分どうしを1つのレースにまとめます。順位は区分ごとに付きます。プログラム表示名を進行スケジュールに入れてください。</p>' +
+    '<div class="tablewrap"><table class="t"><thead><tr><th>プログラム表示名</th><th>種目1</th><th>区分1</th><th>種目2</th><th>区分2</th><th>種目3</th><th>区分3</th><th></th></tr></thead><tbody>' +
+    comb.map((r, i) => '<tr><td>' + inp('comb:' + i + ':name', r.name, 'placeholder="例: 合同 25M 自由形" ' + L) + '</td>' +
+      [0, 1, 2].map(p => { const pr = (r.pairs || [])[p] || {}; return '<td>' + sel('comb:' + i + ':' + p + ':event', pr.event || '', blankOpt().concat(events.filter(Boolean)), L) + '</td><td>' + sel('comb:' + i + ':' + p + ':cat', pr.cat || '', blankOpt().concat(cats.filter(Boolean)), L) + '</td>'; }).join('') +
+      '<td>' + (r.name || (r.pairs || []).some(p => p && (p.event || p.cat)) ? '<button class="x" data-act="delcomb" data-i="' + i + '" title="この行を削除" ' + L + '>×</button>' : '') + '</td></tr>').join('') +
+    '</tbody></table></div></div>' +
+    '<div class="grid g2" style="margin-top:14px">' +
+    '<div class="card"><h2>進行スケジュールの時間</h2><div class="fields">' +
+    field('スケジュール表の題名', inp('set:schedule.title', sc.title, L)) +
+    field('入館開始', inp('set:schedule.doorOpen', sc.doorOpen, L)) + field('W-up', inp('set:schedule.warmup', sc.warmup, L)) +
+    field('開会式', inp('set:schedule.opening', sc.opening, L)) + field('競技開始（例 8:45）', inp('set:schedule.start', sc.start, L)) +
+    field('閉会式', inp('set:schedule.closing', sc.closing, L)) + field('最終退館', inp('set:schedule.exit', sc.exit, L)) +
+    field('種目間インターバル（分）', inp('set:schedule.intervalMin', sc.intervalMin, 'inputmode="decimal" ' + L)) +
+    field('休憩時間（分）', inp('set:schedule.breakMin', sc.breakMin, 'inputmode="decimal" ' + L)) +
+    field('1組ごとの余裕時間（秒）', inp('set:schedule.cycleSec', sc.cycleSec, 'inputmode="numeric" ' + L)) +
+    '</div><h3>1組あたりの時間（分:秒）</h3><div class="fields">' +
+    ['heat25:25M 種目', 'heat50:50M 種目', 'heat100:100M 種目', 'heat200:200M 種目', 'heatRelay:リレー種目'].map(x => { const [k, l] = x.split(':'); return field(l, inp('dur:' + k, C.fmtDuration(C.num(sc[k])), L)); }).join('') +
+    '</div></div>' +
+    '<div class="card"><h2>得点</h2><p class="small muted">クラブの総合得点に使います。リレーは個人の得点×倍率です。</p><div class="fields">' +
+    S.points.ind.map((v, i) => field((i + 1) + '位', inp('set:points.ind.' + i, v, 'inputmode="numeric" ' + L))).join('') +
+    field('完泳点', inp('set:points.indFinish', S.points.indFinish, 'inputmode="numeric" ' + L)) +
+    field('リレー倍率', sel('set:points.relayMult', String(S.points.relayMult), [['2', '2倍'], ['1', '1倍']], L)) +
+    '</div></div></div>';
+};
+function listCard(kind, title, arr, hint) {
+  return '<div class="card"><h2>' + title + '（' + arr.filter(x => C.str(x)).length + '）</h2><p class="small muted">' + esc(hint) + '。1行に1つ。</p>' +
+    '<textarea rows="12" data-k="list:' + kind + '" ' + lockAttr() + '>' + esc(arr.join('\n')) + '</textarea></div>';
+}
+function renameCandidates(kind) {
+  const S = state.settings;
+  const base = kind === 'clubs' ? S.clubs.map(c => c.name) : S[kind];
+  const set = new Set(base.filter(Boolean));
+  if (kind === 'events') { state.entries.forEach(e => e.event && set.add(e.event)); state.relays.forEach(e => e.event && set.add(e.event)); }
+  if (kind === 'categories') { state.entries.forEach(e => e.cat && set.add(e.cat)); state.relays.forEach(e => e.cat && set.add(e.cat)); }
+  if (kind === 'clubs') { state.entries.forEach(e => e.club && set.add(e.club)); state.relays.forEach(e => e.team && set.add(e.team)); }
+  return [...set];
+}
+
+/* ---------------------------------------------------------------- 画面: 個人エントリー */
+const PAGE = 100;
+VIEWS.entries = () => {
+  const S = state.settings, L = lockAttr();
+  const q = C.normKey(ui.entQ || '');
+  let rows = D.ind.filter(it => {
+    if (ui.entClub && it.club !== ui.entClub) return false;
+    if (ui.entCat && it.cat !== ui.entCat) return false;
+    if (ui.entEvent && it.event !== ui.entEvent) return false;
+    if (ui.entOnlyIssue && !D.issuesById.has(it.id)) return false;
+    if (q && C.normKey(it.name + it.club).indexOf(q) < 0) return false;
+    return true;
+  });
+  const pages = Math.max(1, Math.ceil(rows.length / PAGE));
+  if (ui.entPage >= pages) ui.entPage = pages - 1;
+  const show = rows.slice(ui.entPage * PAGE, ui.entPage * PAGE + PAGE);
+  const clubs = S.clubs.map(c => c.name).filter(Boolean), cats = S.categories.filter(Boolean), evs = S.events.filter(e => e && !C.isRelayName(e));
+  const nIssue = D.ind.filter(it => D.issuesById.has(it.id)).length;
+  return '<h1 class="view">個人エントリー</h1><p class="lead">氏名は「苗字　名前　ミョウジ　ナマエ」（全角空白で区切る）。並べ替えや絞り込みをしても計算は崩れません。タイムは 28.78 / 1:32.22 / 00.30.00 のどれでも入力でき、下に読み取った結果が出ます。</p>' +
+    '<div class="bar">' +
+    '<input data-k="ui:entQ" value="' + esc(ui.entQ || '') + '" placeholder="氏名・チームで検索" style="max-width:220px">' +
+    sel('ui:entClub', ui.entClub || '', blankOpt('すべてのチーム').concat(clubs), 'style="max-width:170px"') +
+    sel('ui:entCat', ui.entCat || '', blankOpt('すべての区分').concat(cats), 'style="max-width:150px"') +
+    sel('ui:entEvent', ui.entEvent || '', blankOpt('すべての種目').concat(evs), 'style="max-width:200px"') +
+    '<label class="small"><input type="checkbox" data-k="ui:entOnlyIssue" ' + (ui.entOnlyIssue ? 'checked' : '') + '> 要確認の行だけ（' + nIssue + '）</label>' +
+    '<span class="grow"></span><span class="muted small">' + rows.length + ' / ' + D.ind.length + ' 件</span>' +
+    '<button class="btn" data-act="pasteEntries" ' + L + '>Excelから貼り付け</button><button class="btn primary" data-act="addEntry" ' + L + '>＋ 1行追加</button></div>' +
+    (D.ind.length ? '<div class="tablewrap"><table class="t"><thead><tr><th class="num">No</th><th>氏名</th><th>チーム</th><th>区分</th><th>種目</th><th>エントリー</th><th>公式タイム</th><th>判定</th><th class="c">組</th><th class="c">レーン</th><th class="num">順位</th><th class="num">得点</th><th>状態</th><th></th></tr></thead><tbody>' +
+      show.map(it => {
+        const e = it.e, iss = D.issuesById.get(it.id) || [];
+        const cls = iss.some(x => x.level === 'error') ? 'err' : iss.some(x => x.level === 'warn') ? 'warn' : '';
+        const k = 'ent:' + e.id + ':';
+        return '<tr class="' + cls + '" data-row="' + e.id + '" title="' + esc(iss.map(x => x.msg).join('\n')) + '"><td class="num muted">' + (it.idx + 1) + '</td>' +
+          '<td>' + inp(k + 'name', e.name, 'style="min-width:220px" ' + L) + '</td>' +
+          '<td>' + sel(k + 'club', e.club, blankOpt().concat(clubs), L) + '</td>' +
+          '<td>' + sel(k + 'cat', e.cat, blankOpt().concat(cats), L) + '</td>' +
+          '<td>' + sel(k + 'event', e.event, blankOpt().concat(evs), 'style="min-width:150px" ' + L) + '</td>' +
+          '<td>' + timeCell(k + 'entryTime', e.entryTime, '', L) + '</td>' +
+          '<td>' + timeCell(k + 'officialTime', e.officialTime, '', 'data-col="off"') + '</td>' +
+          '<td>' + sel(k + 'judge', e.judge, [['', '—'], ['棄権', '棄権'], ['失格', '失格']]) + '</td>' +
+          '<td class="c">' + (it.heat || '') + '</td><td class="c">' + (it.lane ? '<span class="lane">' + it.lane + '</span>' : '') + '</td>' +
+          '<td class="num">' + (it.rank || '') + '</td><td class="num">' + (it.points === null ? '' : it.points) + '</td><td>' + pillStatus(it.status) + '</td>' +
+          '<td><button class="x" data-act="delEntry" data-id="' + e.id + '" title="この行を削除" aria-label="削除" ' + L + '>×</button></td></tr>';
+      }).join('') + '</tbody></table></div>' + pager(pages) :
+      '<div class="card empty">まだエントリーがありません。「＋ 1行追加」か「Excelから貼り付け」で入力するか、データ管理からExcelファイルを読み込んでください。</div>');
+};
+function pager(pages) {
+  if (pages <= 1) return '';
+  let h = '<div class="pager"><span class="small muted">ページ</span>';
+  for (let i = 0; i < pages; i++) h += '<button class="btn sm ' + (i === ui.entPage ? 'primary' : '') + '" data-act="page" data-i="' + i + '">' + (i + 1) + '</button>';
+  return h + '</div>';
+}
+
+/* ---------------------------------------------------------------- 画面: リレー */
+VIEWS.relays = () => {
+  const S = state.settings, L = lockAttr();
+  const clubs = S.clubs.map(c => c.name).filter(Boolean), cats = S.categories.filter(Boolean), evs = S.events.filter(e => C.isRelayName(e));
+  const q = C.normKey(ui.relQ || '');
+  const rows = D.rel.filter(it => !q || C.normKey(it.teamDisp + it.members.join('')).indexOf(q) >= 0);
+  return '<h1 class="view">リレーエントリー</h1><p class="lead">同じチームから複数出るときは記号（A・B…）で区別します。泳者の重複や、同じ種目で別チームに入っている泳者は自動で警告します。</p>' +
+    '<div class="bar"><input data-k="ui:relQ" value="' + esc(ui.relQ || '') + '" placeholder="チーム・泳者で検索" style="max-width:240px"><span class="grow"></span><span class="muted small">' + rows.length + ' チーム</span>' +
+    '<button class="btn primary" data-act="addRelay" ' + L + '>＋ 1チーム追加</button></div>' +
+    (rows.length ? '<div class="tablewrap"><table class="t"><thead><tr><th class="num">No</th><th>チーム</th><th>記号</th><th>区分</th><th>種目</th><th>第1泳者</th><th>第2泳者</th><th>第3泳者</th><th>第4泳者</th><th>エントリー</th><th>公式タイム</th><th>判定</th><th class="c">組</th><th class="c">レーン</th><th class="num">順位</th><th class="num">得点</th><th></th></tr></thead><tbody>' +
+      rows.map(it => {
+        const r = it.r, iss = D.issuesById.get(it.id) || [], k = 'rel:' + r.id + ':';
+        const cls = iss.some(x => x.level === 'error') ? 'err' : iss.some(x => x.level === 'warn') ? 'warn' : '';
+        return '<tr class="' + cls + '" data-row="' + r.id + '" title="' + esc(iss.map(x => x.msg).join('\n')) + '"><td class="num muted">' + (it.idx + 1) + '</td>' +
+          '<td>' + sel(k + 'team', r.team, blankOpt().concat(clubs), L) + '</td><td>' + inp(k + 'mark', r.mark, 'style="width:48px" ' + L) + '</td>' +
+          '<td>' + sel(k + 'cat', r.cat, blankOpt().concat(cats), L) + '</td><td>' + sel(k + 'event', r.event, blankOpt().concat(evs), L) + '</td>' +
+          [0, 1, 2, 3].map(m => '<td>' + inp(k + 'm' + m, r.members[m], 'style="min-width:110px" ' + L) + '</td>').join('') +
+          '<td>' + timeCell(k + 'entryTime', r.entryTime, '', L) + '</td><td>' + timeCell(k + 'officialTime', r.officialTime, '', 'data-col="roff"') + '</td>' +
+          '<td>' + sel(k + 'judge', r.judge, [['', '—'], ['棄権', '棄権'], ['失格', '失格']]) + '</td>' +
+          '<td class="c">' + (it.heat || '') + '</td><td class="c">' + (it.lane ? '<span class="lane">' + it.lane + '</span>' : '') + '</td><td class="num">' + (it.rank || '') + '</td><td class="num">' + (it.points === null ? '' : it.points) + '</td>' +
+          '<td><button class="x" data-act="delRelay" data-id="' + r.id + '" aria-label="削除" ' + L + '>×</button></td></tr>';
+      }).join('') + '</tbody></table></div>' : '<div class="card empty">リレーのエントリーはまだありません。</div>');
+};
+
+/* ---------------------------------------------------------------- 画面: 進行スケジュール */
+VIEWS.schedule = () => {
+  const S = state.settings, sc = S.schedule, L = lockAttr();
+  const progs = C.programNames(state);
+  const inSched = new Set(state.schedule.map(r => C.str(r.name)));
+  const used = new Set(D.ind.concat(D.rel).filter(it => it.event).map(it => it.program));
+  const missing = [...used].filter(p => !inSched.has(p));
+  return '<h1 class="view">進行スケジュール</h1><p class="lead">競技の順番を並べると、参加数・組数・所要時間・開始時刻が自動で出ます。「調整（分）」で種目ごとに時間を足し引きできます。</p>' +
+    '<div class="card" style="margin-bottom:12px"><div class="fields">' +
+    [['入館開始', sc.doorOpen], ['W-up', sc.warmup], ['開会式', sc.opening], ['競技開始', sc.start], ['競技終了', D.sched.end !== null ? C.fmtClock(D.sched.end) : '—'], ['閉会式', sc.closing], ['最終退館', sc.exit]]
+      .map(([a, b]) => '<div class="field"><span>' + a + '</span><b class="num">' + esc(b) + '</b></div>').join('') + '</div></div>' +
+    (missing.length ? '<div class="notice err"><span class="grow">エントリーがあるのにスケジュールにない種目: <b>' + esc(missing.join('、')) + '</b></span><button class="btn sm" data-act="fix" data-f="sched" ' + L + '>末尾に追加する</button></div>' : '') +
+    '<div class="bar"><button class="btn" data-act="addSched" data-n="" ' + L + '>＋ 行を追加</button><button class="btn" data-act="addSched" data-n="休憩" ' + L + '>＋ 休憩を追加</button><span class="grow"></span><button class="btn" data-act="printSched">スケジュールを印刷</button></div>' +
+    '<div class="tablewrap"><table class="t"><thead><tr><th class="num">競技No</th><th>種目名</th><th class="num">参加数</th><th class="num">組数</th><th class="num">所要時間</th><th class="num">開始時刻</th><th class="num">終了時刻</th><th class="num">調整(分)</th><th></th></tr></thead><tbody>' +
+    D.sched.rows.map((o, i) => {
+      const r = o.row, k = 'sch:' + r.id + ':';
+      const dupe = state.schedule.filter(x => C.str(x.name) === o.name && o.name && o.name !== '休憩').length > 1;
+      return '<tr class="' + (dupe ? 'warn' : '') + '" data-row="' + r.id + '"><td class="num">' + o.no + '</td><td>' + sel(k + 'name', r.name, blankOpt().concat(progs).concat(['休憩']), 'style="min-width:200px" ' + L) + '</td>' +
+        '<td class="num">' + (o.n === undefined ? '' : o.n) + '</td><td class="num">' + (o.heats === undefined ? '' : o.heats) + '</td><td class="num">' + (o.dur !== undefined ? C.fmtDuration(o.dur) : '') + '</td>' +
+        '<td class="num"><b>' + (o.start !== undefined && o.start !== null ? C.fmtClock(o.start) : '') + '</b></td><td class="num">' + (o.end !== undefined && o.end !== null ? C.fmtClock(o.end) : '') + '</td>' +
+        '<td class="num">' + inp(k + 'adj', r.adj, 'style="width:64px;text-align:right" inputmode="numeric" ' + L) + '</td>' +
+        '<td style="white-space:nowrap"><button class="x" data-act="mvSched" data-i="' + i + '" data-d="-1" title="上へ" ' + L + '>↑</button><button class="x" data-act="mvSched" data-i="' + i + '" data-d="1" title="下へ" ' + L + '>↓</button><button class="x" data-act="delSched" data-i="' + i + '" title="削除" ' + L + '>×</button></td></tr>';
+    }).join('') + '</tbody></table></div>';
+};
+
+/* ---------------------------------------------------------------- 画面: プログラム・記録入力 */
+function programOptions() {
+  const order = [];
+  state.schedule.forEach(r => { const n = C.str(r.name); if (n && n !== '休憩' && order.indexOf(n) < 0) order.push(n); });
+  C.programNames(state).forEach(n => { if (order.indexOf(n) < 0) order.push(n); });
+  return order;
+}
+function programData(name) {
+  const relay = C.isRelayName(name), src = relay ? D.rel : D.ind;
+  const items = src.filter(it => it.program === name && it.event);
+  const heats = new Map();
+  items.forEach(it => { if (!heats.has(it.heat)) heats.set(it.heat, []); heats.get(it.heat).push(it); });
+  const hs = [...heats.keys()].sort((a, b) => a - b).map(h => ({ heat: h, items: heats.get(h).sort((a, b) => (a.lane || 99) - (b.lane || 99)) }));
+  const sch = D.sched.rows.find(r => r.name === name);
+  const done = items.filter(it => it.status !== '未入力').length;
+  return { relay, items, heats: hs, sch, done };
+}
+VIEWS.program = () => {
+  const opts = programOptions();
+  if (!ui.prog || opts.indexOf(ui.prog) < 0) ui.prog = opts[0] || '';
+  const p = programData(ui.prog);
+  const idx = opts.indexOf(ui.prog);
+  const lanes = C.laneList(state.settings).slice().sort((a, b) => a - b);
+  return '<h1 class="view">プログラム・記録入力</h1><p class="lead">組・レーン順に並んでいます。公式タイムを入れて Enter を押すと次のレーンへ進みます。棄権・失格は「判定」で選びます（失格でも泳いだタイムは入れられます）。当日モード中でも記録は入力できます。</p>' +
+    '<div class="bar"><button class="btn" data-act="progStep" data-d="-1" ' + (idx <= 0 ? 'disabled' : '') + '>← 前の種目</button>' +
+    sel('ui:prog', ui.prog, opts.map(n => { const s = D.sched.rows.find(r => r.name === n); return [n, (s ? 'No.' + s.no + ' ' : '') + n]; }), 'style="max-width:320px"') +
+    '<button class="btn" data-act="progStep" data-d="1" ' + (idx >= opts.length - 1 ? 'disabled' : '') + '>次の種目 →</button><span class="grow"></span>' +
+    '<button class="btn" data-act="printProg" data-all="0">この種目を印刷</button><button class="btn" data-act="printProg" data-all="1">全種目のプログラムを印刷</button></div>' +
+    (!ui.prog ? '<div class="card empty">種目がありません。大会設定で種目を登録してください。</div>' :
+      '<div class="card" style="margin-bottom:12px"><div class="fields">' +
+      '<div class="field"><span>競技No</span><b>' + (p.sch ? p.sch.no : '— <span class="pill err">スケジュール未登録</span>') + '</b></div>' +
+      '<div class="field"><span>開始予定時刻</span><b>' + (p.sch && p.sch.start !== null ? C.fmtClock(p.sch.start) : '—') + '</b></div>' +
+      '<div class="field"><span>参加数</span><b>' + p.items.length + (p.relay ? ' チーム' : ' 名') + '</b></div>' +
+      '<div class="field"><span>組数</span><b>' + p.heats.length + '</b></div>' +
+      '<div class="field"><span>記録入力</span><b>' + p.done + ' / ' + p.items.length + '</b></div></div></div>' +
+      (p.items.length ? p.heats.map(h => {
+        const byLane = new Map(h.items.map(it => [it.lane, it]));
+        const noLane = h.items.filter(it => !it.lane);
+        return '<div class="tablewrap" style="margin-bottom:10px"><table class="t"><thead><tr><th colspan="9" style="font-size:13px;color:var(--ink)">第 ' + h.heat + ' 組</th></tr><tr><th class="c">レーン</th><th>' + (p.relay ? 'チーム' : '氏名') + '</th><th>' + (p.relay ? '出場メンバー' : 'チーム') + '</th><th>区分</th><th>エントリー</th><th>公式タイム</th><th>判定</th><th class="num">順位</th><th>状態</th></tr></thead><tbody>' +
+          lanes.map(ln => byLane.get(ln)).concat(noLane).map((it, j) => {
+            if (!it) return '<tr><td class="c"><span class="lane">' + lanes[j] + '</span></td><td colspan="8" class="muted small">（空き）</td></tr>';
+            const pre = (p.relay ? 'rel:' : 'ent:') + it.id + ':';
+            const src = p.relay ? it.r : it.e;
+            return '<tr data-row="' + it.id + '"><td class="c"><span class="lane">' + (it.lane || '?') + '</span></td><td><b>' + esc(p.relay ? it.teamDisp : it.name) + '</b></td><td class="small">' + esc(p.relay ? it.memberText : it.club) + '</td><td>' + esc(it.cat) + (it.event !== ui.prog ? ' <span class="pill mute">' + esc(it.event.split(' ')[0]) + '</span>' : '') + '</td>' +
+              '<td class="num muted">' + (it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '') + '</td><td>' + timeCell(pre + 'officialTime', src.officialTime, '', 'data-col="prog"') + '</td>' +
+              '<td>' + sel(pre + 'judge', src.judge, [['', '—'], ['棄権', '棄権'], ['失格', '失格']]) + '</td><td class="num"><b>' + (it.rank ? it.rank + '位' : '') + '</b></td><td>' + pillStatus(it.status) + '</td></tr>';
+          }).join('') + '</tbody></table></div>';
+      }).join('') : '<div class="card empty">この種目のエントリーはありません。</div>'));
+};
+
+/* ---------------------------------------------------------------- 画面: 速報 */
+VIEWS.flash = () => {
+  const opts = programOptions();
+  if (!ui.flash || opts.indexOf(ui.flash) < 0) ui.flash = opts[0] || '';
+  const list = C.flashList(state, D.ind, D.rel, ui.flash);
+  const relay = C.isRelayName(ui.flash);
+  const sch = D.sched.rows.find(r => r.name === ui.flash);
+  let prevCat = null;
+  return '<h1 class="view">速報</h1><p class="lead">年齢区分ごとに「順位 → 失格 → 棄権 → 未入力」の順に並びます。記録入力に合わせて自動で更新されます。</p>' +
+    '<div class="bar">' + sel('ui:flash', ui.flash, opts) + '<span class="grow"></span><label class="small"><input type="checkbox" data-k="ui:big" ' + (ui.big ? 'checked' : '') + '> 大きな文字で表示</label><button class="btn" data-act="printFlash">速報を印刷</button></div>' +
+    '<div class="' + (ui.big ? 'big' : '') + '"><div class="card" style="margin-bottom:10px"><b style="font-size:' + (ui.big ? 26 : 17) + 'px">' + esc(ui.flash || '') + '</b>' + (sch ? '<span class="muted">　競技No.' + sch.no + '　開始予定 ' + C.fmtClock(sch.start) + '</span>' : '') + '<span class="muted">　対象 ' + list.length + (relay ? 'チーム' : '名') + '</span></div>' +
+    (list.length ? '<div class="tablewrap"><table class="t"><thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ名') + '</th><th>年齢区分</th><th class="num">公式タイム</th></tr></thead><tbody>' +
+      list.map(x => { const g = x.it.cat !== prevCat; prevCat = x.it.cat; return (g ? '<tr class="grp"><td colspan="5">' + esc(x.it.cat) + '</td></tr>' : '') + '<tr><td class="c"><b>' + esc(x.rank) + '</b></td><td>' + esc(x.name) + '</td><td>' + esc(x.club) + '</td><td>' + esc(x.cat) + '</td><td class="num">' + esc(x.time) + '</td></tr>'; }).join('') +
+      '</tbody></table></div>' : '<div class="card empty">この種目のエントリーはありません。</div>') + '</div>';
+};
+
+/* ---------------------------------------------------------------- 画面: ランキング */
+VIEWS.ranking = () => {
+  const S = state.settings;
+  const evs = S.events.filter(Boolean);
+  if (!ui.rankEv || evs.indexOf(ui.rankEv) < 0) ui.rankEv = evs[0] || '';
+  const relay = C.isRelayName(ui.rankEv), src = relay ? D.rel : D.ind;
+  const cats = ui.rankCat ? [ui.rankCat] : S.categories.filter(c => src.some(it => it.event === ui.rankEv && it.cat === c));
+  const body = cats.map(c => {
+    const list = src.filter(it => it.event === ui.rankEv && it.cat === c && it.rank).sort((a, b) => a.rankOrder - b.rankOrder);
+    return '<div class="tablewrap" style="margin-bottom:10px"><table class="t"><thead><tr><th colspan="5" style="color:var(--ink);font-size:13px">' + esc(ui.rankEv) + '　' + esc(c) + '</th></tr><tr><th class="c">順位</th><th>' + (relay ? 'チーム名' : '氏名') + '</th><th>' + (relay ? '出場メンバー' : 'チーム名') + '</th><th>区分</th><th class="num">公式タイム</th></tr></thead><tbody>' +
+      (list.length ? list.map(it => '<tr><td class="c"><b>' + it.rank + '</b></td><td>' + esc(relay ? it.teamDisp : it.name) + '</td><td>' + esc(relay ? it.memberText : it.club) + '</td><td>' + esc(it.cat) + '</td><td class="num">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="5" class="muted">記録がまだありません</td></tr>') +
+      '</tbody></table></div>';
+  }).join('');
+  return '<h1 class="view">公式ランキング</h1><p class="lead">種目・区分ごとの公式順位です。同タイムは同順位になります。</p>' +
+    '<div class="bar">' + sel('ui:rankEv', ui.rankEv, evs) + sel('ui:rankCat', ui.rankCat || '', blankOpt('記録のある全区分').concat(S.categories.filter(Boolean))) + '<span class="grow"></span><button class="btn" data-act="printRank">ランキングを印刷</button></div>' +
+    (body || '<div class="card empty">この種目のエントリーはありません。</div>');
+};
+
+/* ---------------------------------------------------------------- 記録証・賞状 */
+const PAPER = {
+  A4: { w: 210, h: 297, size: 'A4 portrait', label: 'A4 縦',
+    ind: { title: [38, 32], name: [88, 24], club: [102, 13], rank: [114, 20], event: [130, 15], record: [142, 17], meet: [160, 13], lines: [178, 13, 9], date: [228, 12], org: [246, 15] },
+    rel: { title: [38, 32], name: [80, 22], mem1: [94, 12.5], mem2: [102, 12.5], rank: [114, 20], event: [128, 15], record: [140, 17], lines: [158, 13, 9], meet: [200, 13], date: [224, 12], org: [244, 15] } },
+  B5: { w: 257, h: 182, size: '257mm 182mm', label: 'B5 横',
+    ind: { title: [18, 28], name: [44, 21], club: [55, 12], rank: [64, 17], event: [76, 13.5], record: [86, 15], meet: [98, 12], lines: [110, 12, 6.6], date: [143, 11], org: [157, 14] },
+    rel: { title: [16, 28], name: [40, 20], mem1: [51, 11.5], mem2: [57.5, 11.5], rank: [66, 16], event: [77, 13.5], record: [86, 15], lines: [97, 12, 6.6], meet: [126, 12], date: [143, 11], org: [157, 14] } }
+};
+function certData(it, relay, prize) {
+  const S = state.settings, W = prize ? S.award : S.cert;
+  const blank = '　　分　　秒　　';
+  let record;
+  if (it.status === '棄権') record = '棄権';
+  else if (it.status === '失格') record = it.flashTime ? it.flashTime + '　失格' : '失格';
+  else if (!C.str((relay ? it.r : it.e).officialTime) || (!prize && !S.cert.printRecord)) record = blank;
+  else record = it.officialText;
+  let rank;
+  if (prize) rank = '第 ' + it.rank + ' 位';
+  else if (it.status === '棄権' || it.status === '失格') rank = '';
+  else if (!C.str((relay ? it.r : it.e).officialTime) || !S.cert.printRecord) rank = '第　　位';
+  else rank = it.rank ? '第 ' + it.rank + ' 位' : '';
+  return {
+    title: W.title, name: (relay ? it.teamDisp : it.name) + '  殿', club: !relay && it.club ? 'クラブ名： ' + it.club : '',
+    mem1: relay ? [it.members[0], it.members[1]].filter(Boolean).join('　/　') : '', mem2: relay ? [it.members[2], it.members[3]].filter(Boolean).join('　/　') : '',
+    rank, event: '種目： ' + it.cat + ' ' + it.event, record: '記録： ' + record, meet: S.meetName, lines: W.lines, date: C.reiwa(W.date), org: W.organizer
+  };
+}
+function certHTML(it, relay, prize, paper, preview) {
+  const P = PAPER[paper], L = relay ? P.rel : P.ind, S = state.settings, d = certData(it, relay, prize);
+  const sc = (C.num(S.print.scale) || 100) / 100, dy = C.num(S.print.offsetTop), dx = C.num(S.print.offsetLeft);
+  const at = (key, txt, extra) => { const [top, pt] = L[key]; return '<div class="' + (extra || '') + '" style="position:absolute;left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + (top * sc + dy) + 'mm;font-size:' + (pt * sc) + 'pt">' + esc(txt) + '</div>'; };
+  let h = at('title', d.title, 'title') + at('name', d.name, 'name');
+  if (relay) h += at('mem1', d.mem1) + at('mem2', d.mem2); else if (d.club) h += at('club', d.club);
+  h += at('rank', d.rank, 'name') + at('event', d.event) + at('record', d.record) + at('meet', d.meet);
+  const [lt, lpt, lgap] = L.lines;
+  d.lines.forEach((t, i) => { h += '<div style="position:absolute;left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + ((lt + i * lgap) * sc + dy) + 'mm;font-size:' + (lpt * sc) + 'pt">' + esc(t) + '</div>'; });
+  h += at('date', d.date) + at('org', d.org, 'name');
+  const style = preview ? 'width:' + P.w + 'mm;height:' + P.h + 'mm;transform:scale(' + preview + ');transform-origin:top left' : 'width:' + P.w + 'mm;height:' + P.h + 'mm';
+  return '<div class="cert" style="' + style + '">' + h + '</div>';
+}
+function certList() {
+  const relay = ui.certTarget === 'rel', prize = ui.certKind === 'prize';
+  return C.certTargets(state, relay ? D.rel : D.ind, relay, ui.certFilter, prize);
+}
+VIEWS.certs = () => {
+  const S = state.settings, relay = ui.certTarget === 'rel', prize = ui.certKind === 'prize';
+  const W = prize ? S.award : S.cert, wk = prize ? 'award' : 'cert';
+  const list = certList();
+  const f = ui.certFilter || {};
+  const from = Math.max(1, parseInt(ui.certFrom, 10) || 1), to = Math.min(list.length, parseInt(ui.certTo, 10) || list.length);
+  const P = PAPER[ui.certPaper];
+  const pv = 0.42;
+  const clubs = relay ? S.clubs.map(c => c.name) : S.clubs.map(c => c.name);
+  return '<h1 class="view">記録証・賞状</h1><p class="lead">対象者を絞り込んでまとめて印刷します。記録が未入力の人は「　分　秒」の手書き用になります。用紙の印刷位置がずれる場合は、下の「位置の調整」で直せます。最初は1枚だけテスト印刷すると安心です。</p>' +
+    '<div class="card" style="margin-bottom:12px"><div class="fields">' +
+    field('種類', sel('ui:certKind', ui.certKind, [['record', '記録証（全員）'], ['prize', '賞状（' + (S.prizeMaxRank || 10) + '位以内の完泳者）']])) +
+    field('対象', sel('ui:certTarget', ui.certTarget, [['ind', '個人'], ['rel', 'リレー']])) +
+    field('用紙', sel('ui:certPaper', ui.certPaper, [['A4', 'A4 縦'], ['B5', 'B5 横']])) +
+    field('種目', sel('cf:event', f.event || '', blankOpt('すべて').concat(programOptions().filter(n => C.isRelayName(n) === relay)))) +
+    field('区分', sel('cf:cat', f.cat || '', blankOpt('すべて').concat(S.categories.filter(Boolean)))) +
+    field(relay ? 'チーム' : 'クラブ', sel('cf:club', f.club || '', blankOpt('すべて').concat(clubs.filter(Boolean)))) +
+    field('状態', sel('cf:status', f.status || '', blankOpt('すべて').concat(['完泳', '失格', '棄権', '未入力']))) +
+    '</div><div class="bar" style="margin-top:12px"><b>対象 ' + list.length + ' 枚</b><span class="muted">印刷する範囲</span>' +
+    '<input data-k="ui:certFrom" value="' + from + '" style="width:64px" inputmode="numeric"> 〜 <input data-k="ui:certTo" value="' + (list.length ? to : '') + '" style="width:64px" inputmode="numeric"> 枚目<span class="grow"></span>' +
+    '<button class="btn" data-act="printCert" data-test="1" ' + (list.length ? '' : 'disabled') + '>1枚だけテスト印刷</button><button class="btn primary" data-act="printCert" ' + (list.length ? '' : 'disabled') + '>印刷する（' + (list.length ? to - from + 1 : 0) + '枚）</button></div></div>' +
+    '<div class="grid g2"><div class="card"><h2>プレビュー（1枚目）</h2>' +
+    (list.length ? '<div class="certprev" style="width:' + (P.w * pv) + 'mm;height:' + (P.h * pv) + 'mm">' + certHTML(list[from - 1] || list[0], relay, prize, ui.certPaper, pv) + '</div>' : '<div class="empty">対象者がいません。絞り込み条件を確認してください。</div>') +
+    '</div><div class="card"><h2>' + (prize ? '賞状' : '記録証') + 'の文言</h2><div class="fields" style="grid-template-columns:1fr">' +
+    field('タイトル', inp('set:' + wk + '.title', W.title)) +
+    W.lines.map((t, i) => field('文言' + '①②③④'[i], inp('set:' + wk + '.lines.' + i, t))).join('') +
+    field('日付', '<input type="date" data-k="set:' + wk + '.date" value="' + esc(/^\d{4}-\d{2}-\d{2}$/.test(W.date) ? W.date : '') + '">') +
+    field('大会主催者名', inp('set:' + wk + '.organizer', W.organizer)) +
+    (prize ? '' : field('記録の印字', sel('set:cert.printRecord', S.cert.printRecord ? '1' : '0', [['1', '印字する'], ['0', '印字しない（手書き用）']]))) +
+    '</div><h3>位置の調整（すべての証書に共通）</h3><div class="fields">' +
+    field('文字の大きさ（%）', inp('set:print.scale', S.print.scale, 'inputmode="numeric"')) +
+    field('上下のずれ（mm, 下へ+）', inp('set:print.offsetTop', S.print.offsetTop, 'inputmode="decimal"')) +
+    field('左右のずれ（mm, 右へ+）', inp('set:print.offsetLeft', S.print.offsetLeft, 'inputmode="decimal"')) +
+    '</div><p class="small muted">印刷時はブラウザの印刷設定で「余白なし」「倍率100%」「背景のグラフィック オフ」を選んでください。</p></div></div>';
+};
+
+/* ---------------------------------------------------------------- 最優秀・優秀選手 */
+VIEWS.awards = () => {
+  const A = state.award, R = D.aw, m = R.master;
+  const catsShown = m.cat.filter(c => c.on || ui.awShowOff);
+  if (!catsShown.some(c => c.k === ui.awCat)) ui.awCat = catsShown.length ? catsShown[0].k : 1;
+  const k = ui.awCat;
+  const nE = m.ev.length;
+  const statusCls = kind => kind === 'ok' ? 'st-ok' : kind === 'up' ? 'st-up' : kind === 'off' ? 'st-off' : 'st-none';
+  const rate = r => r === null || r === undefined ? '' : (r * 100).toFixed(2) + '%';
+  return '<h1 class="view">最優秀・優秀選手</h1><p class="lead">基準タイムに対する達成率（基準÷記録）で選びます。最優秀選手は男女各1名。優秀選手は区分×男女ごとに1位を選び、最優秀選手と重なったら2位を繰り上げます。入力は自動で再計算されます。</p>' +
+    '<div class="bar"><button class="btn primary" data-act="awImport">大会結果（1〜3位）から取り込む</button><button class="btn" data-act="awCopyMaster">区分・種目を大会設定からコピー</button><span class="grow"></span><button class="btn" data-act="printAwards">表彰ボードを印刷</button><button class="btn danger" data-act="awClear">入力をクリア</button></div>' +
+    (R.warnings.length ? '<div class="notice warn"><div class="grow"><b>確認してください</b><ul style="margin:4px 0 0;padding-left:18px">' + R.warnings.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul></div></div>' :
+      (R.sum.entered ? '<div class="notice ok">入力ミスの可能性がある記録はありません。</div>' : '')) +
+    '<div class="mvp">' + R.mvp.map(o => '<div class="card ' + (o.kind === 'ok' ? 'ok' : '') + '"><span class="muted small">★ 最優秀選手（' + o.sexName + '）</span><div class="who">' + esc(o.name || '—') + '</div>' +
+      (o.kind === 'ok' ? '<div>' + esc(o.catName) + '・' + esc(o.club) + '・' + esc(o.event) + '　<b>' + rate(o.rate) + '</b></div>' : '') +
+      '<div class="small ' + statusCls(o.kind) + '">' + esc(o.status) + '</div></div>').join('') + '</div>' +
+    '<div class="card" style="margin-top:12px"><h2>優秀選手（区分×男女）</h2><div class="tablewrap"><table class="t"><thead><tr><th>区分枠</th><th>年齢区分</th><th>性別</th><th>クラブ</th><th>選手名</th><th>種目</th><th class="num">達成率</th><th>選出内訳</th></tr></thead><tbody>' +
+    R.exc.map(o => '<tr class="' + (o.kind === 'off' ? 'off' : '') + '"><td>' + o.slot + '</td><td><b>' + esc(o.catName) + '</b></td><td>' + o.sexName + '</td><td>' + esc(o.club || '') + '</td><td><b>' + esc(o.name || '') + '</b></td><td>' + esc(o.event || '') + '</td><td class="num">' + rate(o.rate) + '</td><td class="' + statusCls(o.kind) + '">' + esc(o.status) + '</td></tr>').join('') +
+    '</tbody></table></div><p class="small muted">入力進捗: 有効入力枠 ' + R.progress.slots + ' 枠（全8区分枠: ' + R.progress.all + '枠）／入力済み ' + R.progress.entered + ' 名／' + R.progress.pct.toFixed(1) + '% 完了</p></div>' +
+    '<details class="card" style="margin-top:12px"><summary>各年齢区分の上位候補リスト（1位・2位）</summary><div class="tablewrap" style="margin-top:8px"><table class="t"><thead><tr><th>区分・順位</th><th>年齢区分</th><th>性別</th><th>クラブ</th><th>選手名</th><th>種目</th><th class="num">達成率</th><th class="num">記録</th></tr></thead><tbody>' +
+    R.cand.map(o => '<tr class="' + (o.on ? '' : 'off') + '"><td>' + o.slot + '</td><td>' + esc(o.catName) + '</td><td>' + o.sexName + '</td><td>' + esc(o.club || '') + '</td><td>' + esc(o.name || '') + '</td><td>' + esc(o.event || '') + '</td><td class="num">' + rate(o.rate) + '</td><td class="num">' + (o.time ? C.fmtTime(o.time) : '') + '</td></tr>').join('') +
+    '</tbody></table></div></details>' +
+    '<details class="card" style="margin-top:12px" ' + (ui.awMasterOpen ? 'open' : '') + ' data-det="awMasterOpen"><summary>マスタ設定（選出範囲・年齢区分・種目と基準タイム）</summary>' +
+    '<h3>① 最優秀選手の選出範囲</h3><div class="fields">' +
+    field('対象区分（開始No）', sel('awm:cStart', String(A.cStart), ['1', '2', '3', '4', '5', '6', '7', '8'])) +
+    field('対象区分（終了No）', sel('awm:cEnd', String(A.cEnd), ['1', '2', '3', '4', '5', '6', '7', '8'])) +
+    field('選考対象の順位範囲', sel('awm:rankMode', A.rankMode, ['1〜3位すべて', '1〜2位', '1位のみ'])) +
+    field('最低達成率（%）', inp('awm:minRate', A.minRate, 'inputmode="decimal"')) +
+    field('未設定区分の表示', sel('awm:fold', A.fold, ['枠を残して表示', '自動で折りたたむ'])) +
+    '</div><h3>② 年齢区分（最大8区分）</h3><div class="tablewrap"><table class="t"><thead><tr><th>区分No</th><th>年齢区分名</th><th>最優秀対象</th><th>優秀選手対象</th><th>状態</th></tr></thead><tbody>' +
+    A.cats.map((c, i) => '<tr><td>' + (i + 1) + '</td><td>' + inp('awc:' + i + ':name', c.name, 'placeholder="未使用"') + '</td><td>' + sel('awc:' + i + ':mvp', C.isMark(c.mvp) ? '○' : '対象外', ['○', '対象外']) + '</td><td>' + sel('awc:' + i + ':exc', C.isMark(c.exc) ? '○' : '対象外', ['○', '対象外']) + '</td><td class="small">' + (m.cat[i].on ? '<span class="pill ok">有効</span>' : '<span class="pill mute">未使用</span>') + '</td></tr>').join('') +
+    '</tbody></table></div><h3>③ 種目・基準タイム（最大15種目）</h3><div class="tablewrap"><table class="t"><thead><tr><th>No</th><th>種目名</th><th>男子基準タイム</th><th>女子基準タイム</th><th>最優秀対象</th></tr></thead><tbody>' +
+    A.events.map((e, i) => '<tr><td>' + (i + 1) + '</td><td>' + inp('awe:' + e.id + ':name', e.name, 'placeholder="未使用"') + '</td><td>' + timeCell('awe:' + e.id + ':baseM', e.baseM, e.name && C.parseTime(e.baseM).kind !== 'time' ? 'bad' : '') + '</td><td>' + timeCell('awe:' + e.id + ':baseF', e.baseF, e.name && C.parseTime(e.baseF).kind !== 'time' ? 'bad' : '') + '</td><td>' + sel('awe:' + e.id + ':mvp', C.isMark(e.mvp) ? '○' : '対象外', ['○', '対象外']) + '</td></tr>').join('') +
+    '</tbody></table></div></details>' +
+    '<div class="card" style="margin-top:12px"><h2>記録入力表</h2><p class="small muted">区分ごとに、男女×種目の1〜3位のクラブ・選手名・タイムを入れます。タイムは 28.78 / 132.22 / 1:32.22 のどれでも可。オレンジは達成率が極端（打ち間違いの可能性）です。</p>' +
+    '<div class="bar">' + catsShown.map(c => '<button class="btn sm ' + (c.k === k ? 'primary' : '') + '" data-act="awCat" data-k2="' + c.k + '">' + esc(c.name) + '</button>').join('') +
+    '<label class="small"><input type="checkbox" data-k="ui:awShowOff" ' + (ui.awShowOff ? 'checked' : '') + '> 未設定の区分も表示</label></div>' +
+    (nE ? '<div class="tablewrap"><table class="t"><thead><tr><th>No</th><th>性別</th><th>種目</th><th>順位</th><th>クラブ</th><th>選手名</th><th>タイム</th><th class="num">基準</th><th class="num">達成率</th></tr></thead><tbody>' +
+      R.rows.filter(r => r.k === k).map((r, j) => {
+        const kk = 'awi:' + r.key + ':', inpv = A.inputs[r.key] || {};
+        const cls = r.state === 'error' ? 'bad' : r.odd ? 'odd' : '';
+        return (r.rk === 1 ? '<tr class="grp"><td colspan="9">' + C.SEX[r.sx] + '　' + esc(r.ev.name) + '</td></tr>' : '') +
+          '<tr class="' + (r.live ? '' : 'off') + '"><td class="muted">' + r.i + '</td><td>' + C.SEX[r.sx] + '</td><td>' + esc(r.ev.name) + '</td><td class="c">' + r.rk + '</td><td>' + inp(kk + 'club', inpv.club) + '</td><td>' + inp(kk + 'name', inpv.name) + '</td><td>' + timeCell(kk + 'time', inpv.time, cls, 'data-col="aw"') + '</td>' +
+          '<td class="num muted">' + (r.base > 0 ? C.fmtTime(r.base) : '<span class="pill err">未設定</span>') + '</td><td class="num">' + (r.state === 'nobase' ? '基準未設定' : r.state === 'error' ? '入力エラー' : rate(r.rate)) + '</td></tr>';
+      }).join('') + '</tbody></table></div>' : '<div class="empty">種目が1つも設定されていません。マスタ設定③で種目名を入れてください。</div>') + '</div>';
+};
+
+/* ---------------------------------------------------------------- 入力チェック */
+VIEWS.check = () => {
+  const ch = D.checks;
+  const lv = ui.chkLevel || '';
+  const shown = ch.filter(c => !lv || c.level === lv);
+  const cnt = l => ch.filter(c => c.level === l).length;
+  const nFixName = state.entries.filter(e => C.fixName(e.name) !== C.str(e.name)).length;
+  const nFixTime = state.entries.concat(state.relays).filter(e => [e.entryTime, e.officialTime].some(v => typeof v === 'string' && /[０-９．：，　]/.test(v))).length;
+  const unkClubs = unknownList('clubs'), unkEv = unknownList('events'), unkCat = unknownList('categories');
+  const missingSched = [...new Set(D.ind.concat(D.rel).filter(it => it.event).map(it => it.program))].filter(p => !state.schedule.some(r => C.str(r.name) === p));
+  const fixes = [];
+  if (nFixName) fixes.push(['name', '氏名の空白を全角1つにそろえる（' + nFixName + '件）']);
+  if (nFixTime) fixes.push(['time', 'タイムの全角文字を半角にする（' + nFixTime + '件）']);
+  if (unkClubs.length) fixes.push(['clubs', '未登録のチームをクラブリストに追加（' + unkClubs.join('、') + '）']);
+  if (unkEv.length) fixes.push(['events', '未登録の種目を種目リストに追加（' + unkEv.join('、') + '）']);
+  if (unkCat.length) fixes.push(['cats', '未登録の区分を区分リストに追加（' + unkCat.join('、') + '）']);
+  if (missingSched.length) fixes.push(['sched', 'スケジュールにない種目を末尾に追加（' + missingSched.join('、') + '）']);
+  return '<h1 class="view">入力チェック</h1><p class="lead">打ち間違い・二重登録・リストにない名前・極端なタイムなどを、入力のたびに自動で点検しています。項目を押すと該当の行へ移動します。</p>' +
+    '<div class="stats" style="margin-bottom:12px"><div class="stat"><span>エラー（結果がずれる）</span><b style="color:var(--err)">' + cnt('error') + '</b></div><div class="stat"><span>注意（確認が必要）</span><b style="color:var(--warn)">' + cnt('warn') + '</b></div><div class="stat"><span>参考</span><b>' + cnt('info') + '</b></div><div class="stat"><span>計算時間</span><b>' + Math.round(D.ms) + ' ms</b></div></div>' +
+    (fixes.length ? '<div class="card" style="margin-bottom:12px"><h2>ワンクリック修正</h2><p class="small muted">修正後も上部の「↶」で元に戻せます。</p><div class="bar">' + fixes.map(([f, l]) => '<button class="btn" data-act="fix" data-f="' + f + '" ' + (isLocked() && f !== 'time' ? 'disabled' : '') + '>' + esc(l) + '</button>').join('') + '</div></div>' : '') +
+    '<div class="bar">' + [['', 'すべて'], ['error', 'エラー'], ['warn', '注意'], ['info', '参考']].map(([v, l]) => '<button class="btn sm ' + (lv === v ? 'primary' : '') + '" data-act="chkLevel" data-v="' + v + '">' + l + '</button>').join('') + '</div>' +
+    (shown.length ? '<div class="card" style="padding:4px 8px">' + shown.slice(0, 500).map((c, i) => '<div class="issue"><span class="pill ' + (c.level === 'error' ? 'err' : c.level === 'warn' ? 'warn' : 'info') + '">' + (c.level === 'error' ? 'エラー' : c.level === 'warn' ? '注意' : '参考') + '</span><span class="pill mute">' + esc(c.area) + '</span>' +
+      (c.ref ? '<button class="link" data-act="jump" data-i="' + ch.indexOf(c) + '">' + esc(c.msg) + '</button>' : '<span>' + esc(c.msg) + '</span>') + '</div>').join('') +
+      (shown.length > 500 ? '<div class="issue muted">ほか ' + (shown.length - 500) + ' 件</div>' : '') + '</div>' : '<div class="card empty">問題は見つかりませんでした。</div>');
+};
+function unknownList(kind) {
+  const S = state.settings, set = new Set();
+  if (kind === 'clubs') { const k = new Set(S.clubs.map(c => C.str(c.name))); D.ind.forEach(it => { if (it.club && !k.has(it.club)) set.add(it.club); }); D.rel.forEach(it => { if (it.team && !k.has(it.team)) set.add(it.team); }); }
+  if (kind === 'events') { const k = new Set(S.events.map(C.str)); D.ind.concat(D.rel).forEach(it => { if (it.event && !k.has(it.event)) set.add(it.event); }); }
+  if (kind === 'categories') { const k = new Set(S.categories.map(C.str)); D.ind.concat(D.rel).forEach(it => { if (it.cat && !k.has(it.cat)) set.add(it.cat); }); }
+  return [...set];
+}
+
+/* ---------------------------------------------------------------- データ管理 */
+VIEWS.data = () => {
+  const snaps = getSnaps();
+  let used = 0; try { used = (lsGet(KEY) || '').length + (lsGet(SNAP_KEY) || '').length; } catch (e) { /* ignore */ }
+  return '<h1 class="view">データ管理・Excel</h1><p class="lead">データはこのブラウザの中だけに自動保存され、インターネット上には送られません。別のパソコンへ移すときや万一に備えて、バックアップファイルを書き出してください。</p>' +
+    '<div class="grid g2">' +
+    '<div class="card"><h2>バックアップ</h2><p class="small">最後に書き出したのは <b>' + ago(meta.lastBackup) + '</b>。この後の変更は ' + meta.changesSinceBackup + ' 回です。</p>' +
+    '<div class="bar"><button class="btn primary" data-act="backup">バックアップを書き出す（.json）</button><label class="btn">バックアップから復元…<input type="file" accept=".json,application/json" data-file="json" hidden></label></div>' +
+    '<p class="small muted">復元するときは、今のデータを自動で控えに残してから置き換えます。</p></div>' +
+    '<div class="card"><h2>Excel</h2><p class="small">今お使いの「大会運営ブック（.xlsx）」と「表彰者算出ブック（.xlsm）」をそのまま読み込めます。このアプリから書き出したExcelも読み込めます。</p>' +
+    '<div class="bar"><label class="btn primary">Excelファイルを読み込む…<input type="file" accept=".xlsx,.xlsm,.xls" data-file="xlsx" hidden></label><button class="btn" data-act="exportXlsx">結果をExcelに書き出す</button><button class="btn" data-act="exportCsv">エントリーをCSVで書き出す</button></div>' +
+    '<p class="small muted">Excelの読み書きには、初回だけインターネット接続が必要です（表計算ライブラリを読み込むため）。CSVとバックアップはオフラインでも使えます。</p></div>' +
+    '<div class="card"><h2>自動バックアップ（このブラウザ内）</h2><p class="small muted">5分ごと・大きな操作の前に自動で控えを残します（最新15件）。間違えて消したときはここから戻せます。</p>' +
+    (snaps.length ? '<div class="tablewrap"><table class="t"><thead><tr><th>日時</th><th>きっかけ</th><th class="num">個人</th><th></th></tr></thead><tbody>' +
+      snaps.map((s, i) => '<tr><td>' + fmtDT(s.t) + '</td><td>' + esc(s.label) + '</td><td class="num">' + (s.n || 0) + '</td><td><button class="btn sm" data-act="restoreSnap" data-i="' + i + '">この時点に戻す</button></td></tr>').join('') + '</tbody></table></div>' : '<p class="muted">まだありません。</p>') +
+    '<div class="bar" style="margin-top:8px"><button class="btn sm" data-act="snapNow">今の状態を控えておく</button></div></div>' +
+    '<div class="card"><h2>そのほか</h2><div class="bar"><button class="btn" data-act="sample">サンプルデータを読み込む</button><button class="btn danger" data-act="clearResults">記録（公式タイム・判定）だけ消す</button><button class="btn danger" data-act="resetAll">すべて消して最初から</button></div>' +
+    '<p class="small muted">使用容量: 約 ' + Math.round(used / 1024) + ' KB（ブラウザの上限はおよそ5,000 KB）</p>' +
+    '<h3>同じデータを複数のパソコンで使うとき</h3><p class="small">片方で「バックアップを書き出す」→ もう片方で「バックアップから復元」。同じパソコンで2つのタブを開いて編集すると、あとの保存で前の内容が上書きされるため、1つのタブで作業してください（別タブで変更があると自動で読み込み直します）。</p>' +
+    '<h3>キーボード</h3><p class="small"><span class="kbd">Ctrl</span>+<span class="kbd">Z</span> 元に戻す　<span class="kbd">Ctrl</span>+<span class="kbd">Y</span> やり直し（入力欄の外で）　<span class="kbd">Enter</span> 記録入力で次のレーンへ</p></div>' +
+    '</div>';
+};
+
+/* ---------------------------------------------------------------- 値の変更 */
+function setPath(obj, path, val) {
+  const ks = path.split('.');
+  let o = obj;
+  for (let i = 0; i < ks.length - 1; i++) { if (o[ks[i]] === undefined) o[ks[i]] = {}; o = o[ks[i]]; }
+  o[ks[ks.length - 1]] = val;
+}
+function getPath(obj, path) { return path.split('.').reduce((o, k) => (o === undefined || o === null) ? undefined : o[k], obj); }
+const ENT_LOCK_OK = ['officialTime', 'judge'];
+function handleValue(el) {
+  const k = el.dataset.k;
+  if (!k) return;
+  const val = el.type === 'checkbox' ? el.checked : el.value;
+  const [kind, ...rest] = k.split(':');
+  if (kind === 'ui') {
+    const f = rest[0];
+    ui[f] = val;
+    if (f.indexOf('ent') === 0 && f !== 'entPage') ui.entPage = 0;
+    if (f === 'certKind' || f === 'certTarget') { ui.certFilter = {}; ui.certFrom = 1; ui.certTo = ''; }
+    if (f === 'renKind') ui.renFrom = '';
+    save(); render(); return;
+  }
+  if (kind === 'cf') { ui.certFilter = Object.assign({}, ui.certFilter, { [rest[0]]: val }); ui.certFrom = 1; ui.certTo = ''; render(); return; }
+  if (kind === 'set') {
+    const path = rest.join(':');
+    let v = val;
+    if (path === 'points.relayMult') v = +val;
+    if (path === 'cert.printRecord') v = val === '1';
+    if (getPath(state.settings, path) === v) return;
+    const free = /^(cert|award|print)\./.test(path) || /^dashboard\./.test(path);
+    commit('設定の変更', s => {
+      if (path.indexOf('lanes.') === 0) { const i = +path.split('.')[1]; while (s.settings.lanes.length <= i) s.settings.lanes.push(''); s.settings.lanes[i] = v; }
+      else setPath(s.settings, path, v);
+    }, { allowLocked: free });
+    return;
+  }
+  if (kind === 'dur') {
+    const sec = C.parseDuration(val);
+    if (sec === null) { toast('「' + val + '」を時間として読み取れません。1:30 のように 分:秒 で入れてください', 'err'); render(); return; }
+    commit('時間設定の変更', s => { s.settings.schedule[rest[0]] = sec; });
+    return;
+  }
+  if (kind === 'clubt') { const name = rest.join(':'); commit('クラブ目標の変更', s => { const c = s.settings.clubs.find(x => x.name === name); if (c) c.target = val; }, { allowLocked: true }); return; }
+  if (kind === 'list') { return changeList(rest[0], val, el); }
+  if (kind === 'comb') {
+    const i = +rest[0];
+    commit('合同レースの変更', s => {
+      while (s.settings.combined.length <= i) s.settings.combined.push({ name: '', pairs: [{}, {}, {}] });
+      const r = s.settings.combined[i];
+      if (rest[1] === 'name') r.name = val.trim();
+      else { const p = +rest[1]; r.pairs = r.pairs || [{}, {}, {}]; r.pairs[p] = Object.assign({}, r.pairs[p], { [rest[2]]: val }); }
+    });
+    return;
+  }
+  if (kind === 'ent' || kind === 'rel') {
+    const id = rest[0], f = rest[1];
+    const list = kind === 'ent' ? state.entries : state.relays;
+    const row = list.find(x => x.id === id);
+    if (!row) return;
+    const cur = f[0] === 'm' && f.length === 2 ? row.members[+f[1]] : row[f];
+    let v = val;
+    if (f === 'name' || f === 'team' || f === 'mark' || f[0] === 'm') v = val.replace(/^[\s　]+|[\s　]+$/g, '');
+    if (f === 'entryTime' || f === 'officialTime') v = C.fixTimeText(val);
+    if ((cur || '') === v) return;
+    commit((kind === 'ent' ? '個人' : 'リレー') + 'の変更', s => {
+      const r = (kind === 'ent' ? s.entries : s.relays).find(x => x.id === id);
+      if (f[0] === 'm' && f.length === 2) r.members[+f[1]] = v; else r[f] = v;
+    }, { allowLocked: ENT_LOCK_OK.indexOf(f) >= 0 });
+    return;
+  }
+  if (kind === 'sch') {
+    const id = rest[0], f = rest[1];
+    commit('スケジュールの変更', s => { const r = s.schedule.find(x => x.id === id); if (r) r[f] = val; });
+    return;
+  }
+  if (kind === 'awm') { commit('表彰マスタの変更', s => { s.award[rest[0]] = val; }, { allowLocked: true }); return; }
+  if (kind === 'awc') {
+    const i = +rest[0], f = rest[1];
+    commit('年齢区分マスタの変更', s => { s.award.cats[i][f] = f === 'name' ? val.trim() : val === '○'; }, { allowLocked: true });
+    return;
+  }
+  if (kind === 'awe') {
+    const id = rest[0], f = rest[1];
+    const ev = state.award.events.find(e => e.id === id);
+    if (f === 'name' && !val.trim() && ev && ev.name) {
+      const n = Object.keys(state.award.inputs).filter(key => key.split('|')[2] === id && hasAw(state.award.inputs[key])).length;
+      if (n) {
+        confirmBox('種目を削除しますか？', '<p>「' + esc(ev.name) + '」には入力済みの記録が <b>' + n + '件</b> あります。種目名を消すとこの記録も削除されます。</p><p class="small muted">名前を変えるだけなら、新しい名前を上書き入力してください（記録はそのまま引き継がれます）。</p>', '削除する', () => {
+          commit('種目の削除', s => { const e = s.award.events.find(x => x.id === id); e.name = ''; Object.keys(s.award.inputs).forEach(key => { if (key.split('|')[2] === id) delete s.award.inputs[key]; }); }, { allowLocked: true, snap: '表彰種目の削除前' });
+        }, { danger: true });
+        render(); return;
+      }
+    }
+    commit('種目マスタの変更', s => { const e = s.award.events.find(x => x.id === id); e[f] = f === 'mvp' ? val === '○' : (f === 'name' ? val.trim() : C.fixTimeText(val)); }, { allowLocked: true });
+    return;
+  }
+  if (kind === 'awi') {
+    const key = rest[0], f = rest[1];
+    const cur = (state.award.inputs[key] || {})[f] || '';
+    if (cur === val.trim()) return;
+    commit('表彰記録の入力', s => { const o = s.award.inputs[key] = Object.assign({}, s.award.inputs[key]); o[f] = f === 'time' ? C.fixTimeText(val) : val.trim(); if (!hasAw(o)) delete s.award.inputs[key]; }, { allowLocked: true });
+  }
+}
+const hasAw = o => o && (C.str(o.club) || C.str(o.name) || C.str(o.time));
+
+function changeList(kind, text, el) {
+  const S = state.settings;
+  const lines = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  const uniq = [...new Set(lines)];
+  const before = kind === 'clubs' ? S.clubs.map(c => c.name) : S[kind];
+  const removed = before.filter(x => x && uniq.indexOf(x) < 0);
+  const inUse = removed.filter(x => kind === 'clubs' ? state.entries.some(e => e.club === x) || state.relays.some(r => r.team === x) :
+    kind === 'events' ? state.entries.some(e => e.event === x) || state.relays.some(r => r.event === x) : state.entries.some(e => e.cat === x) || state.relays.some(r => r.cat === x));
+  const apply = () => commit('リストの変更', s => {
+    if (kind === 'clubs') s.settings.clubs = uniq.map(n => ({ name: n, target: (S.clubs.find(c => c.name === n) || {}).target || '' }));
+    else s.settings[kind] = uniq;
+  });
+  if (lines.length !== uniq.length) toast('重複していた名前を1つにまとめました');
+  if (inUse.length) {
+    confirmBox('使われている名前が消えます', '<p>次の名前はエントリーで使われています: <b>' + esc(inUse.join('、')) + '</b></p><p>このまま消すと、そのエントリーは「リスト外」として警告されます。名前を変えたいだけなら「キャンセル」して「名前の一括変更」を使ってください。</p>', 'このまま変更する', apply);
+    render();
+  } else apply();
+}
+
+/* ---------------------------------------------------------------- ボタン */
+const ACTIONS = {
+  go: t => { location.hash = t.dataset.v; },
+  undo, redo,
+  lock: () => {
+    const on = !isLocked();
+    undoStack.push({ label: '当日モードの切替', data: serialize() });
+    state.settings.locked = on; state.rev++; save(); recompute(); render();
+    toast(on ? '当日モードにしました。設定・エントリーの変更はできません（記録入力はできます）' : '当日モードを解除しました');
+  },
+  backup: () => exportJSON(),
+  sample: () => {
+    const go = () => { snapshot('サンプル読み込み前', true); undoStack.push({ label: 'サンプル読み込み', data: serialize() }); state = migrate(makeSample()); meta.sample = true; state.rev++; save(); recompute(); location.hash = 'home'; render(); toast('サンプルデータを読み込みました（架空の選手です）'); };
+    if (state.entries.length || state.relays.length) confirmBox('サンプルデータを読み込みますか？', '<p>今のデータはサンプルに置き換わります。今のデータは自動バックアップに控えるので、「データ管理」からいつでも戻せます。</p>', '読み込む', go);
+    else go();
+  },
+  addEntry: () => {
+    const last = state.entries[state.entries.length - 1] || {};
+    const id = uid();
+    commit('行の追加', s => { s.entries.push({ id, name: '', club: ui.entClub || last.club || '', cat: ui.entCat || last.cat || '', event: ui.entEvent || '', entryTime: '', officialTime: '', judge: '' }); });
+    ui.entQ = ''; ui.entOnlyIssue = false;
+    const rows = D.ind.filter(it => (!ui.entClub || it.club === ui.entClub) && (!ui.entCat || it.cat === ui.entCat) && (!ui.entEvent || it.event === ui.entEvent));
+    ui.entPage = Math.max(0, Math.ceil(rows.length / PAGE) - 1);
+    setTimeout(() => { const el = document.querySelector('[data-k="ent:' + id + ':name"]'); if (el) { el.focus(); el.scrollIntoView({ block: 'center' }); } }, 30);
+  },
+  delEntry: t => {
+    const id = t.dataset.id, e = state.entries.find(x => x.id === id);
+    commit('行の削除', s => { s.entries = s.entries.filter(x => x.id !== id); });
+    toast('「' + (e.name || '空の行') + '」を削除しました', null, 7000, { label: '元に戻す', fn: undo });
+  },
+  addRelay: () => { const id = uid(); commit('リレーの追加', s => { s.relays.push({ id, team: '', mark: '', cat: '', event: '', members: ['', '', '', ''], entryTime: '', officialTime: '', judge: '' }); }); },
+  delRelay: t => { const id = t.dataset.id, r = state.relays.find(x => x.id === id); commit('リレーの削除', s => { s.relays = s.relays.filter(x => x.id !== id); }); toast('「' + ((r.team || '') + ' ' + (r.mark || '')).trim() + '」を削除しました', null, 7000, { label: '元に戻す', fn: undo }); },
+  page: t => { ui.entPage = +t.dataset.i; render(); window.scrollTo(0, 0); },
+  addSched: t => commit('スケジュール行の追加', s => { s.schedule.push({ id: uid(), name: t.dataset.n || '', adj: '' }); }),
+  delSched: t => { const i = +t.dataset.i, n = state.schedule[i].name; commit('スケジュール行の削除', s => { s.schedule.splice(i, 1); }); toast('「' + (n || '空の行') + '」をスケジュールから外しました', null, 7000, { label: '元に戻す', fn: undo }); },
+  mvSched: t => { const i = +t.dataset.i, j = i + (+t.dataset.d); if (j < 0 || j >= state.schedule.length) return; commit('順番の入れ替え', s => { const a = s.schedule; [a[i], a[j]] = [a[j], a[i]]; }); },
+  addlane: () => commit('レーンの追加', s => { s.settings.lanes.push(''); }),
+  delcomb: t => commit('合同レースの削除', s => { s.settings.combined.splice(+t.dataset.i, 1); }),
+  rename: () => {
+    const kind = ui.renKind || 'events', from = ui.renFrom || '', to = (ui.renTo || '').trim();
+    if (!from || !to) { toast('変更前の名前と新しい名前を入れてください', 'err'); return; }
+    if (from === to) return;
+    commit('名前の一括変更', s => {
+      let n = 0;
+      const S = s.settings;
+      if (kind === 'clubs') {
+        const ex = S.clubs.find(c => c.name === to), c = S.clubs.find(c => c.name === from);
+        if (c && !ex) c.name = to; else if (c && ex) S.clubs = S.clubs.filter(x => x !== c); else if (!ex) S.clubs.push({ name: to, target: '' });
+        s.entries.forEach(e => { if (e.club === from) { e.club = to; n++; } }); s.relays.forEach(r => { if (r.team === from) { r.team = to; n++; } });
+      } else {
+        const arr = S[kind], i = arr.indexOf(from);
+        if (i >= 0) { if (arr.indexOf(to) >= 0) arr.splice(i, 1); else arr[i] = to; } else if (arr.indexOf(to) < 0) arr.push(to);
+        const f = kind === 'events' ? 'event' : 'cat';
+        s.entries.forEach(e => { if (e[f] === from) { e[f] = to; n++; } }); s.relays.forEach(r => { if (r[f] === from) { r[f] = to; n++; } });
+        (S.combined || []).forEach(r => (r.pairs || []).forEach(p => { if (p && p[f] === from) p[f] = to; }));
+        if (kind === 'events') s.schedule.forEach(r => { if (r.name === from) r.name = to; });
+      }
+      toast('「' + from + '」を「' + to + '」に変更しました（エントリー ' + n + '件）');
+    }, { snap: '名前の一括変更前' });
+    ui.renFrom = ''; ui.renTo = '';
+  },
+  progStep: t => { const o = programOptions(), i = o.indexOf(ui.prog) + (+t.dataset.d); if (o[i]) { ui.prog = o[i]; save(); render(); window.scrollTo(0, 0); } },
+  openprog: t => { ui.prog = t.dataset.p; location.hash = 'program'; },
+  chkLevel: t => { ui.chkLevel = t.dataset.v; render(); },
+  jump: t => {
+    const c = D.checks[+t.dataset.i];
+    if (!c || !c.ref) return;
+    if (c.ref.type === 'entry') {
+      ui.entQ = ''; ui.entClub = ''; ui.entCat = ''; ui.entEvent = ''; ui.entOnlyIssue = false;
+      const idx = state.entries.findIndex(e => e.id === c.ref.id); ui.entPage = Math.floor(idx / PAGE); ui.highlight = c.ref.id; location.hash = 'entries'; render();
+    } else if (c.ref.type === 'relay') { ui.relQ = ''; ui.highlight = c.ref.id; location.hash = 'relays'; render(); }
+    else if (c.ref.view) location.hash = c.ref.view;
+  },
+  fix: t => runFix(t.dataset.f),
+  awCat: t => { ui.awCat = +t.dataset.k2; render(); },
+  awImport: () => {
+    const res = C.awardImportFromResults(state, D.ind);
+    if (!res.n) { modal('<h2>取り込める記録がありません</h2><p>公式タイムが入っていて1〜3位になった個人の記録を、表彰マスタの区分名・種目名と照らし合わせて取り込みます。</p>' + (res.skipped.length ? '<p>取り込めなかった理由:</p><ul>' + res.skipped.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul><p class="small muted">「区分・種目を大会設定からコピー」を押すと名前がそろいます。</p>' : '') + '<div class="actions"><button class="btn primary" data-close>閉じる</button></div>'); return; }
+    const exist = Object.keys(state.award.inputs).length;
+    confirmBox('大会結果から取り込みますか？', '<p>1〜3位の記録 <b>' + res.n + '件</b> を記録入力表に入れます。' + (exist ? '今入っている ' + exist + '件 は置き換わります。' : '') + '</p>' + (res.skipped.length ? '<p class="small">取り込まない記録:</p><ul class="small">' + res.skipped.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul>' : ''), '取り込む', () => {
+      commit('大会結果の取り込み', s => { s.award.inputs = res.inputs; }, { allowLocked: true, snap: '表彰取り込み前' });
+      toast(res.n + '件を取り込みました');
+    });
+  },
+  awCopyMaster: () => {
+    const S = state.settings;
+    const cats = S.categories.filter(Boolean).slice(0, 8);
+    const evNames = [];
+    S.events.forEach(e => { if (!e || C.isRelayName(e)) return; const n = e.replace(/^(男子|女子|混合)\s*/, ''); if (evNames.indexOf(n) < 0) evNames.push(n); });
+    confirmBox('区分・種目を大会設定からコピーしますか？', '<p>年齢区分 ' + cats.length + '件（' + esc(cats.join('、')) + '）と、性別を除いた種目 ' + Math.min(15, evNames.length) + '件（' + esc(evNames.slice(0, 15).join('、')) + '）を表彰マスタに入れます。</p><p class="small">同じ名前の種目の基準タイムと、入力済みの記録は引き継ぎます。' + (evNames.length > 15 ? '<br><b>種目が15を超えるため、16番目以降は入りません。</b>' : '') + '</p>', 'コピーする', () => {
+      commit('表彰マスタのコピー', s => {
+        const A = s.award;
+        A.cats = A.cats.map((c, i) => ({ name: cats[i] || '', mvp: c.mvp, exc: c.exc }));
+        const old = A.events.filter(e => e.name);
+        A.events = evNames.slice(0, 15).map((n, i) => { const o = old.find(e => C.normKey(e.name) === C.normKey(n)); return o ? Object.assign({}, o, { name: n }) : { id: 'ae' + uid(), name: n, baseM: '', baseF: '', mvp: true }; });
+        while (A.events.length < 15) A.events.push({ id: 'ae' + uid(), name: '', baseM: '', baseF: '', mvp: true });
+      }, { allowLocked: true, snap: '表彰マスタのコピー前' });
+      toast('コピーしました。基準タイムが空の種目は入力してください');
+    });
+  },
+  awClear: () => {
+    const n = Object.keys(state.award.inputs).length;
+    if (!n) { toast('クリアする入力データはありません'); return; }
+    confirmBox('表彰の入力データを消しますか？', '<p>入力済みの記録 <b>' + n + '件</b>（クラブ・選手名・タイム）をすべて消去します。マスタ設定（区分・種目・基準タイム）はそのまま残ります。</p>', '消去する', () => { commit('表彰入力のクリア', s => { s.award.inputs = {}; }, { allowLocked: true, snap: '表彰入力クリア前' }); toast('入力データ ' + n + '件をクリアしました', null, 7000, { label: '元に戻す', fn: undo }); }, { danger: true });
+  },
+  pasteEntries: () => openPaste(),
+  printSched: () => printSchedule(),
+  printProg: t => printProgram(t.dataset.all === '1'),
+  printFlash: () => printFlash(),
+  printRank: () => printRanking(),
+  printCert: t => printCerts(t.dataset.test === '1'),
+  printAwards: () => printAwards(),
+  exportXlsx: () => exportXlsx(),
+  exportCsv: () => exportCsv(),
+  snapNow: () => { snapshot('手動で控え', true); render(); toast('今の状態を控えました'); },
+  restoreSnap: t => {
+    const s = getSnaps()[+t.dataset.i];
+    confirmBox('この時点に戻しますか？', '<p>' + fmtDT(s.t) + '（' + esc(s.label) + '）の状態に戻します。今の状態も自動で控えます。</p>', '戻す', () => {
+      snapshot('復元前の状態', true); undoStack.push({ label: '自動バックアップから復元', data: serialize() });
+      state = migrate(JSON.parse(s.data)); state.rev++; save(); recompute(); render(); toast('復元しました', null, 7000, { label: '元に戻す', fn: undo });
+    });
+  },
+  clearResults: () => confirmBox('記録だけ消しますか？', '<p>個人・リレーの公式タイムと判定をすべて消します。エントリーや設定は残ります。</p>', '消す', () => {
+    commit('記録のクリア', s => { s.entries.forEach(e => { e.officialTime = ''; e.judge = ''; }); s.relays.forEach(r => { r.officialTime = ''; r.judge = ''; }); }, { snap: '記録クリア前' });
+    toast('記録を消しました', null, 7000, { label: '元に戻す', fn: undo });
+  }, { danger: true }),
+  resetAll: () => confirmBox('すべてのデータを消しますか？', '<p>エントリー・記録・設定・表彰データをすべて消して、最初の状態に戻します。直前の状態は自動バックアップに残ります。</p>', 'すべて消す', () => {
+    snapshot('全消去前', true); undoStack.push({ label: '全消去', data: serialize() });
+    state = C.emptyState(); meta.sample = false; state.rev++; save(); recompute(); location.hash = 'home'; render(); toast('すべて消しました', null, 7000, { label: '元に戻す', fn: undo });
+  }, { danger: true, typeWord: '削除' })
+};
+
+function runFix(f) {
+  if (f === 'name') commit('氏名の空白をそろえる', s => { s.entries.forEach(e => { e.name = C.fixName(e.name); }); });
+  else if (f === 'time') commit('タイムを半角にする', s => { s.entries.concat(s.relays).forEach(e => { e.entryTime = C.fixTimeText(e.entryTime); e.officialTime = C.fixTimeText(e.officialTime); }); }, { allowLocked: true });
+  else if (f === 'clubs') { const add = unknownList('clubs'); commit('クラブの追加', s => { add.forEach(n => s.settings.clubs.push({ name: n, target: '' })); }); toast(add.length + '件のクラブを追加しました'); }
+  else if (f === 'events') { const add = unknownList('events'); commit('種目の追加', s => { add.forEach(n => s.settings.events.push(n)); }); }
+  else if (f === 'cats') { const add = unknownList('categories'); commit('区分の追加', s => { add.forEach(n => s.settings.categories.push(n)); }); toast('区分はリストの末尾に入りました。組の順番は区分リストの並び順です。必要なら大会設定で並べ替えてください', null, 8000); }
+  else if (f === 'sched') { const miss = [...new Set(D.ind.concat(D.rel).filter(it => it.event).map(it => it.program))].filter(p => !state.schedule.some(r => C.str(r.name) === p)); commit('スケジュールへ追加', s => { miss.forEach(n => s.schedule.push({ id: uid(), name: n, adj: '' })); }); toast(miss.length + '種目をスケジュールの末尾に追加しました'); }
+}
+
+/* ---------------------------------------------------------------- Excelから貼り付け */
+function openPaste() {
+  modal('<h2>Excelから貼り付け</h2><p class="small">Excelで「氏名・チーム名・区分・種目名・エントリータイム（任意）」の列を範囲選択してコピーし、下に貼り付けてください。見出し行があっても自動で読み飛ばします。</p>' +
+    '<textarea id="pz" rows="8" placeholder="山田　太郎　ヤマダ　タロウ	Aクラブ	7〜8歳	男子 25M 自由形	0:25.00" autofocus></textarea><div id="pzprev" class="small" style="margin-top:8px"></div>' +
+    '<div class="actions"><button class="btn" data-close>キャンセル</button><button class="btn primary" id="pzok" disabled>追加する</button></div>', (m, close) => {
+    let rows = [];
+    const S = state.settings;
+    const parse = () => {
+      const txt = m.querySelector('#pz').value;
+      rows = txt.split(/\r?\n/).map(l => l.split('\t')).filter(c => c.some(x => x.trim()))
+        .filter(c => !/氏名|選手名/.test(c[0] || ''))
+        .map(c => ({ id: uid(), name: C.fixName(c[0] || ''), club: (c[1] || '').trim(), cat: (c[2] || '').trim(), event: (c[3] || '').trim(), entryTime: (c[4] || '').trim(), officialTime: (c[5] || '').trim(), judge: '' }));
+      const probs = rows.map(r => {
+        const p = [];
+        if (r.event && S.events.indexOf(r.event) < 0) p.push('種目がリストにない');
+        if (r.cat && S.categories.indexOf(r.cat) < 0) p.push('区分がリストにない');
+        if (r.club && !S.clubs.some(c => c.name === r.club)) p.push('チームがリストにない');
+        if (C.parseTime(r.entryTime, { threeDigit: S.threeDigit }).kind === 'error') p.push('タイムを読めない');
+        if (state.entries.some(e => e.name === r.name && e.event === r.event) || rows.filter(x => x.name === r.name && x.event === r.event).length > 1) p.push('二重エントリー');
+        return p;
+      });
+      const nbad = probs.filter(p => p.length).length;
+      m.querySelector('#pzprev').innerHTML = rows.length ? '<b>' + rows.length + '行</b> を読み取りました' + (nbad ? '。<span style="color:var(--warn)">' + nbad + '行に確認が必要です（追加後に「入力チェック」で直せます）</span>' : '。問題は見つかりませんでした。') +
+        '<div class="tablewrap" style="max-height:220px;margin-top:6px"><table class="t"><thead><tr><th>氏名</th><th>チーム</th><th>区分</th><th>種目</th><th>タイム</th><th>確認</th></tr></thead><tbody>' +
+        rows.slice(0, 200).map((r, i) => '<tr class="' + (probs[i].length ? 'warn' : '') + '"><td>' + esc(r.name) + '</td><td>' + esc(r.club) + '</td><td>' + esc(r.cat) + '</td><td>' + esc(r.event) + '</td><td>' + esc(r.entryTime) + '</td><td>' + esc(probs[i].join('・')) + '</td></tr>').join('') + '</tbody></table></div>' : '';
+      m.querySelector('#pzok').disabled = !rows.length;
+    };
+    m.querySelector('#pz').addEventListener('input', parse);
+    m.querySelector('#pzok').addEventListener('click', () => { close(); commit('貼り付けで追加', s => { s.entries.push(...rows); }, { snap: '貼り付け前' }); toast(rows.length + '行を追加しました', null, 7000, { label: '元に戻す', fn: undo }); });
+  });
+}
+
+/* ---------------------------------------------------------------- 印刷 */
+function doPrint(html, pageCss) {
+  $('#print-root').innerHTML = html;
+  $('#page-style').textContent = '@page { ' + pageCss + ' }';
+  setTimeout(() => { try { window.print(); } catch (e) { toast('印刷を開始できませんでした: ' + e.message, 'err'); } }, 60);
+}
+window.addEventListener('afterprint', () => { $('#print-root').innerHTML = ''; });
+const ptHead = (title, sub) => '<div class="ph"><h1>' + esc(title) + '</h1>' + (sub ? '<p>' + sub + '</p>' : '') + '</div>';
+function printSchedule() {
+  const S = state.settings, sc = S.schedule;
+  const html = ptHead(S.meetName + ' ' + sc.title, '入館開始 ' + esc(sc.doorOpen) + '　W-up ' + esc(sc.warmup) + '　開会式 ' + esc(sc.opening) + '　競技開始 ' + esc(sc.start) + '　競技終了 ' + (D.sched.end !== null ? C.fmtClock(D.sched.end) : '') + '　閉会式 ' + esc(sc.closing) + '　最終退館 ' + esc(sc.exit)) +
+    '<table class="pt"><thead><tr><th>競技No</th><th>種目名</th><th>参加数</th><th>組数</th><th>所要時間</th><th>開始時刻</th><th>終了時刻</th></tr></thead><tbody>' +
+    D.sched.rows.map(o => '<tr><td>' + o.no + '</td><td>' + esc(o.name) + '</td><td>' + (o.n === undefined ? '' : o.n) + '</td><td>' + (o.heats === undefined ? '' : o.heats) + '</td><td>' + (o.dur !== undefined ? C.fmtDuration(o.dur) : '') + '</td><td>' + (o.start !== undefined && o.start !== null ? C.fmtClock(o.start) : '') + '</td><td>' + (o.end !== undefined && o.end !== null ? C.fmtClock(o.end) : '') + '</td></tr>').join('') + '</tbody></table>';
+  doPrint(html, 'size: A4 portrait; margin: 12mm');
+}
+function programPrintHTML(name, pageBreak) {
+  const p = programData(name), lanes = C.laneList(state.settings).slice().sort((a, b) => a - b);
+  const anyRes = p.items.some(it => it.status !== '未入力');
+  let h = '<div class="' + (pageBreak ? 'pbreak' : '') + '">' + ptHead(state.settings.meetName + (anyRes ? '　速報' : '　大会プログラム'), (p.sch ? '競技No.' + p.sch.no + '　' : '') + '<b>' + esc(name) + '</b>' + (p.sch && p.sch.start !== null ? '　開始予定時刻: ' + C.fmtClock(p.sch.start) : ''));
+  h += '<table class="pt"><thead><tr><th>組</th><th>レーン</th><th>' + (p.relay ? 'チーム名' : '氏名') + '</th><th>' + (p.relay ? '出場メンバー' : 'チーム名') + '</th><th>区分</th><th>公式タイム</th><th>順位</th></tr></thead><tbody>';
+  p.heats.forEach(hh => {
+    const byLane = new Map(hh.items.map(it => [it.lane, it]));
+    lanes.forEach((ln, j) => {
+      const it = byLane.get(ln);
+      h += '<tr' + (j === 0 ? ' style="border-top:1.5pt solid #000"' : '') + '><td>' + (j === 0 ? hh.heat : '') + '</td><td>' + ln + '</td><td>' + (it ? esc(p.relay ? it.teamDisp : it.name) : '') + '</td><td>' + (it ? esc(p.relay ? it.memberText : it.club) : '') + '</td><td>' + (it ? esc(it.cat) : '') + '</td><td>' + (it ? esc(it.flashTime) : '') + '</td><td>' + (it ? esc(it.flashRank) : '') + '</td></tr>';
+    });
+  });
+  return h + '</tbody></table></div>';
+}
+function printProgram(all) {
+  const names = all ? programOptions().filter(n => programData(n).items.length) : [ui.prog];
+  if (!names.length || !names[0]) { toast('印刷する種目がありません', 'err'); return; }
+  doPrint(names.map((n, i) => programPrintHTML(n, i < names.length - 1)).join(''), 'size: A4 portrait; margin: 12mm');
+}
+function printFlash() {
+  const list = C.flashList(state, D.ind, D.rel, ui.flash), relay = C.isRelayName(ui.flash);
+  const sch = D.sched.rows.find(r => r.name === ui.flash);
+  const html = ptHead(state.settings.meetName + '　【速報】', '<b>' + esc(ui.flash) + '</b>' + (sch ? '　競技No.' + sch.no + '　開始予定時刻 ' + C.fmtClock(sch.start) : '')) +
+    '<table class="pt"><thead><tr><th>順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ名') + '</th><th>年齢区分</th><th>公式タイム</th></tr></thead><tbody>' +
+    list.map((x, i) => '<tr' + (i > 0 && list[i - 1].it.cat !== x.it.cat ? ' style="border-top:1.5pt solid #000"' : '') + '><td>' + esc(x.rank) + '</td><td>' + esc(x.name) + '</td><td>' + esc(x.club) + '</td><td>' + esc(x.cat) + '</td><td>' + esc(x.time) + '</td></tr>').join('') + '</tbody></table>';
+  doPrint(html, 'size: A4 portrait; margin: 12mm');
+}
+function printRanking() {
+  const S = state.settings, relay = C.isRelayName(ui.rankEv), src = relay ? D.rel : D.ind;
+  const cats = ui.rankCat ? [ui.rankCat] : S.categories.filter(c => src.some(it => it.event === ui.rankEv && it.cat === c));
+  const html = ptHead(' ' + S.meetName + '  公式' + (relay ? 'リレー' : '') + 'ランキング表', '') + cats.map(c => {
+    const list = src.filter(it => it.event === ui.rankEv && it.cat === c && it.rank).sort((a, b) => a.rankOrder - b.rankOrder);
+    return '<p class="ph"><b>' + esc(ui.rankEv) + '　' + esc(c) + '</b></p><table class="pt" style="margin-bottom:10pt"><thead><tr><th>順位</th><th>' + (relay ? 'チーム名' : '氏名') + '</th><th>' + (relay ? '出場メンバー' : 'チーム名') + '</th><th>区分</th><th>公式タイム</th></tr></thead><tbody>' +
+      list.map(it => '<tr><td>' + it.rank + '</td><td>' + esc(relay ? it.teamDisp : it.name) + '</td><td>' + esc(relay ? it.memberText : it.club) + '</td><td>' + esc(it.cat) + '</td><td>' + esc(it.officialText) + '</td></tr>').join('') + '</tbody></table>';
+  }).join('');
+  doPrint(html, 'size: A4 portrait; margin: 12mm');
+}
+function printCerts(test) {
+  const list = certList(), relay = ui.certTarget === 'rel', prize = ui.certKind === 'prize';
+  const from = Math.max(1, parseInt(ui.certFrom, 10) || 1), to = Math.min(list.length, parseInt(ui.certTo, 10) || list.length);
+  const pick = test ? [list[from - 1]] : list.slice(from - 1, to);
+  if (!pick.length || !pick[0]) { toast('印刷する証書がありません', 'err'); return; }
+  const P = PAPER[ui.certPaper];
+  doPrint(pick.map(it => certHTML(it, relay, prize, ui.certPaper)).join(''), 'size: ' + P.size + '; margin: 0');
+  toast((test ? 'テスト印刷: ' : '') + pick.length + '枚を印刷に送りました（' + P.label + '）');
+}
+function printAwards() {
+  const R = D.aw, rate = r => r === null || r === undefined ? '' : (r * 100).toFixed(2) + '%';
+  const html = ptHead(state.settings.meetName + '　最優秀・優秀選手', '選出範囲: ' + esc(R.master.cond)) +
+    '<table class="pt"><thead><tr><th>表彰区分</th><th>年齢区分</th><th>性別</th><th>クラブ</th><th>選手名</th><th>種目</th><th>達成率</th><th>判定</th></tr></thead><tbody>' +
+    R.mvp.map(o => '<tr><td>最優秀選手</td><td>' + esc(o.catName || '') + '</td><td>' + o.sexName + '</td><td>' + esc(o.club || '') + '</td><td><b>' + esc(o.name || '') + '</b></td><td>' + esc(o.event || '') + '</td><td>' + rate(o.rate) + '</td><td>' + esc(o.status) + '</td></tr>').join('') +
+    R.exc.filter(o => o.kind !== 'off').map(o => '<tr><td>優秀選手（' + o.slot + '）</td><td>' + esc(o.catName) + '</td><td>' + o.sexName + '</td><td>' + esc(o.club || '') + '</td><td><b>' + esc(o.name || '') + '</b></td><td>' + esc(o.event || '') + '</td><td>' + rate(o.rate) + '</td><td>' + esc(o.status) + '</td></tr>').join('') + '</tbody></table>';
+  doPrint(html, 'size: A4 portrait; margin: 12mm');
+}
+
+/* ---------------------------------------------------------------- ファイル入出力 */
+function stamp() { const d = new Date(), p = n => String(n).padStart(2, '0'); return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes()); }
+function download(name, blob) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+function exportJSON() {
+  try {
+    download('大会データ_' + stamp() + '.json', new Blob([serialize()], { type: 'application/json' }));
+    meta.lastBackup = Date.now(); meta.changesSinceBackup = 0; saveMeta(); render();
+    toast('バックアップを書き出しました。ダウンロードフォルダを確認してください');
+  } catch (e) { toast('書き出せませんでした: ' + e.message, 'err'); }
+}
+function importJSON(file) {
+  const fr = new FileReader();
+  fr.onload = () => {
+    let s;
+    try { s = JSON.parse(fr.result); } catch (e) { toast('このファイルはバックアップとして読めません（JSON形式ではありません）', 'err'); return; }
+    if (!s || s.app !== 'swim-meet' || !Array.isArray(s.entries)) { toast('このアプリのバックアップファイルではありません', 'err'); return; }
+    confirmBox('バックアップから復元しますか？', '<p>「' + esc(file.name) + '」: 大会名「' + esc((s.settings || {}).meetName || '') + '」、個人 ' + s.entries.length + '件、リレー ' + (s.relays || []).length + '件。</p><p>今のデータは自動バックアップに控えてから置き換えます。</p>', '復元する', () => {
+      snapshot('復元前の状態', true); undoStack.push({ label: 'バックアップから復元', data: serialize() });
+      state = migrate(s); state.rev++; meta.sample = false; save(); recompute(); render(); toast('復元しました', null, 7000, { label: '元に戻す', fn: undo });
+    });
+  };
+  fr.onerror = () => toast('ファイルを読めませんでした', 'err');
+  fr.readAsText(file);
+}
+let xlsxLoading = null;
+function loadXLSX() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  if (xlsxLoading) return xlsxLoading;
+  xlsxLoading = new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = () => window.XLSX ? res(window.XLSX) : rej(new Error('読み込み失敗'));
+    s.onerror = () => { xlsxLoading = null; rej(new Error('表計算ライブラリを読み込めませんでした。インターネット接続を確認してください（バックアップ・CSVはオフラインでも使えます）')); };
+    document.head.appendChild(s);
+  });
+  return xlsxLoading;
+}
+function importXlsx(file) {
+  toast('「' + file.name + '」を読み込んでいます…');
+  Promise.all([loadXLSX(), file.arrayBuffer()]).then(([X, buf]) => {
+    const wb = X.read(buf, { type: 'array' });
+    const res = XlsxImport.detect(wb, X);
+    if (!res) { modal('<h2>読み込めない形式です</h2><p>大会運営ブック（「01_個人エントリー」などのシートがあるもの）、表彰者算出ブック、またはこのアプリが書き出したExcelを選んでください。</p><p class="small muted">シート名: ' + esc(wb.SheetNames.join('、')) + '</p><div class="actions"><button class="btn primary" data-close>閉じる</button></div>'); return; }
+    confirmBox(res.title, res.summary, '読み込む', () => {
+      snapshot('Excel読み込み前', true); undoStack.push({ label: 'Excelの読み込み', data: serialize() });
+      res.apply(state); state = migrate(state); state.rev++; meta.sample = false; save(); recompute();
+      location.hash = res.go || 'home'; render();
+      toast('読み込みました。「入力チェック」で内容を確認してください', null, 8000, { label: '元に戻す', fn: undo });
+    });
+  }).catch(e => toast(e.message, 'err', 9000));
+}
+function exportCsv() {
+  const rows = [['氏名', 'チーム名', '区分', '種目名', 'エントリータイム', '公式タイム', '判定', 'プログラム', '組', 'レーン', '公式順位', '得点', '状態']].concat(
+    D.ind.map(it => [it.e.name, it.e.club, it.e.cat, it.e.event, it.e.entryTime, it.e.officialTime, it.e.judge, it.program, it.heat || '', it.lane || '', it.rank || '', it.points === null ? '' : it.points, it.status]));
+  const csv = '﻿' + rows.map(r => r.map(v => { const s = String(v === null || v === undefined ? '' : v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }).join(',')).join('\r\n');
+  download('個人エントリー_' + stamp() + '.csv', new Blob([csv], { type: 'text/csv' }));
+  toast('CSVを書き出しました');
+}
+function exportXlsx() {
+  loadXLSX().then(X => {
+    const wb = XlsxImport.buildExport(X);
+    X.writeFile(wb, '大会結果_' + stamp() + '.xlsx');
+    meta.lastBackup = Date.now(); meta.changesSinceBackup = 0; saveMeta(); render();
+    toast('Excelを書き出しました（このファイルはバックアップとしても読み込めます）');
+  }).catch(e => toast(e.message, 'err', 9000));
+}
+
+/* ---------------------------------------------------------------- イベント */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]');
+  if (!t || t.disabled) return;
+  const a = ACTIONS[t.dataset.act];
+  if (a) { e.preventDefault(); a(t, e); }
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset && el.dataset.file) { const f = el.files && el.files[0]; el.value = ''; if (!f) return; if (el.dataset.file === 'json') importJSON(f); else importXlsx(f); return; }
+  if (el.dataset && el.dataset.k) handleValue(el);
+});
+let searchTimer = null;
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (!el.dataset || !el.dataset.k) return;
+  if (el.classList.contains('tin')) {
+    const p = C.parseTime(el.value, { threeDigit: el.dataset.k.indexOf('aw') === 0 ? 'mss' : state.settings.threeDigit });
+    const pv = el.parentNode.querySelector('[data-prev]');
+    const bad = p.kind === 'error';
+    el.classList.toggle('bad', bad);
+    if (pv) { pv.textContent = p.kind === 'time' ? C.fmtTime(p.sec) : p.kind === 'special' ? p.special : bad ? p.msg : ''; pv.classList.toggle('bad', bad); }
+  }
+  if (el.dataset.k === 'ui:entQ' || el.dataset.k === 'ui:relQ') {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { ui[el.dataset.k.slice(3)] = el.value; ui.entPage = 0; render(); }, 250);
+  }
+});
+document.addEventListener('toggle', e => { const d = e.target; if (d.dataset && d.dataset.det) ui[d.dataset.det] = d.open; }, true);
+document.addEventListener('keydown', e => {
+  const el = e.target;
+  const inField = el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT');
+  if ((e.ctrlKey || e.metaKey) && !inField) {
+    if (e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+    else if (e.key === 'y' || (e.key === 'z' && e.shiftKey) || e.key === 'Z') { e.preventDefault(); redo(); }
+  }
+  if (e.key === 'Enter' && el && el.tagName === 'INPUT' && el.dataset.k && !e.isComposing) {
+    if (el.dataset.k.indexOf('ui:') === 0) return;
+    e.preventDefault();
+    const col = el.dataset.col;
+    const k = el.dataset.k;
+    let nextK = null;
+    if (col) {
+      const all = [...document.querySelectorAll('input[data-col="' + col + '"]')];
+      const i = all.indexOf(el);
+      if (all[i + 1]) nextK = all[i + 1].dataset.k;
+    }
+    handleValue(el);
+    setTimeout(() => {
+      const n = nextK ? document.querySelector('[data-k="' + CSS.escape(nextK) + '"]') : document.querySelector('[data-k="' + CSS.escape(k) + '"]');
+      if (n) { n.focus(); if (n.select) n.select(); }
+    }, 20);
+  }
+});
+window.addEventListener('hashchange', () => { view = (location.hash || '#home').slice(1) || 'home'; if (!VIEWS[view]) view = 'home'; render(); window.scrollTo(0, 0); });
+window.addEventListener('beforeunload', e => { if (saveError) { e.preventDefault(); e.returnValue = ''; } });
+window.addEventListener('error', e => { toast('予期しないエラー: ' + (e.message || '') + '（データは保存されています。ページを再読み込みしてください）', 'err', 9000); });
+
+/* ---------------------------------------------------------------- Excel 取り込み・書き出し */
+const XlsxImport = (() => {
+  const findSheet = (wb, part) => { const n = wb.SheetNames.find(s => s.indexOf(part) >= 0); return n ? wb.Sheets[n] : null; };
+  const cell = (ws, a) => { const c = ws && ws[a]; return c ? c.v : undefined; };
+  const s = v => v === undefined || v === null ? '' : String(v).trim();
+  const timeStr = v => {
+    if (v === undefined || v === null || v === '') return '';
+    if (typeof v === 'number') { const p = C.parseTime(v, { threeDigit: 'sec' }); return p.kind === 'time' ? C.fmtTime(p.sec) : String(v); }
+    return String(v).trim();
+  };
+  const clock = v => { if (typeof v === 'number' && v < 1) return C.fmtClock(Math.round(v * 86400)); return s(v); };
+  const durSec = v => { if (typeof v === 'number') return v < 1 ? Math.round(v * 86400) : v; const d = C.parseDuration(v); return d === null ? '' : d; };
+  const dateStr = v => {
+    if (typeof v === 'number' && v > 20000) { const d = new Date(Math.round((v - 25569) * 86400000)); return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0'); }
+    return s(v);
+  };
+  const col = (ws, letter, from, to) => { const out = []; for (let r = from; r <= to; r++) out.push(cell(ws, letter + r)); return out; };
+
+  function detect(wb, X) {
+    const app = wb.Sheets['_app_data'];
+    if (app) {
+      const rows = X.utils.sheet_to_json(app, { header: 1 });
+      const json = rows.map(r => r[0] || '').join('');
+      let st; try { st = JSON.parse(json); } catch (e) { st = null; }
+      if (st && st.app === 'swim-meet') return {
+        title: 'このアプリのExcelから復元しますか？',
+        summary: '<p>大会名「' + esc(st.settings.meetName) + '」、個人 ' + st.entries.length + '件、リレー ' + st.relays.length + '件。今のデータは自動バックアップに控えてから置き換えます。</p>',
+        apply: target => { Object.keys(target).forEach(k => delete target[k]); Object.assign(target, st); }
+      };
+    }
+    if (findSheet(wb, '個人エントリー') && findSheet(wb, '大会設定')) return mainBook(wb);
+    const first = wb.Sheets[wb.SheetNames[0]];
+    if (first && (s(cell(first, 'V13')).indexOf('年齢区分') >= 0 || s(cell(first, 'U24')).indexOf('種目') >= 0)) return awardBook(first);
+    return null;
+  }
+
+  function mainBook(wb) {
+    const ind = findSheet(wb, '個人エントリー'), rel = findSheet(wb, 'リレーエントリー'), set = findSheet(wb, '大会設定'), sch = findSheet(wb, '進行スケジュール'), dash = findSheet(wb, 'ダッシュボード'), fl = findSheet(wb, '速報');
+    const entries = [], relays = [];
+    for (let r = 3; r <= 2000; r++) {
+      const v = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].map(c => cell(ind, c + r));
+      if (v.every(x => x === undefined || x === '')) { if (r > 1000) break; continue; }
+      entries.push({ id: uid(), name: s(v[0]), club: s(v[1]), cat: s(v[2]), event: s(v[3]), entryTime: timeStr(v[4]), officialTime: timeStr(v[5]), judge: s(v[6]) });
+    }
+    if (rel) for (let r = 3; r <= 1000; r++) {
+      const v = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'].map(c => cell(rel, c + r));
+      if (v.every(x => x === undefined || x === '')) continue;
+      relays.push({ id: uid(), team: s(v[0]), mark: s(v[1]), cat: s(v[2]), event: s(v[3]), members: [s(v[4]), s(v[5]), s(v[6]), s(v[7])], entryTime: timeStr(v[8]), officialTime: timeStr(v[9]), judge: s(v[10]) });
+    }
+    const events = col(set, 'A', 1, 100).map(s).filter(x => x && x !== '休憩');
+    const cats = col(set, 'B', 1, 100).map(s).filter(Boolean);
+    const clubNames = col(set, 'C', 1, 100).map(s).filter(Boolean);
+    const targets = {};
+    if (dash) for (let r = 5; r <= 54; r++) { const n = s(cell(dash, 'G' + r)); if (n) targets[n] = s(cell(dash, 'H' + r)); }
+    const lanes = col(set, 'F', 2, 6).map(v => v === undefined ? '' : s(v));
+    const combined = [];
+    for (let r = 7; r <= 30; r++) {
+      const name = s(cell(set, 'S' + r));
+      const pairs = [['T', 'U'], ['V', 'W'], ['X', 'Y']].map(([a, b]) => ({ event: s(cell(set, a + r)), cat: s(cell(set, b + r)) }));
+      if (name || pairs.some(p => p.event || p.cat)) combined.push({ name, pairs });
+    }
+    const schedule = [];
+    if (sch) for (let r = 8; r <= 57; r++) { const n = s(cell(sch, 'C' + r)); if (n) schedule.push({ id: uid(), name: n, adj: cell(sch, 'I' + r) === undefined ? '' : String(cell(sch, 'I' + r)) }); }
+    const pts = col(set, 'O', 3, 12).map(v => v === undefined ? '' : v);
+    const meetName = s(cell(ind, 'J1'));
+    return {
+      title: '大会運営ブックを読み込みますか？',
+      summary: '<p>大会名「' + esc(meetName) + '」</p><ul><li>個人エントリー ' + entries.length + '件・リレー ' + relays.length + '件</li><li>種目 ' + events.length + '・区分 ' + cats.length + '・クラブ ' + clubNames.length + '</li><li>進行スケジュール ' + schedule.length + '行・合同レース ' + combined.filter(c => c.name).length + '件</li><li>記録証・賞状の文言、得点、レーン、時間の設定</li></ul><p>今のエントリーと大会設定は置き換わります（表彰者算出のデータはそのまま残ります）。今のデータは自動バックアップに控えます。</p>',
+      go: 'check',
+      apply: st => {
+        const S = st.settings;
+        if (meetName) S.meetName = meetName;
+        if (events.length) S.events = events;
+        if (cats.length) S.categories = cats;
+        if (clubNames.length) S.clubs = clubNames.map(n => ({ name: n, target: targets[n] || '' }));
+        if (lanes.some(Boolean)) S.lanes = lanes;
+        S.combined = combined;
+        const tv = cell(set, 'T2'), tr = cell(set, 'T3');
+        if (tv !== undefined) S.minPerHeatInd = tv; if (tr !== undefined) S.minPerHeatRelay = tr;
+        const sc = S.schedule;
+        const m = { L2: 'title', L4: 'warmup', L11: 'closing' };
+        Object.keys(m).forEach(a => { const v = cell(set, a); if (v !== undefined) sc[m[a]] = s(v); });
+        [['L3', 'doorOpen'], ['L5', 'opening'], ['L6', 'start'], ['L12', 'exit']].forEach(([a, k]) => { const v = cell(set, a); if (v !== undefined) sc[k] = clock(v); });
+        const cyc = cell(set, 'L7'); sc.cycleSec = cyc === undefined ? 0 : C.num(cyc);
+        const iv = cell(set, 'L8'); if (iv !== undefined) sc.intervalMin = Math.round(durSec(iv) / 60 * 100) / 100;
+        const br = cell(set, 'L9'); if (br !== undefined) sc.breakMin = Math.round(durSec(br) / 60 * 100) / 100;
+        [['L14', 'heat25'], ['L15', 'heat50'], ['L16', 'heat100'], ['L17', 'heatRelay']].forEach(([a, k]) => { const v = cell(set, a); if (v !== undefined && durSec(v) !== '') sc[k] = durSec(v); });
+        if (pts.some(v => v !== '')) S.points.ind = pts;
+        const fin = cell(set, 'O13'); S.points.indFinish = fin === undefined ? '' : fin;
+        const mult = s(cell(set, 'R14')); if (mult) S.points.relayMult = mult.indexOf('1') === 0 ? 1 : 2;
+        const ct = (a, d) => { const v = cell(set, a); return v === undefined ? d : s(v); };
+        S.cert = { title: ct('F10', S.cert.title), lines: ['F11', 'F12', 'F13', 'F14'].map((a, i) => ct(a, S.cert.lines[i])), date: dateStr(cell(set, 'F15')), organizer: ct('F16', S.cert.organizer), printRecord: s(cell(set, 'F17')) !== '印字しない' };
+        S.award = { title: ct('F22', S.award.title), lines: ['F23', 'F24', 'F25', 'F26'].map((a, i) => ct(a, S.award.lines[i])), date: dateStr(cell(set, 'F27')), organizer: ct('F28', S.award.organizer) };
+        if (dash) {
+          const dv = a => cell(dash, a);
+          if (dv('D4') !== undefined) S.dashboard.capacity = dv('D4');
+          if (dv('D5') !== undefined) S.dashboard.target = dv('D5');
+          if (dv('D12') !== undefined) S.dashboard.price = dv('D12');
+          if (dv('D13') !== undefined) { const t = C.num(dv('D13')); S.dashboard.tax = t < 1 ? Math.round(t * 1000) / 10 : t; }
+        }
+        st.entries = entries; st.relays = relays;
+        if (schedule.length) st.schedule = schedule;
+        const f = fl && s(cell(fl, 'I2')); if (f) ui.flash = f;
+      }
+    };
+  }
+
+  function awardBook(ws) {
+    const cats = [];
+    for (let r = 14; r <= 21; r++) cats.push({ name: s(cell(ws, 'V' + r)).indexOf('（未設定') === 0 ? '' : s(cell(ws, 'V' + r)), mvp: C.isMark(cell(ws, 'W' + r)), exc: C.isMark(cell(ws, 'X' + r)) });
+    const events = [];
+    for (let r = 25; r <= 39; r++) events.push({ id: 'ae' + uid(), name: s(cell(ws, 'V' + r)), baseM: timeStr(cell(ws, 'W' + r)), baseF: timeStr(cell(ws, 'X' + r)), mvp: C.isMark(cell(ws, 'Y' + r)) });
+    const inputs = {}; let n = 0, lost = 0;
+    for (let r = 5; r <= 1204; r++) {
+      const cat = s(cell(ws, 'B' + r)); if (!cat && !cell(ws, 'A' + r)) break;
+      const club = s(cell(ws, 'F' + r)), name = s(cell(ws, 'G' + r)), tv = cell(ws, 'H' + r);
+      if (!club && !name && (tv === undefined || tv === '')) continue;
+      let k = cats.findIndex(c => c.name && c.name === cat) + 1;
+      if (!k) { const m = cat.match(/（未設定(\d)）/); if (m) k = +m[1]; }
+      const sx = s(cell(ws, 'C' + r)) === '女子' ? 1 : 0;
+      const ev = events.find(e => e.name && e.name === s(cell(ws, 'D' + r)));
+      const rk = parseInt(cell(ws, 'E' + r), 10);
+      if (!k || !ev || !(rk >= 1 && rk <= 3)) { lost++; continue; }
+      inputs[C.awardKey(k, sx, ev.id, rk)] = { club, name, time: typeof tv === 'number' && tv < 1 ? C.fmtTime(tv * 86400) : s(tv) };
+      n++;
+    }
+    const A = {
+      cStart: cell(ws, 'W6') || 1, cEnd: cell(ws, 'W7') || 8, rankMode: s(cell(ws, 'W8')) || '1〜3位すべて',
+      minRate: (() => { const v = cell(ws, 'W9'); return v === undefined ? 0 : (typeof v === 'number' && v > 0 && v <= 5 ? Math.round(v * 1000) / 10 : v); })(),
+      fold: s(cell(ws, 'W10')) || '枠を残して表示', cats, events, inputs
+    };
+    return {
+      title: '表彰者算出ブックを読み込みますか？',
+      summary: '<ul><li>年齢区分 ' + cats.filter(c => c.name).length + '・種目 ' + events.filter(e => e.name).length + '（基準タイム付き）</li><li>入力済みの記録 ' + n + '件' + (lost ? '（区分・種目が合わない ' + lost + '件は読み込みません）' : '') + '</li></ul><p>今の表彰者算出のデータは置き換わります（エントリーや大会設定はそのまま）。</p>',
+      go: 'awards',
+      apply: st => { st.award = A; }
+    };
+  }
+
+  function buildExport(X) {
+    const wb = X.utils.book_new();
+    const add = (name, aoa, widths) => { const ws = X.utils.aoa_to_sheet(aoa); if (widths) ws['!cols'] = widths.map(w => ({ wch: w })); X.utils.book_append_sheet(wb, ws, name); };
+    const S = state.settings;
+    add('個人エントリー', [['氏名', 'チーム名', '区分', '種目名', 'エントリータイム', '公式タイム', '判定', 'プログラム', '組', 'レーン', '公式順位', '得点', '状態', '記録（表示）']].concat(
+      D.ind.map(it => [it.e.name, it.e.club, it.e.cat, it.e.event, it.e.entryTime, it.e.officialTime, it.e.judge, it.program, it.heat || '', it.lane || '', it.rank || '', it.points === null ? '' : it.points, it.status, it.officialText])), [30, 12, 10, 22, 10, 10, 6, 22, 5, 5, 6, 5, 7, 12]);
+    add('リレーエントリー', [['チーム名', '記号', '区分', '種目名', '第1泳者', '第2泳者', '第3泳者', '第4泳者', 'エントリータイム', '公式タイム', '判定', 'プログラム', '組', 'レーン', '公式順位', '得点', '状態']].concat(
+      D.rel.map(it => [it.r.team, it.r.mark, it.r.cat, it.r.event].concat(it.members).concat([it.r.entryTime, it.r.officialTime, it.r.judge, it.program, it.heat || '', it.lane || '', it.rank || '', it.points === null ? '' : it.points, it.status]))));
+    add('進行スケジュール', [['競技No', '種目名', '参加数', '組数', '所要時間', '開始時刻', '終了時刻', '調整(分)']].concat(
+      D.sched.rows.map(o => [o.no, o.name, o.n === undefined ? '' : o.n, o.heats === undefined ? '' : o.heats, o.dur !== undefined ? C.fmtDuration(o.dur) : '', o.start !== null && o.start !== undefined ? C.fmtClock(o.start) : '', o.end !== null && o.end !== undefined ? C.fmtClock(o.end) : '', o.row.adj || ''])));
+    const prog = [['プログラム', '組', 'レーン', '氏名／チーム', 'チーム／メンバー', '区分', '公式タイム', '順位']];
+    programOptions().forEach(n => { const p = programData(n); p.heats.forEach(h => h.items.forEach(it => prog.push([n, h.heat, it.lane || '', p.relay ? it.teamDisp : it.name, p.relay ? it.memberText : it.club, it.cat, it.flashTime, it.flashRank]))); });
+    add('プログラム', prog, [22, 5, 5, 30, 20, 10, 12, 6]);
+    const fl = [['種目', '順位', '選手名／泳者', 'クラブ／チーム', '年齢区分', '公式タイム']];
+    programOptions().forEach(n => C.flashList(state, D.ind, D.rel, n).forEach(x => fl.push([n, x.rank, x.name, x.club, x.cat, x.time])));
+    add('速報', fl, [22, 6, 30, 14, 14, 12]);
+    add('クラブ別', [['クラブ名', '目標', '実績', '差', '割合', '総合得点', 'チーム順位']].concat(D.dash.clubs.map(c => [c.name, c.target === null ? '' : c.target, c.actual, c.diff === null ? '' : c.diff, c.share === null ? '' : Math.round(c.share * 1000) / 10 + '%', c.score, c.rank])));
+    const R = D.aw, rt = r => r === null || r === undefined ? '' : Math.round(r * 10000) / 100 + '%';
+    add('表彰者', [['表彰区分', '年齢区分', '性別', 'クラブ', '選手名', '種目', '達成率', '判定']].concat(
+      R.mvp.map(o => ['最優秀選手', o.catName || '', o.sexName, o.club || '', o.name || '', o.event || '', rt(o.rate), o.status])).concat(
+      R.exc.map(o => [o.slot, o.catName, o.sexName, o.club || '', o.name || '', o.event || '', rt(o.rate), o.status])));
+    // 完全復元用（このシートを消さなければ、このExcelから元どおりに戻せます）
+    const json = serialize(), chunks = [];
+    for (let i = 0; i < json.length; i += 30000) chunks.push([json.slice(i, i + 30000)]);
+    const ws = X.utils.aoa_to_sheet(chunks); X.utils.book_append_sheet(wb, ws, '_app_data');
+    wb.Workbook = { Sheets: wb.SheetNames.map(n => ({ Hidden: n === '_app_data' ? 1 : 0 })) };
+    return wb;
+  }
+  return { detect, buildExport };
+})();
+
+/* ---------------------------------------------------------------- サンプル（架空の選手） */
+function makeSample() {
+  let seed = 7;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const pick = a => a[Math.floor(rnd() * a.length)];
+  const fam = [['佐藤', 'サトウ'], ['鈴木', 'スズキ'], ['高橋', 'タカハシ'], ['田中', 'タナカ'], ['伊藤', 'イトウ'], ['渡辺', 'ワタナベ'], ['山本', 'ヤマモト'], ['中村', 'ナカムラ'], ['小林', 'コバヤシ'], ['加藤', 'カトウ'], ['吉田', 'ヨシダ'], ['山田', 'ヤマダ'], ['松本', 'マツモト'], ['井上', 'イノウエ'], ['木村', 'キムラ'], ['清水', 'シミズ'], ['森', 'モリ'], ['池田', 'イケダ']];
+  const boy = [['陽翔', 'ハルト'], ['蓮', 'レン'], ['湊', 'ミナト'], ['蒼', 'アオイ'], ['樹', 'イツキ'], ['悠真', 'ユウマ'], ['大和', 'ヤマト'], ['律', 'リツ'], ['朝陽', 'アサヒ'], ['颯太', 'ソウタ']];
+  const girl = [['陽葵', 'ヒマリ'], ['凛', 'リン'], ['結菜', 'ユイナ'], ['芽依', 'メイ'], ['紬', 'ツムギ'], ['澪', 'ミオ'], ['咲良', 'サクラ'], ['杏', 'アン'], ['葵', 'アオイ'], ['心春', 'コハル']];
+  const st = C.emptyState(), S = st.settings;
+  S.meetName = '（サンプル）第1回 みなと町ジュニアスイムフェスティバル';
+  S.clubs = [{ name: 'みなとSC', target: 20 }, { name: 'さくらスイム', target: 15 }, { name: 'あおぞらクラブ', target: 15 }, { name: 'ひかりSS', target: 10 }];
+  S.categories = ['6歳以下', '7〜8歳', '9〜10歳', '11〜12歳'];
+  S.cert.date = '2026-11-23'; S.award.date = '2026-11-23';
+  S.combined = [{ name: '合同 50M 自由形', pairs: [{ event: '男子 50M 自由形', cat: '6歳以下' }, { event: '男子 50M 自由形', cat: '7〜8歳' }, {}] }];
+  const ind = ['25M 板キック', '25M 自由形', '25M 背泳ぎ', '25M 平泳ぎ', '25M バタフライ', '50M 自由形'];
+  const base = { '25M 板キック': 26, '25M 自由形': 21, '25M 背泳ぎ': 25, '25M 平泳ぎ': 28, '25M バタフライ': 24, '50M 自由形': 45 };
+  const catAdj = { '6歳以下': 1.45, '7〜8歳': 1.2, '9〜10歳': 1.0, '11〜12歳': 0.86 };
+  const used = new Set();
+  for (let i = 0; i < 64; i++) {
+    const g = rnd() < 0.5 ? '男子' : '女子';
+    const f = pick(fam), n = pick(g === '男子' ? boy : girl);
+    const name = f[0] + '　' + n[0] + '　' + f[1] + '　' + n[1];
+    if (used.has(name)) continue; used.add(name);
+    const club = pick(S.clubs).name, cat = pick(S.categories);
+    const evs = []; const k = rnd() < 0.6 ? 2 : 1;
+    while (evs.length < k) { const e = pick(ind); if (evs.indexOf(e) < 0 && !(e === '50M 自由形' && cat === '6歳以下' && g === '女子')) evs.push(e); }
+    evs.forEach(e => {
+      const t = base[e] * catAdj[cat] * (g === '女子' ? 1.06 : 1) * (0.85 + rnd() * 0.35);
+      const done = /板キック|自由形/.test(e) && !/50M/.test(e);
+      st.entries.push({ id: uid(), name, club, cat, event: g + ' ' + e, entryTime: rnd() < 0.5 ? C.fmtTime(t * (0.97 + rnd() * 0.08)) : '', officialTime: done ? C.fmtTime(t) : '', judge: done && rnd() < 0.04 ? '失格' : '' });
+    });
+  }
+  // 入力ミスの例（入力チェックで見つかります）
+  if (st.entries[5]) st.entries[5].officialTime = '１８．３２';
+  const mem = () => [0, 1, 2, 3].map(() => { const f = pick(fam), n = pick(rnd() < .5 ? boy : girl); return f[0] + '　' + n[0]; });
+  st.relays = [
+    { id: uid(), team: 'みなとSC', mark: 'A', cat: '9〜10歳', event: '混合 4×25M フリーリレー', members: mem(), entryTime: '', officialTime: '1:12.40', judge: '' },
+    { id: uid(), team: 'さくらスイム', mark: '', cat: '9〜10歳', event: '混合 4×25M フリーリレー', members: mem(), entryTime: '', officialTime: '1:15.08', judge: '' },
+    { id: uid(), team: 'あおぞらクラブ', mark: '', cat: '9〜10歳', event: '混合 4×25M フリーリレー', members: mem(), entryTime: '', officialTime: '', judge: '' },
+    { id: uid(), team: 'みなとSC', mark: 'B', cat: '11〜12歳', event: '混合 4×25M フリーリレー', members: mem(), entryTime: '', officialTime: '', judge: '' }
+  ];
+  const order = ['男子 25M 板キック', '女子 25M 板キック', '男子 25M 自由形', '女子 25M 自由形', '男子 25M 背泳ぎ', '女子 25M 背泳ぎ', '休憩', '男子 25M 平泳ぎ', '女子 25M 平泳ぎ', '男子 25M バタフライ', '女子 25M バタフライ', '合同 50M 自由形', '男子 50M 自由形', '女子 50M 自由形', '混合 4×25M フリーリレー'];
+  st.schedule = order.map(n => ({ id: uid(), name: n, adj: '' }));
+  // 表彰マスタは大会設定に合わせる
+  const A = st.award;
+  A.cats = A.cats.map((c, i) => ({ name: S.categories[i] || '', mvp: true, exc: true }));
+  const bt = { '25M 板キック': [22, 24], '25M 自由形': [18, 20], '25M 背泳ぎ': [21, 22], '25M 平泳ぎ': [23, 25], '25M バタフライ': [19, 21], '50M 自由形': [36.6, 40.7] };
+  A.events = ind.map((e, i) => ({ id: 'ae' + (i + 1), name: e, baseM: C.fmtTime(bt[e][0]), baseF: C.fmtTime(bt[e][1]), mvp: true }));
+  while (A.events.length < 15) A.events.push({ id: 'ae' + uid(), name: '', baseM: '', baseF: '', mvp: true });
+  return st;
+}
+
+/* ---------------------------------------------------------------- 起動 */
+(function boot() {
+  load();
+  view = (location.hash || '#home').slice(1) || 'home';
+  if (!VIEWS[view]) view = 'home';
+  recompute();
+  render();
+  if (state.entries.length) snapshot('起動時');
+})();
+</script>
+</body>
+</html>
