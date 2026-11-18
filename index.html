@@ -75,7 +75,7 @@ button.chip { cursor: pointer; }
 .nav a.on .badge { background: var(--accent-ink); color: var(--accent); }
 main { padding: 20px max(16px, env(safe-area-inset-right)) 60px max(16px, env(safe-area-inset-left)); min-width: 0; }
 @media (max-width: 900px) {
-  .app { grid-template-columns: minmax(0, 1fr); }
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
   .nav { position: static; height: auto; display: flex; overflow-x: auto; gap: 4px; padding: 8px; border-right: 0; border-bottom: 1px solid var(--line); }
   .nav h6 { display: none; }
   .nav a { white-space: nowrap; flex: 0 0 auto; }
