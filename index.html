@@ -423,7 +423,13 @@ table.t td > b { white-space: nowrap; }
 .evchip.done { background: var(--ok-soft); border-color: transparent; } .evchip.done i { color: var(--ok); font-weight: 700; }
 .evchip.doing { background: var(--accent-soft); border-color: transparent; } .evchip.doing i { color: var(--accent); font-weight: 700; }
 .evchip.empty { opacity: .5; }
-.evchip.cur { box-shadow: 0 0 0 2px var(--accent); }
+/* いまの種目は、ガラス（レンズ）の枠で示す。枠は格子の内側に収まるので欠けない */
+.seg.grid { display: grid; gap: 6px; padding: 4px; border: 0; border-radius: 14px; background: none; max-width: none; }
+.seg.grid.pressing { background: none; box-shadow: none; }
+.seg.grid > .lens { z-index: 3; border-radius: 12px; background: linear-gradient(180deg, rgba(255,255,255, calc(.24 * var(--lift))), rgba(255,255,255, calc(.06 * var(--lift))));
+  box-shadow: inset 0 0 0 calc(2px * (1 - var(--lift))) var(--accent), inset 0 0 0 calc(1.2px * var(--lift)) rgba(255,255,255, calc(.95 * var(--lift))), inset 0 1.5px 1px rgba(255,255,255, calc(.9 * var(--lift))),
+    inset 0 -3px 8px rgba(0, 40, 80, calc(.10 * var(--lift))), 0 calc(10px * var(--lift)) calc(26px * var(--lift)) rgba(10, 30, 60, calc(.22 * var(--lift))); }
+.seg.grid > .evchip { position: relative; z-index: 1; touch-action: pan-y; }
 .ready { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; margin-top: 10px; }
 .ritem { display: flex; gap: 8px; align-items: center; text-align: left; border: 1px solid var(--hairline); background: var(--fill); border-radius: 12px; padding: 8px 10px; cursor: pointer; font-size: 13px; }
 .ritem span { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-weight: 800; flex: 0 0 auto; }
@@ -586,7 +592,14 @@ html.dragging-seat, html.dragging-seat * { cursor: grabbing !important; -webkit-
 
 .nw { white-space: nowrap; }
 table.pt .tbox .prev.same, table.pt .tbox .prev:empty { display: none; }
-table.pt .tbox:has(.prev.same) input.tin, table.pt .tbox:has(.prev:empty) input.tin { padding-right: 8px; }
+table.pt input.tin.nopv { padding-right: 8px; }   /* 読み取り結果を出さないとき（:has を使わず古いブラウザでも同じ） */
+/* コンテナクエリに未対応の古いブラウザ（iOS 15 など）: 細い画面では表を横スクロールできるようにしておく */
+@supports not (container-type: inline-size) { .tablewrap.pw { overflow-x: auto; } }
+/* iPhone/iPad: 16px 未満の入力欄に触れると画面が勝手に拡大されるので、指で操作する端末では入力欄の文字を 16px に */
+@supports (-webkit-touch-callout: none) { @media (pointer: coarse) {
+  input[type=text], input[type=number], input[type=date], input:not([type]), select, textarea, table.t input, table.t select { font-size: 16px; }
+  .pmode { font-size: 16px; }
+} }
 
 /* ---------- フリガナ（漢字の上に小さく） ---------- */
 ruby { ruby-position: over; ruby-align: center; }
@@ -612,6 +625,9 @@ table.pt td .one, .pcard .fit { padding-top: 1px; }
 .pp.ptab .wbox.rk { width: 10mm; }
 .pp.ptab tr.emp td { padding-top: .6mm; padding-bottom: .6mm; }
 .pg-z.col1 .blk { margin-bottom: 3.2mm; }
+
+.flash-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; }
+@media (max-width: 520px) { .hide-xs { display: none; } }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 10mm }</style>
 </head>
@@ -662,6 +678,7 @@ const Core = (() => {
     if (raw === null || raw === undefined) return { kind: 'empty' };
     if (typeof raw === 'number') {
       if (!isFinite(raw) || raw <= 0) return { kind: 'error', msg: '0以下の数値です' };
+      if (Number.isInteger(raw) && raw >= 1000 && raw < 1000000) return parseTime(String(raw), opt);   // Excelの数値セルに 2534 と入っていても 25.34
       let sec;
       if (raw < 1) sec = raw * 86400;
       else if (raw >= 100 && rule === 'mss') {
@@ -705,6 +722,12 @@ const Core = (() => {
     if (parts.length > 3) return { kind: 'error', msg: '区切りが多すぎます' };
     const n = +s;
     if (n <= 0) return { kind: 'error', msg: '0以下です' };
+    // 点なしの4〜6桁は、下2桁を1/100秒として読む（速く打つときの書き方: 2534 → 25.34、10530 → 1:05.30、123456 → 12:34.56）
+    if (parts.length === 1 && /^\d{4,6}$/.test(s)) {
+      const cc = +s.slice(-2), rest = s.slice(0, -2), ss = +rest.slice(-2), mm = rest.length > 2 ? +rest.slice(0, -2) : 0;
+      if (rest.length > 2 && ss >= 60) return { kind: 'error', msg: '秒が60以上です（例: 1:05.30 は 10530）' };
+      return finish(mm * 60 + ss + cc / 100);
+    }
     if (n >= 100 && rule === 'mss') {
       const mm = Math.floor(+parts[0] / 100), r = n - mm * 100;
       if (r >= 60) return { kind: 'error', msg: '秒が60以上です（例: 1:32.22 は 132.22）' };
@@ -1289,7 +1312,8 @@ const Core = (() => {
   }
   function splitName(name, style) {
     const parts = fixName(name).split('　').filter(Boolean);
-    return { kanji: parts.slice(0, 2).join('　'), kana: kanaConv(parts.slice(2).join('　'), style), kanjiParts: parts.slice(0, 2), kanaParts: parts.slice(2).map(k => kanaConv(k, style)) };
+    const kanaParts = parts.slice(2).map(k => kanaConv(k, style));
+    return { kanji: parts.slice(0, 2).join('　'), kana: kanaParts.join('　'), kanjiParts: parts.slice(0, 2), kanaParts };
   }
   // 入力された氏名のフリガナ部分だけを設定の表記にそろえる（漢字の部分はそのまま）
   function normName(name, style) {
@@ -1883,6 +1907,7 @@ function flushRender() { if (!renderQueued) return; renderQueued = false; render
 function render() {
   if (ptrDown && performance.now() - ptrDown < 4000) { renderHeld = true; return; }
   renderHeld = false;
+  if (!(LENS.quick && LENS.quick.drag) && !(LENS.nav && LENS.nav.drag)) hideTip();   // 画面が変わったら簡易説明は消す
   const act = document.activeElement;
   const fk = act && act.dataset ? act.dataset.k : null;
   const dirtyVal = act && act.dataset && act.dataset.dirty ? act.value : null;   // 確定前の打ちかけの文字は描き直しても消さない
@@ -1978,7 +2003,7 @@ function lensState(seg) {
     const r = act ? itemRect(act) : { x: 0, y: 0, w: 0, h: 0 };
     st = LENS[id] = { x: r.x, y: r.y, w: r.w, h: r.h, vx: 0, vy: 0, vw: 0, vh: 0, t: r, lift: 0, vl: 0, tl: 0, drag: null, settling: false, raf: 0, last: 0, mag: false };
   }
-  st.seg = seg; st.el = seg.querySelector(':scope > .lens'); st.vert = seg.classList.contains('v');
+  st.seg = seg; st.el = seg.querySelector(':scope > .lens'); st.vert = seg.classList.contains('v'); st.grid = seg.classList.contains('grid');
   return st;
 }
 function kickLens(st) { if (!st.raf) { st.last = performance.now(); st.raf = requestAnimationFrame(ts => stepLens(st, ts)); } }
@@ -2003,7 +2028,7 @@ function drawLens(st) {
   if (!el || !el.isConnected) return;
   const L = Math.max(0, Math.min(1, st.lift));
   const round = st.seg.classList.contains('round');
-  const sx = round ? 1 + 0.2 * L : st.vert ? 1 + 0.04 * L : 1 + 0.08 * L, sy = round ? 1 + 0.2 * L : st.vert ? 1 + 0.10 * L : 1 + 0.28 * L;   // 押すとガラスが少しふくらむ
+  const sx = round ? 1 + 0.2 * L : st.grid ? 1 + 0.06 * L : st.vert ? 1 + 0.04 * L : 1 + 0.08 * L, sy = round ? 1 + 0.2 * L : st.grid ? 1 + 0.12 * L : st.vert ? 1 + 0.10 * L : 1 + 0.28 * L;   // 押すとガラスが少しふくらむ
   el.style.width = st.w + 'px'; el.style.height = st.h + 'px';
   el.style.transform = 'translate(' + st.x.toFixed(2) + 'px,' + st.y.toFixed(2) + 'px) scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ')';
   el.style.opacity = st.w > 0 ? '1' : '0';
@@ -2013,10 +2038,12 @@ function drawLens(st) {
   // ガラスの下にある項目（アイコン・文字）は、ガラスの中心に近いほど少し大きく見える
   if (L > 0.01) {
     const c = st.vert ? st.y + st.h / 2 : st.x + st.w / 2, span = (st.vert ? st.h : st.w) * 0.75;
+    const gx = st.x + st.w / 2, gy = st.y + st.h / 2;
     segItems(st.seg).forEach(it => {
-      const r = itemRect(it), ic = st.vert ? r.y + r.h / 2 : r.x + r.w / 2;
-      const f = Math.max(0, 1 - Math.abs(ic - c) / span);
-      it.style.transform = f > 0 ? 'scale(' + (1 + 0.10 * L * f).toFixed(4) + ')' : '';
+      const r = itemRect(it);
+      const f = st.grid ? Math.max(0, 1 - Math.hypot((r.x + r.w / 2 - gx) / (st.w * 0.8), (r.y + r.h / 2 - gy) / (st.h * 0.8)))
+        : Math.max(0, 1 - Math.abs((st.vert ? r.y + r.h / 2 : r.x + r.w / 2) - c) / span);
+      it.style.transform = f > 0 ? 'scale(' + (1 + (st.grid ? 0.05 : 0.10) * L * f).toFixed(4) + ')' : '';
     });
     st.mag = true;
   } else if (st.mag) { segItems(st.seg).forEach(it => { it.style.transform = ''; }); st.mag = false; }
@@ -2035,11 +2062,13 @@ function bindLenses() {
 }
 const placeLenses = bindLenses;
 function rememberLenses() { /* 状態は LENS に残っている */ }
+function lensCenter(st) { return st.grid ? { x: st.t.x + st.t.w / 2, y: st.t.y + st.t.h / 2 } : st.vert ? st.t.y + st.t.h / 2 : st.t.x + st.t.w / 2; }
 function nearestItem(st, pos) {
   let best = null, bd = Infinity;
   segItems(st.seg).forEach(it => {
     if (it.disabled) return;
-    const r = itemRect(it), c = st.vert ? r.y + r.h / 2 : r.x + r.w / 2, d = Math.abs(c - pos);
+    const r = itemRect(it), c = st.vert ? r.y + r.h / 2 : r.x + r.w / 2;
+    const d = typeof pos === 'object' ? Math.hypot(r.x + r.w / 2 - pos.x, r.y + r.h / 2 - pos.y) : Math.abs(c - pos);
     if (d < bd) { bd = d; best = it; }
   });
   return best;
@@ -2057,14 +2086,19 @@ document.addEventListener('pointerdown', e => {
   try { seg.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
   st.tl = 1;
   followPointer(st, e.clientX, e.clientY);
-  if (seg.querySelector('[data-tip]')) { clearTimeout(tipTimer); tipTimer = setTimeout(() => { if (st.drag) showTip(nearestItem(st, st.vert ? st.t.y + st.t.h / 2 : st.t.x + st.t.w / 2)); }, 380); }
+  if (seg.querySelector('[data-tip]')) { clearTimeout(tipTimer); tipTimer = setTimeout(() => { if (st.drag) showTip(nearestItem(st, lensCenter(st))); }, 380); }
 });
 function followPointer(st, cx, cy) {
   const d = st.drag, box = d.box, seg = st.seg;
   const items = segItems(seg);
   const first = itemRect(items[0]), last = itemRect(items[items.length - 1]);
   const soft = (v, lo, hi) => v < lo ? lo - (lo - v) * 0.18 : v > hi ? hi + (v - hi) * 0.18 : v;   // 端の外へは少しだけ
-  if (st.vert) {
+  if (st.grid) {          // 格子状（本部ボードの全種目）: 縦横どちらにも指に付いてくる
+    const px = cx - box.left + seg.scrollLeft, py = cy - box.top + seg.scrollTop;
+    const near = nearestItem(st, { x: px, y: py }), nr = near ? itemRect(near) : first;
+    const maxX = Math.max(...items.map(it => it.offsetLeft + it.offsetWidth)), maxY = Math.max(...items.map(it => it.offsetTop + it.offsetHeight));
+    st.t = { x: soft(px - nr.w / 2, first.x, maxX - nr.w), y: soft(py - nr.h / 2, first.y, maxY - nr.h), w: nr.w, h: nr.h };
+  } else if (st.vert) {
     const near = nearestItem(st, cy - box.top + seg.scrollTop), nr = near ? itemRect(near) : first;
     const h = nr.h, y = soft(cy - box.top + seg.scrollTop - h / 2, first.y, last.y + last.h - h);
     st.t = { x: nr.x, y, w: nr.w, h };
@@ -2081,7 +2115,7 @@ document.addEventListener('pointermove', e => {
     if (!st.drag || st.drag.id !== e.pointerId) continue;
     if (Math.hypot(e.clientX - st.drag.sx, e.clientY - st.drag.sy) > 6) st.drag.moved = true;
     followPointer(st, e.clientX, e.clientY);
-    if (tipFor || (st.drag.moved && st.seg.querySelector('[data-tip]'))) { const n = nearestItem(st, st.vert ? st.t.y + st.t.h / 2 : st.t.x + st.t.w / 2); if (n !== tipFor) showTip(n); }
+    if (tipFor || (st.drag.moved && st.seg.querySelector('[data-tip]'))) { const n = nearestItem(st, lensCenter(st)); if (n !== tipFor) showTip(n); }
   }
 });
 function endLensDrag(e, cancel) {
@@ -2092,11 +2126,11 @@ function endLensDrag(e, cancel) {
     hideTip();
     try { st.seg.releasePointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     st.tl = 0; st.settling = true;
-    const pos = st.vert ? st.t.y + st.t.h / 2 : st.t.x + st.t.w / 2;
+    const pos = lensCenter(st);
     const pick = cancel ? (st.seg.querySelector('[data-seg].on') || d.start) : (d.moved ? nearestItem(st, pos) : d.start);
     if (pick) {
       st.t = itemRect(pick);
-      if (!cancel && (!pick.classList.contains('on') || pick.dataset.act === 'go')) {
+      if (!cancel && (!pick.classList.contains('on') || pick.dataset.act === 'go' || st.grid)) {
         st.seg.querySelectorAll('[data-seg].on').forEach(x => x.classList.remove('on')); pick.classList.add('on');
         setTimeout(() => pick.click(), 90);
       }
@@ -2161,7 +2195,9 @@ const PAGE_TIPS = {
 };
 let tipTimer = 0, tipFor = null;
 function showTip(item) {
-  if (!item || !item.dataset.tip) return;
+  if (!item || !item.dataset.tip || !item.isConnected) return;
+  const ir = item.getBoundingClientRect();
+  if (!ir.width || !ir.height || ir.right < 0 || ir.left > window.innerWidth) return;   // 閉じた一覧・消えたボタンには出さない
   let tip = $('#tip');
   if (!tip) { tip = document.createElement('div'); tip.id = 'tip'; tip.setAttribute('role', 'tooltip'); document.body.appendChild(tip); }
   tip.innerHTML = '<b>' + esc(item.dataset.tipTitle || '') + '</b><span>' + esc(item.dataset.tip) + '</span>';
@@ -2183,6 +2219,12 @@ document.addEventListener('pointerout', e => {
   if (e.pointerType === 'mouse' && !e.buttons) hideTip();
 });
 window.addEventListener('scroll', hideTip, true);
+window.addEventListener('hashchange', hideTip);
+window.addEventListener('blur', hideTip);
+document.addEventListener('keydown', hideTip);
+document.addEventListener('pointerdown', e => { if (!(e.target.closest && e.target.closest('.seg [data-tip]'))) hideTip(); });
+// 説明の元のボタンが消えた・見えなくなったら、すぐ消す（画面一覧を閉じた・切り替えた直後など）
+setInterval(() => { if (tipFor && (!tipFor.isConnected || !tipFor.getBoundingClientRect().width || tipFor.getBoundingClientRect().right < 0)) hideTip(); }, 300);
 
 // 段落の説明は1行に畳み、押すと全文を表示
 document.addEventListener('click', e => { const l = e.target.closest && e.target.closest('.lead'); if (l) l.classList.toggle('open'); });
@@ -2268,7 +2310,8 @@ function timeCell(k, raw, extraClass, attrs) {
   const p = C.parseTime(raw, { threeDigit: k.indexOf('aw') === 0 ? 'mss' : state.settings.threeDigit });
   const bad = p.kind === 'error';
   const prev = p.kind === 'time' ? C.fmtTime(p.sec) : p.kind === 'special' ? p.special : bad ? p.msg : '';
-  return '<input class="tin ' + (bad ? 'bad ' : '') + (extraClass || '') + '" data-k="' + esc(k) + '" value="' + esc(raw === null || raw === undefined ? '' : raw) + '" inputmode="decimal" autocomplete="off" ' + (attrs || '') + '><span class="prev' + (bad ? ' bad' : '') + (prev && prev === String(raw === null || raw === undefined ? '' : raw).trim() ? ' same' : '') + '" data-prev="' + esc(k) + '">' + esc(prev) + '</span>';
+  const same = !prev || prev === String(raw === null || raw === undefined ? '' : raw).trim();
+  return '<input class="tin ' + (bad ? 'bad ' : '') + (same && !bad ? 'nopv ' : '') + (extraClass || '') + '" data-k="' + esc(k) + '" value="' + esc(raw === null || raw === undefined ? '' : raw) + '" inputmode="decimal" autocomplete="off" ' + (attrs || '') + '><span class="prev' + (bad ? ' bad' : '') + (prev && prev === String(raw === null || raw === undefined ? '' : raw).trim() ? ' same' : '') + '" data-prev="' + esc(k) + '">' + esc(prev) + '</span>';
 }
 const pillStatus = s => s === '完泳' ? '<span class="pill ok">完泳</span>' : s === '失格' ? '<span class="pill err">失格</span>' : s === '棄権' ? '<span class="pill warn">棄権</span>' : s ? '<span class="pill mute">' + esc(s) + '</span>' : '';
 const blankOpt = label => [['', label || '—']];
@@ -2315,7 +2358,7 @@ function readiness() {
 function hqBoard() {
   const P = meetProgress(), cur = P.cur, dl = delayText(cur, P.started);
   const rd = readiness(), bad = rd.filter(x => !x.ok && !x.soft).length;
-  const chip = x => '<button class="evchip ' + x.state + (cur && x === cur ? ' cur' : '') + '" data-act="openprog" data-p="' + esc(x.r.name) + '" title="' + esc(x.r.name + '　' + x.done + '/' + x.n) + '"><b>' + x.r.no + '</b><span>' + esc(x.r.name.replace(/^(男子|女子|混合)\s*/, m => m.trim().slice(0, 1) + ' ')) + '</span><i>' + (x.state === 'empty' ? '—' : x.done + '/' + x.n) + '</i></button>';
+  const chip = x => '<button type="button" data-seg class="evchip ' + x.state + (cur && x === cur ? ' cur on' : '') + '" data-act="openprog" data-p="' + esc(x.r.name) + '" title="' + esc(x.r.name + '　' + x.done + '/' + x.n) + '"><b>' + x.r.no + '</b><span>' + esc(x.r.name.replace(/^(男子|女子|混合)\s*/, m => m.trim().slice(0, 1) + ' ')) + '</span><i>' + (x.state === 'empty' ? '—' : x.done + '/' + x.n) + '</i></button>';
   return '<div class="hq">' +
     '<div class="card hq-now">' + (P.finished ? '<span class="muted small">進行</span><div class="hq-title">全種目の記録入力が終わりました</div><div class="bar" style="margin-top:8px"><button class="btn primary" data-act="go" data-v="awards">表彰者を確認</button><button class="btn" data-act="go" data-v="certs">記録証・賞状を印刷</button></div>' :
       cur ? '<span class="muted small">いまの種目</span><div class="hq-title">No.' + cur.r.no + '　' + esc(cur.r.name) + '</div>' +
@@ -2324,7 +2367,7 @@ function hqBoard() {
         '<div class="bar" style="margin:10px 0 0"><button class="btn primary" data-act="openprog" data-p="' + esc(cur.r.name) + '">記録入力を開く</button><button class="btn" data-act="openflash" data-p="' + esc(cur.r.name) + '">速報を開く</button>' + (P.next ? '<span class="muted small">次: No.' + P.next.r.no + ' ' + esc(P.next.r.name) + '（' + C.fmtClock(P.next.r.start) + '）</span>' : '') + '</div>'
       : '<span class="muted small">進行</span><div class="hq-title">スケジュールに種目がありません</div><button class="btn" data-act="go" data-v="schedule">進行スケジュールへ</button>') +
     '</div>' +
-    '<div class="card hq-list"><h2>全種目の入力状況 <span class="muted small">（押すと記録入力へ）</span></h2><div class="evgrid">' + P.rows.map(chip).join('') + '</div></div>' +
+    '<div class="card hq-list"><h2>全種目の入力状況 <span class="muted small">（押すと記録入力へ）</span></h2><div class="evgrid seg grid" data-seg-id="hqev"><span class="lens" aria-hidden="true"></span>' + P.rows.map(chip).join('') + '</div></div>' +
     '<details class="card hq-ready" ' + (bad ? 'open' : '') + '><summary>開催前の確認 ' + (bad ? '<span class="pill warn">要確認 ' + bad + '</span>' : '<span class="pill ok">準備OK</span>') + '</summary><div class="ready">' +
     rd.map(x => '<button class="ritem ' + (x.ok ? 'ok' : x.soft ? 'soft' : 'ng') + '" ' + (x.go ? 'data-act="go" data-v="' + x.go + '"' : 'data-act="' + x.act + '"') + '><span>' + (x.ok ? '✓' : '!') + '</span>' + esc(x.t) + '</button>').join('') + '</div></details>' +
     '</div>';
@@ -2646,9 +2689,9 @@ VIEWS.flash = () => {
   let prevCat = null;
   return '<h1 class="view">速報</h1><p class="lead">年齢区分ごとに「順位 → 失格 → 棄権 → 未入力」の順に並びます。記録入力に合わせて自動で更新されます。</p>' +
     '<div class="bar">' + sel('ui:flash', ui.flash, opts, ui.flashFollow !== false ? 'disabled' : '') + '<label class="small"><input type="checkbox" data-k="ui:flashFollow" ' + (ui.flashFollow !== false ? 'checked' : '') + '> 記録入力中の種目に自動で合わせる</label><span class="grow"></span><label class="small"><input type="checkbox" data-k="ui:big" ' + (ui.big ? 'checked' : '') + '> 大きな文字で表示</label><button class="btn" data-act="printFlash">速報を印刷</button></div>' +
-    '<div class="' + (ui.big ? 'big' : '') + '"><div class="card" style="margin-bottom:10px"><b class="nowrap" style="font-size:' + (ui.big ? 26 : 17) + 'px">' + esc(ui.flash || '') + '</b>' + (sch ? '<span class="muted nowrap">　競技No.' + sch.no + '　開始予定 ' + C.fmtClock(sch.start) + '</span>' : '') + '<span class="muted nowrap">　対象 ' + list.length + (relay ? 'チーム' : '名') + '</span></div>' +
-    (list.length ? '<div class="tablewrap fill" data-fill-id="flash"><table class="t"><thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ名') + '</th><th>年齢区分</th><th class="num">公式タイム</th></tr></thead><tbody>' +
-      list.map(x => { const g = x.it.cat !== prevCat; prevCat = x.it.cat; return (g ? '<tr class="grp"><td colspan="5">' + esc(x.it.cat) + '</td></tr>' : '') + '<tr><td class="c"><b>' + esc(x.rank) + '</b></td><td>' + (relay ? esc(x.name) : rubyName(x.it.np)) + '</td><td>' + esc(x.club) + '</td><td>' + esc(x.cat) + '</td><td class="num">' + esc(x.time) + '</td></tr>'; }).join('') +
+    '<div class="' + (ui.big ? 'big' : '') + '"><div class="card flash-h" style="margin-bottom:10px"><b class="nowrap" style="font-size:' + (ui.big ? 26 : 17) + 'px">' + esc(ui.flash || '') + '</b>' + (sch ? '<span class="muted nowrap">競技No.' + sch.no + '</span><span class="muted nowrap">開始予定 ' + C.fmtClock(sch.start) + '</span>' : '') + '<span class="muted nowrap">対象 ' + list.length + (relay ? 'チーム' : '名') + '</span></div>' +
+    (list.length ? '<div class="tablewrap fill" data-fill-id="flash"><table class="t"><thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ名') + '</th><th class="hide-xs">年齢区分</th><th class="num">公式タイム</th></tr></thead><tbody>' +
+      list.map(x => { const g = x.it.cat !== prevCat; prevCat = x.it.cat; return (g ? '<tr class="grp"><td colspan="5">' + esc(x.it.cat) + '</td></tr>' : '') + '<tr><td class="c"><b>' + esc(x.rank) + '</b></td><td>' + (relay ? esc(x.name) : rubyName(x.it.np)) + '</td><td>' + esc(x.club) + '</td><td class="hide-xs">' + esc(x.cat) + '</td><td class="num">' + esc(x.time) + '</td></tr>'; }).join('') +
       '</tbody></table></div>' : '<div class="card empty">この種目のエントリーはありません。</div>') + '</div>';
 };
 
@@ -3066,7 +3109,7 @@ function changeList(kind, text, el) {
 
 /* ---------------------------------------------------------------- ボタン */
 const ACTIONS = {
-  go: t => { navOpen = false; applyNavLayout(); if (location.hash === '#' + t.dataset.v) render(); else location.hash = t.dataset.v; },
+  go: t => { hideTip(); navOpen = false; applyNavLayout(); if (location.hash === '#' + t.dataset.v) render(); else location.hash = t.dataset.v; },
   undo, redo,
   toggleNav: () => {
     if (navPinnedNow()) { navPref.pinned = false; saveNavPref(); navOpen = false; }
@@ -3706,7 +3749,7 @@ document.addEventListener('input', e => {
     const pv = el.parentNode.querySelector('[data-prev]');
     const bad = p.kind === 'error';
     el.classList.toggle('bad', bad);
-    if (pv) { pv.textContent = p.kind === 'time' ? C.fmtTime(p.sec) : p.kind === 'special' ? p.special : bad ? p.msg : ''; pv.classList.toggle('bad', bad); pv.classList.toggle('same', !!pv.textContent && pv.textContent === el.value.trim()); }
+    if (pv) { pv.textContent = p.kind === 'time' ? C.fmtTime(p.sec) : p.kind === 'special' ? p.special : bad ? p.msg : ''; pv.classList.toggle('bad', bad); pv.classList.toggle('same', !!pv.textContent && pv.textContent === el.value.trim()); el.classList.toggle('nopv', !bad && (!pv.textContent || pv.classList.contains('same'))); }
   }
   if (el.dataset.k === 'ui:entQ' || el.dataset.k === 'ui:relQ') {
     clearTimeout(searchTimer);
