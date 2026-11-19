@@ -104,10 +104,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 
 /* ---------- 枠組み ---------- */
-.app { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 12px;
-  padding: 10px max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left)); min-height: 100vh; }
-.app.pinned.side-left { grid-template-columns: 244px minmax(0, 1fr); }
-.app.pinned.side-right { grid-template-columns: minmax(0, 1fr) 244px; }
+.app { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 8px;
+  padding: 6px max(8px, env(safe-area-inset-right)) 8px max(8px, env(safe-area-inset-left)); min-height: 100vh; }
+.app.pinned.side-left { grid-template-columns: 222px minmax(0, 1fr); }
+.app.pinned.side-right { grid-template-columns: minmax(0, 1fr) 222px; }
 .topbar { grid-column: 1 / -1; position: sticky; top: max(8px, env(safe-area-inset-top)); z-index: 30; display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap;
   padding: 8px 10px; border-radius: 22px; }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 220px; }
@@ -163,7 +163,7 @@ main { min-width: 0; padding-bottom: 16px; }
 @media (max-width: 899px) { .hide-sm { display: none; } .brand { flex-basis: 160px; } }
 
 /* ---------- 液体ガラスのセグメント（動きは JS のばね計算。静止中は平たいピル、押すと透明なガラスに） ---------- */
-.seg { position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--fill); border: 1px solid var(--hairline); max-width: 100%;
+.seg { position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--track); border: 0; max-width: 100%;
   overflow: visible; touch-action: pan-y; user-select: none; -webkit-user-select: none; transition: background .25s, box-shadow .25s; }
 .seg.pressing { background: var(--glass-strong); box-shadow: 0 6px 20px var(--glass-shade); }
 @media (max-width: 600px) { .seg.h { overflow-x: auto; scrollbar-width: none; } .seg.h::-webkit-scrollbar { display: none; } }
@@ -175,17 +175,17 @@ main { min-width: 0; padding-bottom: 16px; }
     inset 0 0 0 calc(1.2px * var(--lift)) rgba(255,255,255, calc(.95 * var(--lift))),
     inset 0 1.5px 1px rgba(255,255,255, calc(.9 * var(--lift))),
     inset 0 -3px 8px rgba(0, 40, 80, calc(.10 * var(--lift))),
-    inset 2px 0 3px rgba(120, 200, 255, calc(.18 * var(--lift))),
-    inset -2px 0 3px rgba(255, 150, 220, calc(.16 * var(--lift))),
+    0 calc(1px * (1 - var(--lift))) calc(3px * (1 - var(--lift))) rgba(10, 30, 60, calc(var(--pill-sh) * (1 - var(--lift)))),
     0 calc(10px * var(--lift)) calc(26px * var(--lift)) rgba(10, 30, 60, calc(.22 * var(--lift))); }
 .seg > .lens.lifted { -webkit-backdrop-filter: blur(.4px) saturate(1.7) brightness(1.07); backdrop-filter: blur(.4px) saturate(1.7) brightness(1.07); }
 html.refract .seg > .lens.lifted { backdrop-filter: url(#lgRefract) saturate(1.6) brightness(1.06); }
-:root { --pill-rgb: 110, 122, 142; --pill-a: .17; }
-:root[data-theme="dark"] { --pill-rgb: 255, 255, 255; --pill-a: .14; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --pill-rgb: 255, 255, 255; --pill-a: .14; } }
+:root { --pill-rgb: 255, 255, 255; --pill-a: 1; --pill-sh: .16; --track: rgba(118, 118, 128, .14); }
+:root[data-theme="dark"] { --pill-rgb: 255, 255, 255; --pill-a: .18; --pill-sh: 0; --track: rgba(255, 255, 255, .08); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --pill-rgb: 255, 255, 255; --pill-a: .18; --pill-sh: 0; --track: rgba(255, 255, 255, .08); } }
 .nav .seg.v > .lens { border-radius: 14px; --pill-rgb: 10, 122, 255; --pill-a: .14; }
 .segbtn { position: relative; z-index: 1; border: 0; background: none; min-height: 36px; padding: 6px 16px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; touch-action: inherit; }
-.segbtn.on { color: var(--ink); font-weight: 650; }
+.segbtn { color: var(--ink); opacity: .78; }
+.segbtn.on { color: var(--ink); font-weight: 650; opacity: 1; }
 .seg.mini .segbtn { min-height: 28px; padding: 3px 11px; font-size: 12.5px; }
 .seg.big .segbtn { min-height: 40px; padding: 8px 18px; font-size: 14px; }
 .nav .seg.v { touch-action: pan-x; }
@@ -424,13 +424,7 @@ table.t td > b { white-space: nowrap; }
 .evchip.done { background: var(--ok-soft); border-color: transparent; } .evchip.done i { color: var(--ok); font-weight: 700; }
 .evchip.doing { background: var(--accent-soft); border-color: transparent; } .evchip.doing i { color: var(--accent); font-weight: 700; }
 .evchip.empty { opacity: .5; }
-/* いまの種目は、ガラス（レンズ）の枠で示す。枠は格子の内側に収まるので欠けない */
-.seg.grid { display: grid; gap: 6px; padding: 4px; border: 0; border-radius: 14px; background: none; max-width: none; }
-.seg.grid.pressing { background: none; box-shadow: none; }
-.seg.grid > .lens { z-index: 3; border-radius: 12px; background: linear-gradient(180deg, rgba(255,255,255, calc(.24 * var(--lift))), rgba(255,255,255, calc(.06 * var(--lift))));
-  box-shadow: inset 0 0 0 calc(2px * (1 - var(--lift))) var(--accent), inset 0 0 0 calc(1.2px * var(--lift)) rgba(255,255,255, calc(.95 * var(--lift))), inset 0 1.5px 1px rgba(255,255,255, calc(.9 * var(--lift))),
-    inset 0 -3px 8px rgba(0, 40, 80, calc(.10 * var(--lift))), 0 calc(10px * var(--lift)) calc(26px * var(--lift)) rgba(10, 30, 60, calc(.22 * var(--lift))); }
-.seg.grid > .evchip { position: relative; z-index: 1; touch-action: pan-y; }
+.evchip.cur { box-shadow: inset 0 0 0 2px var(--accent); }   /* いまの種目（内側の枠なので欠けない） */
 .ready { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; margin-top: 10px; }
 .ritem { display: flex; gap: 8px; align-items: center; text-align: left; border: 1px solid var(--hairline); background: var(--fill); border-radius: 12px; padding: 8px 10px; cursor: pointer; font-size: 13px; }
 .ritem span { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-weight: 800; flex: 0 0 auto; }
@@ -522,7 +516,7 @@ table.pt td.rk { white-space: nowrap; font-size: 13px; }
 
 /* ---------- 印刷プレビュー（右側に常に表示。隠すこともできる） ---------- */
 #print-root.pgroot { }
-.withpv { display: grid; grid-template-columns: minmax(0, 1fr) clamp(260px, 26vw, 380px); gap: 12px; align-items: start; }
+.withpv { display: grid; grid-template-columns: minmax(0, 1fr) clamp(230px, 22vw, 330px); gap: 10px; align-items: start; }
 .pv-main { min-width: 0; }
 .pv { position: sticky; top: calc(var(--toph, 64px) + 18px); padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .pv-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -642,6 +636,52 @@ table.pt td .one, .pcard .fit { padding-top: 1px; }
 /* 証書: 名前の上のフリガナ。名前の位置は変えない（フリガナの分だけ上へ） */
 .cert .cl rt { font-size: .36em; font-weight: 400; letter-spacing: .12em; line-height: 1; }
 .cert .cl.hasruby { transform: translateY(-.42em); }
+
+/* ---------- 上部のバー: 画面の名前と説明 ---------- */
+.topdesc { order: 21; flex: 1 1 320px; min-width: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); padding: 0 4px; }
+.topdesc:empty { display: none; }
+.topbar .tools { order: 20; }
+@media (max-width: 600px) { .topdesc { flex-basis: 100%; font-size: 12px; } }
+.card { padding: 12px 14px; }
+.vhead { margin-bottom: 8px; }
+
+/* ---------- ボタンを見やすく（白い面・はっきりした縁と文字） ---------- */
+:root { --btn-bg: #ffffff; --btn-edge: rgba(18, 40, 72, .18); --btn-ink: #13325a; --btn-hover: #f1f5fa; }
+:root[data-theme="dark"] { --btn-bg: rgba(255, 255, 255, .13); --btn-edge: rgba(255, 255, 255, .24); --btn-ink: #eef4fb; --btn-hover: rgba(255, 255, 255, .2); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --btn-bg: rgba(255, 255, 255, .13); --btn-edge: rgba(255, 255, 255, .24); --btn-ink: #eef4fb; --btn-hover: rgba(255, 255, 255, .2); } }
+.btn:not(.primary):not(.tinted):not(.solid) { background: var(--btn-bg); border-color: var(--btn-edge); color: var(--btn-ink); font-weight: 600; -webkit-backdrop-filter: none; backdrop-filter: none;
+  box-shadow: 0 1px 2px rgba(10, 30, 60, .10); }
+@media (hover: hover) { .btn:not(.primary):not(.tinted):not(.solid):hover { background: var(--btn-hover); } }
+.btn.tinted { background: color-mix(in srgb, var(--accent) 14%, var(--btn-bg)); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); color: var(--accent); }
+.btn.primary { box-shadow: 0 2px 6px color-mix(in srgb, var(--accent) 30%, transparent); }
+.iconbtn { background: var(--btn-bg); border-color: var(--btn-edge); color: var(--btn-ink); box-shadow: 0 1px 2px rgba(10, 30, 60, .08); }
+.btn.danger:not(.solid) { color: var(--err); }
+.evchip { background: var(--btn-bg); border-color: var(--btn-edge); }
+.evchip.done { background: var(--ok-soft); } .evchip.doing { background: var(--accent-soft); }
+
+/* ---------- 印刷物の文字をそろえる（同じ書体・決まった太さ・数字は等幅） ---------- */
+.pgroot .pg { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", "Meiryo", "Noto Sans JP", sans-serif; font-variant-numeric: tabular-nums; }
+.pp { font-size: 10.5pt; font-weight: 400; }
+.pp .nm { font-size: 11.5pt; font-weight: 600; }
+.pp .sm { font-size: 10pt; font-weight: 400; color: #3b434d; }
+.pp .tm { font-family: inherit; font-size: 11pt; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+.pp td.mem { font-size: 10pt; font-weight: 400; }
+.pp .rk { font-weight: 600; }
+.rkb { font-weight: 700; font-size: 9pt; }
+.lane-c { font-weight: 600; }
+.pp th { font-weight: 600; }
+.blk-h { font-weight: 700; }
+.pp.ptab th.hn { font-weight: 700; }
+.pg-title { font-weight: 700; }
+.mvp-p b { font-weight: 600; font-size: 18pt; }
+.pinfo b { font-weight: 600; }
+.pp rt, .mvp-p b rt { font-weight: 400; }
+
+.nav a { white-space: nowrap; }
+.nav a > span, .nav a { overflow: hidden; text-overflow: clip; }
+
+/* スマホ・低い画面: 上部のバーは固定せず、下へ動かすと画面の外へ流れる（作業の場所を広く使う） */
+@media (max-width: 700px), (max-height: 560px) { .topbar { position: relative; top: 0; } }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 10mm }</style>
 </head>
@@ -1942,6 +1982,7 @@ function render() {
   catch (e) { console.error(e); html = '<div class="notice err">この画面の表示中にエラーが起きました: ' + esc(e.message) + '。<button class="btn sm" data-act="go" data-v="data">データ管理へ</button> でバックアップを書き出してから、ページを再読み込みしてください。</div>'; }
   $('#main').innerHTML = (saveError ? '<div class="notice err"><b>保存エラー</b><span class="grow">' + esc(saveError) + '</span><button class="btn sm" data-act="backup">今すぐ書き出す</button></div>' : '') + backupReminder() +
     (PV_VIEWS.includes(view) && !previewOn() ? '<div class="pv-off"><button class="btn sm" data-act="pvToggle">' + icon('print', 'ic sm') + '印刷プレビューを表示</button></div>' : '') + pvShell(html);
+  liftHeading();
   updateFrameStyle();
   sizeFills();
   fitProgram();
@@ -1993,13 +2034,24 @@ function fitProgram() {
   const shift = el.getBoundingClientRect().top - before;        // タブの分だけ表が下がるので高さを合わせる
   if (el.style.maxHeight) el.style.maxHeight = Math.max(240, parseFloat(el.style.maxHeight) - shift) + 'px';
 }
+// 各画面の名前と説明は上部のバーに出す（画面の中はその分だけ広く使う）
+function liftHeading() {
+  const h = document.querySelector('#main h1.view'), t = $('#toptitle'), d = $('#topdesc');
+  if (!h) { if (d) d.textContent = ''; return; }
+  const lead = h.nextElementSibling && h.nextElementSibling.classList.contains('lead') ? h.nextElementSibling : (h.parentElement.querySelector(':scope > .lead'));
+  if (t) t.textContent = h.textContent;
+  if (d) d.textContent = lead ? lead.textContent : '';
+  const box = h.parentElement;
+  h.remove(); if (lead) lead.remove();
+  if (box && box !== $('#main') && box.matches('.vhead > div') && !box.children.length && !box.textContent.trim()) box.remove();
+}
 // 画面の下まで使う領域（表など）は、ページ全体ではなく中だけをスクロールさせる
 function sizeFills() {
   const big = window.innerWidth >= 700 && window.innerHeight >= 560;
   document.querySelectorAll('.fill').forEach(el => {
     if (!big) { el.style.maxHeight = ''; return; }
     const top = el.getBoundingClientRect().top + window.scrollY;
-    el.style.maxHeight = Math.max(260, window.innerHeight - top - 30) + 'px';
+    el.style.maxHeight = Math.max(260, window.innerHeight - top - 16) + 'px';
   });
 }
 
@@ -2181,8 +2233,7 @@ document.addEventListener('pointercancel', e => endLensDrag(e, true));
     const ch = (sc, m, res) => '<feDisplacementMap in="SourceGraphic" in2="map" scale="' + sc + '" xChannelSelector="R" yChannelSelector="G" result="d' + res + '"/><feColorMatrix in="d' + res + '" type="matrix" values="' + m + '" result="c' + res + '"/>';
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;width:0;height:0" aria-hidden="true"><filter id="lgRefract" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">' +
       '<feImage href="' + map + '" x="0" y="0" width="100%" height="100%" preserveAspectRatio="none" result="map"/>' +
-      ch(26, '1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0', 'r') + ch(31, '0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0', 'g') + ch(36, '0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0', 'b') +
-      '<feComposite in="cr" in2="cg" operator="arithmetic" k2="1" k3="1" result="rg"/><feComposite in="rg" in2="cb" operator="arithmetic" k2="1" k3="1"/></filter></svg>';
+      '<feDisplacementMap in="SourceGraphic" in2="map" scale="28" xChannelSelector="R" yChannelSelector="G"/></filter></svg>';   // 色を分けない（七色のにじみを出さない）
     document.body.insertAdjacentHTML('beforeend', svg);
     document.documentElement.classList.add('refract');
   } catch (e) { /* 屈折なしでも動く */ }
@@ -2277,7 +2328,7 @@ function renderTop() {
   const cur = NAV.flatMap(g => g[1]).find(x => x[0] === view);
   $('#top').innerHTML =
     (navPref.side !== 'right' ? menuBtn : '') +
-    '<div class="brand"><img class="logo" src="' + APP_ICON + '" alt=""><div class="brand-t"><small>' + esc(state.settings.meetName || 'スイム大会運営ボード') + '</small><strong>' + esc(cur ? cur[1] : '') + '</strong></div></div>' +
+    '<div class="brand"><img class="logo" src="' + APP_ICON + '" alt=""><div class="brand-t"><small>' + esc(state.settings.meetName || 'スイム大会運営ボード') + '</small><strong id="toptitle">' + esc(cur ? cur[1] : '') + '</strong></div></div>' +
     quickBar() +
     '<div class="chips">' +
     (meta.sample ? '<span class="chip warn">サンプル</span>' : '') +
@@ -2285,6 +2336,7 @@ function renderTop() {
     '<button class="chip ' + (ne ? 'err' : nw ? 'warn' : 'ok') + '" data-act="go" data-v="check" title="入力チェックを開く">' + (ne ? 'エラー ' + ne : nw ? '' : '問題なし') + (nw ? (ne ? '・' : '') + '注意 ' + nw : '') + '</button>' +
     '<button class="chip toggle ' + (locked ? 'lock' : '') + '" data-act="lock" aria-pressed="' + locked + '" title="大会当日は設定・エントリーを誤って変えないようにロックできます。記録入力はできます">' + icon(locked ? 'lock' : 'unlock', 'ic sm') + (locked ? '当日モード中' : '当日モード') + '</button>' +
     '</div>' +
+    '<div class="topdesc" id="topdesc"></div>' +
     '<div class="tools"><button class="iconbtn" data-act="undo" title="元に戻す (Ctrl+Z)" aria-label="元に戻す" ' + (undoStack.length ? '' : 'disabled') + '>' + icon('undo') + '</button>' +
     '<button class="iconbtn" data-act="redo" title="やり直し (Ctrl+Y)" aria-label="やり直し" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '</button>' +
     '<button class="btn sm tinted" data-act="backup">' + icon('save', 'ic sm') + '<span class="hide-sm">バックアップ</span></button></div>' +
@@ -2384,7 +2436,7 @@ function readiness() {
 function hqBoard() {
   const P = meetProgress(), cur = P.cur, dl = delayText(cur, P.started);
   const rd = readiness(), bad = rd.filter(x => !x.ok && !x.soft).length;
-  const chip = x => '<button type="button" data-seg class="evchip ' + x.state + (cur && x === cur ? ' cur on' : '') + '" data-act="openprog" data-p="' + esc(x.r.name) + '" title="' + esc(x.r.name + '　' + x.done + '/' + x.n) + '"><b>' + x.r.no + '</b><span>' + esc(x.r.name.replace(/^(男子|女子|混合)\s*/, m => m.trim().slice(0, 1) + ' ')) + '</span><i>' + (x.state === 'empty' ? '—' : x.done + '/' + x.n) + '</i></button>';
+  const chip = x => '<button type="button" class="evchip ' + x.state + (cur && x === cur ? ' cur' : '') + '" data-act="openprog" data-p="' + esc(x.r.name) + '" title="' + esc(x.r.name + '　' + x.done + '/' + x.n) + '"><b>' + x.r.no + '</b><span>' + esc(x.r.name.replace(/^(男子|女子|混合)\s*/, m => m.trim().slice(0, 1) + ' ')) + '</span><i>' + (x.state === 'empty' ? '—' : x.done + '/' + x.n) + '</i></button>';
   return '<div class="hq">' +
     '<div class="card hq-now">' + (P.finished ? '<span class="muted small">進行</span><div class="hq-title">全種目の記録入力が終わりました</div><div class="bar" style="margin-top:8px"><button class="btn primary" data-act="go" data-v="awards">表彰者を確認</button><button class="btn" data-act="go" data-v="certs">記録証・賞状を印刷</button></div>' :
       cur ? '<span class="muted small">いまの種目</span><div class="hq-title">No.' + cur.r.no + '　' + esc(cur.r.name) + '</div>' +
@@ -2393,7 +2445,7 @@ function hqBoard() {
         '<div class="bar" style="margin:10px 0 0"><button class="btn primary" data-act="openprog" data-p="' + esc(cur.r.name) + '">記録入力を開く</button><button class="btn" data-act="openflash" data-p="' + esc(cur.r.name) + '">速報を開く</button>' + (P.next ? '<span class="muted small">次: No.' + P.next.r.no + ' ' + esc(P.next.r.name) + '（' + C.fmtClock(P.next.r.start) + '）</span>' : '') + '</div>'
       : '<span class="muted small">進行</span><div class="hq-title">スケジュールに種目がありません</div><button class="btn" data-act="go" data-v="schedule">進行スケジュールへ</button>') +
     '</div>' +
-    '<div class="card hq-list"><h2>全種目の入力状況 <span class="muted small">（押すと記録入力へ）</span></h2><div class="evgrid seg grid" data-seg-id="hqev"><span class="lens" aria-hidden="true"></span>' + P.rows.map(chip).join('') + '</div></div>' +
+    '<div class="card hq-list"><h2>全種目の入力状況 <span class="muted small">（押すと記録入力へ）</span></h2><div class="evgrid">' + P.rows.map(chip).join('') + '</div></div>' +
     '<details class="card hq-ready" ' + (bad ? 'open' : '') + '><summary>開催前の確認 ' + (bad ? '<span class="pill warn">要確認 ' + bad + '</span>' : '<span class="pill ok">準備OK</span>') + '</summary><div class="ready">' +
     rd.map(x => '<button class="ritem ' + (x.ok ? 'ok' : x.soft ? 'soft' : 'ng') + '" ' + (x.go ? 'data-act="go" data-v="' + x.go + '"' : 'data-act="' + x.act + '"') + '><span>' + (x.ok ? '✓' : '!') + '</span>' + esc(x.t) + '</button>').join('') + '</div></details>' +
     '</div>';
@@ -3397,6 +3449,7 @@ function fitLines(root) {
   });
 }
 function fitPages(root) {
+  halfAlnum(root);
   root.classList.add('measure');
   root.querySelectorAll('.pg').forEach(pg => {
     const b = pg.querySelector('.pg-b'), z = pg.querySelector('.pg-z');
@@ -3441,15 +3494,35 @@ function fitPages(root) {
   root.classList.remove('measure');
 }
 // 列幅を固定した表: はみ出すセルだけ文字を少し小さくする（改行しない・省略しない）
+// 列幅を固定した表: 入りきらない列は、その列の文字を同じ大きさだけ小さくする（同じ列で大きさがばらばらにならない）
 function fitCells(root) {
-  root.querySelectorAll('.pp.fx td, .pp.fx th').forEach(td => {
-    if (td.dataset.fs0 === undefined) td.dataset.fs0 = td.style.fontSize || '';
-    td.style.fontSize = td.dataset.fs0;
-    const cw = td.clientWidth;
-    if (!cw || td.scrollWidth <= cw + 1) return;
-    let fs = parseFloat(getComputedStyle(td).fontSize); const min = fs * 0.55;
-    for (let i = 0; i < 6 && td.scrollWidth > cw + 1 && fs > min; i++) { fs = Math.max(min, fs * (cw / td.scrollWidth) * 0.97); td.style.fontSize = fs.toFixed(2) + 'px'; }
+  root.querySelectorAll('.pg').forEach(pg => {
+    const cols = new Map();
+    pg.querySelectorAll('.pp.fx').forEach(t => {
+      const n = t.querySelectorAll('col').length;
+      t.querySelectorAll('tr').forEach(tr => {
+        if (tr.children.length !== n) return;                      // 空きレーンなど、セルをつないだ行は除く
+        [...tr.children].forEach((td, k) => { const key = t.className + '|' + k; if (!cols.has(key)) cols.set(key, []); cols.get(key).push(td); });
+      });
+    });
+    cols.forEach(cells => {
+      cells.forEach(td => { if (td.dataset.fs0 === undefined) td.dataset.fs0 = td.style.fontSize || ''; td.style.fontSize = td.dataset.fs0; });
+      let f = 1;
+      cells.forEach(td => { const cw = td.clientWidth, sw = td.scrollWidth; if (cw && sw > cw + 1) f = Math.min(f, cw / sw * 0.97); });
+      if (f >= 1) return;
+      f = Math.max(0.55, f);
+      const tds = cells.filter(td => td.tagName === 'TD');
+      tds.forEach(td => { td.style.fontSize = (parseFloat(getComputedStyle(td).fontSize) * f).toFixed(2) + 'px'; });
+      for (let i = 0; i < 3 && tds.some(td => td.scrollWidth > td.clientWidth + 1); i++) tds.forEach(td => { td.style.fontSize = (parseFloat(td.style.fontSize) * 0.95).toFixed(2) + 'px'; });
+    });
   });
+}
+// 印刷物の全角の英数字は半角にそろえる（ＳＣ → SC、２５Ｍ → 25M）。かな・漢字・記号はそのまま
+function halfAlnum(root) {
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let n = w.nextNode(); n; n = w.nextNode()) {
+    if (/[\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A]/.test(n.nodeValue)) n.nodeValue = n.nodeValue.replace(/[\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+  }
 }
 // ---- 印刷物の部品（{key, title, group, pages, html()}）
 function docSchedule() {
