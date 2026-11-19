@@ -343,6 +343,8 @@ details.card > summary::-webkit-details-marker { display: none; }
 .fitline { white-space: nowrap; overflow: hidden; }
 .pg-b { flex: 1 1 auto; min-height: 0; overflow: hidden; }
 .pg-z { width: max-content; min-width: 100%; }
+.pg-z.fxw { width: 100%; }                                   /* 列幅を固定した表のページは用紙の幅に合わせる */
+.pg-z.fxw.two { grid-template-columns: 1fr 1fr; }
 .pg-z.two { display: grid; grid-template-columns: repeat(2, max-content); column-gap: 9mm; row-gap: 5mm; align-items: start; justify-content: space-between; }
 .pg-z.two .blk { margin: 0; }
 .pg-f { display: flex; justify-content: space-between; gap: 6mm; font-size: 7.5pt; color: var(--sub); letter-spacing: .05em; border-top: .5pt solid var(--hair); padding-top: 2mm; margin-top: 3mm; white-space: nowrap; }
@@ -365,7 +367,6 @@ details.card > summary::-webkit-details-marker { display: none; }
 .pp tr.emp td { padding-top: .7mm; padding-bottom: .7mm; }
 .pp tr.emp .lane-c { transform: scale(.82); }
 .pg-z.col1 .blk { margin-bottom: 4mm; }
-.pg-z.col1 .pp th:first-child { width: 13mm; } .pg-z.col1 .pp th:nth-child(2) { width: 36%; } .pg-z.col1 .pp th:nth-child(3) { width: 24%; } .pg-z.col1 .pp th:nth-child(4) { width: 14%; }
 .pp tr.brk td { color: var(--sub); font-style: italic; }
 .blk { break-inside: avoid; page-break-inside: avoid; margin-bottom: 6mm; }
 .blk-h { font-size: 11pt; font-weight: 800; letter-spacing: .04em; padding-bottom: 1.4mm; margin-bottom: 1mm; color: var(--acc); white-space: nowrap; }
@@ -415,7 +416,7 @@ table.t td > b { white-space: nowrap; }
 .hq-meta b { color: var(--ink); font-size: 16px; font-variant-numeric: tabular-nums; }
 .prog { height: 8px; border-radius: 99px; background: var(--fill); margin-top: 10px; overflow: hidden; border: 1px solid var(--hairline); }
 .prog i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
-.evgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; max-height: 210px; overflow: auto; }
+.evgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); grid-auto-rows: 1fr; gap: 6px; }   /* 全種目を一度に表示・同じ高さ（ガラスの大きさが変わらない） */
 .evchip { display: grid; grid-template-columns: auto 1fr auto; gap: 6px; align-items: center; text-align: left; border: 1px solid var(--hairline); background: var(--fill); border-radius: 12px; padding: 6px 8px; cursor: pointer; font-size: 12.5px; min-height: 38px; }
 .evchip b { font-variant-numeric: tabular-nums; color: var(--muted); }
 .evchip span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -612,22 +613,35 @@ table.pt td .one, .pcard .fit { padding-top: 1px; }
 .pp.ptab th.hn { width: 15mm; min-width: 15mm; white-space: nowrap; padding-left: 0; padding-right: 0; text-align: center; font-size: 10.5pt; font-weight: 800; color: var(--acc); letter-spacing: .02em; border-bottom-color: var(--acc); }
 .pp.ptab th { vertical-align: bottom; }
 .pp.ptab td.ln { text-align: center; padding-left: 0; padding-right: 0; }
-.pp.ptab th.c-nm { width: 30%; } .pp.ptab th.c-club { width: 20%; } .pp.ptab th.c-cat { width: 11%; }
-.pp.ptab th.c-team { width: 17%; } .pp.ptab th.c-mem { width: 33%; }
-.pp.ptab th.c-rec { width: 30mm; } .pp.ptab th.c-rk { width: 14mm; }
-.pp.ptab .nm rt { font-size: 6.5pt; color: #5b6470; font-weight: 400; }
+.pp.ptab .nm rt { font-size: .52em; color: #5b6470; font-weight: 400; }
 .pp.ptab td.mem { font-size: 10pt; }
-.pp.ptab td.mem rt { font-size: 5.6pt; color: #5b6470; }
+.pp.ptab td.mem rt { font-size: .54em; color: #5b6470; }
 .pp.ptab td.mem .sep { font-style: normal; color: #b4bac2; margin: 0 1.4mm; }
 .pp.ptab tbody tr:not(.emp) td { padding-top: calc(1.5mm + var(--rp, 0px)); padding-bottom: calc(1.5mm + var(--rp, 0px)); }
 .pp.ptab.blank tbody tr:not(.emp) td { padding-top: calc(1.8mm + var(--rp, 0px)); padding-bottom: calc(1.8mm + var(--rp, 0px)); }
-.pp.ptab .wbox { display: inline-block; width: 27mm; height: 7.4mm; border: .7pt solid #8d96a0; border-radius: 1.2mm; vertical-align: middle; }
-.pp.ptab .wbox.rk { width: 10mm; }
+.pp.ptab .wbox { display: inline-block; width: 100%; max-width: 27mm; box-sizing: border-box; height: 7.4mm; border: .7pt solid #8d96a0; border-radius: 1.2mm; vertical-align: middle; }
+.pp.ptab .wbox.rk { max-width: 10mm; }
+.pp.ptab td.c:has(.wbox), .pp.ptab td.wc { padding-left: 1.2mm; padding-right: 1.2mm; }
 .pp.ptab tr.emp td { padding-top: .6mm; padding-bottom: .6mm; }
 .pg-z.col1 .blk { margin-bottom: 3.2mm; }
 
 .flash-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; }
 @media (max-width: 520px) { .hide-xs { display: none; } }
+
+/* ---------- 印刷: 列の位置をそろえる・フリガナ ---------- */
+.pp.fx { table-layout: fixed; width: 100%; }
+.pp.fx td, .pp.fx th { overflow: hidden; }
+.pp.fx td { vertical-align: baseline; }               /* フリガナ付きの名前とクラブ名などを同じ線にそろえる */
+.pp.fx thead th { vertical-align: bottom; }
+.pp rt { font-size: .52em; font-weight: 400; color: #5b6470; letter-spacing: 0; line-height: 1; }   /* セルの文字を縮めるとフリガナも一緒に縮む */
+.pp td.mem { font-size: 10pt; }
+.pp td.mem rt { font-size: .54em; }
+.pp .sep { color: #b4bac2; margin: 0 1.2mm; }
+.pp td .kana { display: inline; margin-left: 2mm; }
+.mvp-p b rt { font-size: 7pt; font-weight: 400; color: #5b6470; }
+/* 証書: 名前の上のフリガナ。名前の位置は変えない（フリガナの分だけ上へ） */
+.cert .cl rt { font-size: .36em; font-weight: 400; letter-spacing: .12em; line-height: 1; }
+.cert .cl.hasruby { transform: translateY(-.42em); }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 10mm }</style>
 </head>
@@ -801,7 +815,7 @@ const Core = (() => {
       maxEventsPerPerson: 2,
       cert: { title: '記　録　証', lines: ['あなたは本大会において', '最後まで力強い泳ぎを見せ', '見事完泳されました', 'よってその健闘を讃えこれを証します'], date: '', organizer: '大会主催者名　印', printRecord: true },
       award: { title: '賞　状', lines: ['あなたは本大会において', '極めて優秀な成績を収められました', 'よってその健闘と栄誉を讃え', 'これを賞します'], date: '', organizer: '大会主催者名　印' },
-      print: { scale: 100, offsetTop: 0, offsetLeft: 0, progMode: 'blank' },   // progMode: blank = 記録欄を空けて手書き用 / result = 記録入り
+      print: { scale: 100, offsetTop: 0, offsetLeft: 0, progMode: 'blank', certKana: true },   // progMode: blank = 記録欄を空けて手書き用 / result = 記録入り
       dashboard: { capacity: 90, target: 80, price: 3000, tax: 10 }
     };
   }
@@ -1150,7 +1164,9 @@ const Core = (() => {
       if (f.cat && it.cat !== f.cat) return false;
       if (f.club && (relay ? it.team : it.club) !== f.club) return false;
       if (f.status && it.status !== f.status) return false;
-      if (prize) return it.rank && it.status === '完泳' && it.rank <= maxR;
+      const isPrize = it.rank && it.status === '完泳' && it.rank <= maxR;
+      if (prize) return isPrize;
+      if (S.cert && S.cert.skipPrize && isPrize) return false;      // 賞状をもらう人には記録証を出さない（設定）
       return true;
     });
   }
@@ -1994,7 +2010,8 @@ function sizeFills() {
 const LENS = {};
 const FOLLOW = { k: 2600, c: 102 }, SETTLE = { k: 1000, c: 63 }, LIFT = { k: 700, c: 53 };   // どれも行き過ぎない（臨界減衰）
 function segItems(seg) { return [...seg.querySelectorAll('[data-seg]')]; }
-function itemRect(it) { return { x: it.offsetLeft, y: it.offsetTop, w: it.offsetWidth, h: it.offsetHeight }; }
+let rectCache = null;      // 押している間は項目の位置を1回だけ測って使い回す（毎フレーム測ると重くなり、動きが鈍る）
+function itemRect(it) { const c = rectCache && rectCache.get(it); return c || { x: it.offsetLeft, y: it.offsetTop, w: it.offsetWidth, h: it.offsetHeight }; }
 function lensState(seg) {
   const id = seg.dataset.segId;
   let st = LENS[id];
@@ -2028,7 +2045,7 @@ function drawLens(st) {
   if (!el || !el.isConnected) return;
   const L = Math.max(0, Math.min(1, st.lift));
   const round = st.seg.classList.contains('round');
-  const sx = round ? 1 + 0.2 * L : st.grid ? 1 + 0.06 * L : st.vert ? 1 + 0.04 * L : 1 + 0.08 * L, sy = round ? 1 + 0.2 * L : st.grid ? 1 + 0.12 * L : st.vert ? 1 + 0.10 * L : 1 + 0.28 * L;   // 押すとガラスが少しふくらむ
+  const sx = round ? 1 + 0.2 * L : st.grid ? 1 + 0.03 * L : st.vert ? 1 + 0.04 * L : 1 + 0.08 * L, sy = round ? 1 + 0.2 * L : st.grid ? 1 + 0.03 * L : st.vert ? 1 + 0.10 * L : 1 + 0.28 * L;   // 押すとガラスが少しふくらむ（格子は形を変えず、少しだけ）
   el.style.width = st.w + 'px'; el.style.height = st.h + 'px';
   el.style.transform = 'translate(' + st.x.toFixed(2) + 'px,' + st.y.toFixed(2) + 'px) scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ')';
   el.style.opacity = st.w > 0 ? '1' : '0';
@@ -2036,7 +2053,7 @@ function drawLens(st) {
   el.classList.toggle('lifted', L > 0.04);
   st.seg.classList.toggle('pressing', !!st.drag);
   // ガラスの下にある項目（アイコン・文字）は、ガラスの中心に近いほど少し大きく見える
-  if (L > 0.01) {
+  if (L > 0.01 && !st.grid) {          // 格子（本部ボード）は下の項目を拡大しない（全体がぐらついて見えるため）
     const c = st.vert ? st.y + st.h / 2 : st.x + st.w / 2, span = (st.vert ? st.h : st.w) * 0.75;
     const gx = st.x + st.w / 2, gy = st.y + st.h / 2;
     segItems(st.seg).forEach(it => {
@@ -2081,6 +2098,7 @@ document.addEventListener('pointerdown', e => {
   if (e.pointerType === 'mouse') e.preventDefault();          // リンクの掴み・文字選択を止めて、なぞる操作にする
   const st = lensState(seg);
   const r = itemRect(item);
+  rectCache = null; rectCache = new Map(segItems(seg).map(it => [it, itemRect(it)]));
   st.drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, moved: false, box: seg.getBoundingClientRect(), start: item, size: { w: st.w || r.w, h: st.h || r.h } };
   st.settling = false;
   try { seg.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
@@ -2133,11 +2151,12 @@ function endLensDrag(e, cancel) {
       if (pick.dataset.tip) tipMuted = tipKey(pick);
       if (!cancel && (!pick.classList.contains('on') || pick.dataset.act === 'go' || st.grid)) {
         st.seg.querySelectorAll('[data-seg].on').forEach(x => x.classList.remove('on')); pick.classList.add('on');
-        setTimeout(() => pick.click(), 90);
+        setTimeout(() => pick.click(), 0);      // 離したらすぐ反応する
       }
     }
     kickLens(st);
   }
+  rectCache = null;
 }
 document.addEventListener('pointerup', e => endLensDrag(e, false));
 document.addEventListener('dragstart', e => { if (e.target.closest && e.target.closest('.seg')) e.preventDefault(); });
@@ -2753,9 +2772,11 @@ function certHTML(it, relay, prize, paper, preview) {
   const P = PAPER.A4, L = relay ? P.rel : P.ind, S = state.settings, d = certData(it, relay, prize);
   const sc = (C.num(S.print.scale) || 100) / 100, dy = C.num(S.print.offsetTop), dx = C.num(S.print.offsetLeft);
   const pct = mm => (mm / P.h * 100).toFixed(3) + '%';
-  const at = (key, txt, extra) => { const [top, pt] = L[key]; return '<div class="cl ' + (extra || '') + '" style="left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + pct(top * sc + dy) + ';font-size:' + (pt * sc) + 'pt">' + esc(txt) + '</div>'; };
-  let h = at('title', d.title, 'title') + at('name', d.name, 'name');
-  if (relay) h += at('mem1', d.mem1) + at('mem2', d.mem2); else if (d.club) h += at('club', d.club);
+  const at = (key, txt, extra, html) => { const [top, pt] = L[key]; return '<div class="cl ' + (extra || '') + (html && /<rt>/.test(html) ? ' hasruby' : '') + '" style="left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + pct(top * sc + dy) + ';font-size:' + (pt * sc) + 'pt">' + (html || esc(txt)) + '</div>'; };
+  const kana = S.print.certKana !== false;      // 証書の名前の上にフリガナ
+  const memH = ms => kana ? ms.filter(m => m.kanji).map(m => '<span class="nw">' + rubyName(m) + '</span>').join('　/　') : '';
+  let h = at('title', d.title, 'title') + at('name', d.name, 'name', !relay && kana && it.np.kana ? rubyName(it.np) + '&ensp;殿' : '');
+  if (relay) h += at('mem1', d.mem1, '', memH(it.memberNames.slice(0, 2))) + at('mem2', d.mem2, '', memH(it.memberNames.slice(2, 4))); else if (d.club) h += at('club', d.club);
   h += at('rank', d.rank, 'name') + at('event', d.event) + at('record', d.record) + at('meet', d.meet);
   const [lt, lpt, lgap] = L.lines;
   d.lines.forEach((t, i) => { h += '<div class="cl" style="left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + pct((lt + i * lgap) * sc + dy) + ';font-size:' + (lpt * sc) + 'pt">' + esc(t) + '</div>'; });
@@ -2788,7 +2809,7 @@ VIEWS.certs = () => {
   const clubs = relay ? S.clubs.map(c => c.name) : S.clubs.map(c => c.name);
   return '<h1 class="view">記録証・賞状</h1><p class="lead">対象者を絞り込んでまとめて印刷します。記録が未入力の人は「　分　秒」の手書き用になります。用紙の印刷位置がずれる場合は、下の「位置の調整」で直せます。最初は1枚だけテスト印刷すると安心です。</p>' +
     '<div class="card" style="margin-bottom:12px"><div class="bar">' +
-    seg('certKind', [['record', '記録証（全員）'], ['prize', '賞状（' + (S.prizeMaxRank || 10) + '位以内）']], ui.certKind) +
+    seg('certKind', [['record', S.cert.skipPrize ? '記録証（賞状の人を除く）' : '記録証（全員）'], ['prize', '賞状（' + (S.prizeMaxRank || 10) + '位以内）']], ui.certKind) +
     seg('certTarget', [['ind', '個人'], ['rel', 'リレー']], ui.certTarget) + '<span class="pill info">用紙 A4 縦・1人1枚</span></div><div class="fields">' +
     field('種目', sel('cf:event', f.event || '', blankOpt('すべて').concat(programOptions().filter(n => C.isRelayName(n) === relay)))) +
     field('区分', sel('cf:cat', f.cat || '', blankOpt('すべて').concat(S.categories.filter(Boolean)))) +
@@ -2805,6 +2826,9 @@ VIEWS.certs = () => {
     field('日付', '<input type="date" data-k="set:' + wk + '.date" value="' + esc(/^\d{4}-\d{2}-\d{2}$/.test(W.date) ? W.date : '') + '">') +
     field('大会主催者名', inp('set:' + wk + '.organizer', W.organizer)) +
     (prize ? '' : field('記録の印字', sel('set:cert.printRecord', S.cert.printRecord ? '1' : '0', [['1', '印字する'], ['0', '印字しない（手書き用）']]))) +
+    '</div><div class="bar" style="margin:10px 0 0">' +
+    (prize ? '' : '<label class="small"><input type="checkbox" data-k="set:cert.skipPrize" ' + (S.cert.skipPrize ? 'checked' : '') + '> 賞状の対象者（' + (S.prizeMaxRank || 10) + '位以内）には記録証を出さない</label>') +
+    '<label class="small"><input type="checkbox" data-k="set:print.certKana" ' + (S.print.certKana !== false ? 'checked' : '') + '> 名前の上にフリガナを印刷する</label>' +
     '</div><h3>位置の調整（すべての証書に共通）</h3><div class="fields">' +
     field('文字の大きさ（%）', inp('set:print.scale', S.print.scale, 'inputmode="numeric"')) +
     field('上下のずれ（mm, 下へ+）', inp('set:print.offsetTop', S.print.offsetTop, 'inputmode="decimal"')) +
@@ -3347,6 +3371,7 @@ window.addEventListener('afterprint', () => { $('#print-root').innerHTML = ''; }
 const pnow = () => { const d = new Date(); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
 const nm2 = n => String(n || '').split('　').slice(0, 2).join('　');
 function pPage(title, sub, body, label, zcls) {
+  if (body.indexOf('pp fx') >= 0) zcls = (zcls ? zcls + ' ' : '') + 'fxw';
   return '<section class="pg"><header class="pg-h"><div class="pg-top"><span class="pg-meet fitline">' + esc(state.settings.meetName) + '</span><span class="pg-date">' + pnow() + '</span></div>' +
     '<div class="pg-title fitline">' + esc(title) + '</div>' + (sub ? '<div class="pg-sub fitline">' + sub + '</div>' : '') + '</header>' +
     '<div class="pg-b"><div class="pg-z' + (zcls ? ' ' + zcls : '') + '">' + body + '</div></div>' +
@@ -3412,7 +3437,19 @@ function fitPages(root) {
     }
   });
   fitLines(root);
+  fitCells(root);
   root.classList.remove('measure');
+}
+// 列幅を固定した表: はみ出すセルだけ文字を少し小さくする（改行しない・省略しない）
+function fitCells(root) {
+  root.querySelectorAll('.pp.fx td, .pp.fx th').forEach(td => {
+    if (td.dataset.fs0 === undefined) td.dataset.fs0 = td.style.fontSize || '';
+    td.style.fontSize = td.dataset.fs0;
+    const cw = td.clientWidth;
+    if (!cw || td.scrollWidth <= cw + 1) return;
+    let fs = parseFloat(getComputedStyle(td).fontSize); const min = fs * 0.55;
+    for (let i = 0; i < 6 && td.scrollWidth > cw + 1 && fs > min; i++) { fs = Math.max(min, fs * (cw / td.scrollWidth) * 0.97); td.style.fontSize = fs.toFixed(2) + 'px'; }
+  });
 }
 // ---- 印刷物の部品（{key, title, group, pages, html()}）
 function docSchedule() {
@@ -3436,13 +3473,13 @@ function docProgram(name, mode) {
     const sub = (p.sch ? '競技No.' + p.sch.no + '　' : '') + (p.sch && p.sch.start !== null ? '開始予定 ' + C.fmtClock(p.sch.start) + '　' : '') + p.items.length + unit + '・' + p.heats.length + '組' + (res && done < p.items.length ? '　（記録 ' + done + '/' + p.items.length + '）' : '');
     const body = p.heats.map(hh => {
       const byLane = new Map(hh.items.map(it => [it.lane, it]));
-      return '<div class="blk"><table class="pp ptab ' + (res ? 'res' : 'blank') + (p.relay ? ' rel' : '') + '"><thead><tr><th class="hn">第' + hh.heat + '組</th>' +
+      return '<div class="blk"><table class="pp fx ptab ' + (res ? 'res' : 'blank') + (p.relay ? ' rel' : '') + '">' + colg(p.relay ? ['15mm', '18%', '37%', '12%', '30mm', '14mm'] : ['15mm', '31%', '24%', '13%', '30mm', '14mm']) + '<thead><tr><th class="hn">第' + hh.heat + '組</th>' +
         (p.relay ? '<th class="c-team">チーム</th><th class="c-mem">泳者</th>' : '<th class="c-nm">氏名</th><th class="c-club">クラブ</th>') + '<th class="c-cat">区分</th><th class="c c-rec">記録</th><th class="c c-rk">順位</th></tr></thead><tbody>' +
         lanes.map(ln => {
           const it = byLane.get(ln);
           if (!it) return '<tr class="emp"><td class="ln"><span class="lane-c">' + ln + '</span></td><td colspan="5"></td></tr>';
           const rec = res ? '<td class="tm c">' + esc(it.flashTime) + '</td>' + rkCell(it.status === '完泳' ? it.rank : 0, it.flashRank)
-            : '<td class="c"><span class="wbox"></span></td><td class="c"><span class="wbox rk"></span></td>';
+            : '<td class="c wc"><span class="wbox"></span></td><td class="c wc"><span class="wbox rk"></span></td>';
           return '<tr><td class="ln"><span class="lane-c">' + ln + '</span></td>' +
             (p.relay ? '<td class="nm">' + esc(it.teamDisp) + '</td><td class="mem">' + rubyMembers(it, '<span class="sep">/</span>') + '</td>'
               : '<td class="nm">' + rubyName(it.np) + '</td><td class="sm">' + esc(it.club) + '</td>') +
@@ -3452,14 +3489,25 @@ function docProgram(name, mode) {
     return pPage(name, sub, body || '<p>エントリーはありません。</p>', (res ? '記録入りプログラム' : '大会プログラム') + '　' + name, 'col1');
   } };
 }
+// 印刷の表: 列の幅を固定して、組・区分が変わっても列の位置をそろえる（cols はmm か %）
+const colg = cols => '<colgroup>' + cols.map(w => '<col style="width:' + w + '">').join('') + '</colgroup>';
+// 表彰の入力（漢字の氏名とクラブ）から、エントリーのフリガナを探す
+function npFor(name, club) {
+  const k = C.normKey(name);
+  if (!k) return null;
+  const hit = D.ind.find(it => C.normKey(it.np.kanji) === k && (!club || it.club === club)) || D.ind.find(it => C.normKey(it.np.kanji) === k);
+  return hit ? hit.np : null;
+}
+const rubyOr = (name, club) => { const np = npFor(name, club); return np ? rubyName(np) : esc(name); };
 function docFlash(name) {
   const list = C.flashList(state, D.ind, D.rel, name), relay = C.isRelayName(name);
   const done = list.filter(x => x.it.status !== '未入力').length;
   return { key: 'flash:' + name, group: '速報', title: name, pages: list.length ? 1 : 0, sub: done + '/' + list.length + ' 入力済み', done, html() {
     const sch = D.sched.rows.find(r => r.name === name), groups = [];
     list.forEach(x => { const g = groups[groups.length - 1]; if (g && g.cat === x.it.cat) g.rows.push(x); else groups.push({ cat: x.it.cat, rows: [x] }); });
-    const body = groups.map(g => '<div class="blk"><div class="blk-h">' + esc(g.cat) + '</div><table class="pp"><thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ') + '</th><th class="c">記録</th></tr></thead><tbody>' +
-      g.rows.map(x => '<tr>' + rkCell(rankNum(x.rank), x.rank) + '<td class="nm">' + esc(relay ? x.name : nm2(x.name)) + '</td><td class="sm">' + esc(x.club) + (x.cat !== x.it.cat ? '<div class="kana">' + esc(x.cat) + '</div>' : '') + '</td><td class="tm">' + esc(x.time) + '</td></tr>').join('') + '</tbody></table></div>').join('');
+    const cols = relay ? ['14mm', '55%', '22%', '28mm'] : ['14mm', '44%', '33%', '28mm'];
+    const body = groups.map(g => '<div class="blk"><div class="blk-h">' + esc(g.cat) + '</div><table class="pp fx">' + colg(cols) + '<thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ') + '</th><th class="c">記録</th></tr></thead><tbody>' +
+      g.rows.map(x => '<tr>' + rkCell(rankNum(x.rank), x.rank) + '<td class="nm' + (relay ? ' mem' : '') + '">' + (relay ? rubyMembers(x.it, '<span class="sep">・</span>') : rubyName(x.it.np)) + '</td><td class="sm">' + esc(x.club) + (x.cat !== x.it.cat ? '<span class="kana">' + esc(x.cat) + '</span>' : '') + '</td><td class="tm">' + esc(x.time) + '</td></tr>').join('') + '</tbody></table></div>').join('');
     return pPage('【速報】' + name, (sch ? '競技No.' + sch.no + '　' : '') + list.length + (relay ? 'チーム' : '名'), body);
   } };
 }
@@ -3470,8 +3518,9 @@ function docRanking(ev, cat) {
   return { key: 'rank:' + ev + (cat ? '|' + cat : ''), group: 'ランキング', title: ev + (cat ? '　' + cat : ''), pages: 1, sub: n + '件の記録', n, html() {
     const body = cats.map(c => {
       const list = src.filter(it => it.event === ev && it.cat === c && it.rank).sort((a, b) => a.rankOrder - b.rankOrder);
-      return '<div class="blk"><div class="blk-h">' + esc(c) + '</div><table class="pp"><thead><tr><th class="c">順位</th><th>' + (relay ? 'チーム' : '氏名') + '</th><th>' + (relay ? '泳者' : 'クラブ') + '</th><th class="c">記録</th></tr></thead><tbody>' +
-        (list.length ? list.map(it => '<tr>' + rkCell(it.rank) + '<td class="nm">' + esc(relay ? it.teamDisp : nm2(it.name)) + '</td><td class="sm">' + esc(relay ? it.memberText : it.club) + '</td><td class="tm">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="4" class="sm">記録がまだありません</td></tr>') + '</tbody></table></div>';
+      const cols = relay ? ['14mm', '22%', '55%', '30mm'] : ['14mm', '44%', '33%', '30mm'];
+      return '<div class="blk"><div class="blk-h">' + esc(c) + '</div><table class="pp fx">' + colg(cols) + '<thead><tr><th class="c">順位</th><th>' + (relay ? 'チーム' : '氏名') + '</th><th>' + (relay ? '泳者' : 'クラブ') + '</th><th class="c">記録</th></tr></thead><tbody>' +
+        (list.length ? list.map(it => '<tr>' + rkCell(it.rank) + '<td class="nm">' + (relay ? esc(it.teamDisp) : rubyName(it.np)) + '</td><td class="' + (relay ? 'mem' : 'sm') + '">' + (relay ? rubyMembers(it, '<span class="sep">/</span>') : esc(it.club)) + '</td><td class="tm">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="4" class="sm">記録がまだありません</td></tr>') + '</tbody></table></div>';
     }).join('');
     return pPage('公式' + (relay ? 'リレー' : '') + 'ランキング　' + ev, cat || '', body || '<p>記録がありません。</p>');
   } };
@@ -3479,10 +3528,10 @@ function docRanking(ev, cat) {
 function docAwards() {
   const R = D.aw, rate = r => r === null || r === undefined ? '' : (r * 100).toFixed(2) + '%';
   return { key: 'awards', group: '表彰', title: '最優秀選手・優秀選手', pages: 1, sub: R.sum.entered + '件の記録', html() {
-    const body = '<div class="mvp-p">' + R.mvp.map(o => '<div><span>最優秀選手（' + o.sexName + '）</span><b>' + esc(o.kind === 'ok' ? o.name : '該当なし') + '</b>' +
+    const body = '<div class="mvp-p">' + R.mvp.map(o => '<div><span>最優秀選手（' + o.sexName + '）</span><b>' + (o.kind === 'ok' ? rubyOr(o.name, o.club) : '該当なし') + '</b>' +
         (o.kind === 'ok' ? '<em>' + esc(o.catName) + '・' + esc(o.club) + '・' + esc(o.event) + '　達成率 ' + rate(o.rate) + '</em>' : '') + '</div>').join('') + '</div>' +
-      '<div class="blk"><div class="blk-h">優秀選手</div><table class="pp"><thead><tr><th>年齢区分</th><th class="c">性別</th><th>選手名</th><th>クラブ</th><th>種目</th><th class="c">達成率</th><th>備考</th></tr></thead><tbody>' +
-      R.exc.filter(o => o.kind !== 'off').map(o => '<tr><td class="nm">' + esc(o.catName) + '</td><td class="c">' + o.sexName + '</td><td class="nm">' + esc(o.name || '—') + '</td><td class="sm">' + esc(o.club || '') + '</td><td class="sm">' + esc(o.event || '') + '</td><td class="tm">' + rate(o.rate) + '</td><td class="sm">' + esc(o.kind === 'up' ? '2位繰り上げ' : o.kind === 'ok' ? '' : o.status) + '</td></tr>').join('') + '</tbody></table></div>';
+      '<div class="blk"><div class="blk-h">優秀選手</div><table class="pp fx">' + colg(['20mm', '13mm', '24%', '18%', '21%', '18mm', '15%']) + '<thead><tr><th>年齢区分</th><th class="c">性別</th><th>選手名</th><th>クラブ</th><th>種目</th><th class="c">達成率</th><th>備考</th></tr></thead><tbody>' +
+      R.exc.filter(o => o.kind !== 'off').map(o => '<tr><td class="nm">' + esc(o.catName) + '</td><td class="c">' + o.sexName + '</td><td class="nm">' + (o.name ? rubyOr(o.name, o.club) : '—') + '</td><td class="sm">' + esc(o.club || '') + '</td><td class="sm">' + esc(o.event || '') + '</td><td class="tm">' + rate(o.rate) + '</td><td class="sm">' + esc(o.kind === 'up' ? '2位繰り上げ' : o.kind === 'ok' ? '' : o.status) + '</td></tr>').join('') + '</tbody></table></div>';
     return pPage(this.title, '選出範囲: ' + esc(R.master.cond), body);
   } };
 }
