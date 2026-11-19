@@ -384,7 +384,11 @@ details.card > summary::-webkit-details-marker { display: none; }
   #print-root { display: block !important; position: static !important; width: auto !important; }
   #print-root .cert { width: 100% !important; }
 }
-.cert .cl { white-space: nowrap; overflow: hidden; padding: 0 14mm; box-sizing: border-box; }
+.cert .cl { position: absolute; z-index: 1; white-space: nowrap; overflow: hidden; padding: 0 24mm; box-sizing: border-box; transform: translateY(0); }
+/* 証書の箱: 画面上（測る・プレビュー）は A4 の高さ、印刷では用紙の印刷できる範囲いっぱい */
+.pgroot .cert { width: 100%; height: 297mm; }
+.cframe { position: absolute; inset: 0; z-index: 0; background-size: 100% 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; }
+@media print { #print-root .cert { height: calc(100vh - 1mm) !important; } }
 .cert { position: relative; color: #000; font-family: var(--font-cert); text-align: center; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
 .cert + .cert { break-before: page; page-break-before: always; }
 .cert .title { font-weight: 700; letter-spacing: .3em; }
@@ -427,7 +431,7 @@ table.t td > b { white-space: nowrap; }
 .progbar select { min-width: 220px; }
 
 /* ---------- すべてのボタン: 押している間だけガラスになる（JS が class と位置を付ける） ---------- */
-.btn, button.chip, .iconbtn, .onboard button, .pinbtn, .evchip, .ritem, .x { transition: background .2s, color .2s, transform .24s cubic-bezier(.2, .8, .3, 1), box-shadow .24s; }
+.btn, button.chip, .iconbtn, .onboard button, .pinbtn, .evchip, .ritem, .x, .frtile { transition: background .2s, color .2s, transform .24s cubic-bezier(.2, .8, .3, 1), box-shadow .24s; }
 .glassing { transition: transform .09s ease-out, box-shadow .12s, background .12s !important; z-index: 2;
   box-shadow: inset 0 0 0 1.2px rgba(255,255,255,.95), inset 0 1.5px 1px rgba(255,255,255,.9), inset 0 -3px 8px rgba(0,40,80,.10), inset 2px 0 3px rgba(120,200,255,.2), inset -2px 0 3px rgba(255,150,220,.18), 0 10px 24px rgba(10,30,60,.22) !important; }
 .btn.glassing:not(.primary):not(.solid), button.chip.glassing, .iconbtn.glassing, .pinbtn.glassing:not(.on), .evchip.glassing, .ritem.glassing, .x.glassing, .onboard button.glassing {
@@ -479,7 +483,7 @@ table.t td > b { white-space: nowrap; }
 .pv-body { display: flex; flex-direction: column; gap: 10px; overflow: auto; padding: 2px; }
 .sheetbox { position: relative; width: 100%; overflow: hidden; border-radius: 4px; box-shadow: 0 2px 10px rgba(10,30,60,.18), 0 0 0 1px rgba(10,30,60,.08); background: #fff; flex: 0 0 auto; }
 .sheet { position: absolute; left: 0; top: 0; width: 210mm; height: 297mm; transform-origin: 0 0; background: #fff; color: #111; }
-.sheet > .cert { width: 210mm !important; }
+.sheet > .cert { width: 210mm !important; height: 297mm !important; }
 .sheetno { position: absolute; right: 6px; bottom: 6px; font-size: 10.5px; color: #555; background: rgba(255,255,255,.85); border-radius: 6px; padding: 0 6px; }
 .pv-off { display: flex; justify-content: flex-end; margin: -4px 0 6px; }
 @media (max-width: 1099px) { .withpv { grid-template-columns: minmax(0, 1fr); } .pv { position: static; } .pv-body { max-height: none !important; flex-direction: row; overflow-x: auto; } .sheetbox { width: 260px; } }
@@ -511,6 +515,13 @@ table.t td.num, table.t th.num, table.t td.c { white-space: nowrap; }
 .brand small { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
 @media (max-width: 600px) { table.t td, table.t th { white-space: nowrap; } }
 .nowrap { white-space: nowrap; }
+/* ---------- フレームの選択 ---------- */
+.frbox { margin-bottom: 6px; }
+.frgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.frtile { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px; border-radius: 12px; border: 1.5px solid var(--hairline); background: var(--fill); cursor: pointer; font-size: 11.5px; text-align: center; }
+.frtile.on { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.frimg { display: grid; place-items: center; width: 60px; height: 85px; background: #fff center / 100% 100% no-repeat; border-radius: 3px; box-shadow: 0 1px 4px rgba(10,30,60,.18); color: var(--muted); font-size: 11px; }
+.frtile.up .frimg { font-size: 22px; color: var(--accent); }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 10mm }</style>
 </head>
@@ -1349,6 +1360,144 @@ const Core = (() => {
 })();
 
 
+/* ---------------------------------------------------------------- 記録証・賞状のフレーム（A4 210×297mm。拡大しても粗くならないベクター） */
+const Frames = (() => {
+  const W = 210, H = 297;
+  const svg = (defs, body) => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none"><defs>' + defs + '</defs>' + body + '</svg>';
+  const gold = '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a9791d"/><stop offset=".28" stop-color="#e9cd7a"/><stop offset=".5" stop-color="#b98a2a"/><stop offset=".72" stop-color="#f0d98e"/><stop offset="1" stop-color="#9c6f18"/></linearGradient>';
+  const silver = '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d868f"/><stop offset=".3" stop-color="#d9dee3"/><stop offset=".55" stop-color="#8f99a3"/><stop offset=".8" stop-color="#e3e7ea"/><stop offset="1" stop-color="#6f7881"/></linearGradient>';
+  // 四隅に同じ飾りを置く（左上の形を反転して使う）
+  const corners = (g) => ['', 'translate(' + W + ' 0) scale(-1 1)', 'translate(0 ' + H + ') scale(1 -1)', 'translate(' + W + ' ' + H + ') scale(-1 -1)'].map(t => '<g transform="' + t + '">' + g + '</g>').join('');
+  // 羽根のように広がる曲線の束（鳳凰の尾羽をイメージした飾り）
+  function plume(x0, y0, dir, n, len) {
+    let p = '';
+    for (let i = 0; i < n; i++) {
+      const L = len * (1 - i * 0.07), a = 6 + i * 2.2;
+      p += '<path d="M' + x0 + ' ' + y0 + ' q ' + (dir * L * 0.55) + ' ' + (-a) + ' ' + (dir * L) + ' ' + (a * 0.4 + i * 1.6) + '" fill="none" stroke="url(#g)" stroke-width="' + (0.75 - i * 0.04).toFixed(2) + '" stroke-linecap="round"/>';
+    }
+    return p;
+  }
+  // 桐の紋をイメージした上部中央の飾り（3枚の葉と3本の花房）
+  function crest(cx, cy) {
+    const leaf = (dx, r) => '<path transform="translate(' + (cx + dx) + ' ' + (cy + 6) + ') rotate(' + r + ')" d="M0 0 C -2.6 -1.2 -3 -4.6 0 -6.6 C 3 -4.6 2.6 -1.2 0 0 Z" fill="url(#g)"/>';
+    let s = leaf(-5.2, -48) + leaf(0, 0) + leaf(5.2, 48);
+    [-4.2, 0, 4.2].forEach((dx, i) => {
+      const n = i === 1 ? 5 : 4, top = cy - 1.2 - n * 1.7;
+      s += '<path d="M' + (cx + dx) + ' ' + (cy + 0.6) + ' L' + (cx + dx) + ' ' + (top + 0.6) + '" stroke="url(#g)" stroke-width=".35"/>';
+      for (let k = 0; k < n; k++) s += '<circle cx="' + (cx + dx) + '" cy="' + (top + k * 1.7).toFixed(2) + '" r="' + (0.62 + k * 0.05).toFixed(2) + '" fill="url(#g)"/>';
+    });
+    return s + '<path d="M' + (cx - 12) + ' ' + (cy + 9) + ' q 12 4.5 24 0" fill="none" stroke="url(#g)" stroke-width=".55"/>';
+  }
+  // 上の角から両脇へ流れ落ちる尾羽（鳳凰をイメージ）
+  function tail(side) {
+    const x0 = side < 0 ? 30 : 180, d = side < 0 ? 1 : -1;
+    let s = '';
+    for (let i = 0; i < 9; i++) {
+      const sx = x0 + d * i * 1.6, ex = (side < 0 ? 17.5 : 192.5) + d * (i * 0.55), ey = 92 + i * 9;
+      s += '<path d="M' + sx + ' ' + (22 + i * 0.5) + ' C ' + (sx + d * 6) + ' ' + (40 + i * 2) + ', ' + (ex + d * 4) + ' ' + (ey - 40) + ', ' + ex + ' ' + ey + '" fill="none" stroke="url(#g)" stroke-width="' + (0.8 - i * 0.05).toFixed(2) + '" stroke-linecap="round"/>';
+      s += '<circle cx="' + ex + '" cy="' + ey + '" r="' + (0.9 - i * 0.04).toFixed(2) + '" fill="url(#g)"/>';
+    }
+    // 頭と翼
+    s += '<path d="M' + (x0 + d * 4) + ' 20 c ' + (d * 6) + ' -6 ' + (d * 14) + ' -6 ' + (d * 20) + ' -2 c ' + (-d * 6) + ' 0 ' + (-d * 10) + ' 2 ' + (-d * 14) + ' 6 z" fill="url(#g)"/>';
+    for (let i = 0; i < 6; i++) s += '<path d="M' + (x0 + d * 10) + ' 19 q ' + (d * (10 + i * 3)) + ' ' + (-8 - i * 1.2) + ' ' + (d * (22 + i * 4)) + ' ' + (-2 + i * 0.6) + '" fill="none" stroke="url(#g)" stroke-width=".45"/>';
+    return s;
+  }
+  // 下の帯（葉の連なり）
+  function bottomBand() {
+    let s = '<rect x="14" y="262" width="182" height="21" fill="url(#p)" opacity=".55"/><path d="M14 262 H196" stroke="url(#g)" stroke-width=".6"/>';
+    for (let i = 0; i < 13; i++) {
+      const x = 20 + i * 14;
+      s += '<path d="M' + x + ' 281 C ' + (x - 4) + ' 274, ' + (x - 1) + ' 268, ' + (x + 3) + ' 266 C ' + (x + 4) + ' 271, ' + (x + 3) + ' 277, ' + x + ' 281 Z" fill="url(#g)"/>';
+      s += '<path d="M' + (x + 7) + ' 281 C ' + (x + 11) + ' 275, ' + (x + 9) + ' 270, ' + (x + 5) + ' 268 C ' + (x + 4) + ' 273, ' + (x + 5) + ' 278, ' + (x + 7) + ' 281 Z" fill="url(#g)" opacity=".8"/>';
+    }
+    return s;
+  }
+  // 両脇の下半分（小枝）
+  function sprigs() {
+    let s = '';
+    [[17.5, 1], [192.5, -1]].forEach(([x, d]) => {
+      for (let y = 180; y <= 250; y += 14) s += '<path d="M' + x + ' ' + y + ' q ' + (d * 5) + ' -3 ' + (d * 7) + ' -8" fill="none" stroke="url(#g)" stroke-width=".5"/><path d="M' + (x + d * 7) + ' ' + (y - 8) + ' c ' + (d * 2.5) + ' 0.5 ' + (d * 3) + ' 3 ' + (d * 1) + ' 4.6 c ' + (-d * 2) + ' -0.6 ' + (-d * 2) + ' -3 ' + (-d * 1) + ' -4.6 z" fill="url(#g)"/>';
+    });
+    return s;
+  }
+  const designs = {
+    kin: { name: '金・伝統', make() {
+      const band = '<rect x="7.5" y="7.5" width="195" height="282" fill="none" stroke="url(#g)" stroke-width="2"/><rect x="10.6" y="10.6" width="188.8" height="275.8" fill="none" stroke="url(#g)" stroke-width=".45"/>' +
+        '<rect x="14" y="14" width="182" height="269" fill="none" stroke="url(#g)" stroke-width=".8"/><rect x="8.9" y="8.9" width="192.2" height="279.2" fill="none" stroke="url(#p)" stroke-width="2.4"/>';
+      const corner = '<circle cx="14" cy="14" r="3.4" fill="#fff" stroke="url(#g)" stroke-width=".7"/><circle cx="14" cy="14" r="1.5" fill="url(#g)"/>';
+      return svg(gold + '<pattern id="p" width="3.2" height="3.2" patternUnits="userSpaceOnUse"><circle cx="1.6" cy="1.6" r=".55" fill="#c79b3b"/></pattern>',
+        band + corners(corner) + crest(105, 22) + tail(-1) + tail(1) + bottomBand() + sprigs());
+    } },
+    kinSimple: { name: '金・シンプル', make() {
+      const lines = '<rect x="10" y="10" width="190" height="277" fill="none" stroke="url(#g)" stroke-width="1.6"/><rect x="13.5" y="13.5" width="183" height="270" fill="none" stroke="url(#g)" stroke-width=".5"/>';
+      const corner = '<path d="M13.5 26 L 26 26 L 26 13.5" fill="none" stroke="url(#g)" stroke-width=".7"/><rect x="17" y="17" width="5.5" height="5.5" fill="url(#g)" transform="rotate(45 19.75 19.75)"/>';
+      const mid = '<path d="M95 13.5 q 10 7 20 0 M95 283.5 q 10 -7 20 0" fill="none" stroke="url(#g)" stroke-width=".7"/><circle cx="105" cy="17.5" r="1.4" fill="url(#g)"/><circle cx="105" cy="279.5" r="1.4" fill="url(#g)"/>';
+      return svg(gold, lines + corners(corner) + mid);
+    } },
+    swim: { name: '水泳（波とコースロープ）', make() {
+      const navy = '#0b3a6e', aqua = '#2fa3dc';
+      const wave = (y, flip) => { let d = 'M10 ' + y; for (let x = 10; x < 200; x += 12) d += ' q 3 ' + (flip ? 2.6 : -2.6) + ' 6 0 t 6 0'; return '<path d="' + d + '" fill="none" stroke="' + aqua + '" stroke-width=".9" stroke-linecap="round"/>'; };
+      let rope = '';
+      for (let x = 16, i = 0; x <= 194; x += 5, i++) { rope += '<circle cx="' + x + '" cy="19" r="1.7" fill="' + (i % 2 ? '#ffffff' : '#d8353c') + '" stroke="#c7cfd8" stroke-width=".2"/><circle cx="' + x + '" cy="278" r="1.7" fill="' + (i % 2 ? '#ffffff' : '#d8353c') + '" stroke="#c7cfd8" stroke-width=".2"/>'; }
+      const frame = '<rect x="9" y="9" width="192" height="279" rx="3" fill="none" stroke="' + navy + '" stroke-width="1.6"/><rect x="12.5" y="12.5" width="185" height="272" rx="2" fill="none" stroke="' + navy + '" stroke-width=".4"/>';
+      const sides = '<path d="M16 30 V 267 M194 30 V 267" stroke="' + aqua + '" stroke-width=".5" stroke-dasharray="1.5 2.5"/>';
+      return svg('', frame + wave(25, false) + wave(272, true) + rope + sides);
+    } },
+    gin: { name: '銀・モダン', make() {
+      const lines = '<rect x="10" y="10" width="190" height="277" fill="none" stroke="url(#g)" stroke-width="1.2"/><rect x="14" y="14" width="182" height="269" fill="none" stroke="url(#g)" stroke-width=".35"/>';
+      const corner = '<path d="M14 34 L 22 34 L 22 22 L 34 22 L 34 14" fill="none" stroke="url(#g)" stroke-width=".7"/><path d="M14 28 L 28 14" stroke="url(#g)" stroke-width=".35"/><circle cx="18" cy="18" r="1.2" fill="url(#g)"/>';
+      const mid = '<path d="M80 10 L 105 16 L 130 10 M80 287 L 105 281 L 130 287" fill="none" stroke="url(#g)" stroke-width=".5"/>';
+      return svg(silver, lines + corners(corner) + mid);
+    } }
+  };
+  const cache = {};
+  function url(key) {
+    if (!designs[key]) return '';
+    if (!cache[key]) cache[key] = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(designs[key].make());
+    return cache[key];
+  }
+  return { designs, url, list: Object.keys(designs).map(k => [k, designs[k].name]) };
+})();
+
+// ---- 自分の画像フレーム（この端末のブラウザにだけ保存。公開サイトには送られない）
+const FRAME_IMG_KEY = k => 'swim-meet-app/frame-img/' + k;
+function frameImg(slot) { try { return localStorage.getItem(FRAME_IMG_KEY(slot)) || ''; } catch (e) { return ''; } }
+function frameCfg() {
+  const S = state.settings;
+  const f = Object.assign({ show: { record: true, prize: true }, same: true, record: 'kin', prize: 'kin' }, S.certFrame || {});
+  f.show = Object.assign({ record: true, prize: true }, f.show || {});
+  return f;
+}
+// その種類の証書で使うフレームの画像（無しなら ''）
+function frameUrlFor(kind) {
+  const f = frameCfg();
+  if (!f.show[kind]) return '';
+  const slot = f.same ? 'record' : kind, key = f[slot];
+  if (key === 'custom') return frameImg(slot);
+  return Frames.url(key);
+}
+function loadFrameImage(file, slot) {
+  const fr = new FileReader();
+  fr.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const maxL = 2480, k = Math.min(1, maxL / Math.max(img.width, img.height));
+      const cv = document.createElement('canvas'); cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      let data = /png/i.test(file.type) ? cv.toDataURL('image/png') : cv.toDataURL('image/jpeg', 0.9);
+      if (data.length > 2200000) data = cv.toDataURL('image/jpeg', 0.82);
+      try {
+        localStorage.setItem(FRAME_IMG_KEY(slot), data);
+        commit('フレーム画像の読み込み', s => { s.settings.certFrame = Object.assign(frameCfg(), s.settings.certFrame || {}); s.settings.certFrame[slot] = 'custom'; }, { allowLocked: true });
+        toast('フレーム画像を読み込みました' + (Math.max(img.width, img.height) < 1500 ? '（画像が小さいため、印刷すると粗く見えることがあります。2000ピクセル以上の画像がおすすめです）' : ''), null, 8000);
+      } catch (e) { toast('画像が大きすぎて保存できませんでした。小さめの画像にしてください', 'err'); }
+    };
+    img.onerror = () => toast('この画像は読み込めません（PNG・JPEG を使ってください）', 'err');
+    img.src = fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+
 /* ============================================================================
  * スイム大会運営アプリ — 画面・保存・取り消し
  * ========================================================================== */
@@ -1608,6 +1757,7 @@ function render() {
   catch (e) { console.error(e); html = '<div class="notice err">この画面の表示中にエラーが起きました: ' + esc(e.message) + '。<button class="btn sm" data-act="go" data-v="data">データ管理へ</button> でバックアップを書き出してから、ページを再読み込みしてください。</div>'; }
   $('#main').innerHTML = (saveError ? '<div class="notice err"><b>保存エラー</b><span class="grow">' + esc(saveError) + '</span><button class="btn sm" data-act="backup">今すぐ書き出す</button></div>' : '') + backupReminder() +
     (PV_VIEWS.includes(view) && !previewOn() ? '<div class="pv-off"><button class="btn sm" data-act="pvToggle">' + icon('print', 'ic sm') + '印刷プレビューを表示</button></div>' : '') + pvShell(html);
+  updateFrameStyle();
   sizeFills();
   schedulePreview();
   document.querySelectorAll('.fill[data-fill-id]').forEach(el => { if (fillScroll[el.dataset.fillId]) el.scrollTop = fillScroll[el.dataset.fillId]; });
@@ -1817,7 +1967,7 @@ document.addEventListener('click', e => {
 }, true);
 // ---------------------------------------------------------------- すべてのボタン: 押している間だけガラスになってふくらみ、指に少し付いてくる
 //  離すと元の位置・大きさへ短く戻る。押していないときは一切動かない（マウスを乗せただけでも動かない）。
-const PRESS_SEL = '.btn, button.chip, .iconbtn, .onboard button, .pinbtn, .evchip, .ritem, .x, .lead-x';
+const PRESS_SEL = '.btn, button.chip, .iconbtn, .onboard button, .pinbtn, .evchip, .ritem, .x, .frtile';
 let pressEl = null, pressStart = null;
 document.addEventListener('pointerdown', e => {
   if (e.button > 0) return;
@@ -2344,17 +2494,28 @@ function certData(it, relay, prize) {
   };
 }
 function certHTML(it, relay, prize, paper, preview) {
-  const P = PAPER[paper], L = relay ? P.rel : P.ind, S = state.settings, d = certData(it, relay, prize);
+  // 位置は用紙の高さに対する割合で置く（プリンターの余白があっても、用紙いっぱいに同じ配置で収まる）
+  const P = PAPER.A4, L = relay ? P.rel : P.ind, S = state.settings, d = certData(it, relay, prize);
   const sc = (C.num(S.print.scale) || 100) / 100, dy = C.num(S.print.offsetTop), dx = C.num(S.print.offsetLeft);
-  const at = (key, txt, extra) => { const [top, pt] = L[key]; return '<div class="cl ' + (extra || '') + '" style="position:absolute;left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + (top * sc + dy) + 'mm;font-size:' + (pt * sc) + 'pt">' + esc(txt) + '</div>'; };
+  const pct = mm => (mm / P.h * 100).toFixed(3) + '%';
+  const at = (key, txt, extra) => { const [top, pt] = L[key]; return '<div class="cl ' + (extra || '') + '" style="left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + pct(top * sc + dy) + ';font-size:' + (pt * sc) + 'pt">' + esc(txt) + '</div>'; };
   let h = at('title', d.title, 'title') + at('name', d.name, 'name');
   if (relay) h += at('mem1', d.mem1) + at('mem2', d.mem2); else if (d.club) h += at('club', d.club);
   h += at('rank', d.rank, 'name') + at('event', d.event) + at('record', d.record) + at('meet', d.meet);
   const [lt, lpt, lgap] = L.lines;
-  d.lines.forEach((t, i) => { h += '<div class="cl" style="position:absolute;left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + ((lt + i * lgap) * sc + dy) + 'mm;font-size:' + (lpt * sc) + 'pt">' + esc(t) + '</div>'; });
+  d.lines.forEach((t, i) => { h += '<div class="cl" style="left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + pct((lt + i * lgap) * sc + dy) + ';font-size:' + (lpt * sc) + 'pt">' + esc(t) + '</div>'; });
   h += at('date', d.date) + at('org', d.org, 'name');
-  const style = preview ? 'width:' + P.w + 'mm;height:' + P.h + 'mm;transform:scale(' + preview + ');transform-origin:top left' : 'width:100%;height:' + (P.h - 20) + 'mm';  // 印刷: プリンタの余白（最大10mm）があっても1ページに収める
-  return '<div class="cert" style="' + style + '">' + h + '</div>';
+  const kind = prize ? 'prize' : 'record';
+  const fr = frameUrlFor(kind) ? '<div class="cframe fr-' + kind + '"></div>' : '';
+  const style = preview ? 'width:' + P.w + 'mm;height:' + P.h + 'mm;transform:scale(' + preview + ');transform-origin:top left' : '';
+  return '<div class="cert' + (preview ? ' pvcert' : '') + '" style="' + style + '">' + fr + h + '</div>';
+}
+// フレーム画像は1か所（style）にだけ置き、全員分の証書から参照する（大きな画像でも重くならない）
+function updateFrameStyle() {
+  let el = document.getElementById('frame-style');
+  if (!el) { el = document.createElement('style'); el.id = 'frame-style'; document.head.appendChild(el); }
+  const css = ['record', 'prize'].map(k => { const u = frameUrlFor(k); return u ? '.cframe.fr-' + k + '{background-image:url(\'' + u + '\')}' : ''; }).join('');
+  if (el.textContent !== css) el.textContent = css;
 }
 function certList() {
   const relay = ui.certTarget === 'rel', prize = ui.certKind === 'prize';
@@ -2383,7 +2544,7 @@ VIEWS.certs = () => {
     '<button class="btn" data-act="printCert" data-test="1" ' + (list.length ? '' : 'disabled') + '>1枚だけテスト印刷</button><button class="btn primary" data-act="printCert" ' + (list.length ? '' : 'disabled') + '>印刷する（' + (list.length ? to - from + 1 : 0) + '枚）</button></div></div>' +
     '<div class="grid g2" style="align-items:start"><div class="card fill" data-fill-id="cprev"><h2>プレビュー（1枚目）</h2>' +
     (list.length ? '<div class="certprev" style="width:' + (P.w * pv) + 'mm;height:' + (P.h * pv) + 'mm">' + certHTML(list[from - 1] || list[0], relay, prize, ui.certPaper, pv) + '</div>' : '<div class="empty">対象者がいません。絞り込み条件を確認してください。</div>') +
-    '</div><div class="card fill" data-fill-id="cword"><h2>' + (prize ? '賞状' : '記録証') + 'の文言</h2><div class="fields" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))">' +
+    '</div><div class="card fill" data-fill-id="cword"><h2>' + (prize ? '賞状' : '記録証') + 'の設定</h2>' + frameCard(prize ? 'prize' : 'record') + '<h3>文言</h3><div class="fields" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))">' +
     field('タイトル', inp('set:' + wk + '.title', W.title)) +
     W.lines.map((t, i) => field('文言' + '①②③④'[i], inp('set:' + wk + '.lines.' + i, t))).join('') +
     field('日付', '<input type="date" data-k="set:' + wk + '.date" value="' + esc(/^\d{4}-\d{2}-\d{2}$/.test(W.date) ? W.date : '') + '">') +
@@ -2536,6 +2697,22 @@ VIEWS.prints = () => {
       g.docs.map(d => '<div class="hubrow ' + (ui.hubFocus === d.key ? 'focus' : '') + '"><label><input type="checkbox" data-k="hub:' + esc(d.key) + '" ' + (sel.has(d.key) ? 'checked' : '') + '><span class="hubtx"><span class="hubt">' + esc(d.title) + '</span><span class="hubm">' + (d.sub ? esc(d.sub) + '・' : '') + 'A4 ' + d.pages + '枚</span></span></label><button class="btn sm" data-act="hubFocus" data-v="' + esc(d.key) + '">見る</button></div>').join('') + '</div>').join('') + '</div>';
 };
 
+// フレームの選択（表示・非表示／記録証と賞状で分ける・統一／自分の画像）
+function frameCard(kind) {
+  const f = frameCfg(), slot = f.same ? 'record' : kind, cur = f[slot], label = kind === 'prize' ? '賞状' : '記録証';
+  const img = frameImg(slot);
+  const tile = (k, name, src) => '<button type="button" class="frtile ' + (cur === k ? 'on' : '') + '" data-act="frPick" data-v="' + k + '" aria-pressed="' + (cur === k) + '"><span class="frimg" style="' + (src ? 'background-image:url(\'' + src + '\')' : '') + '">' + (src ? '' : '画像を<br>選ぶ') + '</span><span>' + esc(name) + '</span></button>';
+  return '<div class="frbox"><div class="bar" style="margin:0 0 8px">' +
+    '<label class="small"><input type="checkbox" data-k="frshow:' + kind + '" ' + (f.show[kind] ? 'checked' : '') + '> ' + label + 'にフレームを付けて印刷する</label>' +
+    '<label class="small"><input type="checkbox" data-k="frsame" ' + (f.same ? 'checked' : '') + '> 記録証と賞状で同じフレームにする</label></div>' +
+    (f.show[kind] ? '<p class="small muted" style="margin:0 0 6px">' + (f.same ? '記録証・賞状 共通' : label + '用') + 'のフレーム</p><div class="frgrid">' +
+      Frames.list.map(([k, n]) => tile(k, n, Frames.url(k))).join('') +
+      (img ? tile('custom', '自分の画像', img) : '') +
+      '<label class="frtile up"><span class="frimg">＋</span><span>' + (img ? '画像を変える' : '自分の画像を使う') + '</span><input type="file" accept="image/png,image/jpeg" data-file="frame" data-slot="' + slot + '" hidden></label>' +
+      '</div>' + (img ? '<div class="bar" style="margin-top:6px"><button class="btn sm danger" data-act="frClear" data-v="' + slot + '">自分の画像を消す</button><span class="small muted">画像はこの端末のブラウザにだけ保存され、公開サイトには送られません。</span></div>' : '<p class="small muted" style="margin:6px 0 0">自分の画像（PNG・JPEG。A4縦、2000ピクセル以上がおすすめ）も使えます。</p>')
+      : '<p class="small muted" style="margin:0">フレームなしで印刷します（フレーム入りの用紙に印刷するときなど）。</p>') + '</div>';
+}
+
 /* ---------------------------------------------------------------- 値の変更 */
 function setPath(obj, path, val) {
   const ks = path.split('.');
@@ -2562,6 +2739,10 @@ function handleValue(el) {
   if (kind === 'ui' && rest[0] === 'snapAll') { ui.snapSel = val ? getSnaps().map(x => x.t) : []; render(); return; }
   if (kind === 'ui') { setUI(rest[0], val); return; }
   if (kind === 'hub') { const k = rest.join(':'); ui.hubSel = (ui.hubSel || []).filter(x => x !== k); if (val) ui.hubSel.push(k); ui.hubFocus = ''; render(); return; }
+  if (kind === 'frshow' || kind === 'frsame') {
+    commit('フレームの設定', st => { const f = st.settings.certFrame = frameCfg(); if (kind === 'frsame') { f.same = !!val; if (!val) { f.prize = f.record; f.show.prize = f.show.record; if (f.record === 'custom') { const im = frameImg('record'); try { if (im) localStorage.setItem(FRAME_IMG_KEY('prize'), im); } catch (e) { /* ignore */ } } } } else f.show[rest[0]] = !!val; }, { allowLocked: true });
+    return;
+  }
   if (kind === 'snap') { const t = +rest[0]; ui.snapSel = (ui.snapSel || []).filter(x => x !== t); if (val) ui.snapSel.push(t); render(); return; }
   if (kind === 'cf') { ui.certFilter = Object.assign({}, ui.certFilter, { [rest[0]]: val }); ui.certFrom = 1; ui.certTo = ''; render(); return; }
   if (kind === 'set') {
@@ -2790,6 +2971,16 @@ const ACTIONS = {
     ui.hubSel = [...set]; ui.hubFocus = ''; render();
   },
   hubPrint: () => { const sel = new Set(ui.hubSel || []); printDocs(hubAll().filter(d => sel.has(d.key)), '選んだ印刷物をまとめて印刷します'); },
+  frPick: t => {
+    const kind = ui.certKind === 'prize' ? 'prize' : 'record', f0 = frameCfg(), slot = f0.same ? 'record' : kind;
+    commit('フレームの選択', st => { const f = st.settings.certFrame = frameCfg(); f[slot] = t.dataset.v; }, { allowLocked: true });
+  },
+  frClear: t => {
+    const slot = t.dataset.v;
+    try { localStorage.removeItem(FRAME_IMG_KEY(slot)); } catch (e) { /* ignore */ }
+    commit('フレーム画像を消す', st => { const f = st.settings.certFrame = frameCfg(); if (f[slot] === 'custom') f[slot] = 'kin'; }, { allowLocked: true });
+    toast('自分の画像を消しました');
+  },
   pvToggle: () => { navPref.pv = !previewOn(); saveNavPref(); render(); },
   pvPrint: () => { const d = viewDocs(); printDocs(d, view === 'prints' ? '選んだ印刷物をまとめて印刷します' : '印刷します'); },
   entryForm: () => openEntryFormMaker(),
@@ -3013,6 +3204,7 @@ function viewDocs() {
 function printDocs(docs, msg) {
   docs = docs.filter(d => d && d.pages);
   if (!docs.length) { toast('印刷するものがありません', 'err'); return; }
+  updateFrameStyle();
   const root = $('#print-root');
   root.innerHTML = docs.map(d => d.html()).join('');
   $('#page-style').textContent = '@page { size: A4 portrait; margin: 0 }';
@@ -3058,6 +3250,7 @@ function buildPreview() {
   const total = docs.reduce((a, d) => a + d.pages, 0);
   const cnt = $('#pv-count'); if (cnt) cnt.textContent = total ? 'A4 縦・' + total + '枚' : '';
   if (!total) { body.innerHTML = '<div class="empty small">印刷するものがありません。</div>'; return; }
+  updateFrameStyle();
   const tmp = document.createElement('div'); tmp.className = 'pgroot';
   let left = PV_MAX, html = '';
   docs.forEach(d => { if (left <= 0) return; const n = Math.min(left, d.pages); html += d.html(n); left -= n; });
@@ -3161,7 +3354,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('change', e => {
   const el = e.target;
-  if (el.dataset && el.dataset.file) { const fl = el.files ? [...el.files] : []; el.value = ''; if (!fl.length) return; if (el.dataset.file === 'entryform') { importEntryForms(fl); return; } const f = fl[0]; if (el.dataset.file === 'json') importJSON(f); else importXlsx(f); return; }
+  if (el.dataset && el.dataset.file) { const fl = el.files ? [...el.files] : []; el.value = ''; if (!fl.length) return; if (el.dataset.file === 'entryform') { importEntryForms(fl); return; } if (el.dataset.file === 'frame') { loadFrameImage(fl[0], el.dataset.slot || 'record'); return; } const f = fl[0]; if (el.dataset.file === 'json') importJSON(f); else importXlsx(f); return; }
   if (el.dataset && el.dataset.k) handleValue(el);
 });
 let searchTimer = null;
