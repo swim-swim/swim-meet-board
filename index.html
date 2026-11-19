@@ -553,7 +553,7 @@ table.t th, .pill, .chip, .btn, .segbtn, .evchip span, .sheetno { overflow-wrap:
 .hubrow .hubt { font-weight: 600; }
 .hubrow .hubm { font-size: 12px; color: var(--muted); white-space: nowrap; }
 .hubgrid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
-.evchip span { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
+.evchip span { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; word-break: keep-all; overflow-wrap: anywhere; }   /* 種目名は空白の所でだけ改行（「バタフラ／イ」にしない） */
 .evchip { align-items: center; }
 table.t td.num, table.t th.num, table.t td.c { white-space: nowrap; }
 .clubs table.t td:first-child, [data-fill-id="awin"] td, [data-fill-id="awexc"] td, [data-fill-id="awcand"] td { white-space: nowrap; }
@@ -2130,6 +2130,7 @@ function endLensDrag(e, cancel) {
     const pick = cancel ? (st.seg.querySelector('[data-seg].on') || d.start) : (d.moved ? nearestItem(st, pos) : d.start);
     if (pick) {
       st.t = itemRect(pick);
+      if (pick.dataset.tip) tipMuted = tipKey(pick);
       if (!cancel && (!pick.classList.contains('on') || pick.dataset.act === 'go' || st.grid)) {
         st.seg.querySelectorAll('[data-seg].on').forEach(x => x.classList.remove('on')); pick.classList.add('on');
         setTimeout(() => pick.click(), 90);
@@ -2208,9 +2209,15 @@ function showTip(item) {
   tipFor = item;
 }
 function hideTip() { clearTimeout(tipTimer); tipTimer = 0; tipFor = null; const t = $('#tip'); if (t) t.classList.remove('on'); }
+// 押した（選んだ）項目は、マウスが別の項目へ移るまで説明を出し直さない（画面が描き直されてカーソルの下に同じボタンが来ても出ない）
+let tipMuted = '';
+const tipKey = it => (it.closest('.quick') ? 'q:' : it.closest('.nav') ? 'n:' : 'o:') + (it.dataset.v || it.dataset.tipTitle || '');
+document.addEventListener('pointerdown', e => { const it = e.target.closest && e.target.closest('[data-tip]'); tipMuted = it ? tipKey(it) : ''; }, true);
 document.addEventListener('pointerover', e => {
   const it = e.target.closest && e.target.closest('[data-tip]');
   if (!it || e.pointerType !== 'mouse' || e.buttons) return;
+  if (tipMuted && tipKey(it) === tipMuted) return;
+  tipMuted = '';
   clearTimeout(tipTimer); tipTimer = setTimeout(() => showTip(it), 450);
 });
 document.addEventListener('pointerout', e => {
@@ -3757,6 +3764,7 @@ document.addEventListener('input', e => {
   }
 });
 document.addEventListener('toggle', e => { const d = e.target; if (d.dataset && d.dataset.det) ui[d.dataset.det] = d.open; }, true);
+let enterRefocus = 0;
 document.addEventListener('keydown', e => {
   const el = e.target;
   const inField = el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT');
@@ -3782,11 +3790,14 @@ document.addEventListener('keydown', e => {
     handleValue(el);
     flushRender();
     // すぐに次の欄へ（続けて速く打っても文字が抜けないように、待たずに移る）
-    const go = () => {
+    const go = late => {
       const n = nextK ? document.querySelector('[data-k="' + CSS.escape(nextK) + '"]') : document.querySelector('[data-k="' + CSS.escape(k) + '"]');
-      if (n && document.activeElement !== n) { n.focus(); if (n.select) n.select(); if (n.scrollIntoView) n.scrollIntoView({ block: 'nearest' }); }
+      const a = document.activeElement;
+      if (late && a && a !== document.body && a.tagName === 'INPUT') return;   // もう次の欄で打っているなら、後追いで動かさない
+      if (n && a !== n) { n.focus(); if (n.select) n.select(); if (n.scrollIntoView) n.scrollIntoView({ block: 'nearest' }); }
     };
-    go(); setTimeout(go, 30);
+    clearTimeout(enterRefocus);
+    go(false); enterRefocus = setTimeout(() => go(true), 30);
   }
 });
 window.addEventListener('hashchange', () => { view = (location.hash || '#home').slice(1) || 'home'; if (!VIEWS[view]) view = 'home'; render(); window.scrollTo(0, 0); });
