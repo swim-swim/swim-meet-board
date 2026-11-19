@@ -319,46 +319,57 @@ details.card > summary::-webkit-details-marker { display: none; }
 .issue button.link:hover { text-decoration: underline; }
 .certprev { border-radius: 6px; background: #fff; color: #000; overflow: hidden; margin: 0 auto; box-shadow: 0 10px 30px var(--glass-shade); }
 
-/* ---------- 印刷（A4 縦 1枚。お客様・選手が離れて見ても読める大きさ） ---------- */
+/* ---------- 印刷（A4 縦 1枚。白地に細い線と文字だけのシンプルな構成。文字は改行させず自動で縮める） ---------- */
 #print-root { display: none; }
 .pgroot.measure { display: block !important; position: absolute; left: -10000px; top: 0; width: 210mm; }
 .pgroot, .pgroot * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-.pgroot .pg { width: 100%; height: 277mm; padding: 8mm 10mm 6mm; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #111; font-family: var(--font-ui); break-inside: avoid; }
 .pgroot > * + * { break-before: page; page-break-before: always; }
-.pg-h { display: flex; align-items: center; gap: 4mm; border-bottom: 2.6pt solid #0A2540; padding-bottom: 3mm; margin-bottom: 4mm; }
-.pg-logo { width: 13mm; height: 13mm; border-radius: 3mm; }
-.pg-meet { font-size: 10pt; color: #4a5868; }
-.pg-title { font-size: 21pt; font-weight: 800; line-height: 1.15; letter-spacing: .01em; }
-.pg-sub { font-size: 11.5pt; color: #1d2a38; margin-top: 1mm; }
+.pgroot .pg { --ink: #14181d; --sub: #6b7480; --rule: #14181d; --hair: #dfe3e8; --acc: #0b4f8a;
+  width: 100%; height: 277mm; padding: 12mm 14mm 9mm; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden;
+  background: #fff; color: var(--ink); font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif; break-inside: avoid; }
+.pg-h { padding-bottom: 4mm; margin-bottom: 5mm; border-bottom: 1.2pt solid var(--rule); }
+.pg-top { display: flex; justify-content: space-between; align-items: baseline; gap: 6mm; font-size: 8.5pt; color: var(--sub); letter-spacing: .06em; margin-bottom: 2.2mm; }
+.pg-meet { flex: 1 1 auto; min-width: 0; }
+.pg-date { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pg-title { font-size: 21pt; font-weight: 800; letter-spacing: .02em; line-height: 1.15; }
+.pg-sub { font-size: 10.5pt; color: var(--sub); margin-top: 1.6mm; font-variant-numeric: tabular-nums; }
+.fitline { white-space: nowrap; overflow: hidden; }
 .pg-b { flex: 1 1 auto; min-height: 0; overflow: hidden; }
-.pg-z.two { column-count: 2; column-gap: 6mm; }
-.pg-f { display: flex; justify-content: space-between; font-size: 8.5pt; color: #687684; border-top: .6pt solid #c9d3dd; padding-top: 1.5mm; margin-top: 2mm; }
-.pp { width: 100%; border-collapse: collapse; font-size: 12pt; }
-.pp th { background: #0A2540; color: #fff; font-size: 9.5pt; font-weight: 700; padding: 1.4mm 2mm; text-align: left; letter-spacing: .04em; }
-.pp td { padding: 1.5mm 2mm; border-bottom: .6pt solid #d6dee6; vertical-align: middle; }
-.pp tbody tr:nth-child(even) td { background: #f3f7fb; }
+.pg-z { width: max-content; min-width: 100%; }
+.pg-z.two { display: grid; grid-template-columns: repeat(2, max-content); column-gap: 9mm; row-gap: 5mm; align-items: start; justify-content: space-between; }
+.pg-z.two .blk { margin: 0; }
+.pg-f { display: flex; justify-content: space-between; gap: 6mm; font-size: 7.5pt; color: var(--sub); letter-spacing: .05em; border-top: .5pt solid var(--hair); padding-top: 2mm; margin-top: 3mm; white-space: nowrap; }
+.pp { width: 100%; border-collapse: collapse; font-size: 11.5pt; }
+.pp th, .pp td { white-space: nowrap; }
+.pp th { font-size: 8pt; font-weight: 600; color: var(--sub); text-align: left; letter-spacing: .08em; padding: 0 2.6mm 1.6mm; border-bottom: .9pt solid var(--rule); }
+.pp td { padding: 2mm 2.6mm; border-bottom: .4pt solid var(--hair); vertical-align: middle; }
+.pp tbody tr:last-child td { border-bottom: 0; }
 .pp .c { text-align: center; }
-.pp .nm { font-weight: 700; font-size: 12.5pt; }
-.pp .sm { font-size: 10pt; color: #34414e; }
-.pp .kana { font-size: 8pt; font-weight: 400; color: #6a7684; }
-.pp .tm { font-family: var(--font-num); font-weight: 700; font-size: 12.5pt; text-align: right; white-space: nowrap; }
+.pp .nm { font-weight: 700; font-size: 12pt; }
+.pp .sm { font-size: 9.5pt; color: #3b434d; }
+.pp .kana { display: inline; margin-left: 2.4mm; font-size: 7.5pt; font-weight: 400; color: var(--sub); }
+.pp .tm { font-family: "SF Mono", "Menlo", "Consolas", monospace; font-weight: 700; font-size: 11.5pt; text-align: right; font-variant-numeric: tabular-nums; }
 .pp td.c.tm { text-align: center; }
-.pp .rk { font-weight: 800; font-size: 14pt; text-align: center; white-space: nowrap; width: 15mm; }
-.pp tr.m1 td { background: #ffefb0 !important; } .pp tr.m2 td { background: #e8edf2 !important; } .pp tr.m3 td { background: #f7dcc5 !important; }
-.pp tr.brk td { background: #eef3f7 !important; color: #5a6772; font-style: italic; }
-.blk { break-inside: avoid; page-break-inside: avoid; margin-bottom: 4mm; }
-.blk-h { font-size: 13pt; font-weight: 800; padding: 1.2mm 3mm; background: #e2eef9; border-left: 2.2mm solid #0A73C9; margin-bottom: 1.2mm; }
-.lane-c { display: inline-block; width: 7.5mm; height: 7.5mm; line-height: 7.5mm; border-radius: 50%; background: #0A2540; color: #fff; font-weight: 800; font-size: 11pt; text-align: center; }
-.split2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; align-items: start; }
-.pinfo { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2mm; margin-bottom: 4mm; }
-.pinfo div { border: .8pt solid #0A2540; border-radius: 2mm; padding: 1.2mm 1.5mm; text-align: center; }
-.pinfo span { display: block; font-size: 8pt; color: #4a5868; }
-.pinfo b { font-size: 11.5pt; }
-.mvp-p { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; margin-bottom: 6mm; }
-.mvp-p div { border: 1.4pt solid #b98a00; background: #fff6d6; border-radius: 3mm; padding: 4mm 5mm; }
-.mvp-p span { display: block; font-size: 10.5pt; font-weight: 700; color: #7a5a00; }
-.mvp-p b { display: block; font-size: 22pt; margin: 1mm 0; }
-.mvp-p em { font-style: normal; font-size: 10.5pt; color: #333; }
+.pp .rk { text-align: center; width: 12mm; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pp .rk.st { font-size: 9pt; color: var(--sub); font-weight: 600; }
+.rkb { display: inline-block; width: 6.6mm; height: 6.6mm; line-height: 6.6mm; border-radius: 50%; font-size: 9.5pt; font-weight: 800; text-align: center; color: #fff; }
+.rkb.m1 { background: #c9a227; } .rkb.m2 { background: #9aa3ad; } .rkb.m3 { background: #b07040; }
+.pp tr.emp td { color: #c0c6cd; }
+.pp tr.brk td { color: var(--sub); font-style: italic; }
+.blk { break-inside: avoid; page-break-inside: avoid; margin-bottom: 6mm; }
+.blk-h { font-size: 11pt; font-weight: 800; letter-spacing: .04em; padding-bottom: 1.4mm; margin-bottom: 1mm; color: var(--acc); white-space: nowrap; }
+.lane-c { display: inline-block; width: 6.4mm; height: 6.4mm; line-height: 6.1mm; border-radius: 50%; border: .8pt solid var(--ink); font-weight: 700; font-size: 9.5pt; text-align: center; }
+.split2 { display: grid; grid-template-columns: repeat(2, max-content); gap: 9mm; justify-content: space-between; align-items: start; }
+.pinfo { display: flex; flex-wrap: nowrap; gap: 0; margin-bottom: 6mm; white-space: nowrap; }
+.pinfo span { padding: 0 4mm; border-left: .5pt solid var(--hair); }
+.pinfo span:first-child { padding-left: 0; border-left: 0; }
+.pinfo i { display: block; font-style: normal; font-size: 7.5pt; color: var(--sub); letter-spacing: .06em; margin-bottom: .6mm; }
+.pinfo b { font-size: 12pt; font-variant-numeric: tabular-nums; }
+.mvp-p { display: grid; grid-template-columns: repeat(2, max-content); gap: 12mm; margin-bottom: 9mm; }
+.mvp-p div { border-top: 1.6pt solid #c9a227; padding-top: 2.4mm; white-space: nowrap; }
+.mvp-p span { display: block; font-size: 8.5pt; font-weight: 600; color: var(--sub); letter-spacing: .08em; }
+.mvp-p b { display: block; font-size: 20pt; margin: 1mm 0 .6mm; }
+.mvp-p em { font-style: normal; font-size: 9.5pt; color: #3b434d; }
 @media print {
   html, body { height: auto !important; min-height: 0 !important; background: #fff !important; color: #000 !important; }
   body::before { display: none !important; }
@@ -366,6 +377,7 @@ details.card > summary::-webkit-details-marker { display: none; }
   #print-root { display: block !important; position: static !important; width: auto !important; }
   #print-root .cert { width: 100% !important; }
 }
+.cert .cl { white-space: nowrap; overflow: hidden; padding: 0 14mm; box-sizing: border-box; }
 .cert { position: relative; color: #000; font-family: var(--font-cert); text-align: center; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
 .cert + .cert { break-before: page; page-break-before: always; }
 .cert .title { font-weight: 700; letter-spacing: .3em; }
@@ -2327,12 +2339,12 @@ function certData(it, relay, prize) {
 function certHTML(it, relay, prize, paper, preview) {
   const P = PAPER[paper], L = relay ? P.rel : P.ind, S = state.settings, d = certData(it, relay, prize);
   const sc = (C.num(S.print.scale) || 100) / 100, dy = C.num(S.print.offsetTop), dx = C.num(S.print.offsetLeft);
-  const at = (key, txt, extra) => { const [top, pt] = L[key]; return '<div class="' + (extra || '') + '" style="position:absolute;left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + (top * sc + dy) + 'mm;font-size:' + (pt * sc) + 'pt">' + esc(txt) + '</div>'; };
+  const at = (key, txt, extra) => { const [top, pt] = L[key]; return '<div class="cl ' + (extra || '') + '" style="position:absolute;left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + (top * sc + dy) + 'mm;font-size:' + (pt * sc) + 'pt">' + esc(txt) + '</div>'; };
   let h = at('title', d.title, 'title') + at('name', d.name, 'name');
   if (relay) h += at('mem1', d.mem1) + at('mem2', d.mem2); else if (d.club) h += at('club', d.club);
   h += at('rank', d.rank, 'name') + at('event', d.event) + at('record', d.record) + at('meet', d.meet);
   const [lt, lpt, lgap] = L.lines;
-  d.lines.forEach((t, i) => { h += '<div style="position:absolute;left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + ((lt + i * lgap) * sc + dy) + 'mm;font-size:' + (lpt * sc) + 'pt">' + esc(t) + '</div>'; });
+  d.lines.forEach((t, i) => { h += '<div class="cl" style="position:absolute;left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + ((lt + i * lgap) * sc + dy) + 'mm;font-size:' + (lpt * sc) + 'pt">' + esc(t) + '</div>'; });
   h += at('date', d.date) + at('org', d.org, 'name');
   const style = preview ? 'width:' + P.w + 'mm;height:' + P.h + 'mm;transform:scale(' + preview + ');transform-origin:top left' : 'width:100%;height:' + (P.h - 20) + 'mm';  // 印刷: プリンタの余白（最大10mm）があっても1ページに収める
   return '<div class="cert" style="' + style + '">' + h + '</div>';
@@ -2855,24 +2867,39 @@ window.addEventListener('afterprint', () => { $('#print-root').innerHTML = ''; }
 const pnow = () => { const d = new Date(); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
 const nm2 = n => String(n || '').split('　').slice(0, 2).join('　');
 function pPage(title, sub, body, label) {
-  return '<section class="pg"><header class="pg-h"><img class="pg-logo" src="' + APP_ICON + '" alt=""><div><div class="pg-meet">' + esc(state.settings.meetName) + '</div>' +
-    '<div class="pg-title">' + esc(title) + '</div>' + (sub ? '<div class="pg-sub">' + sub + '</div>' : '') + '</div></header>' +
+  return '<section class="pg"><header class="pg-h"><div class="pg-top"><span class="pg-meet fitline">' + esc(state.settings.meetName) + '</span><span class="pg-date">' + pnow() + '</span></div>' +
+    '<div class="pg-title fitline">' + esc(title) + '</div>' + (sub ? '<div class="pg-sub fitline">' + sub + '</div>' : '') + '</header>' +
     '<div class="pg-b"><div class="pg-z">' + body + '</div></div>' +
-    '<footer class="pg-f"><span>' + esc(label || title) + '</span><span>印刷 ' + pnow() + '</span></footer></section>';
+    '<footer class="pg-f"><span>' + esc(label || title) + '</span><span>' + esc(state.settings.meetName) + '</span></footer></section>';
+}
+// 順位: 1〜3位は金・銀・銅の丸、それ以外は数字だけ（失格・棄権は文字）
+function rkCell(n, text) {
+  if (n >= 1 && n <= 3) return '<td class="rk"><span class="rkb m' + n + '">' + n + '</span></td>';
+  if (n > 0) return '<td class="rk">' + n + '</td>';
+  return '<td class="rk st">' + esc(text || '') + '</td>';
 }
 const medalCls = r => r === 1 ? 'm1' : r === 2 ? 'm2' : r === 3 ? 'm3' : '';
 const rankNum = s => { const m = String(s || '').match(/^(\d+)/); return m ? +m[1] : 0; };
-// 本文が1枚に入りきらなければ、2段組み → 縮小 の順で必ず1枚に収める（container は .pgroot で、測るあいだ実寸で置く）
+// 文字は改行させない。1枚の幅・高さに入りきらなければ 2段組み → 縮小 の順で自動調節（container は .pgroot。測るあいだ実寸で置く）
+function fitLines(root) {
+  root.querySelectorAll('.fitline, .cert .cl').forEach(el => {
+    if (el.dataset.fs0 === undefined) el.dataset.fs0 = el.style.fontSize || '';   // 元の文字の大きさを覚えておき、毎回そこから測る
+    el.style.fontSize = el.dataset.fs0;
+    const cw = el.clientWidth;
+    if (!cw) return;
+    let fs = parseFloat(getComputedStyle(el).fontSize);
+    for (let i = 0; i < 6 && el.scrollWidth > cw + 1 && fs > 5; i++) { fs = fs * (cw / el.scrollWidth) * 0.98; el.style.fontSize = fs.toFixed(2) + 'px'; }
+  });
+}
 function fitPages(root) {
   root.classList.add('measure');
   root.querySelectorAll('.pg').forEach(pg => {
     const b = pg.querySelector('.pg-b'), z = pg.querySelector('.pg-z');
-    const avail = b.clientHeight * 0.97;
-    const h = () => z.getBoundingClientRect().height;
-    z.style.zoom = 1;
-    const h1 = h();
-    if (h1 <= avail) return;
-    if (avail / h1 < 0.75) {           // 少し縮めれば入るなら1段のまま。大きくはみ出すときだけ2段組みを試し、文字が大きく残る方を選ぶ
+    const H = b.clientHeight * 0.98, W = b.clientWidth;
+    const scaleNeed = () => { z.style.zoom = 1; const r = z.getBoundingClientRect(); return Math.min(1, H / r.height, W / r.width); };
+    z.classList.remove('two');
+    const s1 = scaleNeed();
+    if (s1 < 1 && s1 < 0.82) {        // 大きく縮める必要があるときだけ2段組みを試し、文字が大きく残る方を選ぶ
       const t = z.querySelector('table.split');
       let undo = null;
       if (t && t.tBodies[0] && t.tBodies[0].rows.length > 10) {
@@ -2884,14 +2911,16 @@ function fitPages(root) {
         t.parentNode.insertBefore(wrap, t); wrap.appendChild(t); wrap.appendChild(t2);
         undo = () => { wrap.parentNode.insertBefore(t, wrap); [...t2.tBodies[0].rows].forEach(r => t.tBodies[0].appendChild(r)); wrap.remove(); };
       } else if (z.querySelectorAll('.blk').length > 1) { z.classList.add('two'); undo = () => z.classList.remove('two'); }
-      if (undo && avail / h() < (avail / h1) * 1.2) undo();
+      if (undo && scaleNeed() < s1 * 1.12) undo();
     }
-    for (let i = 0; i < 4; i++) {
-      const cur = h();
-      if (cur <= avail) break;
-      z.style.zoom = Math.max(0.3, (parseFloat(z.style.zoom) || 1) * (avail / cur) * 0.985);
+    let sc = scaleNeed();
+    for (let i = 0; i < 4 && sc < 1; i++) {
+      z.style.zoom = Math.max(0.3, (parseFloat(z.style.zoom) || 1) * sc * 0.99);
+      const r = z.getBoundingClientRect();
+      sc = Math.min(1, H / r.height, W / r.width);
     }
   });
+  fitLines(root);
   root.classList.remove('measure');
 }
 // ---- 印刷物の部品（{key, title, group, pages, html()}）
@@ -2899,7 +2928,7 @@ function docSchedule() {
   const S = state.settings, sc = S.schedule;
   return { key: 'sched', group: '進行', title: sc.title || '競技進行スケジュール', pages: 1, html() {
     const info = [['入館開始', sc.doorOpen], ['W-up', sc.warmup], ['開会式', sc.opening], ['競技開始', sc.start], ['競技終了', D.sched.end !== null ? C.fmtClock(D.sched.end) : ''], ['閉会式', sc.closing], ['最終退館', sc.exit]];
-    const body = '<div class="pinfo">' + info.map(([k, v]) => '<div><span>' + k + '</span><b>' + esc(v) + '</b></div>').join('') + '</div>' +
+    const body = '<div class="pinfo">' + info.map(([k, v]) => '<span><i>' + k + '</i><b>' + esc(v) + '</b></span>').join('') + '</div>' +
       '<table class="pp split"><thead><tr><th class="c">No</th><th>種目</th><th class="c">参加</th><th class="c">組</th><th class="c">開始</th><th class="c">終了</th></tr></thead><tbody>' +
       D.sched.rows.filter(o => o.name).map(o => '<tr class="' + (o.isBreak ? 'brk' : '') + '"><td class="c">' + o.no + '</td><td class="nm">' + esc(o.name) + '</td><td class="c">' + (o.n === undefined ? '' : o.n) + '</td><td class="c">' + (o.heats === undefined ? '' : o.heats) + '</td><td class="c tm">' + (o.start !== undefined && o.start !== null ? C.fmtClock(o.start) : '') + '</td><td class="c tm sm">' + (o.end !== undefined && o.end !== null ? C.fmtClock(o.end) : '') + '</td></tr>').join('') + '</tbody></table>';
     return pPage(this.title, '', body);
@@ -2915,9 +2944,9 @@ function docProgram(name) {
       return '<div class="blk"><div class="blk-h">第 ' + hh.heat + ' 組</div><table class="pp"><thead><tr><th class="c">レーン</th><th>' + (p.relay ? 'チーム' : '氏名') + '</th><th>' + (p.relay ? '泳者' : 'クラブ') + '</th><th>区分</th>' + (anyRes ? '<th class="c">記録</th><th class="c">順位</th>' : '') + '</tr></thead><tbody>' +
         lanes.map(ln => {
           const it = byLane.get(ln);
-          return '<tr class="' + (it && anyRes ? medalCls(it.rank) : '') + '"><td class="c"><span class="lane-c">' + ln + '</span></td><td class="nm">' + (it ? esc(p.relay ? it.teamDisp : nm2(it.name)) : '') + (it && !p.relay && it.name.split('　').length > 2 ? '<div class="kana">' + esc(it.name.split('　').slice(2).join('　')) + '</div>' : '') + '</td>' +
+          return '<tr' + (it ? '' : ' class="emp"') + '><td class="c"><span class="lane-c">' + ln + '</span></td><td class="nm">' + (it ? esc(p.relay ? it.teamDisp : nm2(it.name)) : '') + (it && !p.relay && it.name.split('　').length > 2 ? '<div class="kana">' + esc(it.name.split('　').slice(2).join('　')) + '</div>' : '') + '</td>' +
             '<td class="sm">' + (it ? esc(p.relay ? it.memberText : it.club) : '') + '</td><td class="sm">' + (it ? esc(it.cat) : '') + '</td>' +
-            (anyRes ? '<td class="tm">' + (it ? esc(it.flashTime) : '') + '</td><td class="rk">' + (it ? esc(it.flashRank) : '') + '</td>' : '') + '</tr>';
+            (anyRes ? '<td class="tm">' + (it ? esc(it.flashTime) : '') + '</td>' + (it ? rkCell(it.status === '完泳' ? it.rank : 0, it.flashRank) : '<td class="rk"></td>') : '') + '</tr>';
         }).join('') + '</tbody></table></div>';
     }).join('');
     return pPage(name, sub, body || '<p>エントリーはありません。</p>', (anyRes ? '速報' : '大会プログラム') + '　' + name);
@@ -2930,7 +2959,7 @@ function docFlash(name) {
     const sch = D.sched.rows.find(r => r.name === name), groups = [];
     list.forEach(x => { const g = groups[groups.length - 1]; if (g && g.cat === x.it.cat) g.rows.push(x); else groups.push({ cat: x.it.cat, rows: [x] }); });
     const body = groups.map(g => '<div class="blk"><div class="blk-h">' + esc(g.cat) + '</div><table class="pp"><thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ') + '</th><th class="c">記録</th></tr></thead><tbody>' +
-      g.rows.map(x => '<tr class="' + medalCls(rankNum(x.rank)) + '"><td class="rk">' + esc(x.rank) + '</td><td class="nm">' + esc(relay ? x.name : nm2(x.name)) + '</td><td class="sm">' + esc(x.club) + (x.cat !== x.it.cat ? '<div class="kana">' + esc(x.cat) + '</div>' : '') + '</td><td class="tm">' + esc(x.time) + '</td></tr>').join('') + '</tbody></table></div>').join('');
+      g.rows.map(x => '<tr>' + rkCell(rankNum(x.rank), x.rank) + '<td class="nm">' + esc(relay ? x.name : nm2(x.name)) + '</td><td class="sm">' + esc(x.club) + (x.cat !== x.it.cat ? '<div class="kana">' + esc(x.cat) + '</div>' : '') + '</td><td class="tm">' + esc(x.time) + '</td></tr>').join('') + '</tbody></table></div>').join('');
     return pPage('【速報】' + name, (sch ? '競技No.' + sch.no + '　' : '') + list.length + (relay ? 'チーム' : '名'), body);
   } };
 }
@@ -2942,7 +2971,7 @@ function docRanking(ev, cat) {
     const body = cats.map(c => {
       const list = src.filter(it => it.event === ev && it.cat === c && it.rank).sort((a, b) => a.rankOrder - b.rankOrder);
       return '<div class="blk"><div class="blk-h">' + esc(c) + '</div><table class="pp"><thead><tr><th class="c">順位</th><th>' + (relay ? 'チーム' : '氏名') + '</th><th>' + (relay ? '泳者' : 'クラブ') + '</th><th class="c">記録</th></tr></thead><tbody>' +
-        (list.length ? list.map(it => '<tr class="' + medalCls(it.rank) + '"><td class="rk">' + it.rank + '</td><td class="nm">' + esc(relay ? it.teamDisp : nm2(it.name)) + '</td><td class="sm">' + esc(relay ? it.memberText : it.club) + '</td><td class="tm">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="4" class="sm">記録がまだありません</td></tr>') + '</tbody></table></div>';
+        (list.length ? list.map(it => '<tr>' + rkCell(it.rank) + '<td class="nm">' + esc(relay ? it.teamDisp : nm2(it.name)) + '</td><td class="sm">' + esc(relay ? it.memberText : it.club) + '</td><td class="tm">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="4" class="sm">記録がまだありません</td></tr>') + '</tbody></table></div>';
     }).join('');
     return pPage('公式' + (relay ? 'リレー' : '') + 'ランキング　' + ev, cat || '', body || '<p>記録がありません。</p>');
   } };
