@@ -188,9 +188,6 @@ html.refract .seg > .lens.lifted { backdrop-filter: url(#lgRefract) saturate(1.6
 .segbtn, .nav a { position: relative; transition: color .2s; }
 
 /* 説明文は1行に畳む（押すと全文） */
-.lead { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
-.lead::after { content: ""; }
-.lead.open { -webkit-line-clamp: unset; display: block; }
 .vhead { display: flex; align-items: flex-end; gap: 8px 14px; flex-wrap: wrap; margin-bottom: 10px; }
 .vhead > div:first-child { flex: 1 1 320px; min-width: 0; }
 .vhead .lead { margin-bottom: 0; }
@@ -324,10 +321,10 @@ details.card > summary::-webkit-details-marker { display: none; }
 
 /* ---------- 印刷（A4 縦 1枚。お客様・選手が離れて見ても読める大きさ） ---------- */
 #print-root { display: none; }
-#print-root.measure { display: block; position: absolute; left: -10000px; top: 0; width: 190mm; }
-#print-root, #print-root * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-#print-root .pg { width: 100%; height: 268mm; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #111; font-family: var(--font-ui); break-inside: avoid; }
-#print-root .pg + .pg { break-before: page; page-break-before: always; }
+.pgroot.measure { display: block !important; position: absolute; left: -10000px; top: 0; width: 210mm; }
+.pgroot, .pgroot * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.pgroot .pg { width: 100%; height: 277mm; padding: 8mm 10mm 6mm; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #111; font-family: var(--font-ui); break-inside: avoid; }
+.pgroot > * + * { break-before: page; page-break-before: always; }
 .pg-h { display: flex; align-items: center; gap: 4mm; border-bottom: 2.6pt solid #0A2540; padding-bottom: 3mm; margin-bottom: 4mm; }
 .pg-logo { width: 13mm; height: 13mm; border-radius: 3mm; }
 .pg-meet { font-size: 10pt; color: #4a5868; }
@@ -367,6 +364,7 @@ details.card > summary::-webkit-details-marker { display: none; }
   body::before { display: none !important; }
   body > *:not(#print-root) { display: none !important; }
   #print-root { display: block !important; position: static !important; width: auto !important; }
+  #print-root .cert { width: 100% !important; }
 }
 .cert { position: relative; color: #000; font-family: var(--font-cert); text-align: center; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
 .cert + .cert { break-before: page; page-break-before: always; }
@@ -444,6 +442,56 @@ table.t td > b { white-space: nowrap; }
   .topbar .chips, .topbar .tools { flex-wrap: nowrap; }
   .qbtn { width: 29px; height: 32px; } .qbtn .ic { width: 17px; height: 17px; }
 }
+.nav a, .segbtn { -webkit-user-drag: none; }
+.nav .seg.v { touch-action: none; }
+/* 簡易アクセス: 選択中のボタンが光る（静止中は動かない） */
+.quick > .lens { --pill-rgb: 10, 122, 255; --pill-a: .16; box-shadow: 0 0 0 1px rgba(10,122,255, calc(.35 * (1 - var(--lift)))), 0 0 14px rgba(10,122,255, calc(.45 * (1 - var(--lift)))), inset 0 0 0 calc(1.2px * var(--lift)) rgba(255,255,255, calc(.95 * var(--lift))), inset 0 1.5px 1px rgba(255,255,255, calc(.9 * var(--lift))), 0 calc(10px * var(--lift)) calc(26px * var(--lift)) rgba(10, 30, 60, calc(.22 * var(--lift))); }
+.qbtn.on { color: var(--accent); }
+.qbtn.on .ic { filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 70%, transparent)); stroke-width: 2.2; }
+@media (max-height: 720px) { .nav a { min-height: 34px; padding: 5px 12px; } .nav h6 { margin: 6px 12px 0; } }
+
+/* ---------- 印刷プレビュー（右側に常に表示。隠すこともできる） ---------- */
+#print-root.pgroot { }
+.withpv { display: grid; grid-template-columns: minmax(0, 1fr) clamp(260px, 26vw, 380px); gap: 12px; align-items: start; }
+.pv-main { min-width: 0; }
+.pv { position: sticky; top: calc(var(--toph, 64px) + 18px); padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.pv-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pv-head b { font: 650 15px/1.3 var(--font-display); }
+.pv-body { display: flex; flex-direction: column; gap: 10px; overflow: auto; padding: 2px; }
+.sheetbox { position: relative; width: 100%; overflow: hidden; border-radius: 4px; box-shadow: 0 2px 10px rgba(10,30,60,.18), 0 0 0 1px rgba(10,30,60,.08); background: #fff; flex: 0 0 auto; }
+.sheet { position: absolute; left: 0; top: 0; width: 210mm; height: 297mm; transform-origin: 0 0; background: #fff; color: #111; }
+.sheet > .cert { width: 210mm !important; }
+.sheetno { position: absolute; right: 6px; bottom: 6px; font-size: 10.5px; color: #555; background: rgba(255,255,255,.85); border-radius: 6px; padding: 0 6px; }
+.pv-off { display: flex; justify-content: flex-end; margin: -4px 0 6px; }
+@media (max-width: 1099px) { .withpv { grid-template-columns: minmax(0, 1fr); } .pv { position: static; } .pv-body { max-height: none !important; flex-direction: row; overflow-x: auto; } .sheetbox { width: 260px; } }
+/* ---------- 印刷まとめ ---------- */
+.hubgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; align-items: start; }
+.hubrow { display: flex; align-items: center; gap: 8px; padding: 6px 4px; border-bottom: 1px solid var(--hairline); }
+.hubrow:last-child { border-bottom: 0; }
+.hubrow label { display: flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0; cursor: pointer; }
+.hubt { overflow-wrap: anywhere; }
+.hubrow.focus { background: var(--accent-soft); border-radius: 10px; }
+
+/* ---------- 文字の折り返し: 日本語は文節で折り返し、説明は省略せず全文を出す ---------- */
+body { word-break: auto-phrase; line-break: strict; }
+.lead, .notice, .issue, .hubt, .small, p { overflow-wrap: anywhere; }
+.lead { display: block; cursor: default; }
+table.t th, .pill, .chip, .btn, .segbtn, .evchip span, .sheetno { overflow-wrap: normal; }
+.hubrow { align-items: flex-start; }
+.hubrow label { align-items: flex-start; }
+.hubrow label input { margin-top: 3px; }
+.hubrow .hubtx { display: flex; flex-direction: column; min-width: 0; }
+.hubrow .hubt { font-weight: 600; }
+.hubrow .hubm { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.hubgrid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
+.evchip span { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
+.evchip { align-items: center; }
+table.t td.num, table.t th.num, table.t td.c { white-space: nowrap; }
+.clubs table.t td:first-child, [data-fill-id="awin"] td, [data-fill-id="awexc"] td, [data-fill-id="awcand"] td { white-space: nowrap; }
+/* スマホ: 大会名は省略せず2行まで、表は折り返さずに表の中で横スクロール */
+.brand small { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
+@media (max-width: 600px) { table.t td, table.t th { white-space: nowrap; } }
+.nowrap { white-space: nowrap; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 10mm }</style>
 </head>
@@ -455,7 +503,7 @@ table.t td > b { white-space: nowrap; }
   <main id="main"><noscript>このアプリを使うには JavaScript を有効にしてください。</noscript></main>
 </div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
-<div id="print-root"></div>
+<div id="print-root" class="pgroot"></div>
 <script>const APP_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0icG9vbCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwQjNBNkUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjU1IiBzdG9wLWNvbG9yPSIjMEE1RkE4Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBFODZDOSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ic2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkZGRkZGIiBzdG9wLW9wYWNpdHk9Ii4xNiIvPgogICAgICA8c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjRkZGRkZGIiBzdG9wLW9wYWNpdHk9IjAiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8Y2xpcFBhdGggaWQ9InNxIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIvPjwvY2xpcFBhdGg+CiAgPC9kZWZzPgogIDxnIGNsaXAtcGF0aD0idXJsKCNzcSkiPgogICAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9InVybCgjcG9vbCkiLz4KICAgIDwhLS0g5rC06Z2i44Gu44KG44KJ44GO77yI44OX44O844Or5bqV44Gu44Op44Kk44Oz77yJIC0tPgogICAgPHBhdGggZD0iTTAgMTUwIEMgOTAgMTMyLCAxNzAgMTY4LCAyNTYgMTUwIFMgNDIyIDEzMiwgNTEyIDE1MCIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utb3BhY2l0eT0iLjA4IiBzdHJva2Utd2lkdGg9IjEwIiBmaWxsPSJub25lIi8+CiAgICA8IS0tIOOCs+ODvOOCueODreODvOODl++8iOi1pOeZveOBrua1ruOBje+8iSAtLT4KICAgIDxnPgogICAgICA8cmVjdCB4PSIwIiB5PSI0MDciIHdpZHRoPSI1MTIiIGhlaWdodD0iMTAiIGZpbGw9IiMwODM2NUYiIG9wYWNpdHk9Ii41NSIvPgogICAgICA8ZyBmaWxsPSIjRTgzNDNCIj4KICAgICAgICA8Y2lyY2xlIGN4PSIxOCIgY3k9IjQxMiIgcj0iMTciLz48Y2lyY2xlIGN4PSI5MCIgY3k9IjQxMiIgcj0iMTciLz48Y2lyY2xlIGN4PSIxNjIiIGN5PSI0MTIiIHI9IjE3Ii8+PGNpcmNsZSBjeD0iMjM0IiBjeT0iNDEyIiByPSIxNyIvPjxjaXJjbGUgY3g9IjMwNiIgY3k9IjQxMiIgcj0iMTciLz48Y2lyY2xlIGN4PSIzNzgiIGN5PSI0MTIiIHI9IjE3Ii8+PGNpcmNsZSBjeD0iNDUwIiBjeT0iNDEyIiByPSIxNyIvPgogICAgICA8L2c+CiAgICAgIDxnIGZpbGw9IiNGRkZGRkYiPgogICAgICAgIDxjaXJjbGUgY3g9IjU0IiBjeT0iNDEyIiByPSIxNyIvPjxjaXJjbGUgY3g9IjEyNiIgY3k9IjQxMiIgcj0iMTciLz48Y2lyY2xlIGN4PSIxOTgiIGN5PSI0MTIiIHI9IjE3Ii8+PGNpcmNsZSBjeD0iMjcwIiBjeT0iNDEyIiByPSIxNyIvPjxjaXJjbGUgY3g9IjM0MiIgY3k9IjQxMiIgcj0iMTciLz48Y2lyY2xlIGN4PSI0MTQiIGN5PSI0MTIiIHI9IjE3Ii8+PGNpcmNsZSBjeD0iNDg2IiBjeT0iNDEyIiByPSIxNyIvPgogICAgICA8L2c+CiAgICAgIDxnIGZpbGw9IiMwMDAwMDAiIG9wYWNpdHk9Ii4xNCI+CiAgICAgICAgPHJlY3QgeD0iMCIgeT0iNDE3IiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjEyIi8+CiAgICAgIDwvZz4KICAgIDwvZz4KICAgIDwhLS0g5rOz6ICF77yI6Ieq55Sx5b2i77yJOiDohZXjgYzpoK3jga7kuIrjgpLlm57jgaPjgabliY3jga7msLTpnaLjgbggLS0+CiAgICA8ZyBmaWxsPSJub25lIiBzdHJva2U9IiNGRkZGRkYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICAgIDxwYXRoIGQ9Ik05NiAyNzYgQyAxNjAgMjY0LCAyMTQgMjYyLCAyNjggMjY4IiBzdHJva2Utd2lkdGg9IjQyIi8+CiAgICAgIDxwYXRoIGQ9Ik0yNjIgMjUwIEMgMjgwIDE1MCwgMzkyIDEyOCwgNDM4IDI1MiIgc3Ryb2tlLXdpZHRoPSIzMCIvPgogICAgPC9nPgogICAgPGNpcmNsZSBjeD0iMzE4IiBjeT0iMjU2IiByPSIzMiIgZmlsbD0iI0ZGRkZGRiIvPgogICAgPCEtLSDms6LjgajjgZfjgbbjgY0gLS0+CiAgICA8cGF0aCBkPSJNNjAgMzE0IEMgMTAwIDI5OCwgMTQwIDMzMCwgMTgwIDMxNCBTIDI2MCAyOTgsIDMwMCAzMTQgUyAzODAgMzMwLCA0NTIgMzA2IiBzdHJva2U9IiM3RkQ4RkYiIHN0cm9rZS13aWR0aD0iMTQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSIvPgogICAgPHBhdGggZD0iTTExMCAzNDYgQyAxNTAgMzMwLCAxOTAgMzYyLCAyMzAgMzQ2IFMgMzEwIDMzMCwgMzUwIDM0NiIgc3Ryb2tlPSIjQkRFQkZGIiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiIG9wYWNpdHk9Ii43Ii8+CiAgICA8Y2lyY2xlIGN4PSI0NTIiIGN5PSIyNzgiIHI9IjciIGZpbGw9IiNCREVCRkYiLz48Y2lyY2xlIGN4PSI0NzAiIGN5PSIyNjIiIHI9IjUiIGZpbGw9IiNCREVCRkYiIG9wYWNpdHk9Ii44Ii8+CiAgICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0idXJsKCNzaGVlbikiLz4KICA8L2c+Cjwvc3ZnPgo=';</script>
 <script>/* ============================================================================
  * スイム大会運営アプリ — 計算エンジン（DOM非依存）
@@ -1473,7 +1521,7 @@ function ago(t) { if (!t) return 'まだありません'; const m = Math.round((
 // ---------------------------------------------------------------- 描画
 const NAV = [
   ['準備', [['home', '本部ボード', '本部'], ['settings', '大会設定', '設定'], ['entries', '個人エントリー', '個人'], ['relays', 'リレーエントリー', 'リレー'], ['schedule', '進行スケジュール', '進行']]],
-  ['当日', [['program', 'プログラム・記録入力', '記録入力'], ['flash', '速報', '速報'], ['ranking', 'ランキング', '順位'], ['certs', '記録証・賞状', '証書']]],
+  ['当日', [['program', 'プログラム・記録入力', '記録入力'], ['flash', '速報', '速報'], ['ranking', 'ランキング', '順位'], ['certs', '記録証・賞状', '証書'], ['prints', '印刷まとめ', '印刷']]],
   ['表彰', [['awards', '最優秀・優秀選手', '表彰']]],
   ['管理', [['check', '入力チェック', 'チェック'], ['data', 'データ管理・Excel', 'データ']]]
 ];
@@ -1498,6 +1546,8 @@ const ICON_PATHS = {
 };
 const icon = (k, cls) => '<svg class="' + (cls || 'ic') + '" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + ICON_PATHS[k] + '"/></svg>';
 ICON_PATHS.menu = 'M4 7h16M4 12h16M4 17h16';
+ICON_PATHS.print = 'M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-2M7 14h10v6H7z';
+ICON_PATHS.prints = ICON_PATHS.print;
 ICON_PATHS.pin = 'M9 4h6l-1 6 3 3H7l3-3zM12 13v7';
 ICON_PATHS.close = 'M6 6l12 12M18 6 6 18';
 
@@ -1516,7 +1566,7 @@ function applyNavLayout() {
   app.classList.toggle('pinned', navPinnedNow());
   app.classList.toggle('nav-open', !navPinnedNow() && navOpen);
 }
-window.addEventListener('resize', () => { applyNavLayout(); sizeFills(); bindLenses(); });
+window.addEventListener('resize', () => { applyNavLayout(); sizeFills(); bindLenses(); schedulePreview(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && navOpen) { navOpen = false; applyNavLayout(); } });
 
 let renderQueued = false;
@@ -1537,8 +1587,10 @@ function render() {
   let html;
   try { html = fn(); }
   catch (e) { console.error(e); html = '<div class="notice err">この画面の表示中にエラーが起きました: ' + esc(e.message) + '。<button class="btn sm" data-act="go" data-v="data">データ管理へ</button> でバックアップを書き出してから、ページを再読み込みしてください。</div>'; }
-  $('#main').innerHTML = (saveError ? '<div class="notice err"><b>保存エラー</b><span class="grow">' + esc(saveError) + '</span><button class="btn sm" data-act="backup">今すぐ書き出す</button></div>' : '') + backupReminder() + html;
+  $('#main').innerHTML = (saveError ? '<div class="notice err"><b>保存エラー</b><span class="grow">' + esc(saveError) + '</span><button class="btn sm" data-act="backup">今すぐ書き出す</button></div>' : '') + backupReminder() +
+    (PV_VIEWS.includes(view) && !previewOn() ? '<div class="pv-off"><button class="btn sm" data-act="pvToggle">' + icon('print', 'ic sm') + '印刷プレビューを表示</button></div>' : '') + pvShell(html);
   sizeFills();
+  schedulePreview();
   document.querySelectorAll('.fill[data-fill-id]').forEach(el => { if (fillScroll[el.dataset.fillId]) el.scrollTop = fillScroll[el.dataset.fillId]; });
   bindLenses();
   if (fk) {
@@ -1654,6 +1706,7 @@ document.addEventListener('pointerdown', e => {
   if (!seg || !seg.querySelector(':scope > .lens') || e.button > 0) return;
   const item = e.target.closest('[data-seg]');
   if (!item || item.disabled) return;
+  if (e.pointerType === 'mouse') e.preventDefault();          // リンクの掴み・文字選択を止めて、なぞる操作にする
   const st = lensState(seg);
   const r = itemRect(item);
   st.drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, moved: false, box: seg.getBoundingClientRect(), start: item, size: { w: st.w || r.w, h: st.h || r.h } };
@@ -1709,6 +1762,7 @@ function endLensDrag(e, cancel) {
   }
 }
 document.addEventListener('pointerup', e => endLensDrag(e, false));
+document.addEventListener('dragstart', e => { if (e.target.closest && e.target.closest('.seg')) e.preventDefault(); });
 document.addEventListener('pointercancel', e => endLensDrag(e, true));
 // レンズの縁で背景が曲がって見える屈折（虹色のにじみ付き）。Chrome / Edge のみ。ほかのブラウザは透明ガラスだけで表示
 (function setupRefraction() {
@@ -1769,7 +1823,7 @@ const PAGE_TIPS = {
   home: 'いまの種目・遅れ・全種目の入力状況・開催前の確認', settings: '大会名・種目・区分・クラブ・レーン・時間・得点',
   entries: '個人の申込を入力・Excelで配布と取り込み', relays: 'リレーのチームと泳者を入力', schedule: '競技の順番と開始時刻',
   program: '組・レーン順に公式タイムを入力', flash: '順位の速報を表示・印刷', ranking: '種目・区分ごとの公式順位',
-  certs: '記録証・賞状をA4で印刷', awards: '最優秀・優秀選手の選出', check: '打ち間違い・二重登録などの点検', data: 'バックアップ・復元・Excelの読み書き'
+  certs: '記録証・賞状をA4で印刷', prints: 'すべての印刷物をプレビューし、選んでまとめて印刷', awards: '最優秀・優秀選手の選出', check: '打ち間違い・二重登録などの点検', data: 'バックアップ・復元・Excelの読み書き'
 };
 let tipTimer = 0, tipFor = null;
 function showTip(item) {
@@ -1853,7 +1907,7 @@ function renderNav() {
     '</div>' +
     '<div class="seg v" data-seg-id="nav"><span class="lens" aria-hidden="true"></span>' +
     NAV.map(([h, items]) => '<div class="navgrp"><h6>' + h + '</h6>' + items.map(([v, label]) =>
-      '<a href="#' + v + '" class="' + (view === v ? 'on' : '') + '" data-seg data-act="go" data-v="' + v + '"' + (view === v ? ' aria-current="page"' : '') + '>' + icon(v) +
+      '<a href="#' + v + '" draggable="false" class="' + (view === v ? 'on' : '') + '" data-seg data-act="go" data-v="' + v + '" data-tip="' + esc(PAGE_TIPS[v] || '') + '" data-tip-title="' + esc(label) + '"' + (view === v ? ' aria-current="page"' : '') + '>' + icon(v) +
       '<span class="lb">' + label + '</span>' + (v === 'check' && ne ? '<span class="badge">' + ne + '</span>' : '') + '</a>').join('') + '</div>').join('') +
     '</div>';
 }
@@ -2218,7 +2272,7 @@ VIEWS.flash = () => {
   let prevCat = null;
   return '<h1 class="view">速報</h1><p class="lead">年齢区分ごとに「順位 → 失格 → 棄権 → 未入力」の順に並びます。記録入力に合わせて自動で更新されます。</p>' +
     '<div class="bar">' + sel('ui:flash', ui.flash, opts, ui.flashFollow !== false ? 'disabled' : '') + '<label class="small"><input type="checkbox" data-k="ui:flashFollow" ' + (ui.flashFollow !== false ? 'checked' : '') + '> 記録入力中の種目に自動で合わせる</label><span class="grow"></span><label class="small"><input type="checkbox" data-k="ui:big" ' + (ui.big ? 'checked' : '') + '> 大きな文字で表示</label><button class="btn" data-act="printFlash">速報を印刷</button></div>' +
-    '<div class="' + (ui.big ? 'big' : '') + '"><div class="card" style="margin-bottom:10px"><b style="font-size:' + (ui.big ? 26 : 17) + 'px">' + esc(ui.flash || '') + '</b>' + (sch ? '<span class="muted">　競技No.' + sch.no + '　開始予定 ' + C.fmtClock(sch.start) + '</span>' : '') + '<span class="muted">　対象 ' + list.length + (relay ? 'チーム' : '名') + '</span></div>' +
+    '<div class="' + (ui.big ? 'big' : '') + '"><div class="card" style="margin-bottom:10px"><b class="nowrap" style="font-size:' + (ui.big ? 26 : 17) + 'px">' + esc(ui.flash || '') + '</b>' + (sch ? '<span class="muted nowrap">　競技No.' + sch.no + '　開始予定 ' + C.fmtClock(sch.start) + '</span>' : '') + '<span class="muted nowrap">　対象 ' + list.length + (relay ? 'チーム' : '名') + '</span></div>' +
     (list.length ? '<div class="tablewrap fill" data-fill-id="flash"><table class="t"><thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ名') + '</th><th>年齢区分</th><th class="num">公式タイム</th></tr></thead><tbody>' +
       list.map(x => { const g = x.it.cat !== prevCat; prevCat = x.it.cat; return (g ? '<tr class="grp"><td colspan="5">' + esc(x.it.cat) + '</td></tr>' : '') + '<tr><td class="c"><b>' + esc(x.rank) + '</b></td><td>' + esc(x.name) + '</td><td>' + esc(x.club) + '</td><td>' + esc(x.cat) + '</td><td class="num">' + esc(x.time) + '</td></tr>'; }).join('') +
       '</tbody></table></div>' : '<div class="card empty">この種目のエントリーはありません。</div>') + '</div>';
@@ -2306,7 +2360,7 @@ VIEWS.certs = () => {
     field(relay ? 'チーム' : 'クラブ', sel('cf:club', f.club || '', blankOpt('すべて').concat(clubs.filter(Boolean)))) +
     field('状態', sel('cf:status', f.status || '', blankOpt('すべて').concat(['完泳', '失格', '棄権', '未入力']))) +
     '</div><div class="bar" style="margin-top:12px"><b>対象 ' + list.length + ' 枚</b><span class="muted">印刷する範囲</span>' +
-    '<input data-k="ui:certFrom" value="' + from + '" style="width:64px" inputmode="numeric"> 〜 <input data-k="ui:certTo" value="' + (list.length ? to : '') + '" style="width:64px" inputmode="numeric"> 枚目<span class="grow"></span>' +
+    '<span class="nowrap"><input data-k="ui:certFrom" value="' + from + '" style="width:64px" inputmode="numeric"> 〜 <input data-k="ui:certTo" value="' + (list.length ? to : '') + '" style="width:64px" inputmode="numeric"> 枚目</span><span class="grow"></span>' +
     '<button class="btn" data-act="printCert" data-test="1" ' + (list.length ? '' : 'disabled') + '>1枚だけテスト印刷</button><button class="btn primary" data-act="printCert" ' + (list.length ? '' : 'disabled') + '>印刷する（' + (list.length ? to - from + 1 : 0) + '枚）</button></div></div>' +
     '<div class="grid g2" style="align-items:start"><div class="card fill" data-fill-id="cprev"><h2>プレビュー（1枚目）</h2>' +
     (list.length ? '<div class="certprev" style="width:' + (P.w * pv) + 'mm;height:' + (P.h * pv) + 'mm">' + certHTML(list[from - 1] || list[0], relay, prize, ui.certPaper, pv) + '</div>' : '<div class="empty">対象者がいません。絞り込み条件を確認してください。</div>') +
@@ -2419,15 +2473,48 @@ VIEWS.data = () => {
     '<div class="card"><h2>Excel</h2><p class="small">今お使いの「大会運営ブック（.xlsx）」と「表彰者算出ブック（.xlsm）」をそのまま読み込めます。このアプリから書き出したExcelも読み込めます。</p>' +
     '<div class="bar"><label class="btn primary">Excelファイルを読み込む…<input type="file" accept=".xlsx,.xlsm,.xls" data-file="xlsx" hidden></label><button class="btn" data-act="exportXlsx">結果をExcelに書き出す</button><button class="btn" data-act="entryForm">エントリー用Excelを作る</button><label class="btn">記入済みエントリーを読み込む（複数可）<input type="file" accept=".xlsx,.xlsm,.xls" multiple data-file="entryform" hidden></label><button class="btn" data-act="exportCsv">エントリーをCSVで書き出す</button></div>' +
     '<p class="small muted">Excelの読み書きには、初回だけインターネット接続が必要です（表計算ライブラリを読み込むため）。CSVとバックアップはオフラインでも使えます。</p></div>' +
-    '<div class="card"><h2>自動バックアップ（このブラウザ内）</h2><p class="small muted">5分ごと・大きな操作の前に自動で控えを残します（最新15件）。間違えて消したときはここから戻せます。</p>' +
-    (snaps.length ? '<div class="tablewrap"><table class="t"><thead><tr><th>日時</th><th>きっかけ</th><th class="num">個人</th><th></th></tr></thead><tbody>' +
-      snaps.map((s, i) => '<tr><td>' + fmtDT(s.t) + '</td><td>' + esc(s.label) + '</td><td class="num">' + (s.n || 0) + '</td><td><button class="btn sm" data-act="restoreSnap" data-i="' + i + '">この時点に戻す</button></td></tr>').join('') + '</tbody></table></div>' : '<p class="muted">まだありません。</p>') +
+    '<div class="card"><h2>自動バックアップ（このブラウザ内の控え）</h2><p class="small muted">5分ごと・大きな操作の前に自動で控えを残します（最新15件）。間違えて消したときはここから戻せます。不要な控えは選んで削除できます。</p>' +
+    (snaps.length ? '<div class="bar"><label class="small"><input type="checkbox" data-k="ui:snapAll" ' + (snaps.length && snaps.every((x, i) => (ui.snapSel || []).indexOf(x.t) >= 0) ? 'checked' : '') + '> すべて選ぶ</label><span class="grow"></span><button class="btn sm danger" data-act="delSnaps" ' + ((ui.snapSel || []).length ? '' : 'disabled') + '>選んだ控えを削除（' + (ui.snapSel || []).filter(t => snaps.some(x => x.t === t)).length + '件）</button></div>' +
+      '<div class="tablewrap" style="max-height:300px"><table class="t"><thead><tr><th></th><th>日時</th><th>きっかけ</th><th class="num">個人</th><th class="num">大きさ</th><th></th></tr></thead><tbody>' +
+      snaps.map((s2, i) => '<tr><td><input type="checkbox" data-k="snap:' + s2.t + '" ' + ((ui.snapSel || []).indexOf(s2.t) >= 0 ? 'checked' : '') + ' aria-label="この控えを選ぶ"></td><td style="white-space:nowrap">' + fmtDT(s2.t) + '</td><td>' + esc(s2.label) + '</td><td class="num">' + (s2.n || 0) + '</td><td class="num">' + Math.max(1, Math.round((s2.data || '').length / 1024)) + ' KB</td><td><button class="btn sm" data-act="restoreSnap" data-i="' + i + '">この時点に戻す</button></td></tr>').join('') + '</tbody></table></div>' : '<p class="muted">まだありません。</p>') +
     '<div class="bar" style="margin-top:8px"><button class="btn sm" data-act="snapNow">今の状態を控えておく</button></div></div>' +
     '<div class="card"><h2>そのほか</h2><div class="bar"><button class="btn" data-act="sample">サンプルデータを読み込む</button><button class="btn danger" data-act="clearResults">記録（公式タイム・判定）だけ消す</button><button class="btn danger" data-act="resetAll">すべて消して最初から</button></div>' +
     '<p class="small muted">使用容量: 約 ' + Math.round(used / 1024) + ' KB（ブラウザの上限はおよそ5,000 KB）</p>' +
     '<h3>同じデータを複数のパソコンで使うとき</h3><p class="small">片方で「バックアップを書き出す」→ もう片方で「バックアップから復元」。同じパソコンで2つのタブを開いて編集すると、あとの保存で前の内容が上書きされるため、1つのタブで作業してください（別タブで変更があると自動で読み込み直します）。</p>' +
     '<h3>キーボード</h3><p class="small"><span class="kbd">Ctrl</span>+<span class="kbd">Z</span> 元に戻す　<span class="kbd">Ctrl</span>+<span class="kbd">Y</span> やり直し（入力欄の外で）　<span class="kbd">Enter</span> 記録入力で次のレーンへ</p></div>' +
     '</div>';
+};
+
+/* ---------------------------------------------------------------- 印刷まとめ（すべての印刷物・プレビュー・選んで結合印刷） */
+function hubAll() {
+  const opts = programOptions();
+  const S = state.settings;
+  const docs = [docSchedule()];
+  opts.forEach(n => { const d = docProgram(n); if (d.pages) docs.push(d); });
+  opts.forEach(n => { const d = docFlash(n); if (d.pages && d.done) docs.push(d); });
+  S.events.filter(Boolean).forEach(ev => { const d = docRanking(ev, ''); if (d.n) docs.push(d); });
+  if (D.aw.sum.entered) docs.push(docAwards());
+  [['record', 'ind'], ['record', 'rel'], ['prize', 'ind'], ['prize', 'rel']].forEach(([k, t]) => { const d = docCerts(k, t, {}); if (d.pages) docs.push(d); });
+  return docs;
+}
+function hubDocsForPreview() {
+  const all = hubAll(), sel = new Set(ui.hubSel || []);
+  if (ui.hubFocus) { const f = all.find(d => d.key === ui.hubFocus); if (f) return [f]; }
+  return all.filter(d => sel.has(d.key));
+}
+VIEWS.prints = () => {
+  const all = hubAll(), sel = new Set(ui.hubSel || []);
+  const chosen = all.filter(d => sel.has(d.key)), pages = chosen.reduce((a, d) => a + d.pages, 0);
+  const groups = [];
+  all.forEach(d => { let g = groups.find(x => x.name === d.group); if (!g) groups.push(g = { name: d.group, docs: [] }); g.docs.push(d); });
+  const focusName = ui.hubFocus && all.find(d => d.key === ui.hubFocus);
+  return '<div class="vhead"><div><h1 class="view">印刷まとめ</h1><p class="lead">大会で使う印刷物をすべて並べています。チェックを入れたものを、上から順に1つの印刷にまとめて出せます。「見る」を押すと、その印刷物だけを右のプレビューで確認できます。</p></div></div>' +
+    '<div class="bar hubbar"><span class="pill ' + (chosen.length ? 'info' : 'mute') + '">選択 ' + chosen.length + '件・A4 ' + pages + '枚</span>' +
+    '<button class="btn sm" data-act="hubPick" data-v="progs">全種目のプログラム</button><button class="btn sm" data-act="hubPick" data-v="flashes">記録のある速報すべて</button><button class="btn sm" data-act="hubPick" data-v="ranks">ランキングすべて</button><button class="btn sm" data-act="hubPick" data-v="none" ' + (chosen.length ? '' : 'disabled') + '>選択を外す</button>' +
+    '<span class="grow"></span><button class="btn primary" data-act="hubPrint" ' + (pages ? '' : 'disabled') + '>' + icon('print', 'ic sm') + '選んだものをまとめて印刷</button></div>' +
+    (focusName ? '<div class="notice info"><span class="grow">プレビュー: <b>' + esc(focusName.group + '　' + focusName.title) + '</b> を表示中</span><button class="btn sm" data-act="hubFocus" data-v="">選んだもののプレビューに戻す</button></div>' : '') +
+    '<div class="hubgrid fill" data-fill-id="hub">' + groups.map(g => '<div class="card"><h2>' + esc(g.name) + ' <span class="muted small">' + g.docs.length + '件</span></h2>' +
+      g.docs.map(d => '<div class="hubrow ' + (ui.hubFocus === d.key ? 'focus' : '') + '"><label><input type="checkbox" data-k="hub:' + esc(d.key) + '" ' + (sel.has(d.key) ? 'checked' : '') + '><span class="hubtx"><span class="hubt">' + esc(d.title) + '</span><span class="hubm">' + (d.sub ? esc(d.sub) + '・' : '') + 'A4 ' + d.pages + '枚</span></span></label><button class="btn sm" data-act="hubFocus" data-v="' + esc(d.key) + '">見る</button></div>').join('') + '</div>').join('') + '</div>';
 };
 
 /* ---------------------------------------------------------------- 値の変更 */
@@ -2453,7 +2540,10 @@ function handleValue(el) {
   if (!k) return;
   const val = el.type === 'checkbox' ? el.checked : el.value;
   const [kind, ...rest] = k.split(':');
+  if (kind === 'ui' && rest[0] === 'snapAll') { ui.snapSel = val ? getSnaps().map(x => x.t) : []; render(); return; }
   if (kind === 'ui') { setUI(rest[0], val); return; }
+  if (kind === 'hub') { const k = rest.join(':'); ui.hubSel = (ui.hubSel || []).filter(x => x !== k); if (val) ui.hubSel.push(k); ui.hubFocus = ''; render(); return; }
+  if (kind === 'snap') { const t = +rest[0]; ui.snapSel = (ui.snapSel || []).filter(x => x !== t); if (val) ui.snapSel.push(t); render(); return; }
   if (kind === 'cf') { ui.certFilter = Object.assign({}, ui.certFilter, { [rest[0]]: val }); ui.certFrom = 1; ui.certTo = ''; render(); return; }
   if (kind === 'set') {
     const path = rest.join(':');
@@ -2673,6 +2763,16 @@ const ACTIONS = {
     confirmBox('表彰の入力データを消しますか？', '<p>入力済みの記録 <b>' + n + '件</b>（クラブ・選手名・タイム）をすべて消去します。マスタ設定（区分・種目・基準タイム）はそのまま残ります。</p>', '消去する', () => { commit('表彰入力のクリア', s => { s.award.inputs = {}; }, { allowLocked: true, snap: '表彰入力クリア前' }); toast('入力データ ' + n + '件をクリアしました', null, 7000, { label: '元に戻す', fn: undo }); }, { danger: true });
   },
   pasteEntries: () => openPaste(),
+  hubFocus: t => { ui.hubFocus = t.dataset.v; if (!previewOn()) { navPref.pv = true; saveNavPref(); } render(); },
+  hubPick: t => {
+    const all = hubAll(), v = t.dataset.v, set = new Set(ui.hubSel || []);
+    if (v === 'none') set.clear();
+    else all.filter(d => d.key.indexOf(v === 'progs' ? 'prog:' : v === 'flashes' ? 'flash:' : 'rank:') === 0).forEach(d => set.add(d.key));
+    ui.hubSel = [...set]; ui.hubFocus = ''; render();
+  },
+  hubPrint: () => { const sel = new Set(ui.hubSel || []); printDocs(hubAll().filter(d => sel.has(d.key)), '選んだ印刷物をまとめて印刷します'); },
+  pvToggle: () => { navPref.pv = !previewOn(); saveNavPref(); render(); },
+  pvPrint: () => { const d = viewDocs(); printDocs(d, view === 'prints' ? '選んだ印刷物をまとめて印刷します' : '印刷します'); },
   entryForm: () => openEntryFormMaker(),
   printSched: () => printSchedule(),
   printProg: t => printProgram(t.dataset.all === '1'),
@@ -2682,6 +2782,14 @@ const ACTIONS = {
   printAwards: () => printAwards(),
   exportXlsx: () => exportXlsx(),
   exportCsv: () => exportCsv(),
+  delSnaps: () => {
+    const sel = new Set(ui.snapSel || []), sn = getSnaps(), del = sn.filter(x => sel.has(x.t));
+    if (!del.length) return;
+    confirmBox('控えを削除しますか？', '<p>選んだ自動バックアップ <b>' + del.length + '件</b>（' + esc(del.map(x => fmtDT(x.t)).join('、')) + '）を削除します。削除した控えには戻せなくなります。</p><p class="small muted">今のデータ（エントリー・記録・設定）は消えません。ファイルに書き出したバックアップも消えません。</p>', '削除する', () => {
+      try { lsSet(SNAP_KEY, JSON.stringify(sn.filter(x => !sel.has(x.t)))); ui.snapSel = []; render(); toast(del.length + '件の控えを削除しました'); }
+      catch (e) { toast('削除できませんでした: ' + e.message, 'err'); }
+    }, { danger: true });
+  },
   snapNow: () => { snapshot('手動で控え', true); render(); toast('今の状態を控えました'); },
   restoreSnap: t => {
     const s = getSnaps()[+t.dataset.i];
@@ -2741,15 +2849,11 @@ function openPaste() {
   });
 }
 
-/* ---------------------------------------------------------------- 印刷（すべて A4 縦・1枚に収める） */
-function doPrint(html, pageCss) {
-  $('#print-root').innerHTML = html;
-  $('#page-style').textContent = '@page { ' + pageCss + ' }';
-  setTimeout(() => { try { window.print(); } catch (e) { toast('印刷を開始できませんでした: ' + e.message, 'err'); } }, 60);
-}
+/* ---------------------------------------------------------------- 印刷物（すべて A4 縦。1件＝1枚、証書は1人1枚）
+ *  各画面の印刷・常時プレビュー・印刷まとめ（結合印刷）は、すべて下の doc*() で作った同じページを使う */
 window.addEventListener('afterprint', () => { $('#print-root').innerHTML = ''; });
 const pnow = () => { const d = new Date(); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
-// 1ページ分の枠: 見出し（大会名・題名・補足）＋本文＋フッター
+const nm2 = n => String(n || '').split('　').slice(0, 2).join('　');
 function pPage(title, sub, body, label) {
   return '<section class="pg"><header class="pg-h"><img class="pg-logo" src="' + APP_ICON + '" alt=""><div><div class="pg-meet">' + esc(state.settings.meetName) + '</div>' +
     '<div class="pg-title">' + esc(title) + '</div>' + (sub ? '<div class="pg-sub">' + sub + '</div>' : '') + '</div></header>' +
@@ -2758,19 +2862,17 @@ function pPage(title, sub, body, label) {
 }
 const medalCls = r => r === 1 ? 'm1' : r === 2 ? 'm2' : r === 3 ? 'm3' : '';
 const rankNum = s => { const m = String(s || '').match(/^(\d+)/); return m ? +m[1] : 0; };
-// 本文が1ページに入りきらなければ、2段組み → 縮小 の順で必ず1ページに収める
-function fitPages() {
-  const root = $('#print-root');
+// 本文が1枚に入りきらなければ、2段組み → 縮小 の順で必ず1枚に収める（container は .pgroot で、測るあいだ実寸で置く）
+function fitPages(root) {
   root.classList.add('measure');
   root.querySelectorAll('.pg').forEach(pg => {
     const b = pg.querySelector('.pg-b'), z = pg.querySelector('.pg-z');
-    const avail = b.clientHeight;
+    const avail = b.clientHeight * 0.97;
     const h = () => z.getBoundingClientRect().height;
     z.style.zoom = 1;
     const h1 = h();
     if (h1 <= avail) return;
-    // 少し縮めれば入るなら1段のまま（読みやすさ優先）。大きくはみ出すときだけ2段組みを試し、文字が大きく残る方を選ぶ
-    if (avail / h1 < 0.75) {
+    if (avail / h1 < 0.75) {           // 少し縮めれば入るなら1段のまま。大きくはみ出すときだけ2段組みを試し、文字が大きく残る方を選ぶ
       const t = z.querySelector('table.split');
       let undo = null;
       if (t && t.tBodies[0] && t.tBodies[0].rows.length > 10) {
@@ -2787,84 +2889,158 @@ function fitPages() {
     for (let i = 0; i < 4; i++) {
       const cur = h();
       if (cur <= avail) break;
-      const zz = (parseFloat(z.style.zoom) || 1) * (avail / cur) * 0.985;
-      z.style.zoom = Math.max(0.3, zz);
+      z.style.zoom = Math.max(0.3, (parseFloat(z.style.zoom) || 1) * (avail / cur) * 0.985);
     }
   });
   root.classList.remove('measure');
 }
-function doPrintPages(html, msg) {
-  $('#print-root').innerHTML = html;
-  $('#page-style').textContent = '@page { size: A4 portrait; margin: 10mm }';
-  fitPages();
-  setTimeout(() => { try { window.print(); } catch (e) { toast('印刷を開始できませんでした: ' + e.message, 'err'); } }, 80);
-  if (msg) toast(msg);
-}
-function printSchedule() {
+// ---- 印刷物の部品（{key, title, group, pages, html()}）
+function docSchedule() {
   const S = state.settings, sc = S.schedule;
-  const info = [['入館開始', sc.doorOpen], ['W-up', sc.warmup], ['開会式', sc.opening], ['競技開始', sc.start], ['競技終了', D.sched.end !== null ? C.fmtClock(D.sched.end) : ''], ['閉会式', sc.closing], ['最終退館', sc.exit]];
-  const body = '<div class="pinfo">' + info.map(([k, v]) => '<div><span>' + k + '</span><b>' + esc(v) + '</b></div>').join('') + '</div>' +
-    '<table class="pp split"><thead><tr><th class="c">No</th><th>種目</th><th class="c">参加</th><th class="c">組</th><th class="c">開始</th><th class="c">終了</th></tr></thead><tbody>' +
-    D.sched.rows.filter(o => o.name).map(o => '<tr class="' + (o.isBreak ? 'brk' : '') + '"><td class="c">' + o.no + '</td><td class="nm">' + esc(o.name) + '</td><td class="c">' + (o.n === undefined ? '' : o.n) + '</td><td class="c">' + (o.heats === undefined ? '' : o.heats) + '</td><td class="c tm">' + (o.start !== undefined && o.start !== null ? C.fmtClock(o.start) : '') + '</td><td class="c tm sm">' + (o.end !== undefined && o.end !== null ? C.fmtClock(o.end) : '') + '</td></tr>').join('') + '</tbody></table>';
-  doPrintPages(pPage(sc.title || '競技進行スケジュール', '', body), 'スケジュールをA4 1枚で印刷します');
+  return { key: 'sched', group: '進行', title: sc.title || '競技進行スケジュール', pages: 1, html() {
+    const info = [['入館開始', sc.doorOpen], ['W-up', sc.warmup], ['開会式', sc.opening], ['競技開始', sc.start], ['競技終了', D.sched.end !== null ? C.fmtClock(D.sched.end) : ''], ['閉会式', sc.closing], ['最終退館', sc.exit]];
+    const body = '<div class="pinfo">' + info.map(([k, v]) => '<div><span>' + k + '</span><b>' + esc(v) + '</b></div>').join('') + '</div>' +
+      '<table class="pp split"><thead><tr><th class="c">No</th><th>種目</th><th class="c">参加</th><th class="c">組</th><th class="c">開始</th><th class="c">終了</th></tr></thead><tbody>' +
+      D.sched.rows.filter(o => o.name).map(o => '<tr class="' + (o.isBreak ? 'brk' : '') + '"><td class="c">' + o.no + '</td><td class="nm">' + esc(o.name) + '</td><td class="c">' + (o.n === undefined ? '' : o.n) + '</td><td class="c">' + (o.heats === undefined ? '' : o.heats) + '</td><td class="c tm">' + (o.start !== undefined && o.start !== null ? C.fmtClock(o.start) : '') + '</td><td class="c tm sm">' + (o.end !== undefined && o.end !== null ? C.fmtClock(o.end) : '') + '</td></tr>').join('') + '</tbody></table>';
+    return pPage(this.title, '', body);
+  } };
 }
-function programPage(name) {
-  const p = programData(name), lanes = C.laneList(state.settings).slice().sort((a, b) => a - b);
-  const anyRes = p.items.some(it => it.status !== '未入力');
-  const sub = (p.sch ? '競技No.' + p.sch.no + '　' : '') + (p.sch && p.sch.start !== null ? '開始予定 ' + C.fmtClock(p.sch.start) + '　' : '') + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組';
-  const body = p.heats.map(hh => {
-    const byLane = new Map(hh.items.map(it => [it.lane, it]));
-    return '<div class="blk"><div class="blk-h">第 ' + hh.heat + ' 組</div><table class="pp"><thead><tr><th class="c">レーン</th><th>' + (p.relay ? 'チーム' : '氏名') + '</th><th>' + (p.relay ? '泳者' : 'クラブ') + '</th><th>区分</th>' + (anyRes ? '<th class="c">記録</th><th class="c">順位</th>' : '') + '</tr></thead><tbody>' +
-      lanes.map(ln => {
-        const it = byLane.get(ln);
-        return '<tr class="' + (it && anyRes ? medalCls(it.rank) : '') + '"><td class="c"><span class="lane-c">' + ln + '</span></td><td class="nm">' + (it ? esc(p.relay ? it.teamDisp : it.name.split('　').slice(0, 2).join('　')) : '') + (it && !p.relay && it.name.split('　').length > 2 ? '<div class="kana">' + esc(it.name.split('　').slice(2).join('　')) + '</div>' : '') + '</td>' +
-          '<td class="sm">' + (it ? esc(p.relay ? it.memberText : it.club) : '') + '</td><td class="sm">' + (it ? esc(it.cat) : '') + '</td>' +
-          (anyRes ? '<td class="tm">' + (it ? esc(it.flashTime) : '') + '</td><td class="rk">' + (it ? esc(it.flashRank) : '') + '</td>' : '') + '</tr>';
-      }).join('') + '</tbody></table></div>';
-  }).join('');
-  return pPage(name, sub, body || '<p>エントリーはありません。</p>', (anyRes ? '速報' : '大会プログラム') + '　' + name);
+function docProgram(name) {
+  const p = programData(name), anyRes = p.items.some(it => it.status !== '未入力');
+  return { key: 'prog:' + name, group: 'プログラム', title: (p.sch ? 'No.' + p.sch.no + ' ' : '') + name, pages: p.items.length ? 1 : 0, sub: p.items.length + (p.relay ? 'チーム' : '名'), html() {
+    const lanes = C.laneList(state.settings).slice().sort((a, b) => a - b);
+    const sub = (p.sch ? '競技No.' + p.sch.no + '　' : '') + (p.sch && p.sch.start !== null ? '開始予定 ' + C.fmtClock(p.sch.start) + '　' : '') + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組';
+    const body = p.heats.map(hh => {
+      const byLane = new Map(hh.items.map(it => [it.lane, it]));
+      return '<div class="blk"><div class="blk-h">第 ' + hh.heat + ' 組</div><table class="pp"><thead><tr><th class="c">レーン</th><th>' + (p.relay ? 'チーム' : '氏名') + '</th><th>' + (p.relay ? '泳者' : 'クラブ') + '</th><th>区分</th>' + (anyRes ? '<th class="c">記録</th><th class="c">順位</th>' : '') + '</tr></thead><tbody>' +
+        lanes.map(ln => {
+          const it = byLane.get(ln);
+          return '<tr class="' + (it && anyRes ? medalCls(it.rank) : '') + '"><td class="c"><span class="lane-c">' + ln + '</span></td><td class="nm">' + (it ? esc(p.relay ? it.teamDisp : nm2(it.name)) : '') + (it && !p.relay && it.name.split('　').length > 2 ? '<div class="kana">' + esc(it.name.split('　').slice(2).join('　')) + '</div>' : '') + '</td>' +
+            '<td class="sm">' + (it ? esc(p.relay ? it.memberText : it.club) : '') + '</td><td class="sm">' + (it ? esc(it.cat) : '') + '</td>' +
+            (anyRes ? '<td class="tm">' + (it ? esc(it.flashTime) : '') + '</td><td class="rk">' + (it ? esc(it.flashRank) : '') + '</td>' : '') + '</tr>';
+        }).join('') + '</tbody></table></div>';
+    }).join('');
+    return pPage(name, sub, body || '<p>エントリーはありません。</p>', (anyRes ? '速報' : '大会プログラム') + '　' + name);
+  } };
 }
+function docFlash(name) {
+  const list = C.flashList(state, D.ind, D.rel, name), relay = C.isRelayName(name);
+  const done = list.filter(x => x.it.status !== '未入力').length;
+  return { key: 'flash:' + name, group: '速報', title: name, pages: list.length ? 1 : 0, sub: done + '/' + list.length + ' 入力済み', done, html() {
+    const sch = D.sched.rows.find(r => r.name === name), groups = [];
+    list.forEach(x => { const g = groups[groups.length - 1]; if (g && g.cat === x.it.cat) g.rows.push(x); else groups.push({ cat: x.it.cat, rows: [x] }); });
+    const body = groups.map(g => '<div class="blk"><div class="blk-h">' + esc(g.cat) + '</div><table class="pp"><thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ') + '</th><th class="c">記録</th></tr></thead><tbody>' +
+      g.rows.map(x => '<tr class="' + medalCls(rankNum(x.rank)) + '"><td class="rk">' + esc(x.rank) + '</td><td class="nm">' + esc(relay ? x.name : nm2(x.name)) + '</td><td class="sm">' + esc(x.club) + (x.cat !== x.it.cat ? '<div class="kana">' + esc(x.cat) + '</div>' : '') + '</td><td class="tm">' + esc(x.time) + '</td></tr>').join('') + '</tbody></table></div>').join('');
+    return pPage('【速報】' + name, (sch ? '競技No.' + sch.no + '　' : '') + list.length + (relay ? 'チーム' : '名'), body);
+  } };
+}
+function docRanking(ev, cat) {
+  const S = state.settings, relay = C.isRelayName(ev), src = relay ? D.rel : D.ind;
+  const cats = cat ? [cat] : S.categories.filter(c => src.some(it => it.event === ev && it.cat === c));
+  const n = src.filter(it => it.event === ev && it.rank).length;
+  return { key: 'rank:' + ev + (cat ? '|' + cat : ''), group: 'ランキング', title: ev + (cat ? '　' + cat : ''), pages: 1, sub: n + '件の記録', n, html() {
+    const body = cats.map(c => {
+      const list = src.filter(it => it.event === ev && it.cat === c && it.rank).sort((a, b) => a.rankOrder - b.rankOrder);
+      return '<div class="blk"><div class="blk-h">' + esc(c) + '</div><table class="pp"><thead><tr><th class="c">順位</th><th>' + (relay ? 'チーム' : '氏名') + '</th><th>' + (relay ? '泳者' : 'クラブ') + '</th><th class="c">記録</th></tr></thead><tbody>' +
+        (list.length ? list.map(it => '<tr class="' + medalCls(it.rank) + '"><td class="rk">' + it.rank + '</td><td class="nm">' + esc(relay ? it.teamDisp : nm2(it.name)) + '</td><td class="sm">' + esc(relay ? it.memberText : it.club) + '</td><td class="tm">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="4" class="sm">記録がまだありません</td></tr>') + '</tbody></table></div>';
+    }).join('');
+    return pPage('公式' + (relay ? 'リレー' : '') + 'ランキング　' + ev, cat || '', body || '<p>記録がありません。</p>');
+  } };
+}
+function docAwards() {
+  const R = D.aw, rate = r => r === null || r === undefined ? '' : (r * 100).toFixed(2) + '%';
+  return { key: 'awards', group: '表彰', title: '最優秀選手・優秀選手', pages: 1, sub: R.sum.entered + '件の記録', html() {
+    const body = '<div class="mvp-p">' + R.mvp.map(o => '<div><span>最優秀選手（' + o.sexName + '）</span><b>' + esc(o.kind === 'ok' ? o.name : '該当なし') + '</b>' +
+        (o.kind === 'ok' ? '<em>' + esc(o.catName) + '・' + esc(o.club) + '・' + esc(o.event) + '　達成率 ' + rate(o.rate) + '</em>' : '') + '</div>').join('') + '</div>' +
+      '<div class="blk"><div class="blk-h">優秀選手</div><table class="pp"><thead><tr><th>年齢区分</th><th class="c">性別</th><th>選手名</th><th>クラブ</th><th>種目</th><th class="c">達成率</th><th>備考</th></tr></thead><tbody>' +
+      R.exc.filter(o => o.kind !== 'off').map(o => '<tr><td class="nm">' + esc(o.catName) + '</td><td class="c">' + o.sexName + '</td><td class="nm">' + esc(o.name || '—') + '</td><td class="sm">' + esc(o.club || '') + '</td><td class="sm">' + esc(o.event || '') + '</td><td class="tm">' + rate(o.rate) + '</td><td class="sm">' + esc(o.kind === 'up' ? '2位繰り上げ' : o.kind === 'ok' ? '' : o.status) + '</td></tr>').join('') + '</tbody></table></div>';
+    return pPage(this.title, '選出範囲: ' + esc(R.master.cond), body);
+  } };
+}
+function docCerts(kind, target, filter, from, to) {
+  const relay = target === 'rel', prize = kind === 'prize';
+  const list = C.certTargets(state, relay ? D.rel : D.ind, relay, filter || {}, prize);
+  const a = Math.max(1, from || 1), b = Math.min(list.length, to || list.length), pick = list.slice(a - 1, b);
+  return { key: 'cert:' + kind + ':' + target, group: '記録証・賞状', title: (prize ? '賞状' : '記録証') + '（' + (relay ? 'リレー' : '個人') + '）', pages: pick.length, sub: '1人1枚', html(limit) { return (limit ? pick.slice(0, limit) : pick).map(it => certHTML(it, relay, prize, 'A4')).join(''); } };
+}
+// いま開いている画面の印刷物
+function viewDocs() {
+  if (view === 'schedule') return [docSchedule()];
+  if (view === 'program') return ui.prog ? [docProgram(ui.prog)] : [];
+  if (view === 'flash') return ui.flash ? [docFlash(ui.flash)] : [];
+  if (view === 'ranking') return ui.rankEv ? [docRanking(ui.rankEv, ui.rankCat || '')] : [];
+  if (view === 'awards') return [docAwards()];
+  if (view === 'certs') return [docCerts(ui.certKind, ui.certTarget, ui.certFilter, parseInt(ui.certFrom, 10) || 1, parseInt(ui.certTo, 10) || 0)];
+  if (view === 'prints') return hubDocsForPreview();
+  return [];
+}
+function printDocs(docs, msg) {
+  docs = docs.filter(d => d && d.pages);
+  if (!docs.length) { toast('印刷するものがありません', 'err'); return; }
+  const root = $('#print-root');
+  root.innerHTML = docs.map(d => d.html()).join('');
+  $('#page-style').textContent = '@page { size: A4 portrait; margin: 0 }';
+  fitPages(root);
+  setTimeout(() => { try { window.print(); } catch (e) { toast('印刷を開始できませんでした: ' + e.message, 'err'); } }, 80);
+  const pages = docs.reduce((a, d) => a + d.pages, 0);
+  toast((msg || '印刷します') + '（A4 縦・' + pages + '枚）');
+}
+function printSchedule() { printDocs([docSchedule()], 'スケジュールを印刷します'); }
 function printProgram(all) {
   const names = all ? programOptions().filter(n => programData(n).items.length) : [ui.prog];
-  if (!names.length || !names[0]) { toast('印刷する種目がありません', 'err'); return; }
-  doPrintPages(names.map(programPage).join(''), all ? names.length + '種目を、1種目ずつA4 1枚で印刷します' : 'この種目をA4 1枚で印刷します');
+  printDocs(names.map(docProgram), all ? names.length + '種目のプログラムを、1種目1枚で印刷します' : 'この種目を印刷します');
 }
-function printFlash() {
-  const list = C.flashList(state, D.ind, D.rel, ui.flash), relay = C.isRelayName(ui.flash);
-  if (!list.length) { toast('この種目のエントリーはありません', 'err'); return; }
-  const sch = D.sched.rows.find(r => r.name === ui.flash);
-  const groups = [];
-  list.forEach(x => { const g = groups[groups.length - 1]; if (g && g.cat === x.it.cat) g.rows.push(x); else groups.push({ cat: x.it.cat, rows: [x] }); });
-  const body = groups.map(g => '<div class="blk"><div class="blk-h">' + esc(g.cat) + '</div><table class="pp"><thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ') + '</th><th class="c">記録</th></tr></thead><tbody>' +
-    g.rows.map(x => '<tr class="' + medalCls(rankNum(x.rank)) + '"><td class="rk">' + esc(x.rank) + '</td><td class="nm">' + esc(relay ? x.name : x.name.split('　').slice(0, 2).join('　')) + '</td><td class="sm">' + esc(x.club) + (x.cat !== x.it.cat ? '<div class="kana">' + esc(x.cat) + '</div>' : '') + '</td><td class="tm">' + esc(x.time) + '</td></tr>').join('') + '</tbody></table></div>').join('');
-  doPrintPages(pPage('【速報】' + ui.flash, (sch ? '競技No.' + sch.no + '　' : '') + list.length + (relay ? 'チーム' : '名'), body), '速報をA4 1枚で印刷します');
-}
-function printRanking() {
-  const S = state.settings, relay = C.isRelayName(ui.rankEv), src = relay ? D.rel : D.ind;
-  const cats = ui.rankCat ? [ui.rankCat] : S.categories.filter(c => src.some(it => it.event === ui.rankEv && it.cat === c));
-  const body = cats.map(c => {
-    const list = src.filter(it => it.event === ui.rankEv && it.cat === c && it.rank).sort((a, b) => a.rankOrder - b.rankOrder);
-    return '<div class="blk"><div class="blk-h">' + esc(c) + '</div><table class="pp"><thead><tr><th class="c">順位</th><th>' + (relay ? 'チーム' : '氏名') + '</th><th>' + (relay ? '泳者' : 'クラブ') + '</th><th class="c">記録</th></tr></thead><tbody>' +
-      (list.length ? list.map(it => '<tr class="' + medalCls(it.rank) + '"><td class="rk">' + it.rank + '</td><td class="nm">' + esc(relay ? it.teamDisp : it.name.split('　').slice(0, 2).join('　')) + '</td><td class="sm">' + esc(relay ? it.memberText : it.club) + '</td><td class="tm">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="4" class="sm">記録がまだありません</td></tr>') + '</tbody></table></div>';
-  }).join('');
-  doPrintPages(pPage('公式' + (relay ? 'リレー' : '') + 'ランキング　' + ui.rankEv, '', body || '<p>記録がありません。</p>'), 'ランキングをA4 1枚で印刷します');
-}
+function printFlash() { printDocs([docFlash(ui.flash)], '速報を印刷します'); }
+function printRanking() { printDocs([docRanking(ui.rankEv, ui.rankCat || '')], 'ランキングを印刷します'); }
+function printAwards() { printDocs([docAwards()], '表彰ボードを印刷します'); }
 function printCerts(test) {
-  const list = certList(), relay = ui.certTarget === 'rel', prize = ui.certKind === 'prize';
-  const from = Math.max(1, parseInt(ui.certFrom, 10) || 1), to = Math.min(list.length, parseInt(ui.certTo, 10) || list.length);
-  const pick = test ? [list[from - 1]] : list.slice(from - 1, to);
-  if (!pick.length || !pick[0]) { toast('印刷する証書がありません', 'err'); return; }
-  ui.certPaper = 'A4';
-  doPrint(pick.map(it => certHTML(it, relay, prize, 'A4')).join(''), 'size: A4 portrait; margin: 0');
-  toast((test ? 'テスト印刷: ' : '') + pick.length + '枚を印刷に送りました（A4 縦・1人1枚）');
+  const from = Math.max(1, parseInt(ui.certFrom, 10) || 1);
+  const d = docCerts(ui.certKind, ui.certTarget, ui.certFilter, from, test ? from : (parseInt(ui.certTo, 10) || 0));
+  printDocs([d], test ? 'テスト印刷: 1枚' : '証書を印刷します');
 }
-function printAwards() {
-  const R = D.aw, rate = r => r === null || r === undefined ? '' : (r * 100).toFixed(2) + '%';
-  const body = '<div class="mvp-p">' + R.mvp.map(o => '<div><span>最優秀選手（' + o.sexName + '）</span><b>' + esc(o.kind === 'ok' ? o.name : '該当なし') + '</b>' +
-      (o.kind === 'ok' ? '<em>' + esc(o.catName) + '・' + esc(o.club) + '・' + esc(o.event) + '　達成率 ' + rate(o.rate) + '</em>' : '') + '</div>').join('') + '</div>' +
-    '<div class="blk"><div class="blk-h">優秀選手</div><table class="pp"><thead><tr><th>年齢区分</th><th class="c">性別</th><th>選手名</th><th>クラブ</th><th>種目</th><th class="c">達成率</th><th>備考</th></tr></thead><tbody>' +
-    R.exc.filter(o => o.kind !== 'off').map(o => '<tr><td class="nm">' + esc(o.catName) + '</td><td class="c">' + o.sexName + '</td><td class="nm">' + esc(o.name || '—') + '</td><td class="sm">' + esc(o.club || '') + '</td><td class="sm">' + esc(o.event || '') + '</td><td class="tm">' + rate(o.rate) + '</td><td class="sm">' + esc(o.kind === 'up' ? '2位繰り上げ' : o.kind === 'ok' ? '' : o.status) + '</td></tr>').join('') + '</tbody></table></div>';
-  doPrintPages(pPage('最優秀選手・優秀選手', '選出範囲: ' + esc(R.master.cond), body), '表彰ボードをA4 1枚で印刷します');
+
+// ---------------------------------------------------------------- 印刷プレビュー（各印刷画面の右側。表示・非表示を切り替えられる）
+const PV_VIEWS = ['schedule', 'program', 'flash', 'ranking', 'certs', 'awards', 'prints'];
+const PV_MAX = 24;
+let pvTimer = 0;
+function previewOn() { return navPref.pv !== false; }
+function pvShell(inner) {
+  if (!PV_VIEWS.includes(view)) return inner;
+  if (!previewOn()) return inner;
+  return '<div class="withpv"><div class="pv-main">' + inner + '</div><aside class="pv card" aria-label="印刷プレビュー"><div class="pv-head"><b>印刷プレビュー</b><span class="muted small" id="pv-count"></span><span class="grow"></span>' +
+    '<button class="btn sm primary" data-act="pvPrint">印刷</button><button class="iconbtn sm" data-act="pvToggle" title="プレビューを隠す" aria-label="プレビューを隠す">' + icon('close') + '</button></div><div class="pv-body fill" data-fill-id="pv" id="pv-body"><div class="empty small">作成中…</div></div></aside></div>';
+}
+function schedulePreview() {
+  clearTimeout(pvTimer);
+  if (!PV_VIEWS.includes(view) || !previewOn() || !$('#pv-body')) return;
+  pvTimer = setTimeout(buildPreview, 120);
+}
+function buildPreview() {
+  const body = $('#pv-body');
+  if (!body) return;
+  const docs = viewDocs().filter(d => d && d.pages);
+  const total = docs.reduce((a, d) => a + d.pages, 0);
+  const cnt = $('#pv-count'); if (cnt) cnt.textContent = total ? 'A4 縦・' + total + '枚' : '';
+  if (!total) { body.innerHTML = '<div class="empty small">印刷するものがありません。</div>'; return; }
+  const tmp = document.createElement('div'); tmp.className = 'pgroot';
+  let left = PV_MAX, html = '';
+  docs.forEach(d => { if (left <= 0) return; const n = Math.min(left, d.pages); html += d.html(n); left -= n; });
+  tmp.innerHTML = html;
+  document.body.appendChild(tmp);
+  fitPages(tmp);
+  const sheets = [...tmp.children];
+  body.innerHTML = '';
+  sheets.forEach((el, i) => {
+    const box = document.createElement('div'); box.className = 'sheetbox';
+    const sh = document.createElement('div'); sh.className = 'sheet pgroot';
+    sh.appendChild(el); box.appendChild(sh); body.appendChild(box);
+    const scale = box.clientWidth / sh.offsetWidth;
+    sh.style.transform = 'scale(' + scale + ')';
+    box.style.height = (sh.offsetHeight * scale) + 'px';
+    const no = document.createElement('div'); no.className = 'sheetno'; no.textContent = (i + 1) + ' / ' + total; box.appendChild(no);
+  });
+  if (total > sheets.length) { const m = document.createElement('div'); m.className = 'empty small'; m.textContent = 'ほか ' + (total - sheets.length) + '枚（プレビューは最初の' + PV_MAX + '枚まで。印刷ではすべて出ます）'; body.appendChild(m); }
+  tmp.remove();
 }
 
 /* ---------------------------------------------------------------- ファイル入出力 */
