@@ -210,16 +210,16 @@ h1.view { font: 700 24px/1.2 var(--font-display); letter-spacing: -.01em; margin
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 8px 16px; border-radius: 999px;
   border: 1px solid var(--glass-edge); background: var(--fill); cursor: pointer; white-space: nowrap; line-height: 1.25; font-weight: 500;
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 2px 8px var(--glass-shade); }
-.btn:hover { background: var(--fill-hover); }
+@media (hover: hover) { .btn:hover { background: var(--fill-hover); } }
 .btn.primary { background: var(--accent); border-color: transparent; color: var(--accent-ink); font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 16px color-mix(in srgb, var(--accent) 35%, transparent); }
-.btn.primary:hover { background: color-mix(in srgb, var(--accent) 88%, #fff); }
+@media (hover: hover) { .btn.primary:hover { background: color-mix(in srgb, var(--accent) 88%, #fff); } }
 .btn.tinted { background: var(--accent-soft); color: var(--accent); border-color: transparent; font-weight: 600; }
 .btn.danger { color: var(--err); }
 .btn.danger.solid { background: var(--err); color: #fff; border-color: transparent; }
 .btn.sm { min-height: 34px; padding: 5px 12px; font-size: 13px; }
 .btn[disabled] { opacity: .4; cursor: not-allowed; transform: none; }
 .iconbtn { border: 1px solid var(--hairline); background: var(--fill); border-radius: 50%; width: 38px; height: 38px; cursor: pointer; display: inline-grid; place-items: center; color: var(--ink); }
-.iconbtn:hover { background: var(--fill-hover); }
+@media (hover: hover) { .iconbtn:hover { background: var(--fill-hover); } }
 .iconbtn[disabled] { opacity: .35; cursor: not-allowed; }
 .card { border-radius: var(--r-lg); padding: 14px 16px; min-width: 0; }
 .card h2 { font: 650 17px/1.3 var(--font-display); margin: 0 0 12px; }
@@ -238,8 +238,8 @@ h1.view { font: 700 24px/1.2 var(--font-display); letter-spacing: -.01em; margin
 input[type=text], input[type=number], input[type=date], input:not([type]), select, textarea {
   border: 1px solid var(--hairline); background: var(--fill); border-radius: var(--r-sm); padding: 8px 12px; min-height: 40px; min-width: 0; width: 100%;
   transition: background .15s, border-color .15s; }
-input:hover, select:hover, textarea:hover { background: var(--fill-hover); }
-input:focus, select:focus, textarea:focus { background: var(--glass-strong); border-color: var(--accent); }
+@media (hover: hover) { input:hover, select:hover, textarea:hover { background-color: var(--fill-hover); } }
+input:focus, select:focus, textarea:focus { background-color: var(--glass-strong); border-color: var(--accent); }
 select { appearance: none; -webkit-appearance: none; padding-right: 30px;
   background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
   background-position: calc(100% - 16px) 52%, calc(100% - 11px) 52%; background-size: 5px 5px; background-repeat: no-repeat; }
@@ -277,14 +277,14 @@ table.t tr.flash td { animation: flash 1.8s ease-out; }
 table.t input, table.t select { min-height: 36px; padding: 5px 9px; font-size: 14px; border-radius: 10px; }
 table.t select { min-width: 104px; padding-right: 28px; }
 table.t tr.grp td { background: var(--accent-soft); font-weight: 700; color: var(--ink); }
-table.t tbody tr:hover td { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+@media (hover: hover) { table.t tbody tr:hover td { background: color-mix(in srgb, var(--accent) 6%, transparent); } }
 .tin { min-width: 92px; font-family: var(--font-num); }
 .tin.bad { border-color: var(--err); background: var(--err-soft); color: var(--err); }
 .tin.odd { border-color: var(--warn); background: var(--warn-soft); }
 .prev { display: block; font-size: 11px; color: var(--muted); font-family: var(--font-num); min-height: 1em; padding-left: 4px; }
 .prev.bad { color: var(--err); }
 .x { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 18px; width: 34px; height: 34px; border-radius: 50%; display: inline-grid; place-items: center; }
-.x:hover { color: var(--err); background: var(--err-soft); }
+@media (hover: hover) { .x:hover { color: var(--err); background: var(--err-soft); } }
 .x[disabled] { opacity: .3; cursor: not-allowed; background: none; }
 .lane { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; }
 .pager { display: flex; gap: 6px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
@@ -312,7 +312,7 @@ tr.off td { color: var(--muted); opacity: .75; }
 .empty { text-align: center; padding: 40px 16px; color: var(--muted); }
 .onboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 14px; margin-top: 14px; }
 .onboard button { text-align: left; padding: 20px; border-radius: var(--r-lg); cursor: pointer; transition: transform .12s, background .15s; }
-.onboard button:hover { background: var(--glass-strong); }
+@media (hover: hover) { .onboard button:hover { background: var(--glass-strong); } }
 .onboard b { display: block; font: 650 17px/1.3 var(--font-display); margin-bottom: 6px; color: var(--accent); }
 details.card > summary { cursor: pointer; font: 650 16px/1.3 var(--font-display); list-style: none; display: flex; align-items: center; gap: 8px; min-height: 28px; }
 details.card > summary::before { content: "›"; display: inline-block; font-size: 22px; line-height: 1; color: var(--accent); transition: transform .2s; }
@@ -362,6 +362,10 @@ details.card > summary::-webkit-details-marker { display: none; }
 .rkb { display: inline-block; width: 6.6mm; height: 6.6mm; line-height: 6.6mm; border-radius: 50%; font-size: 9.5pt; font-weight: 800; text-align: center; color: #fff; }
 .rkb.m1 { background: #c9a227; } .rkb.m2 { background: #9aa3ad; } .rkb.m3 { background: #b07040; }
 .pp tr.emp td { color: #c0c6cd; }
+.pp tr.emp td { padding-top: .7mm; padding-bottom: .7mm; }
+.pp tr.emp .lane-c { transform: scale(.82); }
+.pg-z.col1 .blk { margin-bottom: 4mm; }
+.pg-z.col1 .pp th:first-child { width: 13mm; } .pg-z.col1 .pp th:nth-child(2) { width: 36%; } .pg-z.col1 .pp th:nth-child(3) { width: 24%; } .pg-z.col1 .pp th:nth-child(4) { width: 14%; }
 .pp tr.brk td { color: var(--sub); font-style: italic; }
 .blk { break-inside: avoid; page-break-inside: avoid; margin-bottom: 6mm; }
 .blk-h { font-size: 11pt; font-weight: 800; letter-spacing: .04em; padding-bottom: 1.4mm; margin-bottom: 1mm; color: var(--acc); white-space: nowrap; }
@@ -428,16 +432,49 @@ table.t td > b { white-space: nowrap; }
 .ritem.soft span { background: var(--info-soft); color: var(--info); }
 
 .heats td.small { white-space: nowrap; }
-.progbar select { min-width: 220px; }
+.progbar select.progsel { flex: 0 1 320px; width: 320px; min-width: 200px; font-weight: 600; }   /* 幅を固定: 種目名の長さで「次 →」の位置がずれない */
 
-/* ---------- すべてのボタン: 押している間だけガラスになる（JS が class と位置を付ける） ---------- */
-.btn, button.chip, .iconbtn, .onboard button, .pinbtn, .evchip, .ritem, .x, .frtile { transition: background .2s, color .2s, transform .24s cubic-bezier(.2, .8, .3, 1), box-shadow .24s; }
-.glassing { transition: transform .09s ease-out, box-shadow .12s, background .12s !important; z-index: 2;
-  box-shadow: inset 0 0 0 1.2px rgba(255,255,255,.95), inset 0 1.5px 1px rgba(255,255,255,.9), inset 0 -3px 8px rgba(0,40,80,.10), inset 2px 0 3px rgba(120,200,255,.2), inset -2px 0 3px rgba(255,150,220,.18), 0 10px 24px rgba(10,30,60,.22) !important; }
-.btn.glassing:not(.primary):not(.solid), button.chip.glassing, .iconbtn.glassing, .pinbtn.glassing:not(.on), .evchip.glassing, .ritem.glassing, .x.glassing, .onboard button.glassing {
-  background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.18)) !important; -webkit-backdrop-filter: blur(1px) saturate(1.8) brightness(1.08); backdrop-filter: blur(1px) saturate(1.8) brightness(1.08); }
-.btn.primary.glassing, .btn.solid.glassing, .pinbtn.on.glassing { filter: brightness(1.08) saturate(1.1); }
-@media (prefers-reduced-motion: reduce) { .glassing { transform: none !important; } }
+/* ---------- プログラム・記録入力: 横にスライドしなくても全部の列が見えて入力できる ---------- */
+.heats.prog-h { grid-template-columns: repeat(auto-fill, minmax(min(100%, 500px), 1fr)); }
+.tablewrap.pw { overflow: visible; container-type: inline-size; }
+table.pt { table-layout: fixed; width: 100%; }
+table.pt col.c-ln { width: 50px; } table.pt col.c-mt { width: 112px; } table.pt col.c-tm { width: 144px; } table.pt col.c-jd { width: 82px; } table.pt col.c-rk { width: 56px; }
+table.pt th, table.pt td { padding: 4px 6px; }
+table.pt th { position: static; }
+table.pt tr.ph th { font-size: 13.5px; color: var(--ink); padding: 7px 10px; }
+table.pt tr.pc th { font-size: 11.5px; padding: 3px 6px; overflow: hidden; text-overflow: ellipsis; }
+table.pt tr.pc th:first-child { padding: 3px 2px; }
+.heats.paged > .tablewrap:not(.cur) { display: none; }
+.heats.paged { grid-template-columns: 1fr; }
+.heattabs { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; margin: -2px 0 10px; }
+.heattabs[hidden] { display: none; }
+table.pt td .one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+table.pt td .sub { font-size: 12px; color: var(--muted); line-height: 1.35; }
+table.pt td.mt { font-size: 12.5px; }
+table.pt tr.emp td { padding-top: 2px; padding-bottom: 2px; height: 30px; }
+table.pt .tbox { position: relative; }
+table.pt input.tin { width: 100%; min-width: 0; padding-right: 60px; scroll-margin: 80px 0 16px; }
+table.pt .tbox .prev { position: absolute; right: 9px; top: 0; height: 36px; display: flex; align-items: center; padding: 0; pointer-events: none; white-space: nowrap; }
+table.pt .tbox .prev.bad { position: static; height: auto; display: block; overflow: hidden; text-overflow: ellipsis; padding: 2px 2px 0; }
+table.pt select { width: 100%; min-width: 0; padding-left: 8px; padding-right: 24px; background-position: calc(100% - 13px) 52%, calc(100% - 8px) 52%; }
+table.pt td.rk { white-space: nowrap; font-size: 13px; }
+/* 細い画面（スマホ・プレビューを横に出しているとき）: 1人を2段にして、それでも全部見せる */
+@container (max-width: 500px) {
+  table.pt colgroup, table.pt tr.pc { display: none; }
+  table.pt, table.pt thead, table.pt tbody, table.pt tr.ph, table.pt tr.ph th { display: block; width: 100%; }
+  table.pt tbody tr { display: grid; grid-template-columns: 40px minmax(0, 1fr) 96px; grid-template-areas: "ln nm mt" "rk tm jd"; column-gap: 6px; align-items: center; padding: 5px 4px; border-bottom: 1px solid var(--hairline); }
+  table.pt tbody tr:last-child { border-bottom: 0; }
+  table.pt tbody td { display: block; border: 0 !important; padding: 1px 0; min-width: 0; }
+  table.pt td.ln { grid-area: ln; } table.pt td.nm { grid-area: nm; } table.pt td.mt { grid-area: mt; } table.pt td.tm { grid-area: tm; } table.pt td.jd { grid-area: jd; } table.pt td.rk { grid-area: rk; text-align: center; font-size: 12px; }
+  table.pt tr.emp { grid-template-areas: "ln nm nm"; padding: 2px 4px; }
+  table.pt tr.emp td:nth-child(2) { grid-area: nm; }
+}
+
+
+/* ---------- 1つだけのボタン: 押している間だけ少し沈む（位置は動かない） ---------- */
+.btn, button.chip, .iconbtn, .onboard button, .pinbtn, .evchip, .ritem, .x, .frtile, .issue button { transition: background .2s, color .2s, transform .12s ease-out, box-shadow .2s, filter .12s; }
+.btn:active:not(:disabled), button.chip:active:not(:disabled), .iconbtn:active:not(:disabled), .onboard button:active, .pinbtn:active, .evchip:active, .ritem:active, .x:active, .frtile:active { transform: scale(.97); filter: brightness(.96); }
+@media (prefers-reduced-motion: reduce) { .btn:active, .iconbtn:active { transform: none; } }
 
 /* ---------- 簡易アクセス（丸アイコン） ---------- */
 .seg.round { padding: 3px; gap: 1px; }
@@ -1734,14 +1771,18 @@ function applyNavLayout() {
   app.classList.toggle('pinned', navPinnedNow());
   app.classList.toggle('nav-open', !navPinnedNow() && navOpen);
 }
-window.addEventListener('resize', () => { applyNavLayout(); sizeFills(); bindLenses(); schedulePreview(); });
+window.addEventListener('resize', () => { applyNavLayout(); sizeFills(); fitProgram(); bindLenses(); schedulePreview(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && navOpen) { navOpen = false; applyNavLayout(); } });
 
 let renderQueued = false;
-function scheduleRender() { if (renderQueued) return; renderQueued = true; setTimeout(() => { renderQueued = false; render(); }, 0); }
+function scheduleRender() { if (renderQueued) return; renderQueued = true; setTimeout(() => { if (!renderQueued) return; renderQueued = false; render(); }, 0); }
+function flushRender() { if (!renderQueued) return; renderQueued = false; render(); }
 function render() {
+  if (ptrDown && performance.now() - ptrDown < 4000) { renderHeld = true; return; }
+  renderHeld = false;
   const act = document.activeElement;
   const fk = act && act.dataset ? act.dataset.k : null;
+  const dirtyVal = act && act.dataset && act.dataset.dirty ? act.value : null;   // 確定前の打ちかけの文字は描き直しても消さない
   const selS = act && 'selectionStart' in act ? (() => { try { return [act.selectionStart, act.selectionEnd]; } catch (e) { return null; } })() : null;
   const scrollY = window.scrollY;
   const fillScroll = {};
@@ -1759,11 +1800,13 @@ function render() {
     (PV_VIEWS.includes(view) && !previewOn() ? '<div class="pv-off"><button class="btn sm" data-act="pvToggle">' + icon('print', 'ic sm') + '印刷プレビューを表示</button></div>' : '') + pvShell(html);
   updateFrameStyle();
   sizeFills();
+  fitProgram();
   schedulePreview();
   document.querySelectorAll('.fill[data-fill-id]').forEach(el => { if (fillScroll[el.dataset.fillId]) el.scrollTop = fillScroll[el.dataset.fillId]; });
   bindLenses();
   if (fk) {
     const el = document.querySelector('[data-k="' + CSS.escape(fk) + '"]');
+    if (el && dirtyVal !== null && el.value !== dirtyVal) { el.value = dirtyVal; el.dataset.dirty = '1'; el.dispatchEvent(new Event('input', { bubbles: true })); }
     if (el) { el.focus({ preventScroll: true }); if (selS && 'setSelectionRange' in el) { try { el.setSelectionRange(selS[0], selS[1]); } catch (e) { /* ignore */ } } }
   }
   window.scrollTo(0, scrollY);
@@ -1777,6 +1820,20 @@ function render() {
     if (tr) { tr.classList.add('flash'); tr.scrollIntoView({ block: 'center' }); }
     ui.highlight = null;
   }
+}
+// プログラム・記録入力: 全組が画面に入りきれば全部、入りきらなければ1組ずつ（組のタブで切り替え）表示して、スクロールせずに入力できるようにする
+function fitProgram() {
+  const el = document.querySelector('.heats.prog-h'), tabs = document.querySelector('.heattabs');
+  if (!el) return;
+  el.classList.remove('paged'); if (tabs) tabs.hidden = true;
+  if (!tabs) return;
+  const avail = () => (parseFloat(el.style.maxHeight) || (window.innerHeight - el.getBoundingClientRect().top - window.scrollY - 16));
+  const before = el.getBoundingClientRect().top;
+  if (el.scrollHeight <= avail() + 2) return;
+  tabs.hidden = false;
+  el.classList.add('paged');
+  const shift = el.getBoundingClientRect().top - before;        // タブの分だけ表が下がるので高さを合わせる
+  if (el.style.maxHeight) el.style.maxHeight = Math.max(240, parseFloat(el.style.maxHeight) - shift) + 'px';
 }
 // 画面の下まで使う領域（表など）は、ページ全体ではなく中だけをスクロールさせる
 function sizeFills() {
@@ -1965,27 +2022,18 @@ document.addEventListener('click', e => {
   const segEl = e.target.closest && e.target.closest('.seg');
   if (segEl && segEl.querySelector(':scope > .lens') && e.isTrusted && e.detail > 0) { e.preventDefault(); e.stopImmediatePropagation(); }
 }, true);
-// ---------------------------------------------------------------- すべてのボタン: 押している間だけガラスになってふくらみ、指に少し付いてくる
-//  離すと元の位置・大きさへ短く戻る。押していないときは一切動かない（マウスを乗せただけでも動かない）。
-const PRESS_SEL = '.btn, button.chip, .iconbtn, .onboard button, .pinbtn, .evchip, .ritem, .x, .frtile';
-let pressEl = null, pressStart = null;
-document.addEventListener('pointerdown', e => {
-  if (e.button > 0) return;
-  const b = e.target.closest && e.target.closest(PRESS_SEL);
-  if (!b || b.disabled || b.closest('.seg')) return;
-  pressEl = b; pressStart = { x: e.clientX, y: e.clientY, id: e.pointerId };
-  b.classList.add('glassing');
-  b.style.transform = 'scale(1.07)';
-});
-document.addEventListener('pointermove', e => {
-  if (!pressEl || !pressStart || e.pointerId !== pressStart.id) return;
-  const lim = 4, dx = lim * Math.tanh((e.clientX - pressStart.x) / 40), dy = lim * Math.tanh((e.clientY - pressStart.y) / 40);
-  pressEl.style.transform = 'translate(' + dx.toFixed(2) + 'px,' + dy.toFixed(2) + 'px) scale(1.07)';
-});
-function endPress() { if (!pressEl) return; pressEl.classList.remove('glassing'); pressEl.style.transform = ''; pressEl = null; pressStart = null; }
-document.addEventListener('pointerup', endPress);
-document.addEventListener('pointercancel', endPress);
-window.addEventListener('blur', endPress);
+// ---------------------------------------------------------------- 1つだけのボタン（前・次・印刷など）
+//  ガラスが滑る動きは「選ぶ」ボタン（切り替え・簡易アクセス・画面一覧）だけ。1つだけのボタンは押した間だけ少し沈む（CSS :active）。
+//  動いたり位置がずれたりしないので、押したまま残ることもない。
+// 押している間は画面を描き直さない。入力欄から直接ボタンを押したとき、入力の確定で画面が描き直されて
+// 押したボタンが入れ替わり、クリックが空振りする（もう一度押さないと反応しない）のを防ぐ。離した直後に描き直す。
+let ptrDown = 0, renderHeld = false;
+function releasePtr() { if (!ptrDown) return; ptrDown = 0; if (renderHeld) { renderHeld = false; setTimeout(render, 0); } }
+window.addEventListener('pointerdown', e => { if (e.isPrimary && e.button <= 0) ptrDown = performance.now(); }, true);
+window.addEventListener('pointerup', releasePtr, true);
+window.addEventListener('pointercancel', releasePtr, true);
+window.addEventListener('blur', releasePtr);
+document.addEventListener('touchstart', () => {}, { passive: true });   // iOS で :active を効かせる
 
 // ---------------------------------------------------------------- 簡易説明（丸アイコンを少し押し続ける・マウスを少し乗せる）
 const PAGE_TIPS = {
@@ -2403,29 +2451,38 @@ VIEWS.program = () => {
   const lanes = C.laneList(state.settings).slice().sort((a, b) => a - b);
   const pct = p.items.length ? Math.round(p.done / p.items.length * 100) : 0;
   const allDone = p.items.length && p.done === p.items.length;
-  return '<div class="vhead"><div><h1 class="view">プログラム・記録入力</h1><p class="lead">組・レーン順に並んでいます。公式タイムを入れて Enter で次のレーンへ。棄権・失格は「判定」で選びます（失格でも泳いだタイムは入れられます）。当日モード中でも記録は入力できます。黄色の行は打ち間違いの可能性があります。</p></div></div>' +
+  // 1組ずつ表示のときの組（未指定なら、まだ入力していないレーンがある最初の組）
+  let curHeat = p.heats.some(h => h.heat === ui.progHeat) ? ui.progHeat : null;
+  if (curHeat === null) { const h0 = p.heats.find(h => h.items.some(it => it.status === '未入力')) || p.heats[0]; curHeat = h0 ? h0.heat : null; }
+  return '<div class="vhead"><div><h1 class="view">プログラム・記録入力</h1><p class="lead">公式タイムを入れて Enter で次のレーンへ進みます。棄権・失格は「判定」で選びます（失格でも泳いだタイムは入れられます）。黄色の行は打ち間違いの可能性があります。当日モード中でも入力できます。</p></div></div>' +
     '<div class="bar progbar"><button class="btn" data-act="progStep" data-d="-1" ' + (idx <= 0 ? 'disabled' : '') + '>← 前</button>' +
-    sel('ui:prog', ui.prog, opts.map(n => { const s = D.sched.rows.find(r => r.name === n); const its = D.ind.concat(D.rel).filter(it => it.program === n && it.event); const dn = its.filter(it => it.status !== '未入力').length; return [n, (s ? 'No.' + s.no + ' ' : '') + n + (its.length ? (dn === its.length ? '　✓' : dn ? '　' + dn + '/' + its.length : '') : '　（なし）')]; }), 'style="max-width:340px;font-weight:600"') +
+    sel('ui:prog', ui.prog, opts.map(n => { const s = D.sched.rows.find(r => r.name === n); const its = D.ind.concat(D.rel).filter(it => it.program === n && it.event); const dn = its.filter(it => it.status !== '未入力').length; return [n, (s ? 'No.' + s.no + ' ' : '') + n + (its.length ? (dn === its.length ? '　✓' : dn ? '　' + dn + '/' + its.length : '') : '　（なし）')]; }), 'class="progsel" aria-label="種目"') +
     '<button class="btn" data-act="progStep" data-d="1" ' + (idx >= opts.length - 1 ? 'disabled' : '') + '>次 →</button>' +
     (ui.prog ? '<span class="pill mute">' + (p.sch ? 'No.' + p.sch.no + '・開始 ' + (p.sch.start !== null ? C.fmtClock(p.sch.start) : '—') : '<span style="color:var(--err)">スケジュール未登録</span>') + '</span><span class="pill mute">' + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組</span>' +
       '<span class="pill ' + (allDone ? 'ok' : 'info') + '">入力 ' + p.done + ' / ' + p.items.length + '</span>' : '') +
     '<span class="grow"></span><button class="btn sm" data-act="openflash" data-p="' + esc(ui.prog) + '">速報を見る</button><button class="btn sm" data-act="printProg" data-all="0">この種目を印刷</button><button class="btn sm" data-act="printProg" data-all="1">全種目を印刷</button></div>' +
     (ui.prog && p.items.length ? '<div class="prog" style="margin:-4px 0 10px"><i style="width:' + pct + '%"></i></div>' : '') +
     (allDone ? '<div class="notice ok"><span class="grow">この種目の記録入力が終わりました。</span><button class="btn sm" data-act="printFlash1" data-p="' + esc(ui.prog) + '">速報を印刷</button>' + (idx < opts.length - 1 ? '<button class="btn sm primary" data-act="progStep" data-d="1">次の種目へ →</button>' : '') + '</div>' : '') +
+    (p.heats.length > 1 ? '<div class="heattabs" hidden><span class="small muted">組</span>' + seg('progHeat', p.heats.map(h => [h.heat, '第' + h.heat + '組' + (h.items.every(it => it.status !== '未入力') ? ' ✓' : '')]), curHeat) + '<span class="small muted">全組が入りきらないので1組ずつ表示しています。Enter で最後のレーンまで入れると次の組へ進みます。</span></div>' : '') +
     (!ui.prog ? '<div class="card empty">種目がありません。大会設定で種目を登録してください。</div>' :
-      (p.items.length ? '<div class="heats fill" data-fill-id="prog">' + p.heats.map(h => {
+      (p.items.length ? '<div class="heats prog-h fill" data-fill-id="prog">' + p.heats.map(h => {
         const byLane = new Map(h.items.map(it => [it.lane, it]));
         const noLane = h.items.filter(it => !it.lane);
         const hDone = h.items.every(it => it.status !== '未入力');
-        return '<div class="tablewrap"><table class="t"><thead><tr><th colspan="8" style="font-size:13.5px;color:var(--ink)">第 ' + h.heat + ' 組' + (hDone ? '　<span class="pill ok">✓ 入力済み</span>' : '') + '</th></tr><tr><th class="c">レーン</th><th>' + (p.relay ? 'チーム' : '氏名') + '</th><th>' + (p.relay ? '泳者' : 'チーム') + '</th><th>区分</th><th class="num">エントリー</th><th>公式タイム</th><th>判定</th><th class="num">順位</th></tr></thead><tbody>' +
+        return '<div class="tablewrap pw' + (h.heat === curHeat ? ' cur' : '') + '" data-heat="' + h.heat + '"><table class="t pt"><colgroup><col class="c-ln"><col><col class="c-mt"><col class="c-tm"><col class="c-jd"><col class="c-rk"></colgroup>' +
+          '<thead><tr class="ph"><th colspan="6">第 ' + h.heat + ' 組' + (hDone ? '　<span class="pill ok">✓ 入力済み</span>' : '') + '</th></tr><tr class="pc"><th class="c">レーン</th><th>' + (p.relay ? 'チーム・泳者' : '氏名・チーム') + '</th><th>区分・申込記録</th><th>公式タイム</th><th>判定</th><th class="c">順位</th></tr></thead><tbody>' +
           lanes.map(ln => byLane.get(ln)).concat(noLane).map((it, j) => {
-            if (!it) return '<tr><td class="c"><span class="lane">' + lanes[j] + '</span></td><td colspan="7" class="muted small">（空き）</td></tr>';
+            if (!it) return '<tr class="emp"><td class="c ln"><span class="lane">' + lanes[j] + '</span></td><td colspan="5" class="muted small">（空き）</td></tr>';
             const pre = (p.relay ? 'rel:' : 'ent:') + it.id + ':';
             const src = p.relay ? it.r : it.e;
             const iss = (D.issuesById.get(it.id) || []).filter(x => /タイム|中央値/.test(x.msg));
-            return '<tr data-row="' + it.id + '" class="' + (iss.length ? 'warn' : '') + '" title="' + esc(iss.map(x => x.msg).join('\n')) + '"><td class="c"><span class="lane">' + (it.lane || '?') + '</span></td><td><b>' + esc(p.relay ? it.teamDisp : it.name.split('　').slice(0, 2).join('　')) + '</b>' + (iss.length ? ' <span class="pill warn">要確認</span>' : '') + '</td><td class="small">' + esc(p.relay ? it.memberText : it.club) + '</td><td class="small">' + esc(it.cat) + (it.event !== ui.prog ? ' <span class="pill mute">' + esc(it.event.split(' ')[0]) + '</span>' : '') + '</td>' +
-              '<td class="num muted">' + (it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '') + '</td><td>' + timeCell(pre + 'officialTime', src.officialTime, '', 'data-col="prog"') + '</td>' +
-              '<td>' + sel(pre + 'judge', src.judge, [['', '—'], ['棄権', '棄権'], ['失格', '失格']]) + '</td><td class="num"><b>' + (it.rank ? it.rank + '位' : it.status === '失格' || it.status === '棄権' ? '<span class="pill ' + (it.status === '失格' ? 'err' : 'warn') + '">' + it.status + '</span>' : '') + '</b></td></tr>';
+            const who = p.relay ? it.teamDisp : it.name.split('　').slice(0, 2).join('　'), sub = p.relay ? it.memberText : it.club;
+            const entry = it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '';
+            return '<tr data-row="' + it.id + '" class="' + (iss.length ? 'warn' : '') + '" title="' + esc(iss.map(x => x.msg).join('\n')) + '"><td class="c ln"><span class="lane">' + (it.lane || '?') + '</span></td>' +
+              '<td class="nm"><div class="one"><b>' + esc(who) + '</b>' + (iss.length ? ' <span class="pill warn">要確認</span>' : '') + '</div><div class="one sub" title="' + esc(sub) + '">' + esc(sub) + '</div></td>' +
+              '<td class="mt"><div class="one">' + esc(it.cat) + (it.event !== ui.prog ? ' <span class="pill mute">' + esc(it.event.split(' ')[0]) + '</span>' : '') + '</div><div class="one sub num">' + (entry ? '申込 ' + entry : '　') + '</div></td>' +
+              '<td class="tm"><div class="tbox">' + timeCell(pre + 'officialTime', src.officialTime, '', 'data-col="prog" aria-label="' + esc(who) + ' 公式タイム"') + '</div></td>' +
+              '<td class="jd">' + sel(pre + 'judge', src.judge, [['', '—'], ['棄権', '棄権'], ['失格', '失格']], 'aria-label="' + esc(who) + ' 判定"') + '</td><td class="c rk"><b>' + (it.rank ? it.rank + '位' : it.status === '失格' || it.status === '棄権' ? '<span class="pill ' + (it.status === '失格' ? 'err' : 'warn') + '">' + it.status + '</span>' : '') + '</b></td></tr>';
           }).join('') + '</tbody></table></div>';
       }).join('') + '</div>' : '<div class="card empty">この種目のエントリーはありません。</div>'));
 };
@@ -2724,7 +2781,8 @@ function getPath(obj, path) { return path.split('.').reduce((o, k) => (o === und
 const ENT_LOCK_OK = ['officialTime', 'judge'];
 function setUI(f, val) {
   if (f === 'awCat') val = +val;
-  if (f === 'prog') ui._focusFirst = true;
+  if (f === 'prog') { ui._focusFirst = true; ui.progHeat = null; }
+  if (f === 'progHeat') { val = +val; ui._focusFirst = true; }
   ui[f] = val;
   if (f.indexOf('ent') === 0 && f !== 'entPage') ui.entPage = 0;
   if (f === 'certKind' || f === 'certTarget') { ui.certFilter = {}; ui.certFrom = 1; ui.certTo = ''; }
@@ -2734,6 +2792,7 @@ function setUI(f, val) {
 function handleValue(el) {
   const k = el.dataset.k;
   if (!k) return;
+  delete el.dataset.dirty;
   const val = el.type === 'checkbox' ? el.checked : el.value;
   const [kind, ...rest] = k.split(':');
   if (kind === 'ui' && rest[0] === 'snapAll') { ui.snapSel = val ? getSnaps().map(x => x.t) : []; render(); return; }
@@ -2916,7 +2975,7 @@ const ACTIONS = {
     }, { snap: '名前の一括変更前' });
     ui.renFrom = ''; ui.renTo = '';
   },
-  progStep: t => { const o = programOptions(), i = o.indexOf(ui.prog) + (+t.dataset.d); if (o[i]) { ui.prog = o[i]; ui._focusFirst = true; save(); render(); window.scrollTo(0, 0); } },
+  progStep: t => { const o = programOptions(), i = o.indexOf(ui.prog) + (+t.dataset.d); if (o[i]) { ui.prog = o[i]; ui.progHeat = null; ui._focusFirst = true; save(); render(); window.scrollTo(0, 0); } },
   printFlash1: t => { ui.flash = t.dataset.p; printFlash(); },
   openprog: t => { ui.prog = t.dataset.p; ui._focusFirst = true; save(); if (location.hash === '#program') render(); else location.hash = 'program'; },
   openflash: t => { ui.flash = t.dataset.p; ui.flashFollow = false; save(); location.hash = 'flash'; },
@@ -3064,10 +3123,10 @@ function openPaste() {
 window.addEventListener('afterprint', () => { $('#print-root').innerHTML = ''; });
 const pnow = () => { const d = new Date(); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
 const nm2 = n => String(n || '').split('　').slice(0, 2).join('　');
-function pPage(title, sub, body, label) {
+function pPage(title, sub, body, label, zcls) {
   return '<section class="pg"><header class="pg-h"><div class="pg-top"><span class="pg-meet fitline">' + esc(state.settings.meetName) + '</span><span class="pg-date">' + pnow() + '</span></div>' +
     '<div class="pg-title fitline">' + esc(title) + '</div>' + (sub ? '<div class="pg-sub fitline">' + sub + '</div>' : '') + '</header>' +
-    '<div class="pg-b"><div class="pg-z">' + body + '</div></div>' +
+    '<div class="pg-b"><div class="pg-z' + (zcls ? ' ' + zcls : '') + '">' + body + '</div></div>' +
     '<footer class="pg-f"><span>' + esc(label || title) + '</span><span>' + esc(state.settings.meetName) + '</span></footer></section>';
 }
 // 順位: 1〜3位は金・銀・銅の丸、それ以外は数字だけ（失格・棄権は文字）
@@ -3097,7 +3156,7 @@ function fitPages(root) {
     const scaleNeed = () => { z.style.zoom = 1; const r = z.getBoundingClientRect(); return Math.min(1, H / r.height, W / r.width); };
     z.classList.remove('two');
     const s1 = scaleNeed();
-    if (s1 < 1 && s1 < 0.82) {        // 大きく縮める必要があるときだけ2段組みを試し、文字が大きく残る方を選ぶ
+    if (s1 < 1 && s1 < 0.82 && !z.classList.contains('col1')) {   // col1: 必ず縦1列（プログラムの組など）        // 大きく縮める必要があるときだけ2段組みを試し、文字が大きく残る方を選ぶ
       const t = z.querySelector('table.split');
       let undo = null;
       if (t && t.tBodies[0] && t.tBodies[0].rows.length > 10) {
@@ -3147,7 +3206,7 @@ function docProgram(name) {
             (anyRes ? '<td class="tm">' + (it ? esc(it.flashTime) : '') + '</td>' + (it ? rkCell(it.status === '完泳' ? it.rank : 0, it.flashRank) : '<td class="rk"></td>') : '') + '</tr>';
         }).join('') + '</tbody></table></div>';
     }).join('');
-    return pPage(name, sub, body || '<p>エントリーはありません。</p>', (anyRes ? '速報' : '大会プログラム') + '　' + name);
+    return pPage(name, sub, body || '<p>エントリーはありません。</p>', (anyRes ? '速報' : '大会プログラム') + '　' + name, 'col1');
   } };
 }
 function docFlash(name) {
@@ -3361,6 +3420,7 @@ let searchTimer = null;
 document.addEventListener('input', e => {
   const el = e.target;
   if (!el.dataset || !el.dataset.k) return;
+  if (e.isTrusted && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && el.type !== 'checkbox') el.dataset.dirty = '1';
   if (el.classList.contains('tin')) {
     const p = C.parseTime(el.value, { threeDigit: el.dataset.k.indexOf('aw') === 0 ? 'mss' : state.settings.threeDigit });
     const pv = el.parentNode.querySelector('[data-prev]');
@@ -3390,13 +3450,20 @@ document.addEventListener('keydown', e => {
     if (col) {
       const all = [...document.querySelectorAll('input[data-col="' + col + '"]')];
       const i = all.indexOf(el);
-      if (all[i + 1]) nextK = all[i + 1].dataset.k;
+      if (all[i + 1]) {
+        nextK = all[i + 1].dataset.k;
+        const hw = all[i + 1].closest('[data-heat]');      // 1組ずつ表示のとき、次のレーンが次の組なら組を切り替える
+        if (hw && col === 'prog') ui.progHeat = +hw.dataset.heat;
+      }
     }
     handleValue(el);
-    setTimeout(() => {
+    flushRender();
+    // すぐに次の欄へ（続けて速く打っても文字が抜けないように、待たずに移る）
+    const go = () => {
       const n = nextK ? document.querySelector('[data-k="' + CSS.escape(nextK) + '"]') : document.querySelector('[data-k="' + CSS.escape(k) + '"]');
-      if (n) { n.focus(); if (n.select) n.select(); }
-    }, 20);
+      if (n && document.activeElement !== n) { n.focus(); if (n.select) n.select(); if (n.scrollIntoView) n.scrollIntoView({ block: 'nearest' }); }
+    };
+    go(); setTimeout(go, 30);
   }
 });
 window.addEventListener('hashchange', () => { view = (location.hash || '#home').slice(1) || 'home'; if (!VIEWS[view]) view = 'home'; render(); window.scrollTo(0, 0); });
