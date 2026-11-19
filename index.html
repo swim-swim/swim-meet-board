@@ -155,23 +155,33 @@ main { position: relative; z-index: 0; }
 main { min-width: 0; padding-bottom: 16px; }
 @media (max-width: 899px) { .hide-sm { display: none; } .brand { flex-basis: 160px; } }
 
-/* ---------- ガラスが滑る切り替え（セグメント） ---------- */
-.seg { position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--fill); border: 1px solid var(--hairline); max-width: 100%; overflow-x: auto; scrollbar-width: none; }
-.seg::-webkit-scrollbar { display: none; }
-.seg > .lens { position: absolute; left: 0; top: 0; z-index: 0; border-radius: 999px; pointer-events: none; opacity: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.62));
-  border: 1px solid rgba(255,255,255,.9);
-  box-shadow: inset 0 1px 0 #fff, inset 0 -1px 2px rgba(18,40,72,.08), 0 4px 14px rgba(18, 40, 72, .16), 0 1px 3px rgba(18,40,72,.12);
-  -webkit-backdrop-filter: blur(10px) saturate(200%); backdrop-filter: blur(10px) saturate(200%);
-  transition: transform .5s cubic-bezier(.3, 1.35, .45, 1), width .5s cubic-bezier(.3, 1.35, .45, 1), height .5s cubic-bezier(.3, 1.35, .45, 1), opacity .2s; }
-:root[data-theme="dark"] .seg > .lens { background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.10)); border-color: rgba(255,255,255,.22); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .seg > .lens { background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.10)); border-color: rgba(255,255,255,.22); } }
-.nav .seg.v > .lens { border-radius: 14px; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, rgba(255,255,255,.85)), color-mix(in srgb, var(--accent) 10%, rgba(255,255,255,.55))); }
-.segbtn { position: relative; z-index: 1; border: 0; background: none; min-height: 36px; padding: 6px 16px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; }
+/* ---------- 液体ガラスのセグメント（動きは JS のばね計算。静止中は平たいピル、押すと透明なガラスに） ---------- */
+.seg { position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--fill); border: 1px solid var(--hairline); max-width: 100%;
+  overflow: visible; touch-action: pan-y; user-select: none; -webkit-user-select: none; transition: background .25s, box-shadow .25s; }
+.seg.pressing { background: var(--glass-strong); box-shadow: 0 6px 20px var(--glass-shade); }
+@media (max-width: 600px) { .seg.h { overflow-x: auto; scrollbar-width: none; } .seg.h::-webkit-scrollbar { display: none; } }
+.seg > .lens { --lift: 0; position: absolute; left: 0; top: 0; z-index: 0; border-radius: 999px; pointer-events: none; opacity: 0; transform-origin: 50% 50%; will-change: transform;
+  background:
+    linear-gradient(180deg, rgba(255,255,255, calc(.22 * var(--lift))), rgba(255,255,255, calc(.04 * var(--lift)))),
+    rgba(var(--pill-rgb), calc(var(--pill-a) * (1 - var(--lift))));
+  box-shadow:
+    inset 0 0 0 calc(1.2px * var(--lift)) rgba(255,255,255, calc(.95 * var(--lift))),
+    inset 0 1.5px 1px rgba(255,255,255, calc(.9 * var(--lift))),
+    inset 0 -3px 8px rgba(0, 40, 80, calc(.10 * var(--lift))),
+    inset 2px 0 3px rgba(120, 200, 255, calc(.18 * var(--lift))),
+    inset -2px 0 3px rgba(255, 150, 220, calc(.16 * var(--lift))),
+    0 calc(10px * var(--lift)) calc(26px * var(--lift)) rgba(10, 30, 60, calc(.22 * var(--lift))); }
+.seg > .lens.lifted { -webkit-backdrop-filter: blur(.4px) saturate(1.7) brightness(1.07); backdrop-filter: blur(.4px) saturate(1.7) brightness(1.07); }
+html.refract .seg > .lens.lifted { backdrop-filter: url(#lgRefract) saturate(1.6) brightness(1.06); }
+:root { --pill-rgb: 110, 122, 142; --pill-a: .17; }
+:root[data-theme="dark"] { --pill-rgb: 255, 255, 255; --pill-a: .14; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --pill-rgb: 255, 255, 255; --pill-a: .14; } }
+.nav .seg.v > .lens { border-radius: 14px; --pill-rgb: 10, 122, 255; --pill-a: .14; }
+.segbtn { position: relative; z-index: 1; border: 0; background: none; min-height: 36px; padding: 6px 16px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; touch-action: inherit; }
 .segbtn.on { color: var(--ink); font-weight: 650; }
 .seg.mini .segbtn { min-height: 28px; padding: 3px 11px; font-size: 12.5px; }
 .seg.big .segbtn { min-height: 40px; padding: 8px 18px; font-size: 14px; }
-@media (prefers-reduced-motion: reduce) { .seg > .lens { transition: opacity .2s; } }
+.nav .seg.v { touch-action: pan-x; }
 
 /* ---------- すべてのボタン: 光の帯が滑り、押した所からガラスが光る ---------- */
 .btn, .chip, .iconbtn, .segbtn, .nav a, .onboard button, .pinbtn { position: relative; overflow: hidden; isolation: isolate; transition: background .2s, transform .18s cubic-bezier(.3, 1.4, .5, 1), box-shadow .2s, color .2s; }
@@ -183,7 +193,8 @@ main { min-width: 0; padding-bottom: 16px; }
 .pressed::after { content: ""; position: absolute; left: var(--px, 50%); top: var(--py, 50%); width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; z-index: -1; pointer-events: none;
   background: radial-gradient(circle, rgba(255,255,255,.9), rgba(255,255,255,.35) 45%, transparent 70%); animation: glassPress .55s cubic-bezier(.2, .8, .3, 1) forwards; }
 @keyframes glassPress { from { transform: scale(1); opacity: 1; } to { transform: scale(26); opacity: 0; } }
-.btn:active, button.chip:active, .iconbtn:active, .segbtn:active, .onboard button:active, .pinbtn:active { transform: scale(.95); }
+.btn:active, button.chip:active, .iconbtn:active, .onboard button:active, .pinbtn:active { transform: scale(1.06); box-shadow: inset 0 0 0 1.2px rgba(255,255,255,.9), inset 0 1.5px 1px rgba(255,255,255,.9), 0 10px 26px rgba(10,30,60,.22); transition: transform .12s ease-out, box-shadow .12s; }
+.btn, button.chip, .iconbtn, .onboard button, .pinbtn { transition: background .2s, transform .55s cubic-bezier(.25, 1.6, .4, 1), box-shadow .45s, color .2s; }
 @media (prefers-reduced-motion: reduce) { .btn::before, button.chip::before, .iconbtn::before { display: none; } .pressed::after { animation: none; } }
 
 /* 説明文は1行に畳む（押すと全文） */
@@ -204,9 +215,8 @@ h1.view { font: 700 24px/1.2 var(--font-display); letter-spacing: -.01em; margin
 .bar .grow { flex: 1 1 auto; }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 8px 16px; border-radius: 999px;
   border: 1px solid var(--glass-edge); background: var(--fill); cursor: pointer; white-space: nowrap; line-height: 1.25; font-weight: 500;
-  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 2px 8px var(--glass-shade); transition: background .15s, transform .1s; }
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 2px 8px var(--glass-shade); }
 .btn:hover { background: var(--fill-hover); }
-.btn:active { transform: scale(.97); }
 .btn.primary { background: var(--accent); border-color: transparent; color: var(--accent-ink); font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 16px color-mix(in srgb, var(--accent) 35%, transparent); }
 .btn.primary:hover { background: color-mix(in srgb, var(--accent) 88%, #fff); }
 .btn.tinted { background: var(--accent-soft); color: var(--accent); border-color: transparent; font-weight: 600; }
@@ -214,8 +224,8 @@ h1.view { font: 700 24px/1.2 var(--font-display); letter-spacing: -.01em; margin
 .btn.danger.solid { background: var(--err); color: #fff; border-color: transparent; }
 .btn.sm { min-height: 34px; padding: 5px 12px; font-size: 13px; }
 .btn[disabled] { opacity: .4; cursor: not-allowed; transform: none; }
-.iconbtn { border: 1px solid var(--hairline); background: var(--fill); border-radius: 50%; width: 38px; height: 38px; cursor: pointer; display: inline-grid; place-items: center; color: var(--ink); transition: background .15s, transform .1s; }
-.iconbtn:hover { background: var(--fill-hover); } .iconbtn:active { transform: scale(.94); }
+.iconbtn { border: 1px solid var(--hairline); background: var(--fill); border-radius: 50%; width: 38px; height: 38px; cursor: pointer; display: inline-grid; place-items: center; color: var(--ink); }
+.iconbtn:hover { background: var(--fill-hover); }
 .iconbtn[disabled] { opacity: .35; cursor: not-allowed; }
 .card { border-radius: var(--r-lg); padding: 14px 16px; min-width: 0; }
 .card h2 { font: 650 17px/1.3 var(--font-display); margin: 0 0 12px; }
@@ -1453,7 +1463,7 @@ function applyNavLayout() {
   app.classList.toggle('pinned', navPinnedNow());
   app.classList.toggle('nav-open', !navPinnedNow() && navOpen);
 }
-window.addEventListener('resize', () => { applyNavLayout(); sizeFills(); placeLenses(true); });
+window.addEventListener('resize', () => { applyNavLayout(); sizeFills(); bindLenses(true); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && navOpen) { navOpen = false; applyNavLayout(); } });
 
 let renderQueued = false;
@@ -1476,7 +1486,7 @@ function render() {
   $('#main').innerHTML = (saveError ? '<div class="notice err"><b>保存エラー</b><span class="grow">' + esc(saveError) + '</span><button class="btn sm" data-act="backup">今すぐ書き出す</button></div>' : '') + backupReminder() + html;
   sizeFills();
   document.querySelectorAll('.fill[data-fill-id]').forEach(el => { if (fillScroll[el.dataset.fillId]) el.scrollTop = fillScroll[el.dataset.fillId]; });
-  placeLenses();
+  bindLenses();
   if (fk) {
     const el = document.querySelector('[data-k="' + CSS.escape(fk) + '"]');
     if (el) { el.focus({ preventScroll: true }); if (selS && 'setSelectionRange' in el) { try { el.setSelectionRange(selS[0], selS[1]); } catch (e) { /* ignore */ } } }
@@ -1498,53 +1508,170 @@ function sizeFills() {
   });
 }
 
-// ---------------------------------------------------------------- ガラスがスライドする選択（.seg の中を .lens が移動）
-const lensMemory = {};
-function rememberLenses() {
-  document.querySelectorAll('.seg[data-seg-id] > .lens').forEach(l => {
-    const id = l.parentNode.dataset.segId;
-    lensMemory[id] = { x: l._x, y: l._y, w: l._w, h: l._h };
-  });
+// ---------------------------------------------------------------- 液体ガラスのレンズ（iOS のセグメントと同じ動き）
+//  静止中: 選択中の項目に平たいピル。押すと透明なガラスに変わって膨らみ、指（カーソル）に遅れてばねのように付いてくる。
+//  指がバーの外へ出ても操作は続き、離すと一番近い項目に吸い付いて選択し、平たいピルに戻る。
+const LENS = {};            // segId → 物理状態（画面を描き直しても引き継ぐ）
+const SPRING = { k: 380, c: 24 }, LIFT = { k: 300, c: 22 };
+function segItems(seg) { return [...seg.querySelectorAll('[data-seg]')]; }
+function itemRect(it) { return { x: it.offsetLeft, y: it.offsetTop, w: it.offsetWidth, h: it.offsetHeight }; }
+function lensState(seg) {
+  const id = seg.dataset.segId;
+  let st = LENS[id];
+  if (!st) {
+    const act = seg.querySelector('[data-seg].on') || segItems(seg)[0];
+    const r = act ? itemRect(act) : { x: 0, y: 0, w: 0, h: 0 };
+    st = LENS[id] = { x: r.x, y: r.y, w: r.w, h: r.h, vx: 0, vy: 0, vw: 0, vh: 0, t: r, lift: 0, vl: 0, tl: 0, drag: null, raf: 0, last: 0 };
+  }
+  st.seg = seg; st.el = seg.querySelector(':scope > .lens'); st.vert = seg.classList.contains('v');
+  return st;
 }
-function moveLens(seg, target, instant) {
-  const lens = seg.querySelector(':scope > .lens');
-  if (!lens) return;
-  if (!target) { lens.style.opacity = '0'; return; }
-  const x = target.offsetLeft, y = target.offsetTop, w = target.offsetWidth, h = target.offsetHeight;
-  if (instant) lens.style.transition = 'none';
-  lens.style.opacity = '1';
-  lens.style.transform = 'translate(' + x + 'px,' + y + 'px)';
-  lens.style.width = w + 'px'; lens.style.height = h + 'px';
-  lens._x = x; lens._y = y; lens._w = w; lens._h = h;
-  if (instant) { void lens.offsetWidth; lens.style.transition = ''; }
+function lensTarget(st, r) { st.t = { x: r.x, y: r.y, w: r.w, h: r.h }; kickLens(st); }
+function kickLens(st) { if (!st.raf) { st.last = performance.now(); st.raf = requestAnimationFrame(ts => stepLens(st, ts)); } }
+function stepLens(st, ts) {
+  st.raf = 0;
+  const dt = Math.min(0.032, Math.max(0.001, (ts - st.last) / 1000)); st.last = ts;
+  const sp = (pos, vel, tgt, P) => { const a = P.k * (tgt - pos) - P.c * vel; vel += a * dt; return [pos + vel * dt, vel]; };
+  [st.x, st.vx] = sp(st.x, st.vx, st.t.x, SPRING);
+  [st.y, st.vy] = sp(st.y, st.vy, st.t.y, SPRING);
+  [st.w, st.vw] = sp(st.w, st.vw, st.t.w, SPRING);
+  [st.h, st.vh] = sp(st.h, st.vh, st.t.h, SPRING);
+  [st.lift, st.vl] = sp(st.lift, st.vl, st.tl, LIFT);
+  drawLens(st);
+  const moving = Math.abs(st.vx) + Math.abs(st.vy) + Math.abs(st.vw) + Math.abs(st.vh) > 2 || Math.abs(st.t.x - st.x) + Math.abs(st.t.y - st.y) + Math.abs(st.t.w - st.w) > 0.4 || Math.abs(st.tl - st.lift) > 0.01 || Math.abs(st.vl) > 0.05;
+  if (moving || st.drag) st.raf = requestAnimationFrame(t => stepLens(st, t));
+  else { st.x = st.t.x; st.y = st.t.y; st.w = st.t.w; st.h = st.t.h; st.lift = st.tl; drawLens(st); }
 }
-function placeLenses(instant) {
+function drawLens(st) {
+  const el = st.el;
+  if (!el || !el.isConnected) return;
+  const L = Math.max(0, Math.min(1.25, st.lift));
+  const v = st.vert ? st.vy : st.vx;
+  const stretch = Math.min(0.22, Math.abs(v) / 2600);               // 速く動くほど進む向きに伸び、反対向きに縮む
+  const sMain = 1 + stretch + 0.10 * L, sCross = 1 - stretch * 0.55 + (st.vert ? 0.06 : 0.34) * L;
+  const sx = st.vert ? sCross : sMain, sy = st.vert ? sMain : sCross;
+  el.style.width = st.w + 'px'; el.style.height = st.h + 'px';
+  el.style.transform = 'translate(' + st.x + 'px,' + st.y + 'px) scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ')';
+  el.style.opacity = st.w > 0 ? '1' : '0';
+  el.style.setProperty('--lift', L.toFixed(3));
+  el.classList.toggle('lifted', L > 0.06);
+  st.seg.classList.toggle('pressing', !!st.drag);
+}
+function bindLenses(instant) {
   document.querySelectorAll('.seg').forEach(seg => {
-    const lens = seg.querySelector(':scope > .lens');
-    if (!lens) return;
-    const active = seg.querySelector('[data-seg].on');
-    const mem = lensMemory[seg.dataset.segId];
-    if (!instant && mem && mem.w && active) {
-      // 前の位置から、選んだ項目までガラスを滑らせる
-      lens.style.transition = 'none';
-      lens.style.opacity = '1';
-      lens.style.transform = 'translate(' + mem.x + 'px,' + mem.y + 'px)'; lens.style.width = mem.w + 'px'; lens.style.height = mem.h + 'px';
-      void lens.offsetWidth; lens.style.transition = '';
-      requestAnimationFrame(() => moveLens(seg, active));
-    } else moveLens(seg, active, true);
+    if (!seg.querySelector(':scope > .lens')) return;
+    const st = lensState(seg);
+    if (st.drag) return;
+    const act = seg.querySelector('[data-seg].on');
+    if (!act) { if (st.el) st.el.style.opacity = '0'; return; }
+    const r = itemRect(act);
+    if (instant || !st.w) { Object.assign(st, { x: r.x, y: r.y, w: r.w, h: r.h, vx: 0, vy: 0, vw: 0, vh: 0 }); st.t = r; drawLens(st); }
+    else { drawLens(st); lensTarget(st, r); }
   });
 }
-document.addEventListener('pointerover', e => {
-  const item = e.target.closest && e.target.closest('.seg [data-seg]');
-  if (!item || e.pointerType === 'touch') return;
-  const seg = item.closest('.seg');
-  if (seg.dataset.hover !== 'off') moveLens(seg, item);
-});
-document.addEventListener('pointerout', e => {
+const placeLenses = bindLenses;
+function rememberLenses() { /* 状態は LENS に常に残っている */ }
+function nearestItem(st, pos) {
+  let best = null, bd = Infinity;
+  segItems(st.seg).forEach(it => {
+    if (it.disabled) return;
+    const r = itemRect(it), c = st.vert ? r.y + r.h / 2 : r.x + r.w / 2, d = Math.abs(c - pos);
+    if (d < bd) { bd = d; best = it; }
+  });
+  return best;
+}
+document.addEventListener('pointerdown', e => {
   const seg = e.target.closest && e.target.closest('.seg');
-  if (!seg || (e.relatedTarget && seg.contains(e.relatedTarget))) return;
-  moveLens(seg, seg.querySelector('[data-seg].on'));
+  if (!seg || !seg.querySelector(':scope > .lens') || e.button > 0) return;
+  const item = e.target.closest('[data-seg]');
+  if (!item || item.disabled) return;
+  const st = lensState(seg);
+  const box = seg.getBoundingClientRect();
+  const r = itemRect(item);
+  st.drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, moved: false, box, start: item, size: { w: st.w || r.w, h: st.h || r.h } };
+  try { seg.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+  st.tl = 1; st.vl += 6;                      // 押した瞬間にふくらむ
+  followPointer(st, e.clientX, e.clientY);
+  kickLens(st);
 });
+function followPointer(st, cx, cy) {
+  const d = st.drag, box = d.box, seg = st.seg;
+  const items = segItems(seg);
+  const first = itemRect(items[0]), last = itemRect(items[items.length - 1]);
+  if (st.vert) {
+    const h = d.size.h, minY = first.y, maxY = last.y + last.h - h;
+    let y = cy - box.top + seg.scrollTop - h / 2;
+    if (y < minY) y = minY - Math.pow(minY - y, 0.75); if (y > maxY) y = maxY + Math.pow(y - maxY, 0.75);   // 端では引っぱり返される
+    const near = nearestItem(st, y + h / 2), nr = near ? itemRect(near) : first;
+    st.t = { x: nr.x, y, w: nr.w, h };
+  } else {
+    const w = d.size.w, minX = first.x, maxX = last.x + last.w - w;
+    let x = cx - box.left + seg.scrollLeft - w / 2;
+    if (x < minX) x = minX - Math.pow(minX - x, 0.75); if (x > maxX) x = maxX + Math.pow(x - maxX, 0.75);
+    const near = nearestItem(st, x + w / 2), nr = near ? itemRect(near) : first;
+    st.t = { x, y: nr.y, w: w + (nr.w - w) * 0.35, h: nr.h };
+  }
+  kickLens(st);
+}
+document.addEventListener('pointermove', e => {
+  for (const id in LENS) {
+    const st = LENS[id];
+    if (!st.drag || st.drag.id !== e.pointerId) continue;
+    if (Math.hypot(e.clientX - st.drag.sx, e.clientY - st.drag.sy) > 6) st.drag.moved = true;
+    followPointer(st, e.clientX, e.clientY);
+  }
+});
+function endLensDrag(e, cancel) {
+  for (const id in LENS) {
+    const st = LENS[id];
+    if (!st.drag || st.drag.id !== e.pointerId) continue;
+    const d = st.drag; st.drag = null;
+    try { st.seg.releasePointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    st.tl = 0;
+    const pos = st.vert ? st.t.y + st.t.h / 2 : st.t.x + st.t.w / 2;
+    const pick = cancel ? (st.seg.querySelector('[data-seg].on') || d.start) : (d.moved ? nearestItem(st, pos) : d.start);
+    if (pick) {
+      lensTarget(st, itemRect(pick));         // 離した後もガラスは選んだ項目まで動き続ける
+      if (!cancel && !pick.classList.contains('on')) { st.seg.querySelectorAll('[data-seg].on').forEach(x => x.classList.remove('on')); pick.classList.add('on'); setTimeout(() => pick.click(), 140); }
+      else if (!cancel && pick.classList.contains('on') && pick.dataset.act === 'go') setTimeout(() => pick.click(), 140);
+    }
+    kickLens(st);
+  }
+}
+document.addEventListener('pointerup', e => endLensDrag(e, false));
+document.addEventListener('pointercancel', e => endLensDrag(e, true));
+// レンズの縁で背景が曲がって見える屈折（虹色のにじみ付き）。Chrome / Edge のみ。ほかのブラウザは透明ガラスだけで表示
+(function setupRefraction() {
+  const ua = navigator.userAgent;
+  if (!/Chrome\/|Edg\//.test(ua) || /iPhone|iPad|CriOS|FxiOS/.test(ua)) return;
+  try {
+    const W = 240, H = 120, r = H / 2, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const g = cv.getContext('2d'), img = g.createImageData(W, H);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const cx = Math.max(r, Math.min(W - r, x)), dx = x + .5 - cx, dy = y + .5 - r, dist = Math.hypot(dx, dy) || 1;
+      const edge = r - dist, zone = r * 0.42;
+      let k = edge < zone ? Math.pow(1 - Math.max(0, edge) / zone, 2) : 0;
+      if (edge < 0) k = 0;
+      const i = (y * W + x) * 4;
+      img.data[i] = 128 + (dx / dist) * k * 127; img.data[i + 1] = 128 + (dy / dist) * k * 127; img.data[i + 2] = 128; img.data[i + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+    const map = cv.toDataURL();
+    const ch = (sc, m, res) => '<feDisplacementMap in="SourceGraphic" in2="map" scale="' + sc + '" xChannelSelector="R" yChannelSelector="G" result="d' + res + '"/><feColorMatrix in="d' + res + '" type="matrix" values="' + m + '" result="c' + res + '"/>';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;width:0;height:0" aria-hidden="true"><filter id="lgRefract" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">' +
+      '<feImage href="' + map + '" x="0" y="0" width="100%" height="100%" preserveAspectRatio="none" result="map"/>' +
+      ch(26, '1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0', 'r') + ch(31, '0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0', 'g') + ch(36, '0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0', 'b') +
+      '<feComposite in="cr" in2="cg" operator="arithmetic" k2="1" k3="1" result="rg"/><feComposite in="rg" in2="cb" operator="arithmetic" k2="1" k3="1"/></filter></svg>';
+    document.body.insertAdjacentHTML('beforeend', svg);
+    document.documentElement.classList.add('refract');
+  } catch (e) { /* 屈折なしでも動く */ }
+})();
+// ポインターを捕まえているので、セグメント内のネイティブのクリックは使わない（キーボード操作のクリックは通す）
+document.addEventListener('click', e => {
+  const it = e.target.closest && e.target.closest('.seg [data-seg]');
+  const segEl = e.target.closest && e.target.closest('.seg');
+  if (segEl && segEl.querySelector(':scope > .lens') && e.isTrusted && e.detail > 0) { e.preventDefault(); e.stopImmediatePropagation(); }
+}, true);
 // ボタンを押した位置から光が広がる（すべてのボタン）
 document.addEventListener('pointerdown', e => {
   const b = e.target.closest && e.target.closest('.btn, .chip, .iconbtn, .segbtn, .nav a, .onboard button, .x');
@@ -1779,7 +1906,7 @@ VIEWS.entries = () => {
     sel('ui:entEvent', ui.entEvent || '', blankOpt('すべての種目').concat(evs), 'style="max-width:200px"') +
     '<label class="small"><input type="checkbox" data-k="ui:entOnlyIssue" ' + (ui.entOnlyIssue ? 'checked' : '') + '> 要確認の行だけ（' + nIssue + '）</label>' +
     '<span class="grow"></span>' + pager(pages) + '<span class="muted small">' + rows.length + ' / ' + D.ind.length + ' 件</span>' +
-    '<button class="btn" data-act="pasteEntries" ' + L + '>Excelから貼り付け</button><button class="btn primary" data-act="addEntry" ' + L + '>＋ 1行追加</button></div>' +
+    '<button class="btn" data-act="entryForm">エントリー用Excelを作る</button><label class="btn" ' + (isLocked() ? 'style="opacity:.4;pointer-events:none"' : '') + '>記入済みExcelを読み込む<input type="file" accept=".xlsx,.xlsm,.xls" multiple data-file="entryform" hidden></label>' + '<button class="btn" data-act="pasteEntries" ' + L + '>Excelから貼り付け</button><button class="btn primary" data-act="addEntry" ' + L + '>＋ 1行追加</button></div>' +
     (D.ind.length ? '<div class="tablewrap fill" data-fill-id="ent"><table class="t"><thead><tr><th class="num">No</th><th>氏名</th><th>チーム</th><th>区分</th><th>種目</th><th>エントリー</th><th>公式タイム</th><th>判定</th><th class="c">組</th><th class="c">レーン</th><th class="num">順位</th><th class="num">得点</th><th>状態</th><th></th></tr></thead><tbody>' +
       show.map(it => {
         const e = it.e, iss = D.issuesById.get(it.id) || [];
@@ -2114,7 +2241,7 @@ VIEWS.data = () => {
     '<div class="bar"><button class="btn primary" data-act="backup">バックアップを書き出す（.json）</button><label class="btn">バックアップから復元…<input type="file" accept=".json,application/json" data-file="json" hidden></label></div>' +
     '<p class="small muted">復元するときは、今のデータを自動で控えに残してから置き換えます。</p></div>' +
     '<div class="card"><h2>Excel</h2><p class="small">今お使いの「大会運営ブック（.xlsx）」と「表彰者算出ブック（.xlsm）」をそのまま読み込めます。このアプリから書き出したExcelも読み込めます。</p>' +
-    '<div class="bar"><label class="btn primary">Excelファイルを読み込む…<input type="file" accept=".xlsx,.xlsm,.xls" data-file="xlsx" hidden></label><button class="btn" data-act="exportXlsx">結果をExcelに書き出す</button><button class="btn" data-act="exportCsv">エントリーをCSVで書き出す</button></div>' +
+    '<div class="bar"><label class="btn primary">Excelファイルを読み込む…<input type="file" accept=".xlsx,.xlsm,.xls" data-file="xlsx" hidden></label><button class="btn" data-act="exportXlsx">結果をExcelに書き出す</button><button class="btn" data-act="entryForm">エントリー用Excelを作る</button><label class="btn">記入済みエントリーを読み込む（複数可）<input type="file" accept=".xlsx,.xlsm,.xls" multiple data-file="entryform" hidden></label><button class="btn" data-act="exportCsv">エントリーをCSVで書き出す</button></div>' +
     '<p class="small muted">Excelの読み書きには、初回だけインターネット接続が必要です（表計算ライブラリを読み込むため）。CSVとバックアップはオフラインでも使えます。</p></div>' +
     '<div class="card"><h2>自動バックアップ（このブラウザ内）</h2><p class="small muted">5分ごと・大きな操作の前に自動で控えを残します（最新15件）。間違えて消したときはここから戻せます。</p>' +
     (snaps.length ? '<div class="tablewrap"><table class="t"><thead><tr><th>日時</th><th>きっかけ</th><th class="num">個人</th><th></th></tr></thead><tbody>' +
@@ -2367,6 +2494,7 @@ const ACTIONS = {
     confirmBox('表彰の入力データを消しますか？', '<p>入力済みの記録 <b>' + n + '件</b>（クラブ・選手名・タイム）をすべて消去します。マスタ設定（区分・種目・基準タイム）はそのまま残ります。</p>', '消去する', () => { commit('表彰入力のクリア', s => { s.award.inputs = {}; }, { allowLocked: true, snap: '表彰入力クリア前' }); toast('入力データ ' + n + '件をクリアしました', null, 7000, { label: '元に戻す', fn: undo }); }, { danger: true });
   },
   pasteEntries: () => openPaste(),
+  entryForm: () => openEntryFormMaker(),
   printSched: () => printSchedule(),
   printProg: t => printProgram(t.dataset.all === '1'),
   printFlash: () => printFlash(),
@@ -2606,6 +2734,7 @@ function importXlsx(file) {
   toast('「' + file.name + '」を読み込んでいます…');
   Promise.all([loadXLSX(), file.arrayBuffer()]).then(([X, buf]) => {
     const wb = X.read(buf, { type: 'array' });
+    if (EntryForm.isForm(wb)) { importEntryForms([file]); return; }
     const res = XlsxImport.detect(wb, X);
     if (!res) { modal('<h2>読み込めない形式です</h2><p>大会運営ブック（「01_個人エントリー」などのシートがあるもの）、表彰者算出ブック、またはこのアプリが書き出したExcelを選んでください。</p><p class="small muted">シート名: ' + esc(wb.SheetNames.join('、')) + '</p><div class="actions"><button class="btn primary" data-close>閉じる</button></div>'); return; }
     confirmBox(res.title, res.summary, '読み込む', () => {
@@ -2641,7 +2770,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('change', e => {
   const el = e.target;
-  if (el.dataset && el.dataset.file) { const f = el.files && el.files[0]; el.value = ''; if (!f) return; if (el.dataset.file === 'json') importJSON(f); else importXlsx(f); return; }
+  if (el.dataset && el.dataset.file) { const fl = el.files ? [...el.files] : []; el.value = ''; if (!fl.length) return; if (el.dataset.file === 'entryform') { importEntryForms(fl); return; } const f = fl[0]; if (el.dataset.file === 'json') importJSON(f); else importXlsx(f); return; }
   if (el.dataset && el.dataset.k) handleValue(el);
 });
 let searchTimer = null;
@@ -2689,6 +2818,274 @@ document.addEventListener('keydown', e => {
 window.addEventListener('hashchange', () => { view = (location.hash || '#home').slice(1) || 'home'; if (!VIEWS[view]) view = 'home'; render(); window.scrollTo(0, 0); });
 window.addEventListener('beforeunload', e => { if (saveError) { e.preventDefault(); e.returnValue = ''; } });
 window.addEventListener('error', e => { toast('予期しないエラー: ' + (e.message || '') + '（データは保存されています。ページを再読み込みしてください）', 'err', 9000); });
+
+/* ---------------------------------------------------------------- エントリー用Excel（配布 → 記入 → 締め切り後に読み込み） */
+const EntryForm = (() => {
+  // ---- 最小限の xlsx 書き出し（ライブラリ不要・オフライン可。プルダウンの入力規則つき）
+  const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  const crc32 = b => { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+  function zip(files) {
+    const enc = new TextEncoder(), parts = [], cen = [];
+    let off = 0;
+    files.forEach(f => {
+      const name = enc.encode(f.name), data = typeof f.data === 'string' ? enc.encode(f.data) : f.data, crc = crc32(data);
+      const h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true);
+      h.setUint16(10, 0, true); h.setUint16(12, 0x21, true); h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true);
+      h.setUint16(26, name.length, true); h.setUint16(28, 0, true);
+      parts.push(new Uint8Array(h.buffer), name, data);
+      const c = new DataView(new ArrayBuffer(46));
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(10, 0, true);
+      c.setUint16(12, 0, true); c.setUint16(14, 0x21, true); c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true);
+      c.setUint16(28, name.length, true); c.setUint32(42, off, true);
+      cen.push(new Uint8Array(c.buffer), name);
+      off += 30 + name.length + data.length;
+    });
+    const cenLen = cen.reduce((a, b) => a + b.length, 0);
+    const e = new DataView(new ArrayBuffer(22));
+    e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cenLen, true); e.setUint32(16, off, true);
+    const all = parts.concat(cen, [new Uint8Array(e.buffer)]);
+    const out = new Uint8Array(all.reduce((a, b) => a + b.length, 0));
+    let p = 0; all.forEach(a => { out.set(a, p); p += a.length; });
+    return out;
+  }
+  const x = s => String(s === null || s === undefined ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+  const colL = n => { let s = ''; n++; while (n) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; };
+  // 書式番号: 0標準 1見出し 2入力欄(文字列) 3題名 4説明 5番号 6固定値 7注意(赤) 8小見出し
+  const STYLES = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    '<fonts count="6"><font><sz val="11"/><name val="游ゴシック"/><family val="3"/><charset val="128"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="游ゴシック"/><family val="3"/><charset val="128"/></font>' +
+    '<font><b/><sz val="16"/><color rgb="FF0A2540"/><name val="游ゴシック"/><family val="3"/><charset val="128"/></font><font><sz val="10"/><color rgb="FF4A5868"/><name val="游ゴシック"/><family val="3"/><charset val="128"/></font>' +
+    '<font><b/><sz val="11"/><color rgb="FFC0322B"/><name val="游ゴシック"/><family val="3"/><charset val="128"/></font><font><b/><sz val="12"/><color rgb="FF0A2540"/><name val="游ゴシック"/><family val="3"/><charset val="128"/></font></fonts>' +
+    '<fills count="6"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0A2540"/></patternFill></fill>' +
+    '<fill><patternFill patternType="solid"><fgColor rgb="FFFFF9DB"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE6EFF8"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEEF2F6"/></patternFill></fill></fills>' +
+    '<borders count="2"><border/><border><left style="thin"><color rgb="FFBFC9D3"/></left><right style="thin"><color rgb="FFBFC9D3"/></right><top style="thin"><color rgb="FFBFC9D3"/></top><bottom style="thin"><color rgb="FFBFC9D3"/></bottom><diagonal/></border></borders>' +
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="9">' +
+    '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
+    '<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>' +
+    '<xf numFmtId="49" fontId="0" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyFill="1" applyBorder="1" applyProtection="1"><alignment vertical="center"/><protection locked="0"/></xf>' +
+    '<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+    '<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
+    '<xf numFmtId="0" fontId="0" fillId="4" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>' +
+    '<xf numFmtId="49" fontId="0" fillId="5" borderId="1" xfId="0" applyNumberFormat="1" applyFill="1" applyBorder="1"><alignment vertical="center"/></xf>' +
+    '<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
+    '<xf numFmtId="0" fontId="5" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+    '</cellXfs></styleSheet>';
+  function sheetXml(o) {
+    // o: {rows:[[{v,s}]], cols:[w], freeze:row, merges:[], dv:[{sqref, list|formula, title, msg}], heights:{r:h}}
+    let h = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">';
+    h += '<sheetViews><sheetView workbookViewId="0"' + (o.tab ? ' tabSelected="1"' : '') + '>' + (o.freeze ? '<pane ySplit="' + o.freeze + '" topLeftCell="A' + (o.freeze + 1) + '" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="B' + (o.freeze + 1) + '" sqref="B' + (o.freeze + 1) + '"/>' : '') + '</sheetView></sheetViews>';
+    h += '<sheetFormatPr defaultRowHeight="20" customHeight="1"/>';
+    if (o.cols) h += '<cols>' + o.cols.map((w, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>').join('') + '</cols>';
+    h += '<sheetData>' + o.rows.map((row, ri) => {
+      const ht = o.heights && o.heights[ri + 1];
+      return '<row r="' + (ri + 1) + '"' + (ht ? ' ht="' + ht + '" customHeight="1"' : '') + '>' + row.map((c, ci) => {
+        if (c === null || c === undefined) return '';
+        const ref = colL(ci) + (ri + 1), s = c.s ? ' s="' + c.s + '"' : '';
+        if (c.v === '' || c.v === undefined || c.v === null) return '<c r="' + ref + '"' + s + '/>';
+        if (typeof c.v === 'number') return '<c r="' + ref + '"' + s + '><v>' + c.v + '</v></c>';
+        return '<c r="' + ref + '"' + s + ' t="inlineStr"><is><t xml:space="preserve">' + x(c.v) + '</t></is></c>';
+      }).join('') + '</row>';
+    }).join('') + '</sheetData>';
+    if (o.merges && o.merges.length) h += '<mergeCells count="' + o.merges.length + '">' + o.merges.map(m => '<mergeCell ref="' + m + '"/>').join('') + '</mergeCells>';
+    if (o.dv && o.dv.length) h += '<dataValidations count="' + o.dv.length + '">' + o.dv.map(d => '<dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" errorStyle="' + (d.strict ? 'stop' : 'warning') + '" errorTitle="' + x(d.title) + '" error="' + x(d.msg) + '" promptTitle="' + x(d.title) + '" prompt="' + x(d.prompt || '▼から選んでください') + '" sqref="' + d.sqref + '"><formula1>' + x(d.formula) + '</formula1></dataValidation>').join('') + '</dataValidations>';
+    h += '<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="landscape" fitToHeight="0"/>';
+    return h + '</worksheet>';
+  }
+  function workbook(sheets, names) {
+    const files = [];
+    files.push({ name: '[Content_Types].xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' + sheets.map((s, i) => '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('') + '</Types>' });
+    files.push({ name: '_rels/.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>' });
+    files.push({ name: 'xl/workbook.xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView activeTab="0"/></bookViews><sheets>' +
+      sheets.map((s, i) => '<sheet name="' + x(s.name) + '" sheetId="' + (i + 1) + '"' + (s.hidden ? ' state="hidden"' : '') + ' r:id="rId' + (i + 1) + '"/>').join('') + '</sheets>' +
+      (names.length ? '<definedNames>' + names.map(n => '<definedName name="' + n.name + '">' + x(n.ref) + '</definedName>').join('') + '</definedNames>' : '') + '</workbook>' });
+    files.push({ name: 'xl/_rels/workbook.xml.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + sheets.map((s, i) => '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>').join('') + '<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>' });
+    files.push({ name: 'xl/styles.xml', data: STYLES });
+    sheets.forEach((s, i) => files.push({ name: 'xl/worksheets/sheet' + (i + 1) + '.xml', data: sheetXml(s) }));
+    return zip(files);
+  }
+
+  const MARK = 'SWIM-ENTRY-FORM-1';
+  const IND_HEAD = ['No', '姓', '名', 'セイ（カナ）', 'メイ（カナ）', 'チーム名', '区分', '種目', 'エントリータイム（任意）'];
+  const REL_HEAD = ['No', 'チーム名', '記号', '区分', '種目', '第1泳者', '第2泳者', '第3泳者', '第4泳者', 'エントリータイム（任意）'];
+  const HEAD_ROW = 4;      // 見出しの行
+  function build(opt) {
+    const S = state.settings;
+    const clubs = S.clubs.map(c => c.name).filter(Boolean), cats = S.categories.filter(Boolean);
+    const indEv = S.events.filter(e => e && !C.isRelayName(e)), relEv = S.events.filter(e => C.isRelayName(e));
+    const team = opt.team || '', nInd = Math.max(10, Math.min(1000, opt.rows || 100)), nRel = Math.max(0, Math.min(200, opt.relRows === undefined ? 20 : opt.relRows));
+    const mx = parseInt(S.maxEventsPerPerson, 10);
+    const sheets = [];
+    // 1. 記入方法
+    const L = [];
+    L.push([{ v: S.meetName + '　エントリー用シート', s: 3 }]);
+    L.push([{ v: team ? 'チーム: ' + team : 'すべてのチーム共通', s: 8 }]);
+    L.push([]);
+    if (opt.deadline) L.push([{ v: '締め切り: ' + opt.deadline, s: 7 }]);
+    if (opt.contact) L.push([{ v: '提出先: ' + opt.contact, s: 8 }]);
+    L.push([]);
+    [['記入のしかた', 8],
+      ['1. 「個人エントリー」シートの黄色いセルに、1行に1種目ずつ記入してください。2種目に出る選手は2行に分けて書きます。', 4],
+      ['2. 姓・名は漢字、セイ・メイはカタカナで記入してください（例: 山田／太郎／ヤマダ／タロウ）。', 4],
+      ['3. チーム名・区分・種目は、セルを選ぶと出る ▼ から選んでください。手で打つと読み込めないことがあります。', 4],
+      ['4. エントリータイムは分かる場合だけ記入します（例: 28.50 または 1:05.30）。', 4],
+      [mx > 0 ? '5. 1人' + mx + '種目までです。' : '5. 出場できる種目数は大会要項を確認してください。', 4],
+      ['6. リレーに出る場合は「リレーエントリー」シートに、チームごとに1行で記入してください。同じチームから2組出るときは記号に A・B と入れます。', 4],
+      ['7. シート名・見出しの行・列の並びは変えないでください。行の追加・削除もしないでください（足りないときは大会係へ連絡してください）。', 7],
+      ['8. 記入が終わったら、このファイルのまま（名前を変えてもかまいません）提出してください。', 4]].forEach(([t, s]) => L.push([{ v: t, s }]));
+    L.push([]);
+    L.push([{ v: '選べる区分: ' + cats.join('、'), s: 4 }]);
+    L.push([{ v: '選べる種目: ' + indEv.join('、'), s: 4 }]);
+    if (relEv.length) L.push([{ v: 'リレー種目: ' + relEv.join('、'), s: 4 }]);
+    sheets.push({ name: '記入方法', rows: L, cols: [120], tab: true, heights: Object.fromEntries(L.map((r, i) => [i + 1, r[0] && r[0].s === 4 ? 34 : r[0] && r[0].s === 3 ? 28 : 20])) });
+    // 2. 個人エントリー
+    const iv = [[{ v: '個人エントリー' + (team ? '（' + team + '）' : ''), s: 3 }], [{ v: '黄色いセルに記入。1行＝1人1種目。チーム・区分・種目は ▼ から選択。', s: 4 }], []];
+    iv.push(IND_HEAD.map(h => ({ v: h, s: 1 })));
+    for (let i = 1; i <= nInd; i++) iv.push([{ v: i, s: 5 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, team ? { v: team, s: 6 } : { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }]);
+    const r1 = HEAD_ROW + 1, r2 = HEAD_ROW + nInd;
+    const dvI = [{ sqref: 'G' + r1 + ':G' + r2, formula: 'CatList', title: '区分', msg: '区分は ▼ の中から選んでください', strict: true },
+      { sqref: 'H' + r1 + ':H' + r2, formula: 'IndEvList', title: '種目', msg: '種目は ▼ の中から選んでください', strict: true }];
+    if (!team) dvI.push({ sqref: 'F' + r1 + ':F' + r2, formula: 'TeamList', title: 'チーム名', msg: 'チーム名は ▼ の中から選んでください', strict: true });
+    sheets.push({ name: '個人エントリー', rows: iv, cols: [6, 12, 12, 14, 14, 18, 12, 24, 16], freeze: HEAD_ROW, merges: ['A1:I1', 'A2:I2'], dv: dvI, heights: { 1: 26, 2: 18, 4: 30 } });
+    // 3. リレーエントリー
+    if (nRel > 0 && relEv.length) {
+      const rv = [[{ v: 'リレーエントリー' + (team ? '（' + team + '）' : ''), s: 3 }], [{ v: '1行＝1チーム。泳者は「姓　名」で4人分。同じチームから2組以上出るときは記号に A・B…', s: 4 }], []];
+      rv.push(REL_HEAD.map(h => ({ v: h, s: 1 })));
+      for (let i = 1; i <= nRel; i++) rv.push([{ v: i, s: 5 }, team ? { v: team, s: 6 } : { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }]);
+      const q1 = HEAD_ROW + 1, q2 = HEAD_ROW + nRel;
+      const dvR = [{ sqref: 'D' + q1 + ':D' + q2, formula: 'CatList', title: '区分', msg: '区分は ▼ の中から選んでください', strict: true },
+        { sqref: 'E' + q1 + ':E' + q2, formula: 'RelEvList', title: '種目', msg: '種目は ▼ の中から選んでください', strict: true },
+        { sqref: 'C' + q1 + ':C' + q2, formula: '"A,B,C,D,E"', title: '記号', msg: '記号は A〜E から選ぶか、空欄にしてください', strict: false }];
+      if (!team) dvR.push({ sqref: 'B' + q1 + ':B' + q2, formula: 'TeamList', title: 'チーム名', msg: 'チーム名は ▼ の中から選んでください', strict: true });
+      sheets.push({ name: 'リレーエントリー', rows: rv, cols: [6, 18, 7, 12, 26, 16, 16, 16, 16, 16], freeze: HEAD_ROW, merges: ['A1:J1', 'A2:J2'], dv: dvR, heights: { 1: 26, 2: 18, 4: 30 } });
+    }
+    // 4. 選択肢（非表示）と、読み込み用の目印
+    const n = Math.max(clubs.length, cats.length, indEv.length, relEv.length, 1);
+    const lr = [[{ v: MARK }, { v: S.meetName }, { v: team }, { v: new Date().toISOString() }], [{ v: 'チーム' }, { v: '区分' }, { v: '個人種目' }, { v: 'リレー種目' }]];
+    for (let i = 0; i < n; i++) lr.push([{ v: clubs[i] || '' }, { v: cats[i] || '' }, { v: indEv[i] || '' }, { v: relEv[i] || '' }]);
+    sheets.push({ name: '_選択肢', rows: lr, hidden: true });
+    const ref = (col, len) => "'_選択肢'!$" + col + '$3:$' + col + '$' + (2 + Math.max(1, len));
+    const names = [{ name: 'TeamList', ref: ref('A', clubs.length) }, { name: 'CatList', ref: ref('B', cats.length) }, { name: 'IndEvList', ref: ref('C', indEv.length) }, { name: 'RelEvList', ref: ref('D', relEv.length) }];
+    return workbook(sheets, names);
+  }
+
+  // ---- 記入済みファイルの読み込み（SheetJS）
+  const s = v => v === undefined || v === null ? '' : String(v).replace(/^[\s　]+|[\s　]+$/g, '');
+  const kana = v => { let t = s(v); try { t = t.normalize('NFKC'); } catch (e) { /* ignore */ } return t.replace(/[ぁ-ゖ]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60)); };
+  function isForm(wb) { const L = wb.Sheets['_選択肢']; return !!(L && L.A1 && String(L.A1.v).indexOf('SWIM-ENTRY-FORM') === 0) || !!(wb.Sheets['個人エントリー'] && wb.Sheets['個人エントリー']['B' + HEAD_ROW] && wb.Sheets['個人エントリー']['B' + HEAD_ROW].v === '姓'); }
+  function read(wb, X, fileName) {
+    const L = wb.Sheets['_選択肢'];
+    const meta = { file: fileName, team: L && L.C1 ? s(L.C1.v) : '', meet: L && L.B1 ? s(L.B1.v) : '' };
+    const timeStr = v => { if (v === undefined || v === null || v === '') return ''; if (typeof v === 'number') { const p = C.parseTime(v, { threeDigit: 'sec' }); return p.kind === 'time' ? C.fmtTime(p.sec) : String(v); } return C.fixTimeText(s(v)); };
+    const rowsOf = ws => ws ? X.utils.sheet_to_json(ws, { header: 1, range: HEAD_ROW, defval: '', raw: true }) : [];
+    const entries = [], relays = [];
+    rowsOf(wb.Sheets['個人エントリー']).forEach((r, i) => {
+      const sei = s(r[1]), mei = s(r[2]), ks = kana(r[3]), km = kana(r[4]);
+      const team = s(r[5]), cat = s(r[6]), ev = s(r[7]), t = timeStr(r[8]);
+      if (!sei && !mei && !ks && !km && !cat && !ev && !t) return;
+      entries.push({ id: uid(), name: [sei, mei, ks, km].filter(Boolean).join('　'), club: team || meta.team, cat, event: ev, entryTime: t, officialTime: '', judge: '', _row: HEAD_ROW + 1 + i, _file: fileName });
+    });
+    rowsOf(wb.Sheets['リレーエントリー']).forEach((r, i) => {
+      const team = s(r[1]), mark = s(r[2]).toUpperCase(), cat = s(r[3]), ev = s(r[4]), mem = [5, 6, 7, 8].map(k => C.fixName(s(r[k])));
+      if (!mark && !cat && !ev && !mem.some(Boolean)) return;
+      relays.push({ id: uid(), team: team || meta.team, mark, cat, event: ev, members: mem, entryTime: timeStr(r[9]), officialTime: '', judge: '', _row: HEAD_ROW + 1 + i, _file: fileName });
+    });
+    return { meta, entries, relays };
+  }
+  function check(res) {
+    const S = state.settings, probs = [];
+    const clubs = new Set(S.clubs.map(c => c.name)), cats = new Set(S.categories), evs = new Set(S.events);
+    const seen = new Set(state.entries.map(e => C.normKey(e.name) + '|' + e.event));
+    res.entries.forEach(e => {
+      const p = [];
+      if (!e.name) p.push('氏名が空欄');
+      else if (e.name.split('　').length < 4) p.push('姓・名・カナのどこかが空欄');
+      if (!e.club) p.push('チーム名が空欄'); else if (!clubs.has(e.club)) p.push('チーム「' + e.club + '」がリストにない');
+      if (!e.cat) p.push('区分が空欄'); else if (!cats.has(e.cat)) p.push('区分「' + e.cat + '」がリストにない');
+      if (!e.event) p.push('種目が空欄'); else if (!evs.has(e.event)) p.push('種目「' + e.event + '」がリストにない');
+      if (C.parseTime(e.entryTime, { threeDigit: S.threeDigit }).kind === 'error') p.push('タイム「' + e.entryTime + '」を読めない');
+      const k = C.normKey(e.name) + '|' + e.event;
+      if (e.name && e.event && seen.has(k)) { e._dup = true; p.push('同じ選手・種目がすでにある'); } else seen.add(k);
+      if (p.length) probs.push({ where: e._file + ' 個人 ' + e._row + '行目 ' + (e.name || ''), what: p.join('・'), dup: !!e._dup });
+    });
+    res.relays.forEach(r => {
+      const p = [];
+      if (!r.team) p.push('チーム名が空欄'); else if (!clubs.has(r.team)) p.push('チーム「' + r.team + '」がリストにない');
+      if (!r.cat) p.push('区分が空欄'); if (!r.event) p.push('種目が空欄'); else if (!evs.has(r.event)) p.push('種目がリストにない');
+      if (r.members.filter(Boolean).length < 4) p.push('泳者が4人そろっていない');
+      if (p.length) probs.push({ where: r._file + ' リレー ' + r._row + '行目 ' + r.team + ' ' + r.mark, what: p.join('・') });
+    });
+    return probs;
+  }
+  return { build, isForm, read, check };
+})();
+
+// ---- 画面からの操作
+function openEntryFormMaker() {
+  const S = state.settings;
+  const clubs = S.clubs.map(c => c.name).filter(Boolean);
+  modal('<h2>エントリー用Excelを作る</h2><p class="small">各チームに配って記入してもらい、締め切り後にまとめて読み込むためのExcelを作ります。チーム名・区分・種目は ▼ から選ぶ形になるので、打ち間違いが起きにくくなります。</p>' +
+    '<div class="fields">' +
+    field('作り方', '<select id="ef-mode"><option value="all">全チーム共通の1ファイル</option><option value="each">チームごとに1ファイルずつ（' + clubs.length + 'ファイル）</option><option value="one">特定のチーム用の1ファイル</option></select>') +
+    field('チーム（特定のチーム用）', '<select id="ef-team">' + clubs.map(c => '<option>' + esc(c) + '</option>').join('') + '</select>') +
+    field('個人の記入行数', '<input id="ef-rows" value="100" inputmode="numeric">') +
+    field('リレーの記入行数', '<input id="ef-rel" value="20" inputmode="numeric">') +
+    field('締め切り（記入方法に表示）', '<input id="ef-deadline" placeholder="例: 11月10日（月）17時">') +
+    field('提出先（記入方法に表示）', '<input id="ef-contact" placeholder="例: 大会係 メールアドレス">') +
+    '</div><p class="small muted" style="margin-top:10px">今の大会設定（種目・区分・クラブ）が選択肢になります。設定を変えたら作り直してください。</p>' +
+    '<div class="actions"><button class="btn" data-close>キャンセル</button><button class="btn primary" id="ef-ok">Excelを作る</button></div>', (m, close) => {
+    m.querySelector('#ef-ok').addEventListener('click', () => {
+      const mode = m.querySelector('#ef-mode').value;
+      const base = { rows: parseInt(m.querySelector('#ef-rows').value, 10) || 100, relRows: parseInt(m.querySelector('#ef-rel').value, 10), deadline: m.querySelector('#ef-deadline').value.trim(), contact: m.querySelector('#ef-contact').value.trim() };
+      const teams = mode === 'all' ? [''] : mode === 'one' ? [m.querySelector('#ef-team').value] : clubs;
+      if (!teams.length) { toast('クラブリストが空です。大会設定でクラブを登録してください', 'err'); return; }
+      close();
+      teams.forEach((t, i) => setTimeout(() => {
+        const bytes = EntryForm.build(Object.assign({ team: t }, base));
+        download('エントリー用_' + (t || '全チーム') + '.xlsx', new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+      }, i * 400));
+      toast(teams.length + 'ファイルを作りました。ダウンロードフォルダを確認してください', null, 6000);
+    });
+  });
+}
+function importEntryForms(fileList) {
+  const files = [...fileList];
+  if (!files.length) return;
+  toast(files.length + 'ファイルを読み込んでいます…');
+  loadXLSX().then(X => Promise.all(files.map(f => f.arrayBuffer().then(buf => ({ f, wb: X.read(buf, { type: 'array' }) })))).then(list => {
+    const res = { entries: [], relays: [], metas: [], bad: [] };
+    list.forEach(({ f, wb }) => {
+      if (!EntryForm.isForm(wb)) { res.bad.push(f.name); return; }
+      const r = EntryForm.read(wb, X, f.name);
+      res.entries.push(...r.entries); res.relays.push(...r.relays); res.metas.push(Object.assign(r.meta, { n: r.entries.length, nr: r.relays.length }));
+    });
+    const probs = EntryForm.check(res);
+    const dups = res.entries.filter(e => e._dup).length;
+    const teams = [...new Set(res.entries.map(e => e.club).concat(res.relays.map(r => r.team)).filter(Boolean))];
+    modal('<h2>記入済みエントリーを読み込む</h2>' +
+      (res.bad.length ? '<div class="notice warn"><span class="grow">エントリー用Excelではないため読み込まないファイル: ' + esc(res.bad.join('、')) + '</span></div>' : '') +
+      '<div class="tablewrap" style="max-height:180px"><table class="t"><thead><tr><th>ファイル</th><th>チーム</th><th class="num">個人</th><th class="num">リレー</th></tr></thead><tbody>' +
+      res.metas.map(mm => '<tr><td>' + esc(mm.file) + '</td><td>' + esc(mm.team || '（共通）') + '</td><td class="num">' + mm.n + '</td><td class="num">' + mm.nr + '</td></tr>').join('') + '</tbody></table></div>' +
+      '<p>合計: 個人 <b>' + res.entries.length + '件</b>・リレー <b>' + res.relays.length + '件</b>' + (dups ? '（うち、すでに登録済みと同じ選手・種目 ' + dups + '件）' : '') + '</p>' +
+      (probs.length ? '<details class="card" style="padding:10px 12px"><summary>確認が必要な行 ' + probs.length + '件（読み込んだ後「入力チェック」でも直せます）</summary><div style="max-height:200px;overflow:auto;margin-top:6px">' + probs.slice(0, 300).map(p => '<div class="issue small"><span class="pill warn">' + esc(p.what) + '</span><span>' + esc(p.where) + '</span></div>').join('') + '</div></details>' : '<div class="notice ok">問題のある行は見つかりませんでした。</div>') +
+      '<div class="fields" style="margin-top:10px">' + field('読み込み方', '<select id="ei-mode"><option value="add">今のエントリーに追加する（登録済みと同じ選手・種目は飛ばす）</option><option value="team">このファイルのチーム（' + esc(teams.join('、') || '—') + '）の今のエントリーを置き換える</option><option value="all">今のエントリーをすべて置き換える</option></select>') + '</div>' +
+      '<div class="actions"><button class="btn" data-close>キャンセル</button><button class="btn primary" id="ei-ok" ' + (res.entries.length + res.relays.length ? '' : 'disabled') + '>読み込む</button></div>', (m, close) => {
+      m.querySelector('#ei-ok').addEventListener('click', () => {
+        const mode = m.querySelector('#ei-mode').value;
+        close();
+        const clean = o => { const c = Object.assign({}, o); delete c._row; delete c._file; delete c._dup; return c; };
+        const addE = res.entries.filter(e => mode !== 'add' || !e._dup).map(clean), addR = res.relays.map(clean);
+        commit('エントリー用Excelの読み込み', s => {
+          if (mode === 'all') { s.entries = []; s.relays = []; }
+          if (mode === 'team') { const ts = new Set(teams); s.entries = s.entries.filter(e => !ts.has(e.club)); s.relays = s.relays.filter(r => !ts.has(r.team)); }
+          s.entries.push(...addE); s.relays.push(...addR);
+        }, { snap: 'エントリー読み込み前' });
+        meta.sample = false; saveMeta();
+        location.hash = 'entries';
+        toast('個人 ' + addE.length + '件・リレー ' + addR.length + '件を読み込みました。「入力チェック」で確認してください', null, 9000, { label: '元に戻す', fn: undo });
+      });
+    });
+  })).catch(e => toast(e.message, 'err', 9000));
+}
 
 /* ---------------------------------------------------------------- Excel 取り込み・書き出し */
 const XlsxImport = (() => {
