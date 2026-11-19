@@ -438,7 +438,7 @@ table.t td > b { white-space: nowrap; }
 .heats.prog-h { grid-template-columns: repeat(auto-fill, minmax(min(100%, 500px), 1fr)); }
 .tablewrap.pw { overflow: visible; container-type: inline-size; }
 table.pt { table-layout: fixed; width: 100%; }
-table.pt col.c-ln { width: 50px; } table.pt col.c-mt { width: 112px; } table.pt col.c-tm { width: 144px; } table.pt col.c-jd { width: 82px; } table.pt col.c-rk { width: 56px; }
+table.pt col.c-ln { width: 44px; } table.pt col.c-mt { width: 100px; } table.pt col.c-tm { width: 128px; } table.pt col.c-jd { width: 74px; } table.pt col.c-rk { width: 50px; }
 table.pt th, table.pt td { padding: 4px 6px; }
 table.pt th { position: static; }
 table.pt tr.ph th { font-size: 13.5px; color: var(--ink); padding: 7px 10px; }
@@ -448,18 +448,21 @@ table.pt tr.pc th:first-child { padding: 3px 2px; }
 .heats.paged { grid-template-columns: 1fr; }
 .heattabs { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; margin: -2px 0 10px; }
 .heattabs[hidden] { display: none; }
-table.pt td .one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+table.pt td .one { white-space: nowrap; overflow: hidden; }
+table.pt td .one.wrap { white-space: normal; overflow: visible; line-height: 1.3; }
+table.pt td.nm .one:first-child { font-size: 14px; }
+@media (min-width: 1100px) { .withpv.pv-program { grid-template-columns: minmax(0, 1fr) clamp(220px, 19vw, 290px); } }
 table.pt td .sub { font-size: 12px; color: var(--muted); line-height: 1.35; }
 table.pt td.mt { font-size: 12.5px; }
 table.pt tr.emp td { padding-top: 2px; padding-bottom: 2px; height: 30px; }
 table.pt .tbox { position: relative; }
-table.pt input.tin { width: 100%; min-width: 0; padding-right: 60px; scroll-margin: 80px 0 16px; }
-table.pt .tbox .prev { position: absolute; right: 9px; top: 0; height: 36px; display: flex; align-items: center; padding: 0; pointer-events: none; white-space: nowrap; }
+table.pt input.tin { width: 100%; min-width: 0; padding-left: 8px; padding-right: 56px; scroll-margin: 80px 0 16px; }
+table.pt .tbox .prev { position: absolute; right: 7px; top: 0; height: 36px; display: flex; align-items: center; padding: 0; pointer-events: none; white-space: nowrap; }
 table.pt .tbox .prev.bad { position: static; height: auto; display: block; overflow: hidden; text-overflow: ellipsis; padding: 2px 2px 0; }
 table.pt select { width: 100%; min-width: 0; padding-left: 8px; padding-right: 24px; background-position: calc(100% - 13px) 52%, calc(100% - 8px) 52%; }
 table.pt td.rk { white-space: nowrap; font-size: 13px; }
 /* 細い画面（スマホ・プレビューを横に出しているとき）: 1人を2段にして、それでも全部見せる */
-@container (max-width: 500px) {
+@container (max-width: 520px) {
   table.pt colgroup, table.pt tr.pc { display: none; }
   table.pt, table.pt thead, table.pt tbody, table.pt tr.ph, table.pt tr.ph th { display: block; width: 100%; }
   table.pt tbody tr { display: grid; grid-template-columns: 40px minmax(0, 1fr) 96px; grid-template-areas: "ln nm mt" "rk tm jd"; column-gap: 6px; align-items: center; padding: 5px 4px; border-bottom: 1px solid var(--hairline); }
@@ -559,6 +562,31 @@ table.t td.num, table.t th.num, table.t td.c { white-space: nowrap; }
 .frtile.on { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .frimg { display: grid; place-items: center; width: 60px; height: 85px; background: #fff center / 100% 100% no-repeat; border-radius: 3px; box-shadow: 0 1px 4px rgba(10,30,60,.18); color: var(--muted); font-size: 11px; }
 .frtile.up .frimg { font-size: 22px; color: var(--accent); }
+
+/* ---------- 組・レーンの入れ替え（ドラッグ＆ドロップ） ---------- */
+.arr { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 10px; align-items: start; }
+.arh { padding: 8px 8px 6px; }
+.arh.newh { border-style: dashed; background: transparent; box-shadow: none; }
+.arh-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 2px 4px 6px; font-size: 13.5px; white-space: nowrap; }
+.slot { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 6px; padding: 2px; border-radius: 12px; transition: background .12s, box-shadow .12s; }
+.slot.over { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
+.pcard { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; align-items: center; width: 100%; min-height: 42px; padding: 4px 9px; text-align: left; border: 1px solid var(--hairline); border-radius: 11px; background: var(--glass-strong); cursor: grab; touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.pcard .fit { display: block; white-space: nowrap; overflow: hidden; min-width: 0; }
+.pcard .fit.wrap { white-space: normal; line-height: 1.3; }
+.pcard .nm { font-size: 13.5px; }
+.pcard .sub { grid-column: 1; font-size: 11.5px; color: var(--muted); }
+.pcard .et { grid-column: 2; grid-row: 1 / 3; font-family: var(--font-num); font-size: 12px; color: var(--muted); }
+.pcard.sel { background: var(--accent-soft); box-shadow: 0 0 0 2px var(--accent); }
+.pcard.lifting { opacity: .3; }
+.pghost { position: fixed; left: 0; top: 0; z-index: 400; pointer-events: none; transform: scale(1.04); cursor: grabbing;
+  background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.55)); -webkit-backdrop-filter: blur(8px) saturate(1.7); backdrop-filter: blur(8px) saturate(1.7);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.9), 0 16px 34px rgba(10,30,60,.28); }
+.slot-empty { width: 100%; min-height: 42px; padding: 0 10px; text-align: left; border: 1px dashed var(--hairline); border-radius: 11px; background: transparent; color: var(--muted); font-size: 12.5px; cursor: pointer; }
+html.dragging-seat, html.dragging-seat * { cursor: grabbing !important; -webkit-user-select: none !important; user-select: none !important; }
+
+.nw { white-space: nowrap; }
+table.pt .tbox .prev.same, table.pt .tbox .prev:empty { display: none; }
+table.pt .tbox:has(.prev.same) input.tin, table.pt .tbox:has(.prev:empty) input.tin { padding-right: 8px; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 10mm }</style>
 </head>
@@ -813,6 +841,34 @@ const Core = (() => {
     });
   }
 
+  // 手で入れ替えた組・レーン（プログラム画面のドラッグ＆ドロップ）を自動の割り当ての上に重ねる
+  //  seat = { p: プログラム名, h: 組, l: レーン }。種目・区分が変わってプログラム名が違えば無視して自動に戻す。
+  //  固定した人と同じ場所に自動の人が来たら、空いているレーン（同じ組 → 他の組 → 新しい組）へずらす。最後に組番号を詰める。
+  function applySeats(items, S, srcKey) {
+    const lanes = laneList(S);
+    const byProg = new Map();
+    items.forEach(it => { if (!it.program || !it.heat) return; if (!byProg.has(it.program)) byProg.set(it.program, []); byProg.get(it.program).push(it); });
+    byProg.forEach((arr, prog) => {
+      const seatOf = it => { const st = it[srcKey] && it[srcKey].seat; return st && st.p === prog && Number.isInteger(+st.h) && +st.h >= 1 && lanes.indexOf(+st.l) >= 0 ? { h: +st.h, l: +st.l } : null; };
+      if (!arr.some(seatOf)) return;
+      const used = new Map(), key = (h, l) => h + '|' + l;
+      const fixed = [], auto = [];
+      arr.forEach(it => { const st = seatOf(it); if (st && !used.has(key(st.h, st.l))) { it.heat = st.h; it.lane = st.l; it.seatFixed = true; used.set(key(st.h, st.l), it); fixed.push(it); } else auto.push(it); });
+      const pending = [];
+      auto.forEach(it => { if (it.lane && !used.has(key(it.heat, it.lane))) used.set(key(it.heat, it.lane), it); else pending.push(it); });
+      pending.forEach(it => {
+        const maxH = Math.max(0, ...arr.filter(x => used.has(key(x.heat, x.lane)) && used.get(key(x.heat, x.lane)) === x).map(x => x.heat));
+        const order = [it.heat].concat(Array.from({ length: maxH }, (_, i) => i + 1).filter(h => h !== it.heat));
+        let spot = null;
+        for (const h of order) { const l = lanes.find(l => !used.has(key(h, l))); if (l !== undefined) { spot = { h, l }; break; } }
+        if (!spot) spot = { h: maxH + 1, l: lanes[0] };
+        it.heat = spot.h; it.lane = spot.l; it.seatMoved = true; used.set(key(spot.h, spot.l), it);
+      });
+      const hs = [...new Set(arr.map(it => it.heat))].sort((a, b) => a - b), ren = new Map(hs.map((h, i) => [h, i + 1]));
+      arr.forEach(it => { it.heat = ren.get(it.heat); });
+    });
+  }
+
   // 公式順位（同じ種目・区分の中で） Excel P/Q 列
   function assignRanks(items) {
     const g = new Map();
@@ -863,6 +919,7 @@ const Core = (() => {
       return it;
     });
     assignHeats(rows, S, S.minPerHeatInd);
+    applySeats(rows, S, 'e');
     assignRanks(rows);
     const medalCount = new Map();
     rows.forEach(it => {
@@ -912,6 +969,7 @@ const Core = (() => {
       return it;
     });
     assignHeats(rows, S, S.minPerHeatRelay);
+    applySeats(rows, S, 'r');
     assignRanks(rows);
     const medal = new Map();
     rows.forEach(it => {
@@ -1822,9 +1880,23 @@ function render() {
   }
 }
 // プログラム・記録入力: 全組が画面に入りきれば全部、入りきらなければ1組ずつ（組のタブで切り替え）表示して、スクロールせずに入力できるようにする
+// 名前・チームなどは省略（…）しない: 入りきらなければ文字を少し小さくし、それでも無理なら2行にする
+function fitProgCells(root) {
+  root.querySelectorAll('.pt .fit, .arr .fit').forEach(d => {
+    d.classList.remove('wrap'); d.style.fontSize = '';
+    const cw = d.clientWidth; if (!cw || d.scrollWidth <= cw + 1) return;
+    const base = parseFloat(getComputedStyle(d).fontSize), min = base * 0.78;
+    let fs = base;
+    for (let i = 0; i < 4 && d.scrollWidth > cw + 1 && fs > min; i++) { fs = Math.max(min, fs * cw / d.scrollWidth * 0.98); d.style.fontSize = fs.toFixed(2) + 'px'; }
+    if (d.scrollWidth > cw + 1) d.classList.add('wrap');
+  });
+}
 function fitProgram() {
+  const arr = document.querySelector('.arr'); if (arr) fitProgCells(arr);
   const el = document.querySelector('.heats.prog-h'), tabs = document.querySelector('.heattabs');
   if (!el) return;
+  el.classList.remove('paged');
+  fitProgCells(el);
   el.classList.remove('paged'); if (tabs) tabs.hidden = true;
   if (!tabs) return;
   const avail = () => (parseFloat(el.style.maxHeight) || (window.innerHeight - el.getBoundingClientRect().top - window.scrollY - 16));
@@ -2142,7 +2214,7 @@ function timeCell(k, raw, extraClass, attrs) {
   const p = C.parseTime(raw, { threeDigit: k.indexOf('aw') === 0 ? 'mss' : state.settings.threeDigit });
   const bad = p.kind === 'error';
   const prev = p.kind === 'time' ? C.fmtTime(p.sec) : p.kind === 'special' ? p.special : bad ? p.msg : '';
-  return '<input class="tin ' + (bad ? 'bad ' : '') + (extraClass || '') + '" data-k="' + esc(k) + '" value="' + esc(raw === null || raw === undefined ? '' : raw) + '" inputmode="decimal" autocomplete="off" ' + (attrs || '') + '><span class="prev' + (bad ? ' bad' : '') + '" data-prev="' + esc(k) + '">' + esc(prev) + '</span>';
+  return '<input class="tin ' + (bad ? 'bad ' : '') + (extraClass || '') + '" data-k="' + esc(k) + '" value="' + esc(raw === null || raw === undefined ? '' : raw) + '" inputmode="decimal" autocomplete="off" ' + (attrs || '') + '><span class="prev' + (bad ? ' bad' : '') + (prev && prev === String(raw === null || raw === undefined ? '' : raw).trim() ? ' same' : '') + '" data-prev="' + esc(k) + '">' + esc(prev) + '</span>';
 }
 const pillStatus = s => s === '完泳' ? '<span class="pill ok">完泳</span>' : s === '失格' ? '<span class="pill err">失格</span>' : s === '棄権' ? '<span class="pill warn">棄権</span>' : s ? '<span class="pill mute">' + esc(s) + '</span>' : '';
 const blankOpt = label => [['', label || '—']];
@@ -2459,10 +2531,11 @@ VIEWS.program = () => {
     sel('ui:prog', ui.prog, opts.map(n => { const s = D.sched.rows.find(r => r.name === n); const its = D.ind.concat(D.rel).filter(it => it.program === n && it.event); const dn = its.filter(it => it.status !== '未入力').length; return [n, (s ? 'No.' + s.no + ' ' : '') + n + (its.length ? (dn === its.length ? '　✓' : dn ? '　' + dn + '/' + its.length : '') : '　（なし）')]; }), 'class="progsel" aria-label="種目"') +
     '<button class="btn" data-act="progStep" data-d="1" ' + (idx >= opts.length - 1 ? 'disabled' : '') + '>次 →</button>' +
     (ui.prog ? '<span class="pill mute">' + (p.sch ? 'No.' + p.sch.no + '・開始 ' + (p.sch.start !== null ? C.fmtClock(p.sch.start) : '—') : '<span style="color:var(--err)">スケジュール未登録</span>') + '</span><span class="pill mute">' + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組</span>' +
-      '<span class="pill ' + (allDone ? 'ok' : 'info') + '">入力 ' + p.done + ' / ' + p.items.length + '</span>' : '') +
-    '<span class="grow"></span><button class="btn sm" data-act="openflash" data-p="' + esc(ui.prog) + '">速報を見る</button><button class="btn sm" data-act="printProg" data-all="0">この種目を印刷</button><button class="btn sm" data-act="printProg" data-all="1">全種目を印刷</button></div>' +
+      '<span class="pill ' + (allDone ? 'ok' : 'info') + '">入力 ' + p.done + ' / ' + p.items.length + '</span>' + (p.items.some(it => it.seatFixed) ? '<span class="pill mute" title="「組・レーンを入れ替え」で手で並べた位置を使っています">手で並べ替え済み</span>' : '') : '') +
+    '<span class="grow"></span>' + (ui.prog && p.items.length ? (ui.progArrange ? '<button class="btn sm primary" data-act="progArrange">入れ替えを終える</button>' : '<button class="btn sm tinted" data-act="progArrange" title="選手をドラッグして組・レーンを入れ替えます">組・レーンを入れ替え</button>') : '') + '<button class="btn sm" data-act="openflash" data-p="' + esc(ui.prog) + '">速報を見る</button><button class="btn sm" data-act="printProg" data-all="0">この種目を印刷</button><button class="btn sm" data-act="printProg" data-all="1">全種目を印刷</button></div>' +
     (ui.prog && p.items.length ? '<div class="prog" style="margin:-4px 0 10px"><i style="width:' + pct + '%"></i></div>' : '') +
-    (allDone ? '<div class="notice ok"><span class="grow">この種目の記録入力が終わりました。</span><button class="btn sm" data-act="printFlash1" data-p="' + esc(ui.prog) + '">速報を印刷</button>' + (idx < opts.length - 1 ? '<button class="btn sm primary" data-act="progStep" data-d="1">次の種目へ →</button>' : '') + '</div>' : '') +
+    (allDone && !ui.progArrange ? '<div class="notice ok"><span class="grow">この種目の記録入力が終わりました。</span><button class="btn sm" data-act="printFlash1" data-p="' + esc(ui.prog) + '">速報を印刷</button>' + (idx < opts.length - 1 ? '<button class="btn sm primary" data-act="progStep" data-d="1">次の種目へ →</button>' : '') + '</div>' : '') +
+    (ui.progArrange && ui.prog && p.items.length ? arrangePanel(p, lanes) :
     (p.heats.length > 1 ? '<div class="heattabs" hidden><span class="small muted">組</span>' + seg('progHeat', p.heats.map(h => [h.heat, '第' + h.heat + '組' + (h.items.every(it => it.status !== '未入力') ? ' ✓' : '')]), curHeat) + '<span class="small muted">全組が入りきらないので1組ずつ表示しています。Enter で最後のレーンまで入れると次の組へ進みます。</span></div>' : '') +
     (!ui.prog ? '<div class="card empty">種目がありません。大会設定で種目を登録してください。</div>' :
       (p.items.length ? '<div class="heats prog-h fill" data-fill-id="prog">' + p.heats.map(h => {
@@ -2479,13 +2552,33 @@ VIEWS.program = () => {
             const who = p.relay ? it.teamDisp : it.name.split('　').slice(0, 2).join('　'), sub = p.relay ? it.memberText : it.club;
             const entry = it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '';
             return '<tr data-row="' + it.id + '" class="' + (iss.length ? 'warn' : '') + '" title="' + esc(iss.map(x => x.msg).join('\n')) + '"><td class="c ln"><span class="lane">' + (it.lane || '?') + '</span></td>' +
-              '<td class="nm"><div class="one"><b>' + esc(who) + '</b>' + (iss.length ? ' <span class="pill warn">要確認</span>' : '') + '</div><div class="one sub" title="' + esc(sub) + '">' + esc(sub) + '</div></td>' +
-              '<td class="mt"><div class="one">' + esc(it.cat) + (it.event !== ui.prog ? ' <span class="pill mute">' + esc(it.event.split(' ')[0]) + '</span>' : '') + '</div><div class="one sub num">' + (entry ? '申込 ' + entry : '　') + '</div></td>' +
+              '<td class="nm"><div class="one fit"><b>' + esc(who) + '</b></div><div class="one sub fit">' + (iss.length ? '<span class="pill warn">要確認</span> ' : '') + (p.relay ? it.members.filter(Boolean).map(m => '<span class="nw">' + esc(m) + '</span>').join(' / ') : esc(sub)) + '</div></td>' +
+              '<td class="mt"><div class="one fit">' + esc(it.cat) + (it.event !== ui.prog ? ' <span class="pill mute">' + esc(it.event.split(' ')[0]) + '</span>' : '') + '</div><div class="one sub num">' + (entry ? '申込 ' + entry : '　') + '</div></td>' +
               '<td class="tm"><div class="tbox">' + timeCell(pre + 'officialTime', src.officialTime, '', 'data-col="prog" aria-label="' + esc(who) + ' 公式タイム"') + '</div></td>' +
               '<td class="jd">' + sel(pre + 'judge', src.judge, [['', '—'], ['棄権', '棄権'], ['失格', '失格']], 'aria-label="' + esc(who) + ' 判定"') + '</td><td class="c rk"><b>' + (it.rank ? it.rank + '位' : it.status === '失格' || it.status === '棄権' ? '<span class="pill ' + (it.status === '失格' ? 'err' : 'warn') + '">' + it.status + '</span>' : '') + '</b></td></tr>';
           }).join('') + '</tbody></table></div>';
-      }).join('') + '</div>' : '<div class="card empty">この種目のエントリーはありません。</div>'));
+      }).join('') + '</div>' : '<div class="card empty">この種目のエントリーはありません。</div>')));
 };
+// 組・レーンの入れ替え（ドラッグ＆ドロップ、またはタップで選んで行き先をタップ）
+function arrangePanel(p, lanes) {
+  const maxH = Math.max(0, ...p.items.map(it => it.heat || 0));
+  const fixedN = p.items.filter(it => it.seatFixed).length, movedN = p.items.filter(it => it.seatMoved).length;
+  const card = it => {
+    const who = p.relay ? it.teamDisp : it.name.split('　').slice(0, 2).join('　');
+    const entry = it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '';
+    return '<button type="button" class="pcard' + (ui.arrSel === it.id ? ' sel' : '') + '" data-act="seatPick" data-id="' + esc(it.id) + '" aria-label="' + esc(who) + '（第' + it.heat + '組 ' + it.lane + 'レーン）">' +
+      '<span class="fit nm"><b>' + esc(who) + '</b></span><span class="fit sub">' + (p.relay ? it.members.filter(Boolean).map(m => '<span class="nw">' + esc(m) + '</span>').join(' / ') : esc(it.club)) + '・' + esc(it.cat) + '</span><span class="et">' + esc(entry) + '</span></button>';
+  };
+  const heat = (h, isNew) => {
+    const its = p.items.filter(it => it.heat === h);
+    return '<div class="arh card' + (isNew ? ' newh' : '') + '"><div class="arh-h"><b>' + (isNew ? '新しい組（第 ' + h + ' 組）' : '第 ' + h + ' 組') + '</b><span class="muted small">' + (isNew ? 'ここへ入れると組が増えます' : its.length + (p.relay ? 'チーム' : '人')) + '</span></div>' +
+      lanes.map(l => { const it = its.find(x => x.lane === l); return '<div class="slot" data-h="' + h + '" data-l="' + l + '"><span class="lane">' + l + '</span>' + (it ? card(it) : '<button type="button" class="slot-empty" data-act="seatPick" aria-label="第' + h + '組 ' + l + 'レーン（空き）">空き</button>') + '</div>'; }).join('') + '</div>';
+  };
+  return '<div class="notice info arr-help"><span class="grow">' + (isLocked() ? '<b>当日モード中は入れ替えできません。</b>上部の「当日モード」を解除してください。' : '選手を別のレーンへドラッグすると入れ替わります（空きなら移動）。スマホ・タブレットは長押ししてから動かします。タップで選んで行き先をタップしても同じです。') + (ui.arrSel ? '　<b>選択中：行き先をタップ</b>' : '') + '</span>' +
+    (fixedN ? '<button class="btn sm" data-act="seatReset">自動の並びに戻す</button>' : '') + '</div>' +
+    (movedN ? '<div class="notice warn">手で入れ替えた後に申込が変わったため、' + movedN + (p.relay ? 'チーム' : '人') + 'を空いているレーンへ自動で入れました。位置を確認してください。</div>' : '') +
+    '<div class="arr fill" data-fill-id="arr">' + Array.from({ length: maxH }, (_, i) => heat(i + 1)).join('') + heat(maxH + 1, true) + '</div>';
+}
 
 /* ---------------------------------------------------------------- 画面: 速報 */
 VIEWS.flash = () => {
@@ -2781,7 +2874,7 @@ function getPath(obj, path) { return path.split('.').reduce((o, k) => (o === und
 const ENT_LOCK_OK = ['officialTime', 'judge'];
 function setUI(f, val) {
   if (f === 'awCat') val = +val;
-  if (f === 'prog') { ui._focusFirst = true; ui.progHeat = null; }
+  if (f === 'prog') { ui._focusFirst = true; ui.progHeat = null; ui.arrSel = null; }
   if (f === 'progHeat') { val = +val; ui._focusFirst = true; }
   ui[f] = val;
   if (f.indexOf('ent') === 0 && f !== 'entPage') ui.entPage = 0;
@@ -2974,6 +3067,20 @@ const ACTIONS = {
       toast('「' + from + '」を「' + to + '」に変更しました（エントリー ' + n + '件）');
     }, { snap: '名前の一括変更前' });
     ui.renFrom = ''; ui.renTo = '';
+  },
+  progArrange: () => { ui.progArrange = !ui.progArrange; ui.arrSel = null; render(); },
+  seatPick: t => {
+    if (seatDrag.justDropped) return;
+    const id = t.dataset.id || null, slot = t.closest('.slot');
+    if (!ui.arrSel) { if (id) { ui.arrSel = id; render(); } return; }
+    if (id === ui.arrSel) { ui.arrSel = null; render(); return; }
+    const from = ui.arrSel; ui.arrSel = null;
+    if (slot) seatMove(from, +slot.dataset.h, +slot.dataset.l); else render();
+  },
+  seatReset: () => {
+    const name = ui.prog, relay = C.isRelayName(name);
+    if (commit('組・レーンを自動の並びに戻す（' + name + '）', s => { (relay ? s.relays : s.entries).forEach(o => { if (o.seat && o.seat.p === name) delete o.seat; }); }))
+      toast('自動の並びに戻しました', null, 7000, { label: '元に戻す', fn: undo });
   },
   progStep: t => { const o = programOptions(), i = o.indexOf(ui.prog) + (+t.dataset.d); if (o[i]) { ui.prog = o[i]; ui.progHeat = null; ui._focusFirst = true; save(); render(); window.scrollTo(0, 0); } },
   printFlash1: t => { ui.flash = t.dataset.p; printFlash(); },
@@ -3294,7 +3401,7 @@ function previewOn() { return navPref.pv !== false; }
 function pvShell(inner) {
   if (!PV_VIEWS.includes(view)) return inner;
   if (!previewOn()) return inner;
-  return '<div class="withpv"><div class="pv-main">' + inner + '</div><aside class="pv card" aria-label="印刷プレビュー"><div class="pv-head"><b>印刷プレビュー</b><span class="muted small" id="pv-count"></span><span class="grow"></span>' +
+  return '<div class="withpv pv-' + view + '"><div class="pv-main">' + inner + '</div><aside class="pv card" aria-label="印刷プレビュー"><div class="pv-head"><b>印刷プレビュー</b><span class="muted small" id="pv-count"></span><span class="grow"></span>' +
     '<button class="btn sm primary" data-act="pvPrint">印刷</button><button class="iconbtn sm" data-act="pvToggle" title="プレビューを隠す" aria-label="プレビューを隠す">' + icon('close') + '</button></div><div class="pv-body fill" data-fill-id="pv" id="pv-body"><div class="empty small">作成中…</div></div></aside></div>';
 }
 function schedulePreview() {
@@ -3404,6 +3511,92 @@ function exportXlsx() {
   }).catch(e => toast(e.message, 'err', 9000));
 }
 
+/* ---------------------------------------------------------------- 組・レーンの入れ替え */
+// 1人を (組 h, レーン l) へ。そこに誰かいれば入れ替え。入れ替えた種目の全員の位置を固定する（後から申込が増えても他の人は動かない）
+function seatMove(id, h, l) {
+  const name = ui.prog, relay = C.isRelayName(name);
+  const items = (relay ? D.rel : D.ind).filter(it => it.program === name && it.heat && it.lane);
+  const a = items.find(it => it.id === id);
+  if (!a || !h || !l) { render(); return; }
+  const b = items.find(it => it.heat === h && it.lane === l);
+  if (b === a) { render(); return; }
+  const pos = new Map(items.map(it => [it.id, { h: it.heat, l: it.lane }]));
+  pos.set(a.id, { h, l });
+  if (b) pos.set(b.id, { h: a.heat, l: a.lane });
+  const nm = it => relay ? it.teamDisp : it.name.split('　').slice(0, 2).join('　');
+  const ok = commit('組・レーンの入れ替え（' + name + '）', s => {
+    const map = new Map((relay ? s.relays : s.entries).map(o => [o.id, o]));
+    pos.forEach((v, k) => { const o = map.get(k); if (o) o.seat = { p: name, h: v.h, l: v.l }; });
+  });
+  if (ok) toast(nm(a) + ' → 第' + h + '組 ' + l + 'レーン' + (b ? '（' + nm(b) + ' と入れ替え）' : ''), null, 7000, { label: '元に戻す', fn: undo });
+}
+const seatDrag = { on: null, justDropped: false };
+function seatTarget(x, y) { const el = document.elementFromPoint(x, y); return el && el.closest ? el.closest('.arr .slot') : null; }
+function seatStart() {
+  const d = seatDrag.on; if (!d || d.started) return;
+  if (isLocked()) { toast('当日モード（設定ロック）中です。上部の「当日モード」を解除してから入れ替えてください', 'err'); seatDrag.on = null; return; }
+  d.started = true;
+  const r = d.el.getBoundingClientRect();
+  d.dx = d.x - r.left; d.dy = d.y - r.top;
+  const g = d.el.cloneNode(true); g.className = 'pcard pghost'; g.removeAttribute('data-act'); g.style.width = r.width + 'px';
+  document.body.appendChild(g); d.ghost = g;
+  d.el.classList.add('lifting'); document.documentElement.classList.add('dragging-seat');
+  seatMoveGhost(d.x, d.y);
+  if (navigator.vibrate) try { navigator.vibrate(8); } catch (e) { /* なくてもよい */ }
+}
+function seatMoveGhost(x, y) {
+  const d = seatDrag.on; if (!d || !d.ghost) return;
+  d.ghost.style.left = (x - d.dx) + 'px'; d.ghost.style.top = (y - d.dy) + 'px';
+  const t = seatTarget(x, y);
+  if (t !== d.over) { if (d.over) d.over.classList.remove('over'); d.over = t; if (t) t.classList.add('over'); }
+  // 端に近づいたら自動でスクロール
+  const box = document.querySelector('.arr.fill');
+  cancelAnimationFrame(d.raf);
+  const step = () => {
+    let vy = 0; const br = box && box.style.maxHeight ? box.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
+    if (y < br.top + 40) vy = -Math.min(18, (br.top + 40 - y) / 2); else if (y > br.bottom - 40) vy = Math.min(18, (y - br.bottom + 40) / 2);
+    if (!vy) return;
+    if (box && box.style.maxHeight) box.scrollTop += vy; else window.scrollBy(0, vy);
+    d.raf = requestAnimationFrame(step);
+  };
+  d.raf = requestAnimationFrame(step);
+}
+function seatEnd(drop, x, y) {
+  const d = seatDrag.on; seatDrag.on = null;
+  if (!d) return;
+  clearTimeout(d.timer); cancelAnimationFrame(d.raf);
+  if (!d.started) return;
+  if (d.ghost) d.ghost.remove();
+  d.el.classList.remove('lifting'); document.documentElement.classList.remove('dragging-seat');
+  if (d.over) d.over.classList.remove('over');
+  seatDrag.justDropped = true; setTimeout(() => { seatDrag.justDropped = false; }, 350);
+  const t = drop ? seatTarget(x, y) : null;
+  ui.arrSel = null;
+  if (t) seatMove(d.id, +t.dataset.h, +t.dataset.l); else render();
+}
+document.addEventListener('pointerdown', e => {
+  const c = e.target.closest && e.target.closest('.arr .pcard');
+  if (!c || e.button > 0 || seatDrag.on) return;
+  seatDrag.on = { id: c.dataset.id, el: c, x: e.clientX, y: e.clientY, pid: e.pointerId, mouse: e.pointerType === 'mouse', started: false };
+  if (!seatDrag.on.mouse) seatDrag.on.timer = setTimeout(() => seatStart(), 280);   // 指: 少し長押ししてから（ふつうのなぞりはスクロール）
+});
+document.addEventListener('pointermove', e => {
+  const d = seatDrag.on; if (!d || e.pointerId !== d.pid) return;
+  if (!d.started) {
+    const dist = Math.hypot(e.clientX - d.x, e.clientY - d.y);
+    if (d.mouse && dist > 5) { seatStart(); }
+    else if (!d.mouse && dist > 10) { clearTimeout(d.timer); seatDrag.on = null; return; }
+    else return;
+  }
+  e.preventDefault();
+  seatMoveGhost(e.clientX, e.clientY);
+});
+document.addEventListener('pointerup', e => { const d = seatDrag.on; if (d && e.pointerId === d.pid) seatEnd(true, e.clientX, e.clientY); });
+document.addEventListener('pointercancel', e => { const d = seatDrag.on; if (d && e.pointerId === d.pid) seatEnd(false); });
+document.addEventListener('touchmove', e => { if (seatDrag.on && seatDrag.on.started) e.preventDefault(); }, { passive: false });
+document.addEventListener('contextmenu', e => { if (seatDrag.on || (e.target.closest && e.target.closest('.arr .pcard'))) e.preventDefault(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && (seatDrag.on || ui.arrSel)) { if (seatDrag.on) seatEnd(false); ui.arrSel = null; render(); } });
+
 /* ---------------------------------------------------------------- イベント */
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-act]');
@@ -3426,7 +3619,7 @@ document.addEventListener('input', e => {
     const pv = el.parentNode.querySelector('[data-prev]');
     const bad = p.kind === 'error';
     el.classList.toggle('bad', bad);
-    if (pv) { pv.textContent = p.kind === 'time' ? C.fmtTime(p.sec) : p.kind === 'special' ? p.special : bad ? p.msg : ''; pv.classList.toggle('bad', bad); }
+    if (pv) { pv.textContent = p.kind === 'time' ? C.fmtTime(p.sec) : p.kind === 'special' ? p.special : bad ? p.msg : ''; pv.classList.toggle('bad', bad); pv.classList.toggle('same', !!pv.textContent && pv.textContent === el.value.trim()); }
   }
   if (el.dataset.k === 'ui:entQ' || el.dataset.k === 'ui:relQ') {
     clearTimeout(searchTimer);
