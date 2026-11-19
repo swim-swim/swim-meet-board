@@ -587,6 +587,31 @@ html.dragging-seat, html.dragging-seat * { cursor: grabbing !important; -webkit-
 .nw { white-space: nowrap; }
 table.pt .tbox .prev.same, table.pt .tbox .prev:empty { display: none; }
 table.pt .tbox:has(.prev.same) input.tin, table.pt .tbox:has(.prev:empty) input.tin { padding-right: 8px; }
+
+/* ---------- フリガナ（漢字の上に小さく） ---------- */
+ruby { ruby-position: over; ruby-align: center; }
+rt { font-size: .56em; font-weight: 400; color: var(--muted); letter-spacing: 0; line-height: 1; }
+table.pt td .one, .pcard .fit { padding-top: 1px; }
+.pmode { width: auto; min-height: 32px; padding-top: 4px; padding-bottom: 4px; font-size: 12.5px; }
+
+/* ---------- 印刷: プログラム（第n組の下にレーン／手書きの記録欄） ---------- */
+.pp.ptab { table-layout: auto; }
+.pp.ptab th.hn { width: 15mm; min-width: 15mm; white-space: nowrap; padding-left: 0; padding-right: 0; text-align: center; font-size: 10.5pt; font-weight: 800; color: var(--acc); letter-spacing: .02em; border-bottom-color: var(--acc); }
+.pp.ptab th { vertical-align: bottom; }
+.pp.ptab td.ln { text-align: center; padding-left: 0; padding-right: 0; }
+.pp.ptab th.c-nm { width: 30%; } .pp.ptab th.c-club { width: 20%; } .pp.ptab th.c-cat { width: 11%; }
+.pp.ptab th.c-team { width: 17%; } .pp.ptab th.c-mem { width: 33%; }
+.pp.ptab th.c-rec { width: 30mm; } .pp.ptab th.c-rk { width: 14mm; }
+.pp.ptab .nm rt { font-size: 6.5pt; color: #5b6470; font-weight: 400; }
+.pp.ptab td.mem { font-size: 10pt; }
+.pp.ptab td.mem rt { font-size: 5.6pt; color: #5b6470; }
+.pp.ptab td.mem .sep { font-style: normal; color: #b4bac2; margin: 0 1.4mm; }
+.pp.ptab tbody tr:not(.emp) td { padding-top: calc(1.5mm + var(--rp, 0px)); padding-bottom: calc(1.5mm + var(--rp, 0px)); }
+.pp.ptab.blank tbody tr:not(.emp) td { padding-top: calc(1.8mm + var(--rp, 0px)); padding-bottom: calc(1.8mm + var(--rp, 0px)); }
+.pp.ptab .wbox { display: inline-block; width: 27mm; height: 7.4mm; border: .7pt solid #8d96a0; border-radius: 1.2mm; vertical-align: middle; }
+.pp.ptab .wbox.rk { width: 10mm; }
+.pp.ptab tr.emp td { padding-top: .6mm; padding-bottom: .6mm; }
+.pg-z.col1 .blk { margin-bottom: 3.2mm; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 10mm }</style>
 </head>
@@ -741,6 +766,7 @@ const Core = (() => {
       minPerHeatInd: 3, minPerHeatRelay: 3,
       combined: [],            // [{name, pairs:[{event,cat}×3]}]
       threeDigit: 'mss',
+      kanaStyle: 'kata',       // フリガナの表記: kata = カタカナ / hira = ひらがな
       schedule: {
         title: '競技進行スケジュール',
         doorOpen: '7:30', warmup: '7:55 ～ 8:25', opening: '8:30', start: '8:45', closing: '10:50 (予定)', exit: '11:15',
@@ -752,7 +778,7 @@ const Core = (() => {
       maxEventsPerPerson: 2,
       cert: { title: '記　録　証', lines: ['あなたは本大会において', '最後まで力強い泳ぎを見せ', '見事完泳されました', 'よってその健闘を讃えこれを証します'], date: '', organizer: '大会主催者名　印', printRecord: true },
       award: { title: '賞　状', lines: ['あなたは本大会において', '極めて優秀な成績を収められました', 'よってその健闘と栄誉を讃え', 'これを賞します'], date: '', organizer: '大会主催者名　印' },
-      print: { scale: 100, offsetTop: 0, offsetLeft: 0 },
+      print: { scale: 100, offsetTop: 0, offsetLeft: 0, progMode: 'blank' },   // progMode: blank = 記録欄を空けて手書き用 / result = 記録入り
       dashboard: { capacity: 90, target: 80, price: 3000, tax: 10 }
     };
   }
@@ -914,6 +940,7 @@ const Core = (() => {
         tie(o) { return this.idx - o.idx; }
       };
       it.program = it.combined || event;
+      it.np = splitName(it.name, S.kanaStyle);     // { kanji: 苗字　名前, kana: フリガナ（設定の表記） }
       // 表示用タイム（Excel S列）
       it.officialText = pf.kind === 'time' ? fmtTimeJa(pf.sec) : (pf.kind === 'special' ? pf.special : (hasF ? str(e.officialTime) : ''));
       return it;
@@ -963,8 +990,9 @@ const Core = (() => {
         tie(o) { return JA.compare(this.teamDisp, o.teamDisp) || this.idx - o.idx; }
       };
       it.program = it.combined || event;
-      it.memberText = members[0] ? members.join(' / ') : '';
-      it.memberFlash = team ? members.filter(Boolean).join('・').replace(/　/g, '') : '';
+      it.memberNames = members.map(m => splitName(m, S.kanaStyle));     // { kanji, kana, ... } ×4
+      it.memberText = members[0] ? it.memberNames.map(m => m.kanji).join(' / ') : '';
+      it.memberFlash = team ? it.memberNames.filter(m => m.kanji).map(m => m.kanji.replace(/　/g, '')).join('・') : '';
       it.officialText = pf.kind === 'time' ? fmtTimeJa(pf.sec) : (pf.kind === 'special' ? pf.special : (hasF ? str(r.officialTime) : ''));
       return it;
     });
@@ -1188,7 +1216,7 @@ const Core = (() => {
       else if (!isRelayName(it.event)) add('error', 'リレー', no + ' ' + who + ': 「' + it.event + '」はリレー種目ではありません', ref);
       if (!it.cat) add('error', 'リレー', no + ' ' + who + ': 区分が空欄です', ref);
       else if (!catSet.has(it.cat)) add('error', 'リレー', no + ' ' + who + ': 区分「' + it.cat + '」が区分リストにありません', ref);
-      const mem = it.members.filter(Boolean);
+      const mem = it.members.filter(Boolean).map(m => splitName(m).kanji);     // 重複の判定は漢字の氏名で
       if (mem.length < 4) add('warn', 'リレー', no + ' ' + who + ': 泳者が' + mem.length + '名です（4名必要）', ref);
       const ms = new Set();
       mem.forEach(m => { const k = normKey(m); if (ms.has(k)) add('error', 'リレー', no + ' ' + who + ': 泳者「' + m + '」が2回入っています', ref); ms.add(k); });
@@ -1250,6 +1278,23 @@ const Core = (() => {
   function hasLooseChars(v) { return typeof v === 'string' && /[０-９．：，　]/.test(v); }
   function fixName(s) {
     return str(s).replace(/[ 　\t]+/g, '　').replace(/^　|　$/g, '');
+  }
+  // ---- フリガナ: 氏名は「苗字　名前　ミョウジ　ナマエ」（3つ目以降がフリガナ）。リレーの泳者も同じ形。
+  //  半角カナは全角に直し、設定（カタカナ／ひらがな）にそろえる
+  function kanaConv(t, style) {
+    t = str(t);
+    try { t = t.normalize('NFKC'); } catch (e) { /* ignore */ }
+    if (style === 'hira') return t.replace(/[\u30A1-\u30F6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+    return t.replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
+  }
+  function splitName(name, style) {
+    const parts = fixName(name).split('　').filter(Boolean);
+    return { kanji: parts.slice(0, 2).join('　'), kana: kanaConv(parts.slice(2).join('　'), style), kanjiParts: parts.slice(0, 2), kanaParts: parts.slice(2).map(k => kanaConv(k, style)) };
+  }
+  // 入力された氏名のフリガナ部分だけを設定の表記にそろえる（漢字の部分はそのまま）
+  function normName(name, style) {
+    const parts = fixName(name).split('　').filter(Boolean);
+    return parts.map((p, i) => i >= 2 ? kanaConv(p, style) : p).join('　');
   }
   function fixTimeText(v) { return typeof v === 'string' ? toHalf(v).trim() : v; }
 
@@ -1450,7 +1495,7 @@ const Core = (() => {
     toHalf, normKey, str, parseTime, fmtTime, fmtTimeJa, fmtClock, parseClock, parseDuration, fmtDuration, num,
     defaultSettings, defaultAward, emptyState, isRelayName, laneList, combinedOf, evSex,
     computeIndividuals, computeRelays, computeSchedule, programNames, flashList, computeDashboard, certTargets, reiwa,
-    validate, fixName, fixTimeText, computeAwards, awardMaster, awardKey, awardImportFromResults, isMark, SEX
+    validate, fixName, fixTimeText, kanaConv, splitName, normName, computeAwards, awardMaster, awardKey, awardImportFromResults, isMark, SEX
   };
 })();
 
@@ -2210,6 +2255,15 @@ const sel = (k, val, opts, attrs) => {
     opts.map(o => { const [ov, ol] = Array.isArray(o) ? o : [o, o]; return '<option value="' + esc(ov) + '"' + (ov === v ? ' selected' : '') + '>' + esc(ol) + '</option>'; }).join('') + '</select>';
 };
 const inp = (k, val, attrs) => '<input data-k="' + esc(k) + '" value="' + esc(val === null || val === undefined ? '' : val) + '" ' + (attrs || '') + '>';
+// 氏名を漢字の上にフリガナを小さく載せて表示（{kanjiParts, kanaParts} は C.splitName の結果）
+function rubyName(np) {
+  if (!np || !np.kanji) return '';
+  if (!np.kana) return esc(np.kanji);
+  if (np.kanjiParts.length === np.kanaParts.length) return np.kanjiParts.map((k, i) => '<ruby>' + esc(k) + '<rt>' + esc(np.kanaParts[i]) + '</rt></ruby>').join('　');
+  return '<ruby>' + esc(np.kanji) + '<rt>' + esc(np.kana) + '</rt></ruby>';
+}
+// リレーの泳者4人（途中で改行しない）
+function rubyMembers(it, sep) { return it.memberNames.filter(m => m.kanji).map(m => '<span class="nw">' + rubyName(m) + '</span>').join(sep || ' / '); }
 function timeCell(k, raw, extraClass, attrs) {
   const p = C.parseTime(raw, { threeDigit: k.indexOf('aw') === 0 ? 'mss' : state.settings.threeDigit });
   const bad = p.kind === 'error';
@@ -2331,6 +2385,7 @@ VIEWS.settings = () => {
     '<div class="grid g2">' +
     '<div class="card"><h2>大会の基本</h2><div class="fields" style="grid-template-columns:1fr">' +
     field('大会名', inp('set:meetName', S.meetName, L)) + '</div><div class="fields" style="margin-top:10px">' +
+    field('フリガナの表記', sel('set:kanaStyle', S.kanaStyle || 'kata', [['kata', 'カタカナ（サトウ　レン）'], ['hira', 'ひらがな（さとう　れん）']])) +
     field('「132.22」のような3桁の数字', sel('set:threeDigit', S.threeDigit, [['mss', '1分32秒22 と読む'], ['sec', '132.22秒 と読む']], L)) +
     field('レーンの割り当て', sel('set:laneOrder', S.laneOrder, [['excel', '従来のExcelと同じ'], ['fast', '組内で速い順に優先レーン']], L)) +
     field('1人あたりの上限種目数（注意表示）', inp('set:maxEventsPerPerson', S.maxEventsPerPerson, 'inputmode="numeric" ' + L)) +
@@ -2414,7 +2469,7 @@ VIEWS.entries = () => {
   const show = rows.slice(ui.entPage * PAGE, ui.entPage * PAGE + PAGE);
   const clubs = S.clubs.map(c => c.name).filter(Boolean), cats = S.categories.filter(Boolean), evs = S.events.filter(e => e && !C.isRelayName(e));
   const nIssue = D.ind.filter(it => D.issuesById.has(it.id)).length;
-  return '<h1 class="view">個人エントリー</h1><p class="lead">氏名は「苗字　名前　ミョウジ　ナマエ」（全角空白で区切る）。並べ替えや絞り込みをしても計算は崩れません。タイムは 28.78 / 1:32.22 / 00.30.00 のどれでも入力でき、下に読み取った結果が出ます。</p>' +
+  return '<h1 class="view">個人エントリー</h1><p class="lead">氏名は「苗字　名前　ミョウジ　ナマエ」（空白で区切る）。フリガナはカタカナでもひらがなでも打てます（大会設定の表記に自動でそろえます）。並べ替えや絞り込みをしても計算は崩れません。タイムは 28.78 / 1:32.22 / 00.30.00 のどれでも入力でき、下に読み取った結果が出ます。</p>' +
     '<div class="bar">' +
     '<input data-k="ui:entQ" value="' + esc(ui.entQ || '') + '" placeholder="氏名・チームで検索" style="max-width:220px">' +
     sel('ui:entClub', ui.entClub || '', blankOpt('すべてのチーム').concat(clubs), 'style="max-width:170px"') +
@@ -2455,7 +2510,7 @@ VIEWS.relays = () => {
   const clubs = S.clubs.map(c => c.name).filter(Boolean), cats = S.categories.filter(Boolean), evs = S.events.filter(e => C.isRelayName(e));
   const q = C.normKey(ui.relQ || '');
   const rows = D.rel.filter(it => !q || C.normKey(it.teamDisp + it.members.join('')).indexOf(q) >= 0);
-  return '<h1 class="view">リレーエントリー</h1><p class="lead">同じチームから複数出るときは記号（A・B…）で区別します。泳者の重複や、同じ種目で別チームに入っている泳者は自動で警告します。</p>' +
+  return '<h1 class="view">リレーエントリー</h1><p class="lead">泳者は個人と同じく「苗字　名前　ミョウジ　ナマエ」で入れると、プログラムで漢字の上にフリガナが出ます（フリガナはカタカナでもひらがなでも可。大会設定の表記に自動でそろえます）。同じチームから複数出るときは記号（A・B…）で区別します。泳者の重複や、同じ種目で別チームに入っている泳者は自動で警告します。</p>' +
     '<div class="bar"><input data-k="ui:relQ" value="' + esc(ui.relQ || '') + '" placeholder="チーム・泳者で検索" style="max-width:240px"><span class="grow"></span><span class="muted small">' + rows.length + ' チーム</span>' +
     '<button class="btn primary" data-act="addRelay" ' + L + '>＋ 1チーム追加</button></div>' +
     (rows.length ? '<div class="tablewrap fill" data-fill-id="rel"><table class="t"><thead><tr><th class="num">No</th><th>チーム</th><th>記号</th><th>区分</th><th>種目</th><th>第1泳者</th><th>第2泳者</th><th>第3泳者</th><th>第4泳者</th><th>エントリー</th><th>公式タイム</th><th>判定</th><th class="c">組</th><th class="c">レーン</th><th class="num">順位</th><th class="num">得点</th><th></th></tr></thead><tbody>' +
@@ -2465,7 +2520,7 @@ VIEWS.relays = () => {
         return '<tr class="' + cls + '" data-row="' + r.id + '" title="' + esc(iss.map(x => x.msg).join('\n')) + '"><td class="num muted">' + (it.idx + 1) + '</td>' +
           '<td>' + sel(k + 'team', r.team, blankOpt().concat(clubs), L) + '</td><td>' + inp(k + 'mark', r.mark, 'style="width:48px" ' + L) + '</td>' +
           '<td>' + sel(k + 'cat', r.cat, blankOpt().concat(cats), L) + '</td><td>' + sel(k + 'event', r.event, blankOpt().concat(evs), L) + '</td>' +
-          [0, 1, 2, 3].map(m => '<td>' + inp(k + 'm' + m, r.members[m], 'style="min-width:110px" ' + L) + '</td>').join('') +
+          [0, 1, 2, 3].map(m => '<td>' + inp(k + 'm' + m, r.members[m], 'style="min-width:190px" placeholder="苗字 名前 ミョウジ ナマエ" ' + L) + '</td>').join('') +
           '<td>' + timeCell(k + 'entryTime', r.entryTime, '', L) + '</td><td>' + timeCell(k + 'officialTime', r.officialTime, '', 'data-col="roff"') + '</td>' +
           '<td>' + sel(k + 'judge', r.judge, [['', '—'], ['棄権', '棄権'], ['失格', '失格']]) + '</td>' +
           '<td class="c">' + (it.heat || '') + '</td><td class="c">' + (it.lane ? '<span class="lane">' + it.lane + '</span>' : '') + '</td><td class="num">' + (it.rank || '') + '</td><td class="num">' + (it.points === null ? '' : it.points) + '</td>' +
@@ -2532,7 +2587,7 @@ VIEWS.program = () => {
     '<button class="btn" data-act="progStep" data-d="1" ' + (idx >= opts.length - 1 ? 'disabled' : '') + '>次 →</button>' +
     (ui.prog ? '<span class="pill mute">' + (p.sch ? 'No.' + p.sch.no + '・開始 ' + (p.sch.start !== null ? C.fmtClock(p.sch.start) : '—') : '<span style="color:var(--err)">スケジュール未登録</span>') + '</span><span class="pill mute">' + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組</span>' +
       '<span class="pill ' + (allDone ? 'ok' : 'info') + '">入力 ' + p.done + ' / ' + p.items.length + '</span>' + (p.items.some(it => it.seatFixed) ? '<span class="pill mute" title="「組・レーンを入れ替え」で手で並べた位置を使っています">手で並べ替え済み</span>' : '') : '') +
-    '<span class="grow"></span>' + (ui.prog && p.items.length ? (ui.progArrange ? '<button class="btn sm primary" data-act="progArrange">入れ替えを終える</button>' : '<button class="btn sm tinted" data-act="progArrange" title="選手をドラッグして組・レーンを入れ替えます">組・レーンを入れ替え</button>') : '') + '<button class="btn sm" data-act="openflash" data-p="' + esc(ui.prog) + '">速報を見る</button><button class="btn sm" data-act="printProg" data-all="0">この種目を印刷</button><button class="btn sm" data-act="printProg" data-all="1">全種目を印刷</button></div>' +
+    '<span class="grow"></span>' + (ui.prog && p.items.length ? (ui.progArrange ? '<button class="btn sm primary" data-act="progArrange">入れ替えを終える</button>' : '<button class="btn sm tinted" data-act="progArrange" title="選手をドラッグして組・レーンを入れ替えます">組・レーンを入れ替え</button>') : '') + '<button class="btn sm" data-act="openflash" data-p="' + esc(ui.prog) + '">速報を見る</button>' + sel('set:print.progMode', state.settings.print.progMode || 'blank', [['blank', '印刷: 手書き用（記録欄が空欄）'], ['result', '印刷: 記録入り']], 'class="pmode" aria-label="プログラムの印刷の形"') + '<button class="btn sm" data-act="printProg" data-all="0">この種目を印刷</button><button class="btn sm" data-act="printProg" data-all="1">全種目を印刷</button></div>' +
     (ui.prog && p.items.length ? '<div class="prog" style="margin:-4px 0 10px"><i style="width:' + pct + '%"></i></div>' : '') +
     (allDone && !ui.progArrange ? '<div class="notice ok"><span class="grow">この種目の記録入力が終わりました。</span><button class="btn sm" data-act="printFlash1" data-p="' + esc(ui.prog) + '">速報を印刷</button>' + (idx < opts.length - 1 ? '<button class="btn sm primary" data-act="progStep" data-d="1">次の種目へ →</button>' : '') + '</div>' : '') +
     (ui.progArrange && ui.prog && p.items.length ? arrangePanel(p, lanes) :
@@ -2549,10 +2604,10 @@ VIEWS.program = () => {
             const pre = (p.relay ? 'rel:' : 'ent:') + it.id + ':';
             const src = p.relay ? it.r : it.e;
             const iss = (D.issuesById.get(it.id) || []).filter(x => /タイム|中央値/.test(x.msg));
-            const who = p.relay ? it.teamDisp : it.name.split('　').slice(0, 2).join('　'), sub = p.relay ? it.memberText : it.club;
+            const who = p.relay ? it.teamDisp : it.np.kanji, sub = p.relay ? it.memberText : it.club;
             const entry = it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '';
             return '<tr data-row="' + it.id + '" class="' + (iss.length ? 'warn' : '') + '" title="' + esc(iss.map(x => x.msg).join('\n')) + '"><td class="c ln"><span class="lane">' + (it.lane || '?') + '</span></td>' +
-              '<td class="nm"><div class="one fit"><b>' + esc(who) + '</b></div><div class="one sub fit">' + (iss.length ? '<span class="pill warn">要確認</span> ' : '') + (p.relay ? it.members.filter(Boolean).map(m => '<span class="nw">' + esc(m) + '</span>').join(' / ') : esc(sub)) + '</div></td>' +
+              '<td class="nm"><div class="one fit"><b>' + (p.relay ? esc(who) : rubyName(it.np)) + '</b></div><div class="one sub fit">' + (iss.length ? '<span class="pill warn">要確認</span> ' : '') + (p.relay ? rubyMembers(it) : esc(sub)) + '</div></td>' +
               '<td class="mt"><div class="one fit">' + esc(it.cat) + (it.event !== ui.prog ? ' <span class="pill mute">' + esc(it.event.split(' ')[0]) + '</span>' : '') + '</div><div class="one sub num">' + (entry ? '申込 ' + entry : '　') + '</div></td>' +
               '<td class="tm"><div class="tbox">' + timeCell(pre + 'officialTime', src.officialTime, '', 'data-col="prog" aria-label="' + esc(who) + ' 公式タイム"') + '</div></td>' +
               '<td class="jd">' + sel(pre + 'judge', src.judge, [['', '—'], ['棄権', '棄権'], ['失格', '失格']], 'aria-label="' + esc(who) + ' 判定"') + '</td><td class="c rk"><b>' + (it.rank ? it.rank + '位' : it.status === '失格' || it.status === '棄権' ? '<span class="pill ' + (it.status === '失格' ? 'err' : 'warn') + '">' + it.status + '</span>' : '') + '</b></td></tr>';
@@ -2564,10 +2619,10 @@ function arrangePanel(p, lanes) {
   const maxH = Math.max(0, ...p.items.map(it => it.heat || 0));
   const fixedN = p.items.filter(it => it.seatFixed).length, movedN = p.items.filter(it => it.seatMoved).length;
   const card = it => {
-    const who = p.relay ? it.teamDisp : it.name.split('　').slice(0, 2).join('　');
+    const who = p.relay ? it.teamDisp : it.np.kanji;
     const entry = it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '';
     return '<button type="button" class="pcard' + (ui.arrSel === it.id ? ' sel' : '') + '" data-act="seatPick" data-id="' + esc(it.id) + '" aria-label="' + esc(who) + '（第' + it.heat + '組 ' + it.lane + 'レーン）">' +
-      '<span class="fit nm"><b>' + esc(who) + '</b></span><span class="fit sub">' + (p.relay ? it.members.filter(Boolean).map(m => '<span class="nw">' + esc(m) + '</span>').join(' / ') : esc(it.club)) + '・' + esc(it.cat) + '</span><span class="et">' + esc(entry) + '</span></button>';
+      '<span class="fit nm"><b>' + (p.relay ? esc(who) : rubyName(it.np)) + '</b></span><span class="fit sub">' + (p.relay ? rubyMembers(it) : esc(it.club)) + '・' + esc(it.cat) + '</span><span class="et">' + esc(entry) + '</span></button>';
   };
   const heat = (h, isNew) => {
     const its = p.items.filter(it => it.heat === h);
@@ -2593,7 +2648,7 @@ VIEWS.flash = () => {
     '<div class="bar">' + sel('ui:flash', ui.flash, opts, ui.flashFollow !== false ? 'disabled' : '') + '<label class="small"><input type="checkbox" data-k="ui:flashFollow" ' + (ui.flashFollow !== false ? 'checked' : '') + '> 記録入力中の種目に自動で合わせる</label><span class="grow"></span><label class="small"><input type="checkbox" data-k="ui:big" ' + (ui.big ? 'checked' : '') + '> 大きな文字で表示</label><button class="btn" data-act="printFlash">速報を印刷</button></div>' +
     '<div class="' + (ui.big ? 'big' : '') + '"><div class="card" style="margin-bottom:10px"><b class="nowrap" style="font-size:' + (ui.big ? 26 : 17) + 'px">' + esc(ui.flash || '') + '</b>' + (sch ? '<span class="muted nowrap">　競技No.' + sch.no + '　開始予定 ' + C.fmtClock(sch.start) + '</span>' : '') + '<span class="muted nowrap">　対象 ' + list.length + (relay ? 'チーム' : '名') + '</span></div>' +
     (list.length ? '<div class="tablewrap fill" data-fill-id="flash"><table class="t"><thead><tr><th class="c">順位</th><th>' + (relay ? '泳者' : '選手名') + '</th><th>' + (relay ? 'チーム' : 'クラブ名') + '</th><th>年齢区分</th><th class="num">公式タイム</th></tr></thead><tbody>' +
-      list.map(x => { const g = x.it.cat !== prevCat; prevCat = x.it.cat; return (g ? '<tr class="grp"><td colspan="5">' + esc(x.it.cat) + '</td></tr>' : '') + '<tr><td class="c"><b>' + esc(x.rank) + '</b></td><td>' + esc(x.name) + '</td><td>' + esc(x.club) + '</td><td>' + esc(x.cat) + '</td><td class="num">' + esc(x.time) + '</td></tr>'; }).join('') +
+      list.map(x => { const g = x.it.cat !== prevCat; prevCat = x.it.cat; return (g ? '<tr class="grp"><td colspan="5">' + esc(x.it.cat) + '</td></tr>' : '') + '<tr><td class="c"><b>' + esc(x.rank) + '</b></td><td>' + (relay ? esc(x.name) : rubyName(x.it.np)) + '</td><td>' + esc(x.club) + '</td><td>' + esc(x.cat) + '</td><td class="num">' + esc(x.time) + '</td></tr>'; }).join('') +
       '</tbody></table></div>' : '<div class="card empty">この種目のエントリーはありません。</div>') + '</div>';
 };
 
@@ -2607,7 +2662,7 @@ VIEWS.ranking = () => {
   const body = cats.map(c => {
     const list = src.filter(it => it.event === ui.rankEv && it.cat === c && it.rank).sort((a, b) => a.rankOrder - b.rankOrder);
     return '<div class="tablewrap" style="margin-bottom:10px"><table class="t"><thead><tr><th colspan="5" style="color:var(--ink);font-size:13px">' + esc(ui.rankEv) + '　' + esc(c) + '</th></tr><tr><th class="c">順位</th><th>' + (relay ? 'チーム名' : '氏名') + '</th><th>' + (relay ? '出場メンバー' : 'チーム名') + '</th><th>区分</th><th class="num">公式タイム</th></tr></thead><tbody>' +
-      (list.length ? list.map(it => '<tr><td class="c"><b>' + it.rank + '</b></td><td>' + esc(relay ? it.teamDisp : it.name) + '</td><td>' + esc(relay ? it.memberText : it.club) + '</td><td>' + esc(it.cat) + '</td><td class="num">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="5" class="muted">記録がまだありません</td></tr>') +
+      (list.length ? list.map(it => '<tr><td class="c"><b>' + it.rank + '</b></td><td>' + (relay ? esc(it.teamDisp) : rubyName(it.np)) + '</td><td>' + (relay ? rubyMembers(it) : esc(it.club)) + '</td><td>' + esc(it.cat) + '</td><td class="num">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="5" class="muted">記録がまだありません</td></tr>') +
       '</tbody></table></div>';
   }).join('');
   return '<h1 class="view">公式ランキング</h1><p class="lead">種目・区分ごとの公式順位です。同タイムは同順位になります。</p>' +
@@ -2638,8 +2693,8 @@ function certData(it, relay, prize) {
   else if (!C.str((relay ? it.r : it.e).officialTime) || !S.cert.printRecord) rank = '第　　位';
   else rank = it.rank ? '第 ' + it.rank + ' 位' : '';
   return {
-    title: W.title, name: (relay ? it.teamDisp : it.name) + '  殿', club: !relay && it.club ? 'クラブ名： ' + it.club : '',
-    mem1: relay ? [it.members[0], it.members[1]].filter(Boolean).join('　/　') : '', mem2: relay ? [it.members[2], it.members[3]].filter(Boolean).join('　/　') : '',
+    title: W.title, name: (relay ? it.teamDisp : it.np.kanji) + '  殿', club: !relay && it.club ? 'クラブ名： ' + it.club : '',
+    mem1: relay ? [it.memberNames[0].kanji, it.memberNames[1].kanji].filter(Boolean).join('　/　') : '', mem2: relay ? [it.memberNames[2].kanji, it.memberNames[3].kanji].filter(Boolean).join('　/　') : '',
     rank, event: '種目： ' + it.cat + ' ' + it.event, record: '記録： ' + record, meet: S.meetName, lines: W.lines, date: C.reiwa(W.date), org: W.organizer
   };
 }
@@ -2820,7 +2875,8 @@ function hubAll() {
   const opts = programOptions();
   const S = state.settings;
   const docs = [docSchedule()];
-  opts.forEach(n => { const d = docProgram(n); if (d.pages) docs.push(d); });
+  opts.forEach(n => { const d = docProgram(n, 'blank'); if (d.pages) docs.push(d); });
+  opts.forEach(n => { const d = docProgram(n, 'result'); if (d.pages && d.done) docs.push(d); });   // 記録が入った種目だけ
   opts.forEach(n => { const d = docFlash(n); if (d.pages && d.done) docs.push(d); });
   S.events.filter(Boolean).forEach(ev => { const d = docRanking(ev, ''); if (d.n) docs.push(d); });
   if (D.aw.sum.entered) docs.push(docAwards());
@@ -2840,7 +2896,7 @@ VIEWS.prints = () => {
   const focusName = ui.hubFocus && all.find(d => d.key === ui.hubFocus);
   return '<div class="vhead"><div><h1 class="view">印刷まとめ</h1><p class="lead">大会で使う印刷物をすべて並べています。チェックを入れたものを、上から順に1つの印刷にまとめて出せます。「見る」を押すと、その印刷物だけを右のプレビューで確認できます。</p></div></div>' +
     '<div class="bar hubbar"><span class="pill ' + (chosen.length ? 'info' : 'mute') + '">選択 ' + chosen.length + '件・A4 ' + pages + '枚</span>' +
-    '<button class="btn sm" data-act="hubPick" data-v="progs">全種目のプログラム</button><button class="btn sm" data-act="hubPick" data-v="flashes">記録のある速報すべて</button><button class="btn sm" data-act="hubPick" data-v="ranks">ランキングすべて</button><button class="btn sm" data-act="hubPick" data-v="none" ' + (chosen.length ? '' : 'disabled') + '>選択を外す</button>' +
+    '<button class="btn sm" data-act="hubPick" data-v="progs">全種目のプログラム（手書き用）</button><button class="btn sm" data-act="hubPick" data-v="progrs">記録入りプログラムすべて</button><button class="btn sm" data-act="hubPick" data-v="flashes">記録のある速報すべて</button><button class="btn sm" data-act="hubPick" data-v="ranks">ランキングすべて</button><button class="btn sm" data-act="hubPick" data-v="none" ' + (chosen.length ? '' : 'disabled') + '>選択を外す</button>' +
     '<span class="grow"></span><button class="btn primary" data-act="hubPrint" ' + (pages ? '' : 'disabled') + '>' + icon('print', 'ic sm') + '選んだものをまとめて印刷</button></div>' +
     (focusName ? '<div class="notice info"><span class="grow">プレビュー: <b>' + esc(focusName.group + '　' + focusName.title) + '</b> を表示中</span><button class="btn sm" data-act="hubFocus" data-v="">選んだもののプレビューに戻す</button></div>' : '') +
     '<div class="hubgrid fill" data-fill-id="hub">' + groups.map(g => '<div class="card"><h2>' + esc(g.name) + ' <span class="muted small">' + g.docs.length + '件</span></h2>' +
@@ -2903,7 +2959,16 @@ function handleValue(el) {
     if (path === 'points.relayMult') v = +val;
     if (path === 'cert.printRecord') v = val === '1';
     if (getPath(state.settings, path) === v) return;
-    const free = /^(cert|award|print)\./.test(path) || /^dashboard\./.test(path);
+    const free = /^(cert|award|print)\./.test(path) || /^dashboard\./.test(path) || path === 'kanaStyle';
+    if (path === 'kanaStyle') {      // 表記を変えたら、入力済みのフリガナもすべてそろえる
+      commit('フリガナの表記を' + (v === 'hira' ? 'ひらがな' : 'カタカナ') + 'に変更', s => {
+        s.settings.kanaStyle = v;
+        s.entries.forEach(e => { if (e.name) e.name = C.normName(e.name, v); });
+        s.relays.forEach(r => { r.members = (r.members || []).map(m => m ? C.normName(m, v) : m); });
+      }, { allowLocked: true });
+      toast('フリガナを' + (v === 'hira' ? 'ひらがな' : 'カタカナ') + 'にそろえました', null, 6000, { label: '元に戻す', fn: undo });
+      return;
+    }
     commit('設定の変更', s => {
       if (path.indexOf('lanes.') === 0) { const i = +path.split('.')[1]; while (s.settings.lanes.length <= i) s.settings.lanes.push(''); s.settings.lanes[i] = v; }
       else setPath(s.settings, path, v);
@@ -2936,6 +3001,7 @@ function handleValue(el) {
     const cur = f[0] === 'm' && f.length === 2 ? row.members[+f[1]] : row[f];
     let v = val;
     if (f === 'name' || f === 'team' || f === 'mark' || f[0] === 'm') v = val.replace(/^[\s　]+|[\s　]+$/g, '');
+    if (f === 'name' || (f[0] === 'm' && f.length === 2)) v = C.normName(v, state.settings.kanaStyle);   // 空白をそろえ、フリガナを設定の表記へ自動で変換
     if (f === 'entryTime' || f === 'officialTime') v = C.fixTimeText(val);
     if ((cur || '') === v) return;
     commit((kind === 'ent' ? '個人' : 'リレー') + 'の変更', s => {
@@ -3133,7 +3199,7 @@ const ACTIONS = {
   hubPick: t => {
     const all = hubAll(), v = t.dataset.v, set = new Set(ui.hubSel || []);
     if (v === 'none') set.clear();
-    else all.filter(d => d.key.indexOf(v === 'progs' ? 'prog:' : v === 'flashes' ? 'flash:' : 'rank:') === 0).forEach(d => set.add(d.key));
+    else all.filter(d => d.key.indexOf(v === 'progs' ? 'prog:' : v === 'progrs' ? 'progr:' : v === 'flashes' ? 'flash:' : 'rank:') === 0).forEach(d => set.add(d.key));
     ui.hubSel = [...set]; ui.hubFocus = ''; render();
   },
   hubPrint: () => { const sel = new Set(ui.hubSel || []); printDocs(hubAll().filter(d => sel.has(d.key)), '選んだ印刷物をまとめて印刷します'); },
@@ -3283,6 +3349,17 @@ function fitPages(root) {
       const r = z.getBoundingClientRect();
       sc = Math.min(1, H / r.height, W / r.width);
     }
+    // プログラム: 余白が大きく残るときは、行の高さを広げて用紙を使い切る（手書きの記入欄も書きやすくなる）
+    z.style.removeProperty('--rp');
+    if (z.classList.contains('col1') && sc >= 1) {
+      const rows = z.querySelectorAll('.ptab tbody tr:not(.emp)').length;
+      const extra = H - z.getBoundingClientRect().height;
+      if (rows && extra > 20) {
+        const per = Math.min(44, extra / rows) / 2;
+        z.style.setProperty('--rp', per.toFixed(1) + 'px');
+        for (let i = 0; i < 3 && z.getBoundingClientRect().height > H; i++) z.style.setProperty('--rp', (parseFloat(z.style.getPropertyValue('--rp')) * 0.85).toFixed(1) + 'px');
+      }
+    }
   });
   fitLines(root);
   root.classList.remove('measure');
@@ -3298,22 +3375,31 @@ function docSchedule() {
     return pPage(this.title, '', body);
   } };
 }
-function docProgram(name) {
-  const p = programData(name), anyRes = p.items.some(it => it.status !== '未入力');
-  return { key: 'prog:' + name, group: 'プログラム', title: (p.sch ? 'No.' + p.sch.no + ' ' : '') + name, pages: p.items.length ? 1 : 0, sub: p.items.length + (p.relay ? 'チーム' : '名'), html() {
+function progPrintMode() { return state.settings.print.progMode === 'result' ? 'result' : 'blank'; }
+// プログラム: 組ごとの表。左端の列は「第n組」の下にレーン番号。記録・順位は 手書き用（空の記入欄）か 記録入り
+function docProgram(name, mode) {
+  const p = programData(name), res = (mode || progPrintMode()) === 'result';
+  const done = p.items.filter(it => it.status !== '未入力').length, unit = p.relay ? 'チーム' : '名';
+  return { key: (res ? 'progr:' : 'prog:') + name, group: res ? 'プログラム（記録入り）' : 'プログラム（手書き用）', title: (p.sch ? 'No.' + p.sch.no + ' ' : '') + name, pages: p.items.length ? 1 : 0, done,
+    sub: res ? '記録 ' + done + '/' + p.items.length : p.items.length + unit, html() {
     const lanes = C.laneList(state.settings).slice().sort((a, b) => a - b);
-    const sub = (p.sch ? '競技No.' + p.sch.no + '　' : '') + (p.sch && p.sch.start !== null ? '開始予定 ' + C.fmtClock(p.sch.start) + '　' : '') + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組';
+    const sub = (p.sch ? '競技No.' + p.sch.no + '　' : '') + (p.sch && p.sch.start !== null ? '開始予定 ' + C.fmtClock(p.sch.start) + '　' : '') + p.items.length + unit + '・' + p.heats.length + '組' + (res && done < p.items.length ? '　（記録 ' + done + '/' + p.items.length + '）' : '');
     const body = p.heats.map(hh => {
       const byLane = new Map(hh.items.map(it => [it.lane, it]));
-      return '<div class="blk"><div class="blk-h">第 ' + hh.heat + ' 組</div><table class="pp"><thead><tr><th class="c">レーン</th><th>' + (p.relay ? 'チーム' : '氏名') + '</th><th>' + (p.relay ? '泳者' : 'クラブ') + '</th><th>区分</th>' + (anyRes ? '<th class="c">記録</th><th class="c">順位</th>' : '') + '</tr></thead><tbody>' +
+      return '<div class="blk"><table class="pp ptab ' + (res ? 'res' : 'blank') + (p.relay ? ' rel' : '') + '"><thead><tr><th class="hn">第' + hh.heat + '組</th>' +
+        (p.relay ? '<th class="c-team">チーム</th><th class="c-mem">泳者</th>' : '<th class="c-nm">氏名</th><th class="c-club">クラブ</th>') + '<th class="c-cat">区分</th><th class="c c-rec">記録</th><th class="c c-rk">順位</th></tr></thead><tbody>' +
         lanes.map(ln => {
           const it = byLane.get(ln);
-          return '<tr' + (it ? '' : ' class="emp"') + '><td class="c"><span class="lane-c">' + ln + '</span></td><td class="nm">' + (it ? esc(p.relay ? it.teamDisp : nm2(it.name)) : '') + (it && !p.relay && it.name.split('　').length > 2 ? '<div class="kana">' + esc(it.name.split('　').slice(2).join('　')) + '</div>' : '') + '</td>' +
-            '<td class="sm">' + (it ? esc(p.relay ? it.memberText : it.club) : '') + '</td><td class="sm">' + (it ? esc(it.cat) : '') + '</td>' +
-            (anyRes ? '<td class="tm">' + (it ? esc(it.flashTime) : '') + '</td>' + (it ? rkCell(it.status === '完泳' ? it.rank : 0, it.flashRank) : '<td class="rk"></td>') : '') + '</tr>';
+          if (!it) return '<tr class="emp"><td class="ln"><span class="lane-c">' + ln + '</span></td><td colspan="5"></td></tr>';
+          const rec = res ? '<td class="tm c">' + esc(it.flashTime) + '</td>' + rkCell(it.status === '完泳' ? it.rank : 0, it.flashRank)
+            : '<td class="c"><span class="wbox"></span></td><td class="c"><span class="wbox rk"></span></td>';
+          return '<tr><td class="ln"><span class="lane-c">' + ln + '</span></td>' +
+            (p.relay ? '<td class="nm">' + esc(it.teamDisp) + '</td><td class="mem">' + rubyMembers(it, '<span class="sep">/</span>') + '</td>'
+              : '<td class="nm">' + rubyName(it.np) + '</td><td class="sm">' + esc(it.club) + '</td>') +
+            '<td class="sm">' + esc(it.cat) + '</td>' + rec + '</tr>';
         }).join('') + '</tbody></table></div>';
     }).join('');
-    return pPage(name, sub, body || '<p>エントリーはありません。</p>', (anyRes ? '速報' : '大会プログラム') + '　' + name, 'col1');
+    return pPage(name, sub, body || '<p>エントリーはありません。</p>', (res ? '記録入りプログラム' : '大会プログラム') + '　' + name, 'col1');
   } };
 }
 function docFlash(name) {
@@ -3382,7 +3468,8 @@ function printDocs(docs, msg) {
 function printSchedule() { printDocs([docSchedule()], 'スケジュールを印刷します'); }
 function printProgram(all) {
   const names = all ? programOptions().filter(n => programData(n).items.length) : [ui.prog];
-  printDocs(names.map(docProgram), all ? names.length + '種目のプログラムを、1種目1枚で印刷します' : 'この種目を印刷します');
+  const m = progPrintMode() === 'result' ? '記録入りの' : '手書き用の';
+  printDocs(names.map(n => docProgram(n)), all ? names.length + '種目の' + m + 'プログラムを、1種目1枚で印刷します' : 'この種目の' + m + 'プログラムを印刷します');
 }
 function printFlash() { printDocs([docFlash(ui.flash)], '速報を印刷します'); }
 function printRanking() { printDocs([docRanking(ui.rankEv, ui.rankCat || '')], 'ランキングを印刷します'); }
@@ -3748,9 +3835,12 @@ const EntryForm = (() => {
     return zip(files);
   }
 
-  const MARK = 'SWIM-ENTRY-FORM-1';
-  const IND_HEAD = ['No', '姓', '名', 'セイ（カナ）', 'メイ（カナ）', 'チーム名', '区分', '種目', 'エントリータイム（任意）'];
-  const REL_HEAD = ['No', 'チーム名', '記号', '区分', '種目', '第1泳者', '第2泳者', '第3泳者', '第4泳者', 'エントリータイム（任意）'];
+  const MARK = 'SWIM-ENTRY-FORM-2';
+  // フリガナの見出しは大会設定の表記（カタカナ／ひらがな）に合わせる。どちらで書かれても読み込み時にそろえる
+  const hira = () => state.settings.kanaStyle === 'hira';
+  const KANA_WORD = () => hira() ? 'ふりがな' : 'フリガナ';
+  const IND_HEAD = () => ['No', '姓', '名', hira() ? 'せい（ふりがな）' : 'セイ（カナ）', hira() ? 'めい（ふりがな）' : 'メイ（カナ）', 'チーム名', '区分', '種目', 'エントリータイム（任意）'];
+  const REL_HEAD = () => ['No', 'チーム名', '記号', '区分', '種目'].concat(...[1, 2, 3, 4].map(m => ['第' + m + '泳者 氏名', '第' + m + '泳者 ' + KANA_WORD()])).concat(['エントリータイム（任意）']);
   const HEAD_ROW = 4;      // 見出しの行
   function build(opt) {
     const S = state.settings;
@@ -3769,11 +3859,11 @@ const EntryForm = (() => {
     L.push([]);
     [['記入のしかた', 8],
       ['1. 「個人エントリー」シートの黄色いセルに、1行に1種目ずつ記入してください。2種目に出る選手は2行に分けて書きます。', 4],
-      ['2. 姓・名は漢字、セイ・メイはカタカナで記入してください（例: 山田／太郎／ヤマダ／タロウ）。', 4],
+      [hira() ? '2. 姓・名は漢字、せい・めいは ふりがな で記入してください（例: 山田／太郎／やまだ／たろう）。カタカナで書いても、読み込むときに ふりがな に直します。' : '2. 姓・名は漢字、セイ・メイはカタカナで記入してください（例: 山田／太郎／ヤマダ／タロウ）。ひらがなで書いても、読み込むときにカタカナに直します。', 4],
       ['3. チーム名・区分・種目は、セルを選ぶと出る ▼ から選んでください。手で打つと読み込めないことがあります。', 4],
       ['4. エントリータイムは分かる場合だけ記入します（例: 28.50 または 1:05.30）。', 4],
       [mx > 0 ? '5. 1人' + mx + '種目までです。' : '5. 出場できる種目数は大会要項を確認してください。', 4],
-      ['6. リレーに出る場合は「リレーエントリー」シートに、チームごとに1行で記入してください。同じチームから2組出るときは記号に A・B と入れます。', 4],
+      ['6. リレーに出る場合は「リレーエントリー」シートに、チームごとに1行で記入してください。泳者4人それぞれの氏名（例: 山田 太郎）と' + KANA_WORD() + '（例: ' + (hira() ? 'やまだ たろう' : 'ヤマダ タロウ') + '）を書きます。同じチームから2組出るときは記号に A・B と入れます。', 4],
       ['7. シート名・見出しの行・列の並びは変えないでください。行の追加・削除もしないでください（足りないときは大会係へ連絡してください）。', 7],
       ['8. 記入が終わったら、このファイルのまま（名前を変えてもかまいません）提出してください。', 4]].forEach(([t, s]) => L.push([{ v: t, s }]));
     L.push([]);
@@ -3783,7 +3873,7 @@ const EntryForm = (() => {
     sheets.push({ name: '記入方法', rows: L, cols: [120], tab: true, heights: Object.fromEntries(L.map((r, i) => [i + 1, r[0] && r[0].s === 4 ? 34 : r[0] && r[0].s === 3 ? 28 : 20])) });
     // 2. 個人エントリー
     const iv = [[{ v: '個人エントリー' + (team ? '（' + team + '）' : ''), s: 3 }], [{ v: '黄色いセルに記入。1行＝1人1種目。チーム・区分・種目は ▼ から選択。', s: 4 }], []];
-    iv.push(IND_HEAD.map(h => ({ v: h, s: 1 })));
+    iv.push(IND_HEAD().map(h => ({ v: h, s: 1 })));
     for (let i = 1; i <= nInd; i++) iv.push([{ v: i, s: 5 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, team ? { v: team, s: 6 } : { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }]);
     const r1 = HEAD_ROW + 1, r2 = HEAD_ROW + nInd;
     const dvI = [{ sqref: 'G' + r1 + ':G' + r2, formula: 'CatList', title: '区分', msg: '区分は ▼ の中から選んでください', strict: true },
@@ -3792,15 +3882,15 @@ const EntryForm = (() => {
     sheets.push({ name: '個人エントリー', rows: iv, cols: [6, 12, 12, 14, 14, 18, 12, 24, 16], freeze: HEAD_ROW, merges: ['A1:I1', 'A2:I2'], dv: dvI, heights: { 1: 26, 2: 18, 4: 30 } });
     // 3. リレーエントリー
     if (nRel > 0 && relEv.length) {
-      const rv = [[{ v: 'リレーエントリー' + (team ? '（' + team + '）' : ''), s: 3 }], [{ v: '1行＝1チーム。泳者は「姓　名」で4人分。同じチームから2組以上出るときは記号に A・B…', s: 4 }], []];
-      rv.push(REL_HEAD.map(h => ({ v: h, s: 1 })));
-      for (let i = 1; i <= nRel; i++) rv.push([{ v: i, s: 5 }, team ? { v: team, s: 6 } : { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }]);
+      const rv = [[{ v: 'リレーエントリー' + (team ? '（' + team + '）' : ''), s: 3 }], [{ v: '1行＝1チーム。泳者4人の氏名（姓 名）と' + KANA_WORD() + 'を記入。同じチームから2組以上出るときは記号に A・B…', s: 4 }], []];
+      rv.push(REL_HEAD().map(h => ({ v: h, s: 1 })));
+      for (let i = 1; i <= nRel; i++) rv.push([{ v: i, s: 5 }, team ? { v: team, s: 6 } : { v: '', s: 2 }].concat(Array.from({ length: 12 }, () => ({ v: '', s: 2 }))));
       const q1 = HEAD_ROW + 1, q2 = HEAD_ROW + nRel;
       const dvR = [{ sqref: 'D' + q1 + ':D' + q2, formula: 'CatList', title: '区分', msg: '区分は ▼ の中から選んでください', strict: true },
         { sqref: 'E' + q1 + ':E' + q2, formula: 'RelEvList', title: '種目', msg: '種目は ▼ の中から選んでください', strict: true },
         { sqref: 'C' + q1 + ':C' + q2, formula: '"A,B,C,D,E"', title: '記号', msg: '記号は A〜E から選ぶか、空欄にしてください', strict: false }];
       if (!team) dvR.push({ sqref: 'B' + q1 + ':B' + q2, formula: 'TeamList', title: 'チーム名', msg: 'チーム名は ▼ の中から選んでください', strict: true });
-      sheets.push({ name: 'リレーエントリー', rows: rv, cols: [6, 18, 7, 12, 26, 16, 16, 16, 16, 16], freeze: HEAD_ROW, merges: ['A1:J1', 'A2:J2'], dv: dvR, heights: { 1: 26, 2: 18, 4: 30 } });
+      sheets.push({ name: 'リレーエントリー', rows: rv, cols: [6, 18, 7, 12, 26, 14, 16, 14, 16, 14, 16, 14, 16, 16], freeze: HEAD_ROW, merges: ['A1:N1', 'A2:N2'], dv: dvR, heights: { 1: 26, 2: 18, 4: 30 } });
     }
     // 4. 選択肢（非表示）と、読み込み用の目印
     const n = Math.max(clubs.length, cats.length, indEv.length, relEv.length, 1);
@@ -3814,7 +3904,7 @@ const EntryForm = (() => {
 
   // ---- 記入済みファイルの読み込み（SheetJS）
   const s = v => v === undefined || v === null ? '' : String(v).replace(/^[\s　]+|[\s　]+$/g, '');
-  const kana = v => { let t = s(v); try { t = t.normalize('NFKC'); } catch (e) { /* ignore */ } return t.replace(/[ぁ-ゖ]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60)); };
+  const kana = v => C.kanaConv(s(v), state.settings.kanaStyle);   // カタカナ・ひらがな・半角カナのどれで書かれても設定の表記へ
   function isForm(wb) { const L = wb.Sheets['_選択肢']; return !!(L && L.A1 && String(L.A1.v).indexOf('SWIM-ENTRY-FORM') === 0) || !!(wb.Sheets['個人エントリー'] && wb.Sheets['個人エントリー']['B' + HEAD_ROW] && wb.Sheets['個人エントリー']['B' + HEAD_ROW].v === '姓'); }
   function read(wb, X, fileName) {
     const L = wb.Sheets['_選択肢'];
@@ -3828,10 +3918,19 @@ const EntryForm = (() => {
       if (!sei && !mei && !ks && !km && !cat && !ev && !t) return;
       entries.push({ id: uid(), name: [sei, mei, ks, km].filter(Boolean).join('　'), club: team || meta.team, cat, event: ev, entryTime: t, officialTime: '', judge: '', _row: HEAD_ROW + 1 + i, _file: fileName });
     });
-    rowsOf(wb.Sheets['リレーエントリー']).forEach((r, i) => {
-      const team = s(r[1]), mark = s(r[2]).toUpperCase(), cat = s(r[3]), ev = s(r[4]), mem = [5, 6, 7, 8].map(k => C.fixName(s(r[k])));
+    // リレー: 新しい形（泳者ごとに 氏名・フリガナ の2列）と、以前に配った形（氏名だけ4列）のどちらも読める
+    const wsR = wb.Sheets['リレーエントリー'];
+    const g4 = wsR && wsR['G' + HEAD_ROW] ? s(wsR['G' + HEAD_ROW].v) : '';
+    const withKana = /フリガナ|ふりがな|カナ/.test(g4);
+    rowsOf(wsR).forEach((r, i) => {
+      const team = s(r[1]), mark = s(r[2]).toUpperCase(), cat = s(r[3]), ev = s(r[4]);
+      const mem = [0, 1, 2, 3].map(m => {
+        const nm = C.fixName(s(withKana ? r[5 + m * 2] : r[5 + m])), kn = withKana ? C.fixName(kana(r[6 + m * 2])) : '';
+        return nm ? C.normName(nm + (kn ? '　' + kn : ''), state.settings.kanaStyle) : '';
+      });
+      const noKana = withKana ? [0, 1, 2, 3].filter(m => s(r[5 + m * 2]) && !s(r[6 + m * 2])).map(m => m + 1) : [];
       if (!mark && !cat && !ev && !mem.some(Boolean)) return;
-      relays.push({ id: uid(), team: team || meta.team, mark, cat, event: ev, members: mem, entryTime: timeStr(r[9]), officialTime: '', judge: '', _row: HEAD_ROW + 1 + i, _file: fileName });
+      relays.push({ id: uid(), team: team || meta.team, mark, cat, event: ev, members: mem, entryTime: timeStr(withKana ? r[13] : r[9]), officialTime: '', judge: '', _row: HEAD_ROW + 1 + i, _file: fileName, _noKana: noKana });
     });
     return { meta, entries, relays };
   }
@@ -3842,7 +3941,7 @@ const EntryForm = (() => {
     res.entries.forEach(e => {
       const p = [];
       if (!e.name) p.push('氏名が空欄');
-      else if (e.name.split('　').length < 4) p.push('姓・名・カナのどこかが空欄');
+      else if (e.name.split('　').length < 4) p.push('姓・名・フリガナのどこかが空欄');
       if (!e.club) p.push('チーム名が空欄'); else if (!clubs.has(e.club)) p.push('チーム「' + e.club + '」がリストにない');
       if (!e.cat) p.push('区分が空欄'); else if (!cats.has(e.cat)) p.push('区分「' + e.cat + '」がリストにない');
       if (!e.event) p.push('種目が空欄'); else if (!evs.has(e.event)) p.push('種目「' + e.event + '」がリストにない');
@@ -3856,6 +3955,7 @@ const EntryForm = (() => {
       if (!r.team) p.push('チーム名が空欄'); else if (!clubs.has(r.team)) p.push('チーム「' + r.team + '」がリストにない');
       if (!r.cat) p.push('区分が空欄'); if (!r.event) p.push('種目が空欄'); else if (!evs.has(r.event)) p.push('種目がリストにない');
       if (r.members.filter(Boolean).length < 4) p.push('泳者が4人そろっていない');
+      if (r._noKana && r._noKana.length) p.push('第' + r._noKana.join('・') + '泳者のフリガナが空欄');
       if (p.length) probs.push({ where: r._file + ' リレー ' + r._row + '行目 ' + r.team + ' ' + r.mark, what: p.join('・') });
     });
     return probs;
@@ -3916,7 +4016,7 @@ function importEntryForms(fileList) {
       m.querySelector('#ei-ok').addEventListener('click', () => {
         const mode = m.querySelector('#ei-mode').value;
         close();
-        const clean = o => { const c = Object.assign({}, o); delete c._row; delete c._file; delete c._dup; return c; };
+        const clean = o => { const c = Object.assign({}, o); delete c._row; delete c._file; delete c._dup; delete c._noKana; return c; };
         const addE = res.entries.filter(e => mode !== 'add' || !e._dup).map(clean), addR = res.relays.map(clean);
         commit('エントリー用Excelの読み込み', s => {
           if (mode === 'all') { s.entries = []; s.relays = []; }
@@ -4135,7 +4235,7 @@ function makeSample() {
   }
   // 入力ミスの例（入力チェックで見つかります）
   if (st.entries[5]) st.entries[5].officialTime = '１８．３２';
-  const mem = () => [0, 1, 2, 3].map(() => { const f = pick(fam), n = pick(rnd() < .5 ? boy : girl); return f[0] + '　' + n[0]; });
+  const mem = () => [0, 1, 2, 3].map(() => { const f = pick(fam), n = pick(rnd() < .5 ? boy : girl); return f[0] + '　' + n[0] + '　' + f[1] + '　' + n[1]; });
   st.relays = [
     { id: uid(), team: 'みなとSC', mark: 'A', cat: '9〜10歳', event: '混合 4×25M フリーリレー', members: mem(), entryTime: '', officialTime: '1:12.40', judge: '' },
     { id: uid(), team: 'さくらスイム', mark: '', cat: '9〜10歳', event: '混合 4×25M フリーリレー', members: mem(), entryTime: '', officialTime: '1:15.08', judge: '' },
