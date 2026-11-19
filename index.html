@@ -123,7 +123,7 @@ button.chip { cursor: pointer; }
 
 /* 画面切り替えパネル: 「常に表示」なら列として並べ、そうでなければ左右から滑り出す */
 .nav { padding: 10px; border-radius: var(--r-lg); display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
-.app.pinned .nav { position: sticky; top: 76px; align-self: start; max-height: calc(100vh - 88px); }
+.app.pinned .nav { position: sticky; top: calc(var(--toph, 64px) + 18px); align-self: start; max-height: calc(100vh - var(--toph, 64px) - 30px); }
 .app.pinned.side-left .nav { grid-column: 1; grid-row: 2; }
 .app.pinned.side-left main { grid-column: 2; grid-row: 2; }
 .app.pinned.side-right .nav { grid-column: 2; grid-row: 2; }
@@ -186,11 +186,6 @@ html.refract .seg > .lens.lifted { backdrop-filter: url(#lgRefract) saturate(1.6
 /* ---------- すべてのボタン: 光の帯が滑り、押した所からガラスが光る ---------- */
 .btn, .chip, .iconbtn, .onboard button, .pinbtn { position: relative; overflow: hidden; isolation: isolate; transition: background .2s, transform .22s ease-out, box-shadow .2s, color .2s; }
 .segbtn, .nav a { position: relative; transition: color .2s; }
-.pressed::after { content: ""; position: absolute; left: var(--px, 50%); top: var(--py, 50%); width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; z-index: -1; pointer-events: none;
-  background: radial-gradient(circle, rgba(255,255,255,.9), rgba(255,255,255,.35) 45%, transparent 70%); animation: glassPress .4s ease-out forwards; }
-@keyframes glassPress { from { transform: scale(1); opacity: .7; } to { transform: scale(18); opacity: 0; } }
-.btn:active, button.chip:active, .iconbtn:active, .onboard button:active, .pinbtn:active { transform: scale(1.03); box-shadow: inset 0 0 0 1px rgba(255,255,255,.85), 0 6px 16px rgba(10,30,60,.16); transition: transform .1s ease-out, box-shadow .1s; }
-@media (prefers-reduced-motion: reduce) { .pressed::after { animation: none; } }
 
 /* 説明文は1行に畳む（押すと全文） */
 .lead { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
@@ -413,6 +408,42 @@ table.t td > b { white-space: nowrap; }
 
 .heats td.small { white-space: nowrap; }
 .progbar select { min-width: 220px; }
+
+/* ---------- すべてのボタン: 押している間だけガラスになる（JS が class と位置を付ける） ---------- */
+.btn, button.chip, .iconbtn, .onboard button, .pinbtn, .evchip, .ritem, .x { transition: background .2s, color .2s, transform .24s cubic-bezier(.2, .8, .3, 1), box-shadow .24s; }
+.glassing { transition: transform .09s ease-out, box-shadow .12s, background .12s !important; z-index: 2;
+  box-shadow: inset 0 0 0 1.2px rgba(255,255,255,.95), inset 0 1.5px 1px rgba(255,255,255,.9), inset 0 -3px 8px rgba(0,40,80,.10), inset 2px 0 3px rgba(120,200,255,.2), inset -2px 0 3px rgba(255,150,220,.18), 0 10px 24px rgba(10,30,60,.22) !important; }
+.btn.glassing:not(.primary):not(.solid), button.chip.glassing, .iconbtn.glassing, .pinbtn.glassing:not(.on), .evchip.glassing, .ritem.glassing, .x.glassing, .onboard button.glassing {
+  background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.18)) !important; -webkit-backdrop-filter: blur(1px) saturate(1.8) brightness(1.08); backdrop-filter: blur(1px) saturate(1.8) brightness(1.08); }
+.btn.primary.glassing, .btn.solid.glassing, .pinbtn.on.glassing { filter: brightness(1.08) saturate(1.1); }
+@media (prefers-reduced-motion: reduce) { .glassing { transform: none !important; } }
+
+/* ---------- 簡易アクセス（丸アイコン） ---------- */
+.seg.round { padding: 3px; gap: 1px; }
+.seg.round > .lens { border-radius: 50%; }
+.qbtn { width: 38px; height: 38px; min-height: 0; padding: 0; border-radius: 50%; display: inline-grid; place-items: center; color: var(--accent); }
+.qbtn .ic { width: 19px; height: 19px; }
+.qbtn.on { color: var(--ink); }
+.qdot { position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--err); box-shadow: 0 0 0 2px var(--surface, #fff); }
+.topbar .quick { flex: 0 1 auto; }
+@media (max-width: 1279px) { .topbar .quick { order: 10; } }
+#tip { position: fixed; z-index: 300; left: 0; top: 0; pointer-events: none; opacity: 0; transform: translateY(-4px) scale(.98); transition: opacity .15s, transform .15s;
+  display: flex; flex-direction: column; gap: 2px; max-width: 260px; padding: 8px 12px; border-radius: 14px;
+  background: var(--drawer); color: var(--ink); border: 1px solid var(--glass-edge); box-shadow: 0 10px 28px rgba(10,30,60,.22); font-size: 12.5px; line-height: 1.45; }
+#tip b { font-size: 13.5px; }
+#tip span { color: var(--muted); }
+#tip.on { opacity: 1; transform: none; }
+
+.btn, .chip, .iconbtn, .segbtn, .nav a, .evchip, .ritem, .pinbtn, .x { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+@media (max-width: 600px) {
+  .topbar { gap: 6px 6px; padding: 8px; }
+  .topbar .chip { min-height: 28px; padding: 2px 9px; font-size: 11.5px; }
+  .topbar .iconbtn { width: 32px; height: 32px; }
+  .topbar .btn.sm { min-height: 30px; padding: 4px 9px; }
+  .topbar .chips, .topbar .tools { flex-wrap: nowrap; }
+  .qbtn { width: 29px; height: 32px; } .qbtn .ic { width: 17px; height: 17px; }
+}
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 10mm }</style>
 </head>
@@ -1501,6 +1532,7 @@ function render() {
   renderTop();
   renderNav();
   applyNavLayout();
+  document.documentElement.style.setProperty('--toph', $('#top').offsetHeight + 'px');
   const fn = VIEWS[view] || VIEWS.home;
   let html;
   try { html = fn(); }
@@ -1540,7 +1572,7 @@ function sizeFills() {
 //  ガラスの下のアイコン・文字は少し拡大して見える。押している間は指がバーの外へ出ても追従する。
 //  離すと一番近い項目へ短く吸い付いて止まり、平たいピルに戻る。押していないときは一切動かない。
 const LENS = {};
-const FOLLOW = { k: 1100, c: 66 }, SETTLE = { k: 900, c: 60 }, LIFT = { k: 700, c: 53 };   // どれも行き過ぎない（臨界減衰）
+const FOLLOW = { k: 2600, c: 102 }, SETTLE = { k: 1000, c: 63 }, LIFT = { k: 700, c: 53 };   // どれも行き過ぎない（臨界減衰）
 function segItems(seg) { return [...seg.querySelectorAll('[data-seg]')]; }
 function itemRect(it) { return { x: it.offsetLeft, y: it.offsetTop, w: it.offsetWidth, h: it.offsetHeight }; }
 function lensState(seg) {
@@ -1559,7 +1591,8 @@ function stepLens(st, ts) {
   st.raf = 0;
   const dt = Math.min(0.024, Math.max(0.001, (ts - st.last) / 1000)); st.last = ts;
   const P = st.drag ? FOLLOW : SETTLE;
-  const sp = (pos, vel, tgt, Q) => { const a = Q.k * (tgt - pos) - Q.c * vel; vel += a * dt; return [pos + vel * dt, vel]; };
+  const n = Math.ceil(dt / 0.004), h = dt / n;           // 細かく刻んで計算（速い追従でも暴れない）
+  const sp = (pos, vel, tgt, Q) => { for (let i = 0; i < n; i++) { const a = Q.k * (tgt - pos) - Q.c * vel; vel += a * h; pos += vel * h; } return [pos, vel]; };
   [st.x, st.vx] = sp(st.x, st.vx, st.t.x, P);
   [st.y, st.vy] = sp(st.y, st.vy, st.t.y, P);
   [st.w, st.vw] = sp(st.w, st.vw, st.t.w, P);
@@ -1574,7 +1607,8 @@ function drawLens(st) {
   const el = st.el;
   if (!el || !el.isConnected) return;
   const L = Math.max(0, Math.min(1, st.lift));
-  const sx = st.vert ? 1 + 0.04 * L : 1 + 0.08 * L, sy = st.vert ? 1 + 0.10 * L : 1 + 0.28 * L;   // 押すとガラスが少しふくらむ（縦方向に大きく）
+  const round = st.seg.classList.contains('round');
+  const sx = round ? 1 + 0.2 * L : st.vert ? 1 + 0.04 * L : 1 + 0.08 * L, sy = round ? 1 + 0.2 * L : st.vert ? 1 + 0.10 * L : 1 + 0.28 * L;   // 押すとガラスが少しふくらむ
   el.style.width = st.w + 'px'; el.style.height = st.h + 'px';
   el.style.transform = 'translate(' + st.x.toFixed(2) + 'px,' + st.y.toFixed(2) + 'px) scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ')';
   el.style.opacity = st.w > 0 ? '1' : '0';
@@ -1627,6 +1661,7 @@ document.addEventListener('pointerdown', e => {
   try { seg.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
   st.tl = 1;
   followPointer(st, e.clientX, e.clientY);
+  if (seg.querySelector('[data-tip]')) { clearTimeout(tipTimer); tipTimer = setTimeout(() => { if (st.drag) showTip(nearestItem(st, st.vert ? st.t.y + st.t.h / 2 : st.t.x + st.t.w / 2)); }, 380); }
 });
 function followPointer(st, cx, cy) {
   const d = st.drag, box = d.box, seg = st.seg;
@@ -1650,6 +1685,7 @@ document.addEventListener('pointermove', e => {
     if (!st.drag || st.drag.id !== e.pointerId) continue;
     if (Math.hypot(e.clientX - st.drag.sx, e.clientY - st.drag.sy) > 6) st.drag.moved = true;
     followPointer(st, e.clientX, e.clientY);
+    if (tipFor || (st.drag.moved && st.seg.querySelector('[data-tip]'))) { const n = nearestItem(st, st.vert ? st.t.y + st.t.h / 2 : st.t.x + st.t.w / 2); if (n !== tipFor) showTip(n); }
   }
 });
 function endLensDrag(e, cancel) {
@@ -1657,6 +1693,7 @@ function endLensDrag(e, cancel) {
     const st = LENS[id];
     if (!st.drag || st.drag.id !== e.pointerId) continue;
     const d = st.drag; st.drag = null;
+    hideTip();
     try { st.seg.releasePointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     st.tl = 0; st.settling = true;
     const pos = st.vert ? st.t.y + st.t.h / 2 : st.t.x + st.t.w / 2;
@@ -1705,16 +1742,60 @@ document.addEventListener('click', e => {
   const segEl = e.target.closest && e.target.closest('.seg');
   if (segEl && segEl.querySelector(':scope > .lens') && e.isTrusted && e.detail > 0) { e.preventDefault(); e.stopImmediatePropagation(); }
 }, true);
-// ボタンを押した位置から光が広がる（すべてのボタン）
+// ---------------------------------------------------------------- すべてのボタン: 押している間だけガラスになってふくらみ、指に少し付いてくる
+//  離すと元の位置・大きさへ短く戻る。押していないときは一切動かない（マウスを乗せただけでも動かない）。
+const PRESS_SEL = '.btn, button.chip, .iconbtn, .onboard button, .pinbtn, .evchip, .ritem, .x, .lead-x';
+let pressEl = null, pressStart = null;
 document.addEventListener('pointerdown', e => {
-  const b = e.target.closest && e.target.closest('.btn, .chip, .iconbtn, .onboard button, .pinbtn');
-  if (!b || b.disabled) return;
-  const r = b.getBoundingClientRect();
-  b.style.setProperty('--px', (e.clientX - r.left) + 'px');
-  b.style.setProperty('--py', (e.clientY - r.top) + 'px');
-  b.classList.remove('pressed'); void b.offsetWidth; b.classList.add('pressed');
-  setTimeout(() => b.classList.remove('pressed'), 600);
+  if (e.button > 0) return;
+  const b = e.target.closest && e.target.closest(PRESS_SEL);
+  if (!b || b.disabled || b.closest('.seg')) return;
+  pressEl = b; pressStart = { x: e.clientX, y: e.clientY, id: e.pointerId };
+  b.classList.add('glassing');
+  b.style.transform = 'scale(1.07)';
 });
+document.addEventListener('pointermove', e => {
+  if (!pressEl || !pressStart || e.pointerId !== pressStart.id) return;
+  const lim = 4, dx = lim * Math.tanh((e.clientX - pressStart.x) / 40), dy = lim * Math.tanh((e.clientY - pressStart.y) / 40);
+  pressEl.style.transform = 'translate(' + dx.toFixed(2) + 'px,' + dy.toFixed(2) + 'px) scale(1.07)';
+});
+function endPress() { if (!pressEl) return; pressEl.classList.remove('glassing'); pressEl.style.transform = ''; pressEl = null; pressStart = null; }
+document.addEventListener('pointerup', endPress);
+document.addEventListener('pointercancel', endPress);
+window.addEventListener('blur', endPress);
+
+// ---------------------------------------------------------------- 簡易説明（丸アイコンを少し押し続ける・マウスを少し乗せる）
+const PAGE_TIPS = {
+  home: 'いまの種目・遅れ・全種目の入力状況・開催前の確認', settings: '大会名・種目・区分・クラブ・レーン・時間・得点',
+  entries: '個人の申込を入力・Excelで配布と取り込み', relays: 'リレーのチームと泳者を入力', schedule: '競技の順番と開始時刻',
+  program: '組・レーン順に公式タイムを入力', flash: '順位の速報を表示・印刷', ranking: '種目・区分ごとの公式順位',
+  certs: '記録証・賞状をA4で印刷', awards: '最優秀・優秀選手の選出', check: '打ち間違い・二重登録などの点検', data: 'バックアップ・復元・Excelの読み書き'
+};
+let tipTimer = 0, tipFor = null;
+function showTip(item) {
+  if (!item || !item.dataset.tip) return;
+  let tip = $('#tip');
+  if (!tip) { tip = document.createElement('div'); tip.id = 'tip'; tip.setAttribute('role', 'tooltip'); document.body.appendChild(tip); }
+  tip.innerHTML = '<b>' + esc(item.dataset.tipTitle || '') + '</b><span>' + esc(item.dataset.tip) + '</span>';
+  const r = item.getBoundingClientRect();
+  tip.classList.add('on');
+  const w = tip.offsetWidth, x = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width / 2 - w / 2));
+  tip.style.left = x + 'px'; tip.style.top = (r.bottom + 10) + 'px';
+  tipFor = item;
+}
+function hideTip() { clearTimeout(tipTimer); tipTimer = 0; tipFor = null; const t = $('#tip'); if (t) t.classList.remove('on'); }
+document.addEventListener('pointerover', e => {
+  const it = e.target.closest && e.target.closest('[data-tip]');
+  if (!it || e.pointerType !== 'mouse' || e.buttons) return;
+  clearTimeout(tipTimer); tipTimer = setTimeout(() => showTip(it), 450);
+});
+document.addEventListener('pointerout', e => {
+  const it = e.target.closest && e.target.closest('[data-tip]');
+  if (!it || (e.relatedTarget && it.contains(e.relatedTarget))) return;
+  if (e.pointerType === 'mouse' && !e.buttons) hideTip();
+});
+window.addEventListener('scroll', hideTip, true);
+
 // 段落の説明は1行に畳み、押すと全文を表示
 document.addEventListener('click', e => { const l = e.target.closest && e.target.closest('.lead'); if (l) l.classList.toggle('open'); });
 
@@ -1741,6 +1822,7 @@ function renderTop() {
   $('#top').innerHTML =
     (navPref.side !== 'right' ? menuBtn : '') +
     '<div class="brand"><img class="logo" src="' + APP_ICON + '" alt=""><div class="brand-t"><small>' + esc(state.settings.meetName || 'スイム大会運営ボード') + '</small><strong>' + esc(cur ? cur[1] : '') + '</strong></div></div>' +
+    quickBar() +
     '<div class="chips">' +
     (meta.sample ? '<span class="chip warn">サンプル</span>' : '') +
     (saveError ? '<button class="chip err" data-act="backup"><span class="dot"></span>保存エラー</button>' : '<span class="chip quiet" title="入力のたびにこのブラウザへ自動保存しています"><span class="dot"></span>保存済み</span>') +
@@ -1751,6 +1833,12 @@ function renderTop() {
     '<button class="iconbtn" data-act="redo" title="やり直し (Ctrl+Y)" aria-label="やり直し" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '</button>' +
     '<button class="btn sm tinted" data-act="backup">' + icon('save', 'ic sm') + '<span class="hide-sm">バックアップ</span></button></div>' +
     (navPref.side === 'right' ? menuBtn : '');
+}
+function quickBar() {
+  const items = NAV.flatMap(g => g[1]);
+  const ne = (D.checks || []).filter(c => c.level === 'error').length;
+  return '<div class="seg h round quick" data-seg-id="quick" aria-label="簡易アクセス"><span class="lens" aria-hidden="true"></span>' +
+    items.map(([v, label]) => '<button type="button" class="segbtn qbtn ' + (view === v ? 'on' : '') + '" data-seg data-act="go" data-v="' + v + '" data-tip="' + esc(PAGE_TIPS[v] || '') + '" data-tip-title="' + esc(label) + '" aria-label="' + esc(label) + '">' + icon(v) + (v === 'check' && ne ? '<span class="qdot"></span>' : '') + '</button>').join('') + '</div>';
 }
 function renderNav() {
   const ch = D.checks || [];
