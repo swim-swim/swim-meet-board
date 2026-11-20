@@ -682,6 +682,23 @@ table.pt td .one, .pcard .fit { padding-top: 1px; }
 
 /* スマホ・低い画面: 上部のバーは固定せず、下へ動かすと画面の外へ流れる（作業の場所を広く使う） */
 @media (max-width: 700px), (max-height: 560px) { .topbar { position: relative; top: 0; } }
+
+.partseg { padding: 2px; } .partseg .segbtn { min-height: 28px; padding: 3px 12px; font-size: 12.5px; }
+.partseg .segbtn.on { background: #fff; box-shadow: 0 1px 3px rgba(10,30,60,.16); border-radius: 999px; }
+
+/* ---------- プログラム: 1枚に4組・行の高さと文字の大きさを固定 ---------- */
+.pg-z.fixedpg { width: 100%; }
+.pp.ptab.fixrow td { height: var(--rowh); padding-top: 0 !important; padding-bottom: 0 !important; font-size: 10.5pt; }
+.pp.ptab.fixrow td.nm { font-size: 11pt; }
+.pp.ptab.fixrow td.mem { font-size: 9.5pt; }
+.pp.ptab.fixrow tr.emp td { height: var(--rowh); }
+.pp.ptab.fixrow tr.emp .lane-c { transform: none; }
+.pp.ptab.fixrow .wbox { height: calc(var(--rowh) - 1.6mm); }
+.pp.ptab.fixrow thead th { padding-top: 0; padding-bottom: 1.2mm; font-size: 8pt; }
+.pg-z.fixedpg .hb { margin-bottom: 3mm; }
+.pg-z.fixedpg .blk-h { font-size: 10.5pt; padding-bottom: .8mm; }
+/* 印刷物の基本の文字（どの印刷物も同じ） */
+.pp td { font-size: 10.5pt; } .pp .nm { font-size: 11pt; } .pp .sm { font-size: 10pt; } .pp .tm { font-size: 10.5pt; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 10mm }</style>
 </head>
@@ -1723,7 +1740,13 @@ function loadFrameImage(file, slot) {
  * ========================================================================== */
 'use strict';
 const C = Core;
-const KEY = 'swim-meet-app/state', SNAP_KEY = 'swim-meet-app/snapshots', META_KEY = 'swim-meet-app/meta';
+// 1部・2部など、大会を分けてそれぞれのデータを別々に保存する（PART = '' が1部、'2' が2部）
+const PART_KEY = 'swim-meet-app/part';
+const PART = (() => { try { return localStorage.getItem(PART_KEY) || ''; } catch (e) { return ''; } })();
+const PARTS = [['', '1部'], ['2', '2部']];
+const partSuffix = PART ? '@' + PART : '';
+const KEY = 'swim-meet-app/state' + partSuffix, SNAP_KEY = 'swim-meet-app/snapshots' + partSuffix, META_KEY = 'swim-meet-app/meta' + partSuffix;
+function switchPart(v) { try { save(); localStorage.setItem(PART_KEY, v || ''); } catch (e) { /* ignore */ } location.reload(); }
 const TAB_ID = Math.random().toString(36).slice(2);
 const esc = s => String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const $ = (sel, root) => (root || document).querySelector(sel);
@@ -1800,7 +1823,7 @@ function snapshot(label, force) {
 
 // 複数タブ対策
 let bc = null;
-try { bc = new BroadcastChannel('swim-meet-app'); } catch (e) { bc = null; }
+try { bc = new BroadcastChannel('swim-meet-app' + partSuffix); } catch (e) { bc = null; }
 function onOtherTabSaved() {
   const raw = lsGet(KEY);
   if (!raw) return;
@@ -2331,6 +2354,7 @@ function renderTop() {
     '<div class="brand"><img class="logo" src="' + APP_ICON + '" alt=""><div class="brand-t"><small>' + esc(state.settings.meetName || 'スイム大会運営ボード') + '</small><strong id="toptitle">' + esc(cur ? cur[1] : '') + '</strong></div></div>' +
     quickBar() +
     '<div class="chips">' +
+    '<span class="seg mini partseg" role="group" aria-label="1部・2部">' + PARTS.map(([v, l]) => '<button type="button" class="segbtn ' + (PART === v ? 'on' : '') + '" data-act="part" data-v="' + v + '" title="' + l + 'のデータに切り替え">' + l + '</button>').join('') + '</span>' +
     (meta.sample ? '<span class="chip warn">サンプル</span>' : '') +
     (saveError ? '<button class="chip err" data-act="backup"><span class="dot"></span>保存エラー</button>' : '<span class="chip quiet" title="入力のたびにこのブラウザへ自動保存しています"><span class="dot"></span>保存済み</span>') +
     '<button class="chip ' + (ne ? 'err' : nw ? 'warn' : 'ok') + '" data-act="go" data-v="check" title="入力チェックを開く">' + (ne ? 'エラー ' + ne : nw ? '' : '問題なし') + (nw ? (ne ? '・' : '') + '注意 ' + nw : '') + '</button>' +
@@ -2708,7 +2732,7 @@ VIEWS.program = () => {
     '<button class="btn" data-act="progStep" data-d="1" ' + (idx >= opts.length - 1 ? 'disabled' : '') + '>次 →</button>' +
     (ui.prog ? '<span class="pill mute">' + (p.sch ? 'No.' + p.sch.no + '・開始 ' + (p.sch.start !== null ? C.fmtClock(p.sch.start) : '—') : '<span style="color:var(--err)">スケジュール未登録</span>') + '</span><span class="pill mute">' + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組</span>' +
       '<span class="pill ' + (allDone ? 'ok' : 'info') + '">入力 ' + p.done + ' / ' + p.items.length + '</span>' + (p.items.some(it => it.seatFixed) ? '<span class="pill mute" title="「組・レーンを入れ替え」で手で並べた位置を使っています">手で並べ替え済み</span>' : '') : '') +
-    '<span class="grow"></span>' + (ui.prog && p.items.length ? (ui.progArrange ? '<button class="btn sm primary" data-act="progArrange">入れ替えを終える</button>' : '<button class="btn sm tinted" data-act="progArrange" title="選手をドラッグして組・レーンを入れ替えます">組・レーンを入れ替え</button>') : '') + '<button class="btn sm" data-act="openflash" data-p="' + esc(ui.prog) + '">速報を見る</button>' + sel('set:print.progMode', state.settings.print.progMode || 'blank', [['blank', '印刷: 手書き用（記録欄が空欄）'], ['result', '印刷: 記録入り']], 'class="pmode" aria-label="プログラムの印刷の形"') + '<button class="btn sm" data-act="printProg" data-all="0">この種目を印刷</button><button class="btn sm" data-act="printProg" data-all="1">全種目を印刷</button></div>' +
+    '<span class="grow"></span>' + (ui.prog && p.items.length ? (ui.progArrange ? '<button class="btn sm primary" data-act="progArrange">入れ替えを終える</button>' : '<button class="btn sm tinted" data-act="progArrange" title="選手をドラッグして組・レーンを入れ替えます">組・レーンを入れ替え</button>') : '') + '<button class="btn sm" data-act="openflash" data-p="' + esc(ui.prog) + '">速報を見る</button>' + sel('set:print.progMode', state.settings.print.progMode || 'blank', [['blank', '印刷: 手書き用（記録欄が空欄）'], ['result', '印刷: 記録入り']], 'class="pmode" aria-label="プログラムの印刷の形"') + sel('set:print.progFill', state.settings.print.progFill || 'blank', [['blank', '4組に満たない所: 空白'], ['pack', '4組に満たない所: 次の種目を詰める']], 'class="pmode" aria-label="4組に満たないページ"') + '<button class="btn sm" data-act="printProg" data-all="0">この種目を印刷</button><button class="btn sm" data-act="printProg" data-all="1">全種目を印刷</button></div>' +
     (ui.prog && p.items.length ? '<div class="prog" style="margin:-4px 0 10px"><i style="width:' + pct + '%"></i></div>' : '') +
     (allDone && !ui.progArrange ? '<div class="notice ok"><span class="grow">この種目の記録入力が終わりました。</span><button class="btn sm" data-act="printFlash1" data-p="' + esc(ui.prog) + '">速報を印刷</button>' + (idx < opts.length - 1 ? '<button class="btn sm primary" data-act="progStep" data-d="1">次の種目へ →</button>' : '') + '</div>' : '') +
     (ui.progArrange && ui.prog && p.items.length ? arrangePanel(p, lanes) :
@@ -3002,7 +3026,8 @@ function hubAll() {
   const S = state.settings;
   const docs = [docSchedule()];
   opts.forEach(n => { const d = docProgram(n, 'blank'); if (d.pages) docs.push(d); });
-  opts.forEach(n => { const d = docProgram(n, 'result'); if (d.pages && d.done) docs.push(d); });   // 記録が入った種目だけ
+  opts.forEach(n => { const d = docProgram(n, 'result'); if (d.pages && d.done) docs.push(d); });
+  if (progFill() === 'pack') { const ns = opts.filter(n => programData(n).items.length); if (ns.length) docs.push(docProgramSet(ns, 'blank', 'pack', { key: 'progpack', listTitle: '全種目（4組ずつ・次の種目を詰める）' })); }   // 記録が入った種目だけ
   opts.forEach(n => { const d = docFlash(n); if (d.pages && d.done) docs.push(d); });
   S.events.filter(Boolean).forEach(ev => { const d = docRanking(ev, ''); if (d.n) docs.push(d); });
   if (D.aw.sum.entered) docs.push(docAwards());
@@ -3260,6 +3285,7 @@ const ACTIONS = {
     }, { snap: '名前の一括変更前' });
     ui.renFrom = ''; ui.renTo = '';
   },
+  part: t => { if ((t.dataset.v || '') !== PART) switchPart(t.dataset.v || ''); },
   progArrange: () => { ui.progArrange = !ui.progArrange; ui.arrSel = null; render(); },
   seatPick: t => {
     if (seatDrag.justDropped) return;
@@ -3457,6 +3483,7 @@ function fitPages(root) {
     const scaleNeed = () => { z.style.zoom = 1; const r = z.getBoundingClientRect(); return Math.min(1, H / r.height, W / r.width); };
     z.classList.remove('two');
     const s1 = scaleNeed();
+    if (z.classList.contains('fixedpg')) return;      // プログラム: 大きさは固定（どのページも同じ）
     if (s1 < 1 && s1 < 0.82 && !z.classList.contains('col1')) {   // col1: 必ず縦1列（プログラムの組など）        // 大きく縮める必要があるときだけ2段組みを試し、文字が大きく残る方を選ぶ
       const t = z.querySelector('table.split');
       let undo = null;
@@ -3537,31 +3564,52 @@ function docSchedule() {
 }
 function progPrintMode() { return state.settings.print.progMode === 'result' ? 'result' : 'blank'; }
 // プログラム: 組ごとの表。左端の列は「第n組」の下にレーン番号。記録・順位は 手書き用（空の記入欄）か 記録入り
-function docProgram(name, mode) {
-  const p = programData(name), res = (mode || progPrintMode()) === 'result';
-  const done = p.items.filter(it => it.status !== '未入力').length, unit = p.relay ? 'チーム' : '名';
-  return { key: (res ? 'progr:' : 'prog:') + name, group: res ? 'プログラム（記録入り）' : 'プログラム（手書き用）', title: (p.sch ? 'No.' + p.sch.no + ' ' : '') + name, pages: p.items.length ? 1 : 0, done,
-    sub: res ? '記録 ' + done + '/' + p.items.length : p.items.length + unit, html() {
-    const lanes = C.laneList(state.settings).slice().sort((a, b) => a - b);
-    const sub = (p.sch ? '競技No.' + p.sch.no + '　' : '') + (p.sch && p.sch.start !== null ? '開始予定 ' + C.fmtClock(p.sch.start) + '　' : '') + p.items.length + unit + '・' + p.heats.length + '組' + (res && done < p.items.length ? '　（記録 ' + done + '/' + p.items.length + '）' : '');
-    const body = p.heats.map(hh => {
-      const byLane = new Map(hh.items.map(it => [it.lane, it]));
-      return '<div class="blk"><table class="pp fx ptab ' + (res ? 'res' : 'blank') + (p.relay ? ' rel' : '') + '">' + colg(p.relay ? ['15mm', '18%', '37%', '12%', '30mm', '14mm'] : ['15mm', '31%', '24%', '13%', '30mm', '14mm']) + '<thead><tr><th class="hn">第' + hh.heat + '組</th>' +
-        (p.relay ? '<th class="c-team">チーム</th><th class="c-mem">泳者</th>' : '<th class="c-nm">氏名</th><th class="c-club">クラブ</th>') + '<th class="c-cat">区分</th><th class="c c-rec">記録</th><th class="c c-rk">順位</th></tr></thead><tbody>' +
-        lanes.map(ln => {
-          const it = byLane.get(ln);
-          if (!it) return '<tr class="emp"><td class="ln"><span class="lane-c">' + ln + '</span></td><td colspan="5"></td></tr>';
-          const rec = res ? '<td class="tm c">' + esc(it.flashTime) + '</td>' + rkCell(it.status === '完泳' ? it.rank : 0, it.flashRank)
-            : '<td class="c wc"><span class="wbox"></span></td><td class="c wc"><span class="wbox rk"></span></td>';
-          return '<tr><td class="ln"><span class="lane-c">' + ln + '</span></td>' +
-            (p.relay ? '<td class="nm">' + esc(it.teamDisp) + '</td><td class="mem">' + rubyMembers(it, '<span class="sep">/</span>') + '</td>'
-              : '<td class="nm">' + rubyName(it.np) + '</td><td class="sm">' + esc(it.club) + '</td>') +
-            '<td class="sm">' + esc(it.cat) + '</td>' + rec + '</tr>';
-        }).join('') + '</tbody></table></div>';
-    }).join('');
-    return pPage(name, sub, body || '<p>エントリーはありません。</p>', (res ? '記録入りプログラム' : '大会プログラム') + '　' + name, 'col1');
-  } };
+// プログラム: 1枚に4組ずつ。行の高さ・文字の大きさはどのページも同じ。
+//  4組に満たないページは「空白のまま」か「次の種目を詰める」（印刷の設定 print.progFill）を選べる
+function progFill() { return state.settings.print.progFill === 'pack' ? 'pack' : 'blank'; }
+function docProgramSet(names, mode, fill, meta) {
+  const res = (mode || progPrintMode()) === 'result';
+  fill = fill || progFill();
+  const lanes = C.laneList(state.settings).slice().sort((a, b) => a - b), L = Math.max(1, lanes.length);
+  const blocks = [];
+  names.forEach(n => { const p = programData(n); p.heats.forEach(h => blocks.push({ name: n, p, h })); });
+  const pages = [];
+  if (fill === 'pack') for (let i = 0; i < blocks.length; i += 4) pages.push(blocks.slice(i, i + 4));
+  else names.forEach(n => { const bs = blocks.filter(b => b.name === n); for (let i = 0; i < bs.length; i += 4) pages.push(bs.slice(i, i + 4)); });
+  const rowh = Math.max(5.2, Math.min(9, (226 / 4 - 14) / L)).toFixed(2) + 'mm';
+  const done = blocks.reduce((a, b) => a + b.h.items.filter(it => it.status !== '未入力').length, 0);
+  const heat = b => {
+    const p = b.p, byLane = new Map(b.h.items.map(it => [it.lane, it]));
+    const head = (fill === 'pack' || names.length > 1 ? (p.sch ? 'No.' + p.sch.no + '　' : '') + esc(b.name) + '　' : '') + '第' + b.h.heat + '組';
+    return '<div class="blk hb"><div class="blk-h">' + head + '</div><table class="pp fx ptab fixrow ' + (res ? 'res' : 'blank') + (p.relay ? ' rel' : '') + '" style="--rowh:' + rowh + '">' +
+      colg(p.relay ? ['15mm', '18%', '37%', '12%', '30mm', '14mm'] : ['15mm', '31%', '24%', '13%', '30mm', '14mm']) +
+      '<thead><tr><th class="c">レーン</th>' + (p.relay ? '<th>チーム</th><th>泳者</th>' : '<th>氏名</th><th>クラブ</th>') + '<th>区分</th><th class="c">記録</th><th class="c">順位</th></tr></thead><tbody>' +
+      lanes.map(ln => {
+        const it = byLane.get(ln);
+        if (!it) return '<tr class="emp"><td class="ln c"><span class="lane-c">' + ln + '</span></td><td colspan="5"></td></tr>';
+        const rec = res ? '<td class="tm c">' + esc(it.flashTime) + '</td>' + rkCell(it.status === '完泳' ? it.rank : 0, it.flashRank)
+          : '<td class="c wc"><span class="wbox"></span></td><td class="c wc"><span class="wbox rk"></span></td>';
+        return '<tr><td class="ln c"><span class="lane-c">' + ln + '</span></td>' +
+          (p.relay ? '<td class="nm">' + esc(it.teamDisp) + '</td><td class="mem">' + rubyMembers(it, '<span class="sep">/</span>') + '</td>' : '<td class="nm">' + rubyName(it.np) + '</td><td class="sm">' + esc(it.club) + '</td>') +
+          '<td class="sm">' + esc(it.cat) + '</td>' + rec + '</tr>';
+      }).join('') + '</tbody></table></div>';
+  };
+  const single = names.length === 1 ? programData(names[0]) : null;
+  const title = meta && meta.title || (single ? names[0] : '大会プログラム');
+  return { key: (meta && meta.key) || ((res ? 'progr:' : 'prog:') + names.join('|')), group: res ? 'プログラム（記録入り）' : 'プログラム（手書き用）',
+    title: meta && meta.listTitle || (single && single.sch ? 'No.' + single.sch.no + ' ' : '') + title, pages: pages.length, done,
+    sub: (res ? '記録 ' + done + '/' + blocks.reduce((a, b) => a + b.h.items.length, 0) + '・' : '') + pages.length + '枚', html() {
+      return pages.map((pg, i) => {
+        const evs = [...new Set(pg.map(b => b.name))];
+        const t = fill === 'pack' && names.length > 1 ? evs.join('・') : pg[0].name;
+        const p0 = pg[0].p;
+        const sub = fill === 'pack' && names.length > 1 ? '大会プログラム　' + (i + 1) + ' / ' + pages.length :
+          (p0.sch ? '競技No.' + p0.sch.no + '　' : '') + (p0.sch && p0.sch.start !== null ? '開始予定 ' + C.fmtClock(p0.sch.start) + '　' : '') + p0.items.length + (p0.relay ? 'チーム' : '名') + '・' + p0.heats.length + '組' + (pages.length > 1 ? '　（' + (i + 1) + '/' + pages.length + '）' : '');
+        return pPage(t, sub, pg.map(heat).join(''), (res ? '記録入りプログラム' : '大会プログラム') + '　' + t, 'col1 fixedpg');
+      }).join('');
+    } };
 }
+function docProgram(name, mode) { return docProgramSet([name], mode, 'blank'); }
 // 印刷の表: 列の幅を固定して、組・区分が変わっても列の位置をそろえる（cols はmm か %）
 const colg = cols => '<colgroup>' + cols.map(w => '<col style="width:' + w + '">').join('') + '</colgroup>';
 // 表彰の入力（漢字の氏名とクラブ）から、エントリーのフリガナを探す
@@ -3641,7 +3689,8 @@ function printSchedule() { printDocs([docSchedule()], 'スケジュールを印�
 function printProgram(all) {
   const names = all ? programOptions().filter(n => programData(n).items.length) : [ui.prog];
   const m = progPrintMode() === 'result' ? '記録入りの' : '手書き用の';
-  printDocs(names.map(n => docProgram(n)), all ? names.length + '種目の' + m + 'プログラムを、1種目1枚で印刷します' : 'この種目の' + m + 'プログラムを印刷します');
+  const d = all ? docProgramSet(names) : docProgram(ui.prog);
+  printDocs([d], (all ? names.length + '種目の' : 'この種目の') + m + 'プログラムを印刷します（1枚に4組' + (all && progFill() === 'pack' ? '・次の種目を詰める' : '') + '）');
 }
 function printFlash() { printDocs([docFlash(ui.flash)], '速報を印刷します'); }
 function printRanking() { printDocs([docRanking(ui.rankEv, ui.rankCat || '')], 'ランキングを印刷します'); }
