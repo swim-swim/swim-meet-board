@@ -699,6 +699,21 @@ table.pt td .one, .pcard .fit { padding-top: 1px; }
 .pg-z.fixedpg .blk-h { font-size: 10.5pt; padding-bottom: .8mm; }
 /* 印刷物の基本の文字（どの印刷物も同じ） */
 .pp td { font-size: 10.5pt; } .pp .nm { font-size: 11pt; } .pp .sm { font-size: 10pt; } .pp .tm { font-size: 10.5pt; }
+
+/* プログラム（1枚4組）: 行の中身（フリガナ付きの名前・レーンの丸・順位の丸）を行の高さに収める */
+.pp.ptab.fixrow td { line-height: 1.2; }
+.pp.ptab.fixrow rt { line-height: 1; }
+.pp.ptab.fixrow .lane-c { width: min(6.2mm, calc(var(--rowh) - .8mm)); height: min(6.2mm, calc(var(--rowh) - .8mm)); line-height: min(5.9mm, calc(var(--rowh) - 1.1mm)); font-size: 9pt; }
+.pp.ptab.fixrow .rkb { width: min(6.2mm, calc(var(--rowh) - .8mm)); height: min(6.2mm, calc(var(--rowh) - .8mm)); line-height: min(6.2mm, calc(var(--rowh) - .8mm)); font-size: 8.5pt; }
+.pp.ptab.fixrow td.ln, .pp.ptab.fixrow td.rk { vertical-align: middle; }
+/* プログラム: 名前（フリガナ付き）・クラブ・区分の文字を同じ線にそろえる（行の下にそろえる） */
+.pp.ptab.fixrow td.nm, .pp.ptab.fixrow td.sm, .pp.ptab.fixrow td.mem, .pp.ptab.fixrow td.tm { vertical-align: bottom; padding-bottom: 1.1mm !important; }
+.pp.ptab.fixrow td.wc { vertical-align: middle; }
+.pp.ptab.fixrow td { line-height: 1.1; }
+.pp.ptab.fixrow td.nm, .pp.ptab.fixrow td.sm, .pp.ptab.fixrow td.mem, .pp.ptab.fixrow td.tm { padding-bottom: .7mm !important; }
+.pp.ptab.fixrow .nm rt, .pp.ptab.fixrow .mem rt { font-size: .5em; }
+.pg-z.fixedpg .hb { margin-bottom: 2.4mm; }
+.pg-z.fixedpg .blk-h { padding-bottom: .4mm; margin-bottom: .4mm; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 10mm }</style>
 </head>
@@ -3516,9 +3531,34 @@ function fitPages(root) {
       }
     }
   });
+  fitFixed([...root.querySelectorAll('.pg-z.fixedpg')]);
   fitLines(root);
   fitCells(root);
   root.classList.remove('measure');
+}
+// プログラム（1枚4組）: 全ページが用紙に収まる行の高さを探し、全ページ同じ高さにそろえる。
+//  それでも入らないとき（レーンがとても多いなど）だけ、全ページを同じ倍率で縮める
+function fitFixed(zs) {
+  if (!zs.length) return;
+  const tables = zs.flatMap(z => [...z.querySelectorAll('table.fixrow')]);
+  if (!tables.length) return;
+  const set = v => tables.forEach(t => t.style.setProperty('--rowh', v.toFixed(2) + 'mm'));
+  const over = () => Math.max(...zs.map(z => { z.style.zoom = 1; return z.getBoundingClientRect().height / (z.parentElement.clientHeight * 0.985); }));
+  // 文字（フリガナ付きの名前）が入る一番低い行の高さを測る。これより低くはしない（枠や丸が文字より小さくならない）
+  set(0.5);
+  const pxmm = 96 / 25.4;
+  const nat = Math.max(...tables.flatMap(t => [...t.querySelectorAll('tbody tr:not(.emp)')].map(tr => tr.getBoundingClientRect().height))) / pxmm;
+  const minH = Math.max(4.6, (isFinite(nat) ? nat : 0) + 0.3);
+  const start = Math.max(minH, parseFloat(tables[0].style.getPropertyValue('--rowh')) || 8);
+  set(start);
+  if (over() > 1) {
+    let lo = minH, hi = start;
+    set(lo);
+    if (over() <= 1) { for (let i = 0; i < 10; i++) { const mid = (lo + hi) / 2; set(mid); if (over() <= 1) lo = mid; else hi = mid; } }
+    set(lo);
+  }
+  const o = over();
+  if (o > 1) zs.forEach(z => { z.style.zoom = (0.99 / o).toFixed(4); });
 }
 // 列幅を固定した表: はみ出すセルだけ文字を少し小さくする（改行しない・省略しない）
 // 列幅を固定した表: 入りきらない列は、その列の文字を同じ大きさだけ小さくする（同じ列で大きさがばらばらにならない）
