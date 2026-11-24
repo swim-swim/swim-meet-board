@@ -463,7 +463,7 @@ table.pt .tbox .prev.bad { position: static; height: auto; display: block; overf
 table.pt select { width: 100%; min-width: 0; padding-left: 8px; padding-right: 24px; background-position: calc(100% - 13px) 52%, calc(100% - 8px) 52%; }
 table.pt td.rk { white-space: nowrap; font-size: 13px; }
 /* 細い画面（スマホ・プレビューを横に出しているとき）: 1人を2段にして、それでも全部見せる */
-@container (max-width: 560px) {
+@container (max-width: 700px) {
   table.pt colgroup, table.pt tr.pc { display: none; }
   table.pt, table.pt thead, table.pt tbody, table.pt tr.ph, table.pt tr.ph th { display: block; width: 100%; }
   table.pt tbody tr { display: grid; grid-template-columns: 40px minmax(0, 1fr) 96px; grid-template-areas: "ln nm mt" "rk tm jd"; column-gap: 6px; align-items: center; padding: 5px 4px; border-bottom: 1px solid var(--hairline); }
@@ -724,7 +724,7 @@ table.pt td .one, .pcard .fit { padding-top: 1px; }
 .jb.on.j-out { background: #5b6470; border-color: #5b6470; color: #fff; }
 .jb:active { transform: scale(.95); }
 table.pt col.c-jd { width: 118px; } table.pt col.c-mt { width: 92px; } table.pt col.c-tm { width: 118px; }
-@container (max-width: 560px) { table.pt tbody tr { grid-template-columns: 40px minmax(0, 1fr) 122px !important; } }
+@container (max-width: 700px) { table.pt tbody tr { grid-template-columns: 40px minmax(0, 1fr) 122px !important; } }
 .mcell { min-width: 140px; } .mcell input { display: block; width: 100%; } .mcell input.kin { margin-top: 3px; font-size: 12.5px; min-height: 30px; }
 /* ---------- フリガナを大きめに ---------- */
 rt { font-size: .66em; }
@@ -764,6 +764,56 @@ rt { font-size: .66em; }
 .heattabs { min-width: 0; }
 .ready { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
 .ritem { white-space: normal; min-width: 0; overflow-wrap: anywhere; }
+
+/* ---------- 上部のバー: 左（メニュー・大会名）／中央（簡易ボタン・常に同じ位置）／右（状態） ---------- */
+.topbar { display: grid !important; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 6px 12px; }
+.topbar .tl { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.topbar .tl .brand { flex: 1 1 auto; min-width: 0; }
+.topbar .qnav { grid-column: 2; justify-self: center; order: 0 !important; flex-basis: auto !important; }
+.topbar .tr { display: flex; align-items: center; justify-content: flex-end; gap: 6px; min-width: 0; }
+.topbar .tr .chips { flex-wrap: wrap; justify-content: flex-end; }
+.topbar .trow2 { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px 12px; min-width: 0; }
+.topbar .trow2 .topdesc { flex: 1 1 300px; order: 0; }
+@media (max-width: 1279px) {
+  .topbar { grid-template-columns: minmax(0, 1fr) auto; }
+  .topbar .qnav { grid-column: 1 / -1; grid-row: 2; justify-self: center; max-width: 100%; }
+  .topbar .tr { grid-column: 2; grid-row: 1; }
+  .topbar .trow2 { grid-row: 3; }
+}
+@media (max-width: 600px) { .topbar { grid-template-columns: minmax(0, 1fr); } .topbar .tr { grid-column: 1; grid-row: 2; justify-content: flex-start; } .topbar .qnav { grid-row: 3; justify-self: stretch; } .topbar .trow2 { grid-row: 4; } }
+/* 簡易ボタンのガラス（押している間だけ動く） */
+.qnav.seg { gap: 2px; padding: 3px; border-radius: 16px; background: var(--track); }
+.qnav.seg > .lens { border-radius: 12px; }
+.qnav .segbtn.qn { opacity: 1; min-height: 0; border-radius: 12px; background: transparent !important; box-shadow: none !important; touch-action: pan-x; }
+.qnav .segbtn.qn.on { color: var(--accent); }
+
+.arh-h { align-items: center; }
+.arh-h .hlock { min-height: 30px; padding: 3px 10px; font-size: 12px; }
+.arh-h .hlock.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.arh.hlocked { box-shadow: inset 0 0 0 2px var(--accent); }
+.slot-empty.tgt { border: 2px solid #e0a800; background: color-mix(in srgb, #ffd54a 30%, transparent); color: var(--ink); font-weight: 600; }
+.arrs { margin-bottom: 10px; padding: 10px 12px; }
+.arrs-list { display: grid; gap: 4px; max-height: 240px; overflow: auto; }
+.arrs-row { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 10px; background: var(--btn-bg); border: 1px solid var(--hairline); }
+
+/* ---------- 記録入力: 大きく見やすく・押しやすく ---------- */
+table.pt td { font-size: 15px; padding-top: 6px; padding-bottom: 6px; }
+table.pt td.nm .one:first-child { font-size: 17px; }
+table.pt td .sub { font-size: 13px; }
+table.pt col.c-ln { width: 54px; } table.pt col.c-mt { width: 104px; } table.pt col.c-tm { width: 150px; } table.pt col.c-jd { width: 176px; } table.pt col.c-rk { width: 60px; }
+table.pt .lane { width: 34px; height: 34px; font-size: 16px; font-weight: 700; }
+table.pt input.tin { min-height: 46px; font-size: 19px; font-weight: 600; padding-left: 10px; }
+table.pt .tbox .prev { height: 46px; font-size: 12px; }
+table.pt .jb { min-height: 42px; font-size: 13.5px; padding: 6px 10px; border-radius: 10px; }
+table.pt .jbtns { gap: 5px; }
+table.pt td.rk { font-size: 16px; }
+table.pt tr.pc th { font-size: 12.5px; }
+table.pt tr.ph th { font-size: 16px; }
+.progbar .btn, .progbar select.progsel { min-height: 46px; font-size: 15px; }
+.progbar select.progsel { font-size: 16px; }
+.progbar .btn.sm { min-height: 40px; font-size: 14px; }
+.heattabs .segbtn { min-height: 40px; font-size: 14.5px; padding: 6px 16px; }
+@container (max-width: 700px) { table.pt tbody tr { grid-template-columns: 44px minmax(0, 1fr) 182px !important; } }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2417,29 +2467,27 @@ function renderTop() {
   const menuBtn = '<button class="iconbtn menu ' + ((pinned || navOpen) ? 'on' : '') + '" data-act="toggleNav" aria-label="画面の切り替え" aria-expanded="' + (pinned || navOpen) + '" title="画面の切り替え">' + icon('menu') + '</button>';
   const cur = NAV.flatMap(g => g[1]).find(x => x[0] === view);
   $('#top').innerHTML =
-    (navPref.side !== 'right' ? menuBtn : '') +
-    '<div class="brand"><img class="logo" src="' + APP_ICON + '" alt=""><div class="brand-t"><small>' + esc(state.settings.meetName || 'スイム大会運営ボード') + '</small><strong id="toptitle">' + esc(cur ? cur[1] : '') + '</strong></div></div>' +
+    '<div class="tl">' + (navPref.side !== 'right' ? menuBtn : '') +
+    '<div class="brand"><img class="logo" src="' + APP_ICON + '" alt=""><div class="brand-t"><small>' + esc(state.settings.meetName || 'スイム大会運営ボード') + '</small><strong id="toptitle">' + esc(cur ? cur[1] : '') + '</strong></div></div></div>' +
     quickBar() +
-    '<div class="chips">' +
+    '<div class="tr"><div class="chips">' +
     '<span class="seg mini partseg" role="group" aria-label="1部・2部">' + PARTS.map(([v, l]) => '<button type="button" class="segbtn ' + (PART === v ? 'on' : '') + '" data-act="part" data-v="' + v + '" title="' + l + 'のデータに切り替え">' + l + '</button>').join('') + '</span>' +
     (meta.sample ? '<span class="chip warn">サンプル</span>' : '') +
     (saveError ? '<button class="chip err" data-act="backup"><span class="dot"></span>保存エラー</button>' : '<span class="chip quiet" title="入力のたびにこのブラウザへ自動保存しています"><span class="dot"></span>保存済み</span>') +
     '<button class="chip ' + (ne ? 'err' : nw ? 'warn' : 'ok') + '" data-act="go" data-v="check" title="入力チェックを開く">' + (ne ? 'エラー ' + ne : nw ? '' : '問題なし') + (nw ? (ne ? '・' : '') + '注意 ' + nw : '') + '</button>' +
     '<button class="chip toggle ' + (locked ? 'lock' : '') + '" data-act="lock" aria-pressed="' + locked + '" title="大会当日は設定・エントリーを誤って変えないようにロックできます。記録入力はできます">' + icon(locked ? 'lock' : 'unlock', 'ic sm') + (locked ? '当日モード中' : '当日モード') + '</button>' +
-    '</div>' +
-    '<div class="topdesc" id="topdesc"></div>' +
-    '<div class="tools"><button class="iconbtn" data-act="undo" title="元に戻す (Ctrl+Z)" aria-label="元に戻す" ' + (undoStack.length ? '' : 'disabled') + '>' + icon('undo') + '</button>' +
+    '</div>' + (navPref.side === 'right' ? menuBtn : '') + '</div>' +
+    '<div class="trow2"><div class="tools"><button class="iconbtn" data-act="undo" title="元に戻す (Ctrl+Z)" aria-label="元に戻す" ' + (undoStack.length ? '' : 'disabled') + '>' + icon('undo') + '</button>' +
     '<button class="iconbtn" data-act="redo" title="やり直し (Ctrl+Y)" aria-label="やり直し" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '</button>' +
-    '<button class="btn sm tinted" data-act="backup">' + icon('save', 'ic sm') + '<span class="hide-sm">バックアップ</span></button></div>' +
-    (navPref.side === 'right' ? menuBtn : '');
+    '<button class="btn sm tinted" data-act="backup">' + icon('save', 'ic sm') + '<span class="hide-sm">バックアップ</span></button></div><div class="topdesc" id="topdesc"></div></div>';
 }
 // 簡易アクセス: アイコン＋短い名前のボタン（押すだけ。見て分かる・指で押しやすい大きさ）
 const QLABEL = { home: '本部', settings: '設定', entries: '個人', relays: 'リレー', schedule: '進行', program: '記録入力', flash: '速報', ranking: '順位', certs: '証書', prints: '印刷', awards: '表彰', check: 'チェック', data: 'データ' };
 function quickBar() {
   const items = NAV.flatMap(g => g[1]);
   const ne = (D.checks || []).filter(c => c.level === 'error').length;
-  return '<nav class="qnav" aria-label="簡易アクセス">' +
-    items.map(([v, label]) => '<button type="button" class="qn' + (view === v ? ' on' : '') + '" data-act="go" data-v="' + v + '" title="' + esc(label + '：' + (PAGE_TIPS[v] || '')) + '" aria-label="' + esc(label) + '"' + (view === v ? ' aria-current="page"' : '') + '>' + icon(v) + '<span>' + esc(QLABEL[v] || label) + '</span>' + (v === 'check' && ne ? '<i class="qdot"></i>' : '') + '</button>').join('') + '</nav>';
+  return '<nav class="seg h qnav" data-seg-id="quick" aria-label="簡易アクセス"><span class="lens" aria-hidden="true"></span>' +
+    items.map(([v, label]) => '<button type="button" class="segbtn qn' + (view === v ? ' on' : '') + '" data-seg data-act="go" data-v="' + v + '" data-tip="' + esc(PAGE_TIPS[v] || '') + '" data-tip-title="' + esc(label) + '" aria-label="' + esc(label) + '"' + (view === v ? ' aria-current="page"' : '') + '>' + icon(v) + '<span>' + esc(QLABEL[v] || label) + '</span>' + (v === 'check' && ne ? '<i class="qdot"></i>' : '') + '</button>').join('') + '</nav>';
 }
 function renderNav() {
   const ch = D.checks || [];
@@ -2858,6 +2906,15 @@ VIEWS.program = () => {
           }).join('') + '</tbody></table></div>';
       }).join('') + '</div>' : '<div class="card empty">この種目のエントリーはありません。</div>')));
 };
+// レーンで検索して割り当て: 空きレーンを押す（または検索欄に入れる）→ 候補から「ここへ」
+function arrSearch(p) {
+  const t = ui.arrTarget, q = C.normKey(ui.arrQ || '');
+  if (!t && !q) return '';
+  const list = p.items.filter(it => !q || C.normKey(it.name + (it.teamDisp || '') + (it.members || []).join('') + it.club).indexOf(q) >= 0).slice(0, 24);
+  return '<div class="card arrs"><div class="bar" style="margin:0 0 6px">' + (t ? '<b>第' + t.h + '組 ' + t.l + 'レーンに入れる選手</b>' : '<b>検索結果</b>') + '<span class="muted small">' + list.length + '件</span><span class="grow"></span>' + (t ? '<button class="btn sm" data-act="arrTargetOff">やめる</button>' : '') + '</div>' +
+    (list.length ? '<div class="arrs-list">' + list.map(it => '<div class="arrs-row"><span class="lane">' + it.lane + '</span><span class="grow"><b>' + (p.relay ? esc(it.teamDisp) : rubyName(it.np)) + '</b> <span class="muted small">第' + it.heat + '組・' + esc(p.relay ? it.memberText : it.club) + '</span></span>' +
+      (t ? '<button class="btn sm primary" data-act="arrPut" data-id="' + esc(it.id) + '">ここへ入れる</button>' : '<button class="btn sm" data-act="seatPick" data-id="' + esc(it.id) + '">選ぶ</button>') + '</div>').join('') + '</div>' : '<p class="small muted">見つかりません。</p>') + '</div>';
+}
 // 組・レーンの入れ替え（ドラッグ＆ドロップ、またはタップで選んで行き先をタップ）
 function arrangePanel(p, lanes) {
   const maxH = Math.max(0, ...p.items.map(it => it.heat || 0));
@@ -2871,12 +2928,15 @@ function arrangePanel(p, lanes) {
   };
   const heat = (h, isNew) => {
     const its = p.items.filter(it => it.heat === h);
-    return '<div class="arh card' + (isNew ? ' newh' : '') + '"><div class="arh-h"><b>' + (isNew ? '新しい組（第 ' + h + ' 組）' : '第 ' + h + ' 組') + '</b><span class="muted small">' + (isNew ? 'ここへ入れると組が増えます' : its.length + (p.relay ? 'チーム' : '人')) + '</span></div>' +
-      lanes.map(l => { const it = its.find(x => x.lane === l); return '<div class="slot" data-h="' + h + '" data-l="' + l + '"><span class="lane">' + l + '</span>' + (it ? card(it) + '<button type="button" class="lockb' + (it.seatFixed ? ' on' : '') + '" data-act="seatLock" data-id="' + esc(it.id) + '" title="' + (it.seatFixed ? 'ロック中（自動の組分けで動かない）。押すと解除' : 'この組・レーンにロックする') + '" aria-label="ロック">' + icon(it.seatFixed ? 'lock' : 'unlock', 'ic sm') + '</button>' : '<button type="button" class="slot-empty" data-act="seatPick" aria-label="第' + h + '組 ' + l + 'レーン（空き）">空き</button>') + '</div>'; }).join('') + '</div>';
+    const allLocked = its.length && its.every(it => it.seatFixed);
+    return '<div class="arh card' + (isNew ? ' newh' : '') + (allLocked ? ' hlocked' : '') + '"><div class="arh-h"><b>' + (isNew ? '新しい組（第 ' + h + ' 組）' : '第 ' + h + ' 組') + '</b><span class="muted small">' + (isNew ? 'ここへ入れると組が増えます' : its.length + (p.relay ? 'チーム' : '人')) + '</span>' +
+      (!isNew && its.length ? '<button type="button" class="btn sm hlock' + (allLocked ? ' on' : '') + '" data-act="heatLock" data-h="' + h + '">' + icon(allLocked ? 'lock' : 'unlock', 'ic sm') + (allLocked ? '組をロック中' : '組をロック') + '</button>' : '') + '</div>' +
+      lanes.map(l => { const it = its.find(x => x.lane === l); return '<div class="slot" data-h="' + h + '" data-l="' + l + '"><span class="lane">' + l + '</span>' + (it ? card(it) + '<button type="button" class="lockb' + (it.seatFixed ? ' on' : '') + '" data-act="seatLock" data-id="' + esc(it.id) + '" title="' + (it.seatFixed ? 'ロック中（自動の組分けで動かない）。押すと解除' : 'この組・レーンにロックする') + '" aria-label="ロック">' + icon(it.seatFixed ? 'lock' : 'unlock', 'ic sm') + '</button>' : '<button type="button" class="slot-empty' + (ui.arrTarget && ui.arrTarget.h === h && ui.arrTarget.l === l ? ' tgt' : '') + '" data-act="seatPick" aria-label="第' + h + '組 ' + l + 'レーン（空き）">' + (ui.arrTarget && ui.arrTarget.h === h && ui.arrTarget.l === l ? 'ここに入れる選手を検索 ↑' : '空き（押すと検索して入れられます）') + '</button>') + '</div>'; }).join('') + '</div>';
   };
   return '<div class="notice info arr-help"><span class="grow">' + (isLocked() ? '<b>当日モード中は入れ替えできません。</b>上部の「当日モード」を解除してください。' : '選手を別のレーンへドラッグ（スマホは長押ししてから）、またはタップで選んで行き先をタップすると入れ替わります。動かした選手は自動でロック（🔒）され、自動の組分けで動きません。') + (ui.arrSel ? '　<b>選択中：行き先をタップ</b>' : '') + '</span>' +
     '<input data-k="ui:arrQ" value="' + esc(ui.arrQ || '') + '" placeholder="選手・チームを検索" style="max-width:200px" aria-label="選手を検索">' +
     (fixedN ? '<button class="btn sm" data-act="seatReset">ロックを全部外して自動に戻す</button>' : '') + '</div>' +
+    arrSearch(p) +
     (movedN ? '<div class="notice warn">手で入れ替えた後に申込が変わったため、' + movedN + (p.relay ? 'チーム' : '人') + 'を空いているレーンへ自動で入れました。位置を確認してください。</div>' : '') +
     '<div class="arr fill" data-fill-id="arr">' + Array.from({ length: maxH }, (_, i) => heat(i + 1)).join('') + heat(maxH + 1, true) + '</div>';
 }
@@ -3419,11 +3479,23 @@ const ACTIONS = {
       toast((relay ? it.teamDisp : it.np.kanji) + (lock ? ' を第' + it.heat + '組 ' + it.lane + 'レーンにロックしました（自動の組分けで動きません）' : ' のロックを解除しました（自動の組分けに戻ります）'), null, 6000, { label: '元に戻す', fn: undo });
   },
   printClubSum: () => printDocs([docClubSum()], 'クラブ総合得点（1部・2部合算）を印刷します'),
+  arrTargetOff: () => { ui.arrTarget = null; render(); },
+  arrPut: t => { const tg = ui.arrTarget; if (!tg) return; ui.arrTarget = null; ui.arrQ = ''; seatMove(t.dataset.id, tg.h, tg.l); },
+  heatLock: t => {
+    const h = +t.dataset.h, name = ui.prog, relay = C.isRelayName(name);
+    const its = (relay ? D.rel : D.ind).filter(it => it.program === name && it.heat === h), lock = !its.every(it => it.seatFixed);
+    if (commit((lock ? '組をロック' : '組のロックを解除') + '（' + name + ' 第' + h + '組）', s => { const map = new Map((relay ? s.relays : s.entries).map(o => [o.id, o])); its.forEach(it => { const o = map.get(it.id); if (!o) return; if (lock) o.seat = { p: name, h: it.heat, l: it.lane }; else delete o.seat; }); }))
+      toast('第' + h + '組を' + (lock ? 'ロックしました（自動の組分けで動きません）' : 'ロック解除しました'), null, 6000, { label: '元に戻す', fn: undo });
+  },
   progArrange: () => { ui.progArrange = !ui.progArrange; ui.arrSel = null; render(); },
   seatPick: t => {
     if (seatDrag.justDropped) return;
     const id = t.dataset.id || null, slot = t.closest('.slot');
-    if (!ui.arrSel) { if (id) { ui.arrSel = id; render(); } return; }
+    if (!ui.arrSel) {
+      if (id) { ui.arrSel = id; ui.arrTarget = null; render(); return; }
+      if (slot) { ui.arrTarget = { h: +slot.dataset.h, l: +slot.dataset.l }; render(); const q = document.querySelector('[data-k="ui:arrQ"]'); if (q) q.focus(); }   // 空きレーン → 検索して入れる
+      return;
+    }
     if (id === ui.arrSel) { ui.arrSel = null; render(); return; }
     const from = ui.arrSel; ui.arrSel = null;
     if (slot) seatMove(from, +slot.dataset.h, +slot.dataset.l); else render();
