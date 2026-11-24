@@ -814,6 +814,9 @@ table.pt tr.ph th { font-size: 16px; }
 .progbar .btn.sm { min-height: 40px; font-size: 14px; }
 .heattabs .segbtn { min-height: 40px; font-size: 14.5px; padding: 6px 16px; }
 @container (max-width: 700px) { table.pt tbody tr { grid-template-columns: 44px minmax(0, 1fr) 182px !important; } }
+/* 上部バーの高さを画面によって変えない（簡易ボタンの位置を固定するため、大会名・画面名は1行） */
+.topbar .brand small, .topbar .brand strong { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; display: block; }
+.topbar .brand-t { min-width: 0; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2468,7 +2471,7 @@ function renderTop() {
   const cur = NAV.flatMap(g => g[1]).find(x => x[0] === view);
   $('#top').innerHTML =
     '<div class="tl">' + (navPref.side !== 'right' ? menuBtn : '') +
-    '<div class="brand"><img class="logo" src="' + APP_ICON + '" alt=""><div class="brand-t"><small>' + esc(state.settings.meetName || 'スイム大会運営ボード') + '</small><strong id="toptitle">' + esc(cur ? cur[1] : '') + '</strong></div></div></div>' +
+    '<div class="brand" title="' + esc(state.settings.meetName || '') + '"><img class="logo" src="' + APP_ICON + '" alt=""><div class="brand-t"><small>' + esc(state.settings.meetName || 'スイム大会運営ボード') + '</small><strong id="toptitle">' + esc(cur ? cur[1] : '') + '</strong></div></div></div>' +
     quickBar() +
     '<div class="tr"><div class="chips">' +
     '<span class="seg mini partseg" role="group" aria-label="1部・2部">' + PARTS.map(([v, l]) => '<button type="button" class="segbtn ' + (PART === v ? 'on' : '') + '" data-act="part" data-v="' + v + '" title="' + l + 'のデータに切り替え">' + l + '</button>').join('') + '</span>' +
