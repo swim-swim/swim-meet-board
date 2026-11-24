@@ -1049,6 +1049,20 @@ table.pt tbody tr td, table.pt tbody tr.emp td { height: 60px; }
 
 /* 簡易ボタン: 指でなぞってもブラウザに横スクロールを取られない（横に並びきる画面） */
 @media (min-width: 601px) { .qnav, .qnav .segbtn.qn { touch-action: none !important; } }
+
+/* 丸ボタンは押しつぶされない（狭いときにひし形/楕円にならない） */
+.iconbtn, .iconbtn.menu, .logo, .nav .x, .lockb, .qnav .segbtn.qn, .bell { flex-shrink: 0 !important; aspect-ratio: 1 / 1; }
+
+/* 進行スケジュール: 時刻をその場で変更 */
+.schtimes { display: flex; flex-wrap: wrap; gap: 8px 10px; padding: 10px 12px; margin-bottom: 10px; }
+.schtimes .stime { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--ink-2, #667); min-width: 0; }
+.schtimes .stime input { width: 84px; text-align: center; font-weight: 700; font-size: 15px; }
+.schtimes .stime.ro b { display: inline-flex; align-items: center; justify-content: center; width: 84px; height: 40px; font-size: 15px; color: var(--ink); }
+td.stcell { white-space: nowrap; }
+td.stcell input.st { width: 72px; text-align: center; font-weight: 700; }
+td.stcell.fixed input.st { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+td.stcell.over input.st { border-color: #d97706; background: rgba(217, 119, 6, .12); color: #b45309; }
+td.stcell .x { margin-left: 4px; vertical-align: middle; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -1498,7 +1512,13 @@ const Core = (() => {
         const x = heatsOf(name); o.n = x.n; o.heats = x.h;
         o.dur = Math.max(0, x.h * (perHeat(name) + num(sc.cycleSec)) + adj * 60);
       }
-      if (start === null) { o.start = null; o.end = null; }
+      const fixedAt = parseClock(row.at);
+      if (fixedAt !== null) {        // 開始時刻を手で決めた行（遅れ・前倒しの反映）
+        o.fixed = true;
+        if (maxEnd !== null && fixedAt < maxEnd) o.overlap = true;
+        o.start = fixedAt;
+      }
+      else if (start === null) { o.start = null; o.end = null; }
       else if (maxEnd === null) o.start = start;
       else {
         const prev = out.length ? out[out.length - 1] : null;
@@ -3136,16 +3156,19 @@ VIEWS.relays = () => {
 };
 
 /* ---------------------------------------------------------------- 画面: 進行スケジュール */
+function clockShow(v) { const t = C.parseClock(v); return t === null ? (v || '') : C.fmtClock(t); }
 VIEWS.schedule = () => {
   const S = state.settings, sc = S.schedule, L = lockAttr();
   const progs = C.programNames(state);
   const inSched = new Set(state.schedule.map(r => C.str(r.name)));
   const used = new Set(D.ind.concat(D.rel).filter(it => it.event).map(it => it.program));
   const missing = [...used].filter(p => !inSched.has(p));
-  return '<h1 class="view">進行スケジュール</h1><p class="lead">競技の順番を並べると、参加数・組数・所要時間・開始時刻が自動で出ます。「調整（分）」で種目ごとに時間を足し引きできます。</p>' +
-    '<div class="card" style="margin-bottom:12px"><div class="fields">' +
-    [['入館開始', sc.doorOpen], ['W-up', sc.warmup], ['開会式', sc.opening], ['競技開始', sc.start], ['競技終了', D.sched.end !== null ? C.fmtClock(D.sched.end) : '—'], ['閉会式', sc.closing], ['最終退館', sc.exit]]
-      .map(([a, b]) => '<div class="field"><span>' + a + '</span><b class="num">' + esc(b) + '</b></div>').join('') + '</div></div>' +
+  return '<h1 class="view">進行スケジュール</h1><p class="lead">競技の順番を並べると、参加数・組数・所要時間・開始時刻が自動で出ます。開始時刻は直接書きかえられます（その時刻に固定、↺で自動に戻す）。「調整（分）」で種目ごとに時間を足し引きできます。</p>' +
+    '<div class="card schtimes">' +
+    [['入館開始', 'doorOpen'], ['W-up', 'warmup'], ['開会式', 'opening'], ['競技開始', 'start'], ['競技終了', null], ['閉会式', 'closing'], ['最終退館', 'exit']]
+      .map(([a, k]) => '<label class="stime' + (k ? '' : ' ro') + '"><span>' + a + '</span>' + (k ? inp('set:schedule.' + k, clockShow(sc[k]), 'class="num" inputmode="numeric" placeholder="8:45"') : '<b class="num">' + (D.sched.end !== null ? C.fmtClock(D.sched.end) : '—') + '</b>') + '</label>').join('') +
+    [['種目間(分)', 'intervalMin', 'decimal'], ['休憩(分)', 'breakMin', 'decimal'], ['1組の余裕(秒)', 'cycleSec', 'numeric']]
+      .map(([a, k, im]) => '<label class="stime"><span>' + a + '</span>' + inp('set:schedule.' + k, sc[k], 'class="num" inputmode="' + im + '"') + '</label>').join('') + '</div>' +
     (missing.length ? '<div class="notice err"><span class="grow">エントリーがあるのにスケジュールにない種目: <b>' + esc(missing.join('、')) + '</b></span><button class="btn sm" data-act="fix" data-f="sched" ' + L + '>末尾に追加する</button></div>' : '') +
     '<div class="bar"><button class="btn" data-act="addSched" data-n="" ' + L + '>＋ 行を追加</button><button class="btn" data-act="addSched" data-n="休憩" ' + L + '>＋ 休憩を追加</button><span class="grow"></span><button class="btn" data-act="printSched">スケジュールを印刷</button></div>' +
     '<div class="tablewrap fill" data-fill-id="sch"><table class="t"><thead><tr><th class="num">競技No</th><th>種目名</th><th class="num">参加数</th><th class="num">組数</th><th class="num">所要時間</th><th class="num">開始時刻</th><th class="num">終了時刻</th><th class="num">調整(分)</th><th></th></tr></thead><tbody>' +
@@ -3154,8 +3177,8 @@ VIEWS.schedule = () => {
       const dupe = state.schedule.filter(x => C.str(x.name) === o.name && o.name && o.name !== '休憩').length > 1;
       return '<tr class="' + (dupe ? 'warn' : '') + '" data-row="' + r.id + '"><td class="num">' + o.no + '</td><td>' + sel(k + 'name', r.name, blankOpt().concat(progs).concat(['休憩']), 'style="min-width:200px" ' + L) + '</td>' +
         '<td class="num">' + (o.n === undefined ? '' : o.n) + '</td><td class="num">' + (o.heats === undefined ? '' : o.heats) + '</td><td class="num">' + (o.dur !== undefined ? C.fmtDuration(o.dur) : '') + '</td>' +
-        '<td class="num"><b>' + (o.start !== undefined && o.start !== null ? C.fmtClock(o.start) : '') + '</b></td><td class="num">' + (o.end !== undefined && o.end !== null ? C.fmtClock(o.end) : '') + '</td>' +
-        '<td class="num">' + inp(k + 'adj', r.adj, 'style="width:64px;text-align:right" inputmode="numeric" ' + L) + '</td>' +
+        '<td class="num stcell' + (o.fixed ? ' fixed' : '') + (o.overlap ? ' over' : '') + '"' + (o.overlap ? ' title="前の種目が終わる前の時刻です"' : '') + '>' + (o.name ? inp(k + 'at', o.start !== undefined && o.start !== null ? C.fmtClock(o.start) : '', 'class="num st" inputmode="numeric" title="開始時刻を入れると、その時刻に固定（空欄で自動に戻す）"') + (o.fixed ? '<button class="x" data-act="schAuto" data-id="' + r.id + '" title="自動の時刻に戻す">↺</button>' : '') : '') + '</td><td class="num">' + (o.end !== undefined && o.end !== null ? C.fmtClock(o.end) : '') + '</td>' +
+        '<td class="num">' + inp(k + 'adj', r.adj, 'style="width:64px;text-align:right" inputmode="numeric"') + '</td>' +
         '<td style="white-space:nowrap"><button class="x" data-act="mvSched" data-i="' + i + '" data-d="-1" title="上へ" ' + L + '>↑</button><button class="x" data-act="mvSched" data-i="' + i + '" data-d="1" title="下へ" ' + L + '>↓</button><button class="x" data-act="delSched" data-i="' + i + '" title="削除" ' + L + '>×</button></td></tr>';
     }).join('') + '</tbody></table></div>';
 };
@@ -3583,6 +3606,16 @@ function setUI(f, val) {
   if (f === 'renKind') ui.renFrom = '';
   save(); render();
 }
+// 時刻の入力をそろえる: 845 / 8.45 / ８：４５ → 8:45。空欄は ''。読めないときは null
+function clockText(raw) {
+  const t = String(raw || '').replace(/[０-９：．]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).replace(/\s/g, '');
+  if (!t) return '';
+  let m = t.match(/^(\d{1,2})[:.](\d{1,2})$/) || t.match(/^(\d{1,2})(\d{2})$/);
+  if (!m) return null;
+  const h = +m[1], mi = +m[2];
+  if (h > 23 || mi > 59) return null;
+  return h + ':' + String(mi).padStart(2, '0');
+}
 function handleValue(el) {
   const k = el.dataset.k;
   if (!k) return;
@@ -3604,7 +3637,12 @@ function handleValue(el) {
     if (path === 'points.relayMult') v = +val;
     if (path === 'cert.printRecord') v = val === '1';
     if (getPath(state.settings, path) === v) return;
-    const free = /^(cert|award|print)\./.test(path) || /^dashboard\./.test(path) || path === 'kanaStyle';
+    if (/^schedule\.(doorOpen|warmup|opening|start|closing|exit)$/.test(path)) {
+      v = clockText(val);
+      if (v === null) { toast('「' + val + '」を時刻として読み取れません。8:45 のように入れてください', 'err'); render(); return; }
+      if (getPath(state.settings, path) === v) return;
+    }
+    const free = /^schedule\.(doorOpen|warmup|opening|start|closing|exit|intervalMin|breakMin|cycleSec)$/.test(path) || /^(cert|award|print)\./.test(path) || /^dashboard\./.test(path) || path === 'kanaStyle';
     if (path === 'kanaStyle') {      // 表記を変えたら、入力済みのフリガナもすべてそろえる
       commit('フリガナの表記を' + (v === 'hira' ? 'ひらがな' : 'カタカナ') + 'に変更', s => {
         s.settings.kanaStyle = v;
@@ -3668,7 +3706,14 @@ function handleValue(el) {
   }
   if (kind === 'sch') {
     const id = rest[0], f = rest[1];
-    commit('スケジュールの変更', s => { const r = s.schedule.find(x => x.id === id); if (r) r[f] = val; });
+    let v = val;
+    if (f === 'at') {                // 開始時刻: 「845」「8.45」「8：45」も 8:45 に。空欄＝自動に戻す
+      v = clockText(val);
+      if (v === null) { toast('「' + val + '」を時刻として読み取れません。8:45 のように入れてください', 'err'); render(); return; }
+      const cur = D.sched.rows.find(o => o.row.id === id);
+      if (v && cur && !cur.fixed && cur.start !== null && cur.start !== undefined && C.parseClock(v) === cur.start) { render(); return; }
+    }
+    commit(f === 'at' ? (v ? '開始時刻を ' + v + ' に変更' : '開始時刻を自動に戻す') : 'スケジュールの変更', s => { const r = s.schedule.find(x => x.id === id); if (r) r[f] = v; }, { allowLocked: f === 'at' || f === 'adj' });
     return;
   }
   if (kind === 'awm') { commit('表彰マスタの変更', s => { s.award[rest[0]] = val; }, { allowLocked: true }); return; }
@@ -3724,6 +3769,7 @@ function changeList(kind, text, el) {
 const ACTIONS = {
   go: t => { hideTip(); navOpen = false; applyNavLayout(); if (location.hash === '#' + t.dataset.v) render(); else location.hash = t.dataset.v; },
   undo, redo,
+  schAuto: el => { const id = el.dataset.id; commit('開始時刻を自動に戻す', s => { const r = s.schedule.find(x => x.id === id); if (r) r.at = ''; }, { allowLocked: true }); },
   toggleNav: () => {
     if (navPinnedNow()) { navPref.pinned = false; saveNavPref(); navOpen = false; }
     else navOpen = !navOpen;
