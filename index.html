@@ -817,6 +817,57 @@ table.pt tr.ph th { font-size: 16px; }
 /* 上部バーの高さを画面によって変えない（簡易ボタンの位置を固定するため、大会名・画面名は1行） */
 .topbar .brand small, .topbar .brand strong { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; display: block; }
 .topbar .brand-t { min-width: 0; }
+
+/* ---------- 上部バーの通知（決まった枠・高さは変わらない） ---------- */
+.topbar .trow2 { position: relative; }
+.tnote { flex: 1 1 300px; min-width: 0; height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 6px 0 14px; border-radius: 999px; background: var(--track); font-size: 13px; overflow: hidden; transition: background .2s; }
+.tnote .tn-msg { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tnote .tn-idle { color: var(--muted); }
+.tnote.on { background: color-mix(in srgb, var(--accent) 14%, var(--btn-bg)); color: var(--ink); }
+.tnote.warn { background: var(--warn-soft); color: var(--warn); }
+.tnote.err { background: var(--err); color: #fff; }
+.tn-btn { flex: 0 0 auto; height: 28px; padding: 0 14px; border-radius: 999px; border: 0; background: var(--btn-bg); color: var(--accent); font-weight: 700; font-size: 12.5px; cursor: pointer; }
+.tnote.err .tn-btn { color: var(--err); }
+.bell { position: relative; flex: 0 0 auto; }
+.bell .bdg { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--err); color: #fff; font: 700 11px/18px system-ui; font-style: normal; display: none; text-align: center; }
+.bell.has .bdg { display: block; }
+.notes { position: absolute; right: 0; top: calc(100% + 8px); width: min(460px, 92vw); max-height: 60vh; overflow: auto; z-index: 80; padding: 10px; box-shadow: 0 16px 40px rgba(10, 30, 60, .25); background: var(--drawer, #fff); }
+.notes[hidden] { display: none; }
+.nt-h { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.nt-i { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 12px; font-size: 13px; }
+.nt-i + .nt-i { border-top: 1px solid var(--hairline); }
+.nt-i.err { color: var(--err); } .nt-i.info { color: var(--warn); }
+.nt-t { color: var(--muted); font-variant-numeric: tabular-nums; flex: 0 0 auto; }
+.toasts { display: none !important; }
+.topdesc { display: none !important; }
+/* ---------- ボタンはすべて丸い形 ---------- */
+.btn, .jb, .chip, .qn, .tn-btn, .hlock, .chit .btn, .slot-empty, .pmode, select.progsel { border-radius: 999px !important; }
+.lockb, .iconbtn { border-radius: 50% !important; }
+.jb { padding-left: 12px; padding-right: 12px; }
+/* ---------- 印刷プレビュー: 左右どちらにも固定・狭いときは自動で細く ---------- */
+@media (min-width: 1100px) {
+  .withpv.pvl { grid-template-columns: clamp(230px, 22vw, 330px) minmax(0, 1fr) !important; }
+  .withpv.pvl > .pv { order: -1; }
+  .app.pvslim .withpv { grid-template-columns: minmax(0, 1fr) 210px !important; }
+  .app.pvslim .withpv.pvl { grid-template-columns: 210px minmax(0, 1fr) !important; }
+}
+/* 画面一覧を固定していて場所が足りないとき: アイコンだけの細い帯 */
+.app.pinned.navrail.side-left { grid-template-columns: 64px minmax(0, 1fr); }
+.app.pinned.navrail.side-right { grid-template-columns: minmax(0, 1fr) 64px; }
+.app.navrail .nav a { font-size: 0; justify-content: center; padding: 8px 0; gap: 0; }
+.app.navrail .nav a .ic { width: 22px; height: 22px; }
+.app.navrail .nav a .badge, .app.navrail .nav .navhead b, .app.navrail .nav .seg.mini, .app.navrail .nav h4, .app.navrail .nav .navgrp, .app.navrail .nav small { display: none; }
+/* ---------- 本部ボード: 進行と得点を最初に ---------- */
+.hq.hq2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 10px; align-items: start; }
+.hq.hq2 .hq-list { grid-column: 1 / -1; }
+@media (max-width: 900px) { .hq.hq2 { grid-template-columns: minmax(0, 1fr); } }
+.hq-all { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: 10px; margin-top: 10px; font-size: 13px; color: var(--muted); }
+.hq-all b { color: var(--ink); font-size: 15px; }
+.hq-all .prog { margin: 0; }
+table.pts { font-size: 15px; }
+table.pts td, table.pts th { padding: 5px 8px; }
+.rkn { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; font-weight: 800; font-size: 13px; background: var(--track); }
+.rkn.r1 { background: #c9a227; color: #fff; } .rkn.r2 { background: #9aa3ad; color: #fff; } .rkn.r3 { background: #b07040; color: #fff; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2006,20 +2057,46 @@ function recompute() {
 }
 
 // ---------------------------------------------------------------- トースト・モーダル
+// 通知はすべて上部のバーに出す（画面の中や下に浮かせない＝操作中に画面が動かない）
+//  いまの通知は決まった枠に1件。過去の通知と「要対応」は 🔔 の一覧で見られる
+const NOTES = []; let noteCur = null, noteTimer = 0, notesOpen = false, notesSeen = 0;
 function toast(msg, kind, ms, action) {
-  const box = $('#toasts');
-  const el = document.createElement('div');
-  el.className = 'toast' + (kind === 'err' ? ' err' : '');
-  el.setAttribute('role', 'status');
-  el.innerHTML = '<span>' + esc(msg) + '</span>';
-  if (action) {
-    const b = document.createElement('button'); b.textContent = action.label;
-    b.onclick = () => { action.fn(); el.remove(); };
-    el.appendChild(b);
-  }
-  box.appendChild(el);
-  setTimeout(() => el.remove(), ms || (action ? 7000 : 3500));
+  const n = { msg: String(msg), kind: kind || '', t: Date.now(), action: action || null, id: Math.random().toString(36).slice(2) };
+  NOTES.unshift(n); if (NOTES.length > 40) NOTES.pop();
+  noteCur = n; clearTimeout(noteTimer);
+  noteTimer = setTimeout(() => { if (noteCur === n) { noteCur = null; paintNote(); } }, ms || (action ? 9000 : 5000));
+  paintNote();
 }
+function noteAct(id) { const n = NOTES.find(x => x.id === id); if (n && n.action) { const fn = n.action.fn; n.action = null; if (noteCur === n) noteCur = null; paintNote(); fn(); } }
+function alertsNow() {      // 消えない「要対応」の通知
+  const a = [];
+  if (saveError) a.push({ kind: 'err', msg: '保存エラー: ' + saveError, act: 'backup', label: '今すぐ書き出す' });
+  if (state.entries.length || state.relays.length) {
+    const age = Date.now() - (meta.lastBackup || 0);
+    if (meta.lastBackup ? (meta.changesSinceBackup > 0 && age > 60 * 60 * 1000) : meta.changesSinceBackup >= 30)
+      a.push({ kind: 'info', msg: 'バックアップ: ' + (meta.lastBackup ? ago(meta.lastBackup) + 'に書き出した後、' + meta.changesSinceBackup + '回変更しています' : 'まだファイルに書き出していません'), act: 'backup', label: '書き出す' });
+  }
+  return a;
+}
+function paintNote() {
+  const slot = $('#tnote'); if (!slot) return;
+  const al = alertsNow();
+  const n = noteCur;
+  slot.className = 'tnote' + (n ? (n.kind === 'err' ? ' err' : ' on') : al.length ? ' warn' : '');
+  slot.innerHTML = n ? '<span class="tn-msg">' + esc(n.msg) + '</span>' + (n.action ? '<button type="button" class="tn-btn" data-note="' + n.id + '">' + esc(n.action.label) + '</button>' : '')
+    : al.length ? '<span class="tn-msg">' + esc(al[0].msg) + '</span><button type="button" class="tn-btn" data-act="' + al[0].act + '">' + esc(al[0].label) + '</button>' : '<span class="tn-msg tn-idle">通知はありません</span>';
+  const bell = $('#bell'); if (bell) { const unread = NOTES.filter(x => x.t > notesSeen).length + al.length; bell.querySelector('.bdg').textContent = unread ? String(unread) : ''; bell.classList.toggle('has', !!unread); }
+  const panel = $('#notes'); if (panel) {
+    panel.hidden = !notesOpen;
+    if (notesOpen) panel.innerHTML = '<div class="nt-h"><b>通知</b><span class="grow"></span><button type="button" class="btn sm" data-act="notesClose">閉じる</button></div>' +
+      (al.length ? al.map(x => '<div class="nt-i ' + x.kind + '"><span class="grow">' + esc(x.msg) + '</span><button type="button" class="btn sm" data-act="' + x.act + '">' + esc(x.label) + '</button></div>').join('') : '') +
+      (NOTES.length ? NOTES.map(x => '<div class="nt-i ' + (x.kind === 'err' ? 'err' : '') + '"><span class="nt-t">' + new Date(x.t).toTimeString().slice(0, 5) + '</span><span class="grow">' + esc(x.msg) + '</span>' + (x.action ? '<button type="button" class="btn sm" data-note="' + x.id + '">' + esc(x.action.label) + '</button>' : '') + '</div>').join('') : '<p class="small muted" style="margin:6px 4px">まだ通知はありません。</p>');
+  }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-note]'); if (b) { e.preventDefault(); noteAct(b.dataset.note); return; }
+  if (notesOpen && !(e.target.closest && e.target.closest('#notes, #bell'))) { notesOpen = false; paintNote(); }
+}, true);
 function modal(html, onMount) {
   const bg = document.createElement('div');
   bg.className = 'modal-bg';
@@ -2073,7 +2150,8 @@ const ICON_PATHS = {
   redo: 'm15 14 5-5-5-5M20 9H9.5a5.5 5.5 0 0 0 0 11H13',
   save: 'M12 4v11m0 0-4-4m4 4 4-4M5 19h14',
   lock: 'M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z',
-  unlock: 'M7 11V8a5 5 0 0 1 9.6-2M6 11h12v9H6z'
+  unlock: 'M7 11V8a5 5 0 0 1 9.6-2M6 11h12v9H6z',
+  bell: 'M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0'
 };
 const icon = (k, cls) => '<svg class="' + (cls || 'ic') + '" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + ICON_PATHS[k] + '"/></svg>';
 ICON_PATHS.menu = 'M4 7h16M4 12h16M4 17h16';
@@ -2096,6 +2174,11 @@ function applyNavLayout() {
   app.classList.toggle('side-left', navPref.side !== 'right');
   app.classList.toggle('pinned', navPinnedNow());
   app.classList.toggle('nav-open', !navPinnedNow() && navOpen);
+  // 画面一覧とプレビューを両方固定しても横スクロールしないよう、狭いときは画面一覧をアイコンだけの細い帯にする
+  let pvOn = false; try { pvOn = PV_VIEWS.includes(view) && previewOn() && window.innerWidth >= 1100; } catch (e) { /* 読み込み途中 */ }
+  const left = window.innerWidth - (navPinnedNow() ? 222 : 0) - (pvOn ? Math.min(330, Math.max(230, window.innerWidth * 0.22)) : 0);
+  app.classList.toggle('navrail', navPinnedNow() && left < 760);
+  app.classList.toggle('pvslim', pvOn && left < 640);
 }
 window.addEventListener('resize', () => { applyNavLayout(); sizeFills(); fitProgram(); bindLenses(); schedulePreview(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && navOpen) { navOpen = false; applyNavLayout(); } });
@@ -2123,9 +2206,10 @@ function render() {
   let html;
   try { html = fn(); }
   catch (e) { console.error(e); html = '<div class="notice err">この画面の表示中にエラーが起きました: ' + esc(e.message) + '。<button class="btn sm" data-act="go" data-v="data">データ管理へ</button> でバックアップを書き出してから、ページを再読み込みしてください。</div>'; }
-  $('#main').innerHTML = (saveError ? '<div class="notice err"><b>保存エラー</b><span class="grow">' + esc(saveError) + '</span><button class="btn sm" data-act="backup">今すぐ書き出す</button></div>' : '') + backupReminder() +
+  $('#main').innerHTML =
     (PV_VIEWS.includes(view) && !previewOn() ? '<div class="pv-off"><button class="btn sm" data-act="pvToggle">' + icon('print', 'ic sm') + '印刷プレビューを表示</button></div>' : '') + pvShell(html);
   liftHeading();
+  paintNote();
   updateFrameStyle();
   sizeFills();
   fitProgram();
@@ -2183,7 +2267,8 @@ function liftHeading() {
   if (!h) { if (d) d.textContent = ''; return; }
   const lead = h.nextElementSibling && h.nextElementSibling.classList.contains('lead') ? h.nextElementSibling : (h.parentElement.querySelector(':scope > .lead'));
   if (t) t.textContent = h.textContent;
-  if (d) d.textContent = lead ? lead.textContent : '';
+  if (d) d.textContent = '';
+  if (t) t.title = lead ? lead.textContent : '';
   const box = h.parentElement;
   h.remove(); if (lead) lead.remove();
   if (box && box !== $('#main') && box.matches('.vhead > div') && !box.children.length && !box.textContent.trim()) box.remove();
@@ -2482,7 +2567,10 @@ function renderTop() {
     '</div>' + (navPref.side === 'right' ? menuBtn : '') + '</div>' +
     '<div class="trow2"><div class="tools"><button class="iconbtn" data-act="undo" title="元に戻す (Ctrl+Z)" aria-label="元に戻す" ' + (undoStack.length ? '' : 'disabled') + '>' + icon('undo') + '</button>' +
     '<button class="iconbtn" data-act="redo" title="やり直し (Ctrl+Y)" aria-label="やり直し" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '</button>' +
-    '<button class="btn sm tinted" data-act="backup">' + icon('save', 'ic sm') + '<span class="hide-sm">バックアップ</span></button></div><div class="topdesc" id="topdesc"></div></div>';
+    '<button class="btn sm tinted" data-act="backup">' + icon('save', 'ic sm') + '<span class="hide-sm">バックアップ</span></button></div>' +
+    '<div class="tnote" id="tnote" role="status" aria-live="polite"></div>' +
+    '<button type="button" class="iconbtn bell" id="bell" data-act="notes" title="通知の一覧" aria-label="通知の一覧">' + icon('bell') + '<i class="bdg"></i></button>' +
+    '<div class="notes card" id="notes" hidden></div></div>';
 }
 // 簡易アクセス: アイコン＋短い名前のボタン（押すだけ。見て分かる・指で押しやすい大きさ）
 const QLABEL = { home: '本部', settings: '設定', entries: '個人', relays: 'リレー', schedule: '進行', program: '記録入力', flash: '速報', ranking: '順位', certs: '証書', prints: '印刷', awards: '表彰', check: 'チェック', data: 'データ' };
@@ -2586,14 +2674,16 @@ function hqBoard() {
   const P = meetProgress(), cur = P.cur, dl = delayText(cur, P.started);
   const rd = readiness(), bad = rd.filter(x => !x.ok && !x.soft).length;
   const chip = x => '<button type="button" class="evchip ' + x.state + (cur && x === cur ? ' cur' : '') + '" data-act="openprog" data-p="' + esc(x.r.name) + '" title="' + esc(x.r.name + '　' + x.done + '/' + x.n) + '"><b>' + x.r.no + '</b><span>' + esc(x.r.name.replace(/^(男子|女子|混合)\s*/, m => m.trim().slice(0, 1) + ' ')) + '</span><i>' + (x.state === 'empty' ? '—' : x.done + '/' + x.n) + '</i></button>';
-  return '<div class="hq">' +
+  return '<div class="hq hq2">' +
     '<div class="card hq-now">' + (P.finished ? '<span class="muted small">進行</span><div class="hq-title">全種目の記録入力が終わりました</div><div class="bar" style="margin-top:8px"><button class="btn primary" data-act="go" data-v="awards">表彰者を確認</button><button class="btn" data-act="go" data-v="certs">記録証・賞状を印刷</button></div>' :
       cur ? '<span class="muted small">いまの種目</span><div class="hq-title">No.' + cur.r.no + '　' + esc(cur.r.name) + '</div>' +
         '<div class="hq-meta"><span>開始予定 <b>' + C.fmtClock(cur.r.start) + '</b></span><span>入力 <b>' + cur.done + ' / ' + cur.n + '</b></span>' + (dl ? '<span class="pill ' + dl.cls + '">' + dl.t + '</span>' : '') + '</div>' +
         '<div class="prog"><i style="width:' + (cur.n ? Math.round(cur.done / cur.n * 100) : 0) + '%"></i></div>' +
+        (() => { const ev = P.rows.filter(x => x.state !== 'empty'), fin = ev.filter(x => x.state === 'done').length; return '<div class="hq-all"><span>全体の進行</span><b>' + fin + ' / ' + ev.length + ' 種目</b><div class="prog"><i style="width:' + (ev.length ? Math.round(fin / ev.length * 100) : 0) + '%"></i></div></div>'; })() +
         '<div class="bar" style="margin:10px 0 0"><button class="btn primary" data-act="openprog" data-p="' + esc(cur.r.name) + '">記録入力を開く</button><button class="btn" data-act="openflash" data-p="' + esc(cur.r.name) + '">速報を開く</button>' + (P.next ? '<span class="muted small">次: No.' + P.next.r.no + ' ' + esc(P.next.r.name) + '（' + C.fmtClock(P.next.r.start) + '）</span>' : '') + '</div>'
       : '<span class="muted small">進行</span><div class="hq-title">スケジュールに種目がありません</div><button class="btn" data-act="go" data-v="schedule">進行スケジュールへ</button>') +
     '</div>' +
+    pointsCard() +
     '<div class="card hq-list"><h2>全種目の入力状況 <span class="muted small">（押すと記録入力へ）</span></h2><div class="evgrid">' + P.rows.map(chip).join('') + '</div></div>' +
     '<details class="card hq-ready" ' + (bad ? 'open' : '') + '><summary>開催前の確認 ' + (bad ? '<span class="pill warn">要確認 ' + bad + '</span>' : '<span class="pill ok">準備OK</span>') + '</summary><div class="ready">' +
     rd.map(x => '<button class="ritem ' + (x.ok ? 'ok' : x.soft ? 'soft' : 'ng') + '" ' + (x.go ? 'data-act="go" data-v="' + x.go + '"' : 'data-act="' + x.act + '"') + '><span>' + (x.ok ? '✓' : '!') + '</span>' + esc(x.t) + '</button>').join('') + '</div></details>' +
@@ -2631,13 +2721,20 @@ VIEWS.home = () => {
     '<tr><td>目標との売上差</td><td class="num">' + yen(d.salesDiff) + '</td></tr></tbody></table></div>' +
     '<div class="card"><h2>メダル発注シミュレーター</h2><p class="small muted">区分×種目ごとに、申込が1名以上なら金、2名以上なら銀、3名以上なら銅を1つ。リレーは泳者の人数分を数えます。</p>' +
     '<div class="stats"><div class="stat"><span>金メダル</span><b>' + d.medals.gold + '</b></div><div class="stat"><span>銀メダル</span><b>' + d.medals.silver + '</b></div><div class="stat"><span>銅メダル</span><b>' + d.medals.bronze + '</b></div></div></div>' +
-    clubSumCard() +
     '<div class="card clubs"><h2>クラブ別 申込状況・総合得点</h2>' +
     (d.otherClubs.length ? '<div class="notice warn"><span class="grow">クラブリストにないチーム名があります: ' + esc(d.otherClubs.join('、')) + '（集計されません）</span><button class="btn sm" data-act="fix" data-f="clubs">クラブリストに追加</button></div>' : '') +
     '<div class="tablewrap fill" data-fill-id="club"><table class="t"><thead><tr><th>クラブ名</th><th class="num">目標</th><th class="num">実績</th><th class="num">差</th><th class="num">割合</th><th class="num">総合得点</th><th class="num">チーム順位</th></tr></thead><tbody>' +
     d.clubs.map((c, i) => '<tr><td>' + esc(c.name) + '</td><td class="num">' + inp('clubt:' + c.name, (S.clubs.find(x => x.name === c.name) || {}).target,'style="width:70px;text-align:right" inputmode="numeric"') + '</td><td class="num">' + c.actual + '</td><td class="num">' + (c.diff === null ? '' : (c.diff > 0 ? '+' : '') + c.diff) + '</td><td class="num">' + (c.share === null ? '' : (c.share * 100).toFixed(1) + '%') + '</td><td class="num"><b>' + c.score + '</b></td><td class="num">' + c.rank + '</td></tr>').join('') +
     '</tbody></table></div></div></div>';
 };
+// 本部ボード: クラブ得点（この部の順位と、もう一方の部があれば合算）をすぐ見られるように
+function pointsCard() {
+  const cs = clubSums(), part = PART ? '2部' : '1部';
+  const rows = cs.rows.slice(0, 10);
+  return '<div class="card hq-pts"><div class="bar" style="margin:0 0 6px"><h2 style="margin:0">クラブ得点</h2><span class="muted small">' + (cs.hasOther ? '1部・2部 合算' : part + 'のみ') + '</span><span class="grow"></span><button class="btn sm" data-act="printClubSum">' + icon('print', 'ic sm') + '印刷</button></div>' +
+    (rows.length ? '<table class="t pts"><thead><tr><th class="num">順位</th><th>クラブ</th>' + (cs.hasOther ? '<th class="num">1部</th><th class="num">2部</th>' : '') + '<th class="num">得点</th></tr></thead><tbody>' +
+      rows.map(r => '<tr><td class="num"><span class="rkn r' + Math.min(r.rank, 4) + '">' + r.rank + '</span></td><td>' + esc(r.name) + '</td>' + (cs.hasOther ? '<td class="num">' + r.a + '</td><td class="num">' + r.b + '</td>' : '') + '<td class="num"><b>' + r.sum + '</b></td></tr>').join('') + '</tbody></table>' : '<p class="small muted">クラブリストを登録すると得点が出ます。</p>') + '</div>';
+}
 // クラブの総合得点を1部・2部で合算（もう一方の部のデータはこのブラウザに保存されているもの）
 function otherPartState() {
   const k = 'swim-meet-app/state' + (PART ? '' : '@2');
@@ -2881,10 +2978,11 @@ VIEWS.program = () => {
     '<button class="btn" data-act="progStep" data-d="1" ' + (idx >= opts.length - 1 ? 'disabled' : '') + '>次 →</button>' +
     (ui.prog ? '<span class="pill mute">' + (p.sch ? 'No.' + p.sch.no + '・開始 ' + (p.sch.start !== null ? C.fmtClock(p.sch.start) : '—') : '<span style="color:var(--err)">スケジュール未登録</span>') + '</span><span class="pill mute">' + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組</span>' +
       '<span class="pill ' + (allDone ? 'ok' : 'info') + '">入力 ' + p.done + ' / ' + p.items.length + '</span>' + (p.items.some(it => it.seatFixed) ? '<span class="pill mute" title="「組・レーンを入れ替え」で手で並べた位置を使っています">手で並べ替え済み</span>' : '') : '') +
-    (p.items.some(it => it.status === '対象外') ? '<button class="btn sm" data-act="clearOut" data-all="0">対象外を一括解除</button>' : '') + (D.ind.concat(D.rel).some(it => it.status === '対象外' && it.program !== ui.prog) ? '<button class="btn sm" data-act="clearOut" data-all="1">全種目の対象外を解除</button>' : '') +
+    '<button class="btn sm" data-act="clearOut" data-all="0" ' + (p.items.some(it => it.status === '対象外') ? '' : 'disabled') + '>対象外を一括解除</button><button class="btn sm" data-act="clearOut" data-all="1" ' + (D.ind.concat(D.rel).some(it => it.status === '対象外') ? '' : 'disabled') + '>全種目の対象外を解除</button>' +
     '<span class="grow"></span>' + (ui.prog && p.items.length ? (ui.progArrange ? '<button class="btn sm primary" data-act="progArrange">入れ替えを終える</button>' : '<button class="btn sm tinted" data-act="progArrange" title="選手をドラッグして組・レーンを入れ替えます">組・レーンを入れ替え</button>') : '') + '<button class="btn sm" data-act="openflash" data-p="' + esc(ui.prog) + '">速報を見る</button>' + sel('set:print.progMode', state.settings.print.progMode || 'blank', [['blank', '印刷: 手書き用（記録欄が空欄）'], ['result', '印刷: 記録入り']], 'class="pmode" aria-label="プログラムの印刷の形"') + sel('set:print.progFill', state.settings.print.progFill || 'blank', [['blank', '4組に満たない所: 空白'], ['pack', '4組に満たない所: 次の種目を詰める']], 'class="pmode" aria-label="4組に満たないページ"') + '<button class="btn sm" data-act="printProg" data-all="0">この種目を印刷</button><button class="btn sm" data-act="printProg" data-all="1">全種目を印刷</button></div>' +
     (ui.prog && p.items.length ? '<div class="prog" style="margin:-4px 0 10px"><i style="width:' + pct + '%"></i></div>' : '') +
-    (allDone && !ui.progArrange ? '<div class="notice ok"><span class="grow">この種目の記録入力が終わりました。</span><button class="btn sm" data-act="printFlash1" data-p="' + esc(ui.prog) + '">速報を印刷</button>' + (idx < opts.length - 1 ? '<button class="btn sm primary" data-act="progStep" data-d="1">次の種目へ →</button>' : '') + '</div>' : '') +
+    (allDone && ui._doneNote !== ui.prog ? (ui._doneNote = ui.prog, setTimeout(() => toast('「' + ui.prog + '」の記録入力が終わりました', null, 10000, idx < opts.length - 1 ? { label: '次の種目へ', fn: () => ACTIONS.progStep({ dataset: { d: '1' } }) } : null), 0), '') : '') +
+    (false ? '<div class="notice ok"><span class="grow">この種目の記録入力が終わりました。</span><button class="btn sm" data-act="printFlash1" data-p="' + esc(ui.prog) + '">速報を印刷</button>' + (idx < opts.length - 1 ? '<button class="btn sm primary" data-act="progStep" data-d="1">次の種目へ →</button>' : '') + '</div>' : '') +
     (ui.progArrange && ui.prog && p.items.length ? arrangePanel(p, lanes) :
     (p.heats.length > 1 ? '<div class="heattabs" hidden><span class="small muted">組</span>' + seg('progHeat', p.heats.map(h => [h.heat, '第' + h.heat + '組' + (h.items.every(it => it.status !== '未入力') ? ' ✓' : '')]), curHeat) + '<span class="small muted">全組が入りきらないので1組ずつ表示しています。Enter で最後のレーンまで入れると次の組へ進みます。</span></div>' : '') +
     (!ui.prog ? '<div class="card empty">種目がありません。大会設定で種目を登録してください。</div>' :
@@ -3490,6 +3588,9 @@ const ACTIONS = {
     if (commit((lock ? '組をロック' : '組のロックを解除') + '（' + name + ' 第' + h + '組）', s => { const map = new Map((relay ? s.relays : s.entries).map(o => [o.id, o])); its.forEach(it => { const o = map.get(it.id); if (!o) return; if (lock) o.seat = { p: name, h: it.heat, l: it.lane }; else delete o.seat; }); }))
       toast('第' + h + '組を' + (lock ? 'ロックしました（自動の組分けで動きません）' : 'ロック解除しました'), null, 6000, { label: '元に戻す', fn: undo });
   },
+  notes: () => { notesOpen = !notesOpen; notesSeen = Date.now(); paintNote(); },
+  notesClose: () => { notesOpen = false; paintNote(); },
+  pvSide: () => { navPref.pvSide = navPref.pvSide === 'left' ? 'right' : 'left'; saveNavPref(); render(); },
   progArrange: () => { ui.progArrange = !ui.progArrange; ui.arrSel = null; render(); },
   seatPick: t => {
     if (seatDrag.justDropped) return;
@@ -3951,7 +4052,8 @@ function previewOn() { return navPref.pv !== false; }
 function pvShell(inner) {
   if (!PV_VIEWS.includes(view)) return inner;
   if (!previewOn()) return inner;
-  return '<div class="withpv pv-' + view + '"><div class="pv-main">' + inner + '</div><aside class="pv card" aria-label="印刷プレビュー"><div class="pv-head"><b>印刷プレビュー</b><span class="muted small" id="pv-count"></span><span class="grow"></span>' +
+  return '<div class="withpv pv-' + view + (navPref.pvSide === 'left' ? ' pvl' : '') + '"><div class="pv-main">' + inner + '</div><aside class="pv card" aria-label="印刷プレビュー"><div class="pv-head"><b>印刷プレビュー</b><span class="muted small" id="pv-count"></span><span class="grow"></span>' +
+    '<button class="iconbtn sm" data-act="pvSide" title="プレビューを' + (navPref.pvSide === 'left' ? '右' : '左') + 'に固定" aria-label="プレビューの位置を左右に切り替え">' + (navPref.pvSide === 'left' ? '→' : '←') + '</button>' +
     '<button class="btn sm primary" data-act="pvPrint">印刷</button><button class="iconbtn sm" data-act="pvToggle" title="プレビューを隠す" aria-label="プレビューを隠す">' + icon('close') + '</button></div><div class="pv-body fill" data-fill-id="pv" id="pv-body"><div class="empty small">作成中…</div></div></aside></div>';
 }
 function schedulePreview() {
