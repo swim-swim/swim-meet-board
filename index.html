@@ -1081,6 +1081,133 @@ td.stcell .x { margin-left: 4px; vertical-align: middle; }
 table.pt tbody tr:not(.emp) td { padding-top: 2px !important; padding-bottom: 2px !important; }
 /* 本部ボード: 低い画面ではパネルを縮めて中でスクロール（画面全体は動かさない） */
 @media (min-width: 901px) { .hrow { min-height: 180px; } }
+
+/* =====================================================================
+   スマホ版（html.phone）: 上は1行の見出し＋通知、下に親指で押せるタブ、
+   その他の画面は下から出るシート。入力欄は16px以上（iPhone で拡大されない）
+   ===================================================================== */
+.tabbar[hidden] { display: none !important; }
+html.phone body { -webkit-text-size-adjust: 100%; }
+html.phone .app, html.phone .app.pinned { display: block !important; grid-template-columns: none !important; padding: 0 !important; }
+html.phone .topbar { display: block !important; position: sticky; top: 0; margin: 0; padding: calc(6px + env(safe-area-inset-top)) 10px 6px !important; border-radius: 0 0 20px 20px; }
+html.phone .topbar .ph-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+html.phone .topbar .ph-row .logo { width: 34px; height: 34px; }
+html.phone .topbar .brand-t { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+html.phone .topbar .brand-t small { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html.phone .topbar .brand-t strong { font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html.phone .topbar .partseg { flex: 0 0 auto; }
+html.phone .topbar .partseg .segbtn { min-height: 36px; padding: 0 12px; font-size: 14px; }
+html.phone .ph-lock { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; border: 0; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+html.phone .topbar .tmon { display: flex !important; align-items: center; gap: 6px; margin-top: 6px; width: auto !important; position: relative; }
+html.phone .topbar .tmon .tnote { flex: 1 1 auto; min-width: 0; min-height: 36px; font-size: 13px; }
+html.phone .topbar .bellbtn { flex: 0 0 auto; min-height: 36px; }
+html.phone .topbar .notes { position: fixed !important; left: 8px !important; right: 8px !important; top: calc(var(--toph, 96px) + 4px) !important; width: auto !important; max-height: 60vh; }
+html.phone #main { padding: 10px 10px calc(88px + env(safe-area-inset-bottom)) !important; margin: 0 !important; min-width: 0; }
+
+/* 下のタブ */
+html.phone .tabbar { position: fixed; z-index: 40; left: 8px; right: 8px; bottom: calc(6px + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; padding: 5px;
+  border-radius: 26px; background: var(--glass-strong, rgba(255,255,255,.86)); -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
+  box-shadow: 0 8px 28px rgba(10, 30, 60, .18), inset 0 0 0 1px rgba(255,255,255,.6); }
+html.phone .tabbar .tab { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 56px; border: 0; border-radius: 20px; background: transparent; color: var(--muted); font: inherit; font-size: 11px; font-weight: 600; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+html.phone .tabbar .tab .ic { width: 24px; height: 24px; }
+html.phone .tabbar .tab.on { color: var(--accent); background: var(--accent-soft); }
+html.phone .tabbar .tab.main .ic { width: 26px; height: 26px; }
+html.phone .tabbar .tab:active { transform: scale(.95); }
+html.phone .tabbar .qdot { position: absolute; top: 8px; right: calc(50% - 18px); width: 9px; height: 9px; border-radius: 50%; background: var(--danger, #e5484d); }
+
+/* その他: 下から出るシート（大きなタイルで全画面へ） */
+html.phone .nav { position: fixed !important; left: 0 !important; right: 0 !important; top: auto !important; bottom: 0 !important; width: auto !important; max-width: none !important; height: auto !important; max-height: 82vh;
+  border-radius: 26px 26px 0 0 !important; padding: 12px 14px calc(92px + env(safe-area-inset-bottom)) !important; overflow-y: auto; transform: translateY(105%) !important; opacity: 1; z-index: 35; }
+html.phone .app.nav-open .nav { transform: none !important; }
+html.phone .nav .navprefs, html.phone .nav .lens { display: none !important; }
+html.phone .nav .navhead b { font-size: 17px; }
+html.phone .nav .seg.v { display: block; background: none; padding: 0; }
+html.phone .nav .navgrp { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
+html.phone .nav .navgrp h6 { grid-column: 1 / -1; margin: 6px 2px 0; }
+html.phone .nav .navgrp a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 74px; padding: 8px 4px; border-radius: 18px; background: var(--track); font-size: 12.5px !important; text-align: center; line-height: 1.25; }
+html.phone .nav .navgrp a .ic { width: 24px; height: 24px; }
+html.phone .nav .navgrp a.on { background: var(--accent-soft); color: var(--accent); }
+html.phone .nav .navgrp a .badge { position: absolute; margin: -44px 0 0 40px; }
+html.phone .nav .navgrp a { position: relative; }
+.ph-tools { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 8px 0 12px; }
+.ph-t { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 64px; border: 0; border-radius: 18px; background: var(--track); color: var(--ink); font: inherit; font-size: 11.5px; font-weight: 600; }
+.ph-t .ic { width: 22px; height: 22px; }
+.ph-t.on { background: var(--accent-soft); color: var(--accent); }
+.ph-t[disabled] { opacity: .4; }
+.uimode { display: flex; align-items: center; gap: 8px; margin: 4px 0 10px; font-size: 12.5px; color: var(--muted); }
+.uimode .seg { flex: 1 1 auto; }
+.uimode .segbtn { flex: 1 1 0; min-height: 34px; }
+html.phone .scrim { z-index: 34; }
+
+/* 画面の中身: 1列・押しやすく・iPhone で拡大されない文字 */
+html.phone input, html.phone select, html.phone textarea { font-size: 16px !important; }
+html.phone .btn, html.phone button.chip { min-height: 44px; }
+html.phone .pv-off, html.phone .qnav, html.phone .trow2 .tools, html.phone #tip { display: none !important; }
+html.phone .fields { grid-template-columns: minmax(0, 1fr) !important; }
+html.phone .tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+html.phone .fill { max-height: none !important; height: auto !important; }
+html.phone .hrow { grid-template-columns: minmax(0, 1fr) !important; height: auto !important; max-height: none !important; overflow: visible; }
+html.phone .kstrip { flex-wrap: wrap !important; }
+html.phone .kstrip .kpi { flex: 1 1 calc(50% - 8px) !important; }
+html.phone .kstrip .kbtn { flex: 1 1 100% !important; min-height: 52px; font-size: 16px; }
+html.phone .bar { gap: 8px; }
+html.phone .toasts { bottom: calc(92px + env(safe-area-inset-bottom)); }
+html.phone .topbar .tmon { width: 100% !important; max-width: none !important; justify-self: stretch !important; }
+html.phone .nav { width: 100% !important; min-width: 0 !important; box-sizing: border-box; }
+html.phone .nav > * { min-width: 0; }
+/* 記録入力（スマホ）: 種目の選択を1行（← 種目 →）、ボタンは2つずつ、印刷の設定は隠す（印刷はPCで） */
+html.phone .progbar { display: grid !important; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; align-items: center; }
+html.phone .progbar > [data-act="progStep"] { grid-row: 1; width: 48px !important; height: 48px; min-height: 48px; padding: 0 !important; border-radius: 50% !important; font-size: 20px; justify-self: center; }
+html.phone .progbar > [data-act="progStep"][data-d="-1"] { grid-column: 1; }
+html.phone .progbar > [data-act="progStep"][data-d="1"] { grid-column: 6; }
+html.phone .progbar > .progsel { grid-column: 2 / 6; grid-row: 1; min-height: 48px; font-weight: 700; min-width: 0; width: 100%; }
+html.phone .progbar > .pill { grid-column: 1 / -1; justify-self: start; }
+html.phone .progbar > .pill ~ .pill { display: none; }
+html.phone .progbar > .grow, html.phone .progbar .pmode, html.phone .progbar [data-act="printProg"] { display: none !important; }
+html.phone .progbar > .btn.sm { grid-column: span 3; min-width: 0; white-space: normal; line-height: 1.2; font-size: 13.5px; }
+html.phone .nav { overflow-x: hidden !important; }
+html.phone .nav .navgrp a .lb { font-size: 12px; word-break: keep-all; overflow-wrap: anywhere; }
+html.phone .uimode .seg { min-width: 0; }
+html.phone .ph-tools .ph-t { min-width: 0; }
+/* スマホ版: 表 → カード */
+html.phone #main .tablewrap:has(table.cards) { overflow: visible; background: none; border: 0; box-shadow: none; padding: 0; }
+html.phone #main table.t.cards { display: block; width: 100% !important; min-width: 0 !important; border: 0; background: none; }
+html.phone #main table.t.cards thead, html.phone #main table.t.cards colgroup { display: none; }
+html.phone #main table.t.cards tbody { display: grid; gap: 8px; }
+html.phone #main table.t.cards tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 10px; padding: 10px 12px; border-radius: 18px; background: var(--card, rgba(255,255,255,.9)); box-shadow: 0 1px 3px rgba(10, 30, 60, .08), inset 0 0 0 1px var(--hairline); }
+html.phone #main table.t.cards tr.warn { box-shadow: inset 0 0 0 2px rgba(217, 119, 6, .55); }
+html.phone #main table.t.cards tr.err { box-shadow: inset 0 0 0 2px rgba(229, 72, 77, .55); }
+html.phone #main table.t.cards td { display: flex; flex-direction: column; justify-content: flex-start; gap: 3px; min-width: 0; padding: 0 !important; border: 0 !important; height: auto !important; text-align: left !important; white-space: normal !important; background: none !important; position: static !important; }
+html.phone #main table.t.cards td::before { content: attr(data-th); font-size: 11px; font-weight: 600; color: var(--muted); line-height: 1.2; }
+html.phone #main table.t.cards td[data-th=""]::before { display: none; }
+html.phone #main table.t.cards td:first-child { grid-column: 1 / -1; flex-direction: row; align-items: baseline; gap: 8px; font-weight: 700; font-size: 15px; }
+html.phone #main table.t.cards td:first-child::before { font-size: 12px; }
+html.phone #main table.t.cards td.cw { grid-column: 1 / -1; }
+html.phone #main table.t.cards td.cact { grid-column: 1 / -1; flex-direction: row; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+html.phone #main table.t.cards td:empty { display: none; }
+html.phone #main table.t.cards td input:not([type=checkbox]):not([type=radio]), html.phone #main table.t.cards td select { width: 100% !important; min-width: 0 !important; max-width: none !important; min-height: 44px; }
+html.phone #main table.t.cards td .x { width: 44px; height: 44px; font-size: 18px; }
+html.phone #main table.t.cards td .jbtns, html.phone #main table.t.cards td .mcell { flex-wrap: wrap; }
+html.phone #main table.t.cards tr { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+html.phone #main table.t.cards td { grid-column: span 3; }
+html.phone #main table.t.cards td.ro { grid-column: span 2; }
+html.phone #main table.t.cards td:first-child { grid-column: 1 / 5; grid-row: 1; }
+html.phone #main table.t.cards td.cact { grid-column: 5 / 7; grid-row: 1; justify-content: flex-end; }
+html.phone #main table.t.cards td.cact:first-child { grid-column: 1 / -1; }
+html.phone #main table.t.cards td.cw { grid-column: 1 / -1; }
+html.phone #main table.t.cards td.cact .x { width: 36px; height: 36px; font-size: 16px; }
+html.phone #main table.t.cards td { display: block; }
+html.phone #main table.t.cards td::before { display: block; margin-bottom: 3px; }
+html.phone #main table.t.cards td[data-th=""]::before { display: none; }
+html.phone #main table.t.cards td:first-child { display: flex; flex-direction: row; align-items: baseline; gap: 8px; }
+html.phone #main table.t.cards td:first-child::before { margin: 0; }
+html.phone #main table.t.cards td.cact { display: flex; flex-wrap: nowrap; gap: 4px; align-items: center; }
+html.phone #main table.t.cards td.cact .x { width: 34px; height: 34px; flex: 0 0 34px; }
+html.phone #main table.t.cards td .jbtns { display: flex; }
+html.phone .arrbar { display: flex; flex-wrap: wrap; gap: 8px; }
+html.phone .arrbar > * { flex: 1 1 100%; min-width: 0; max-width: 100%; white-space: normal; }
+html.phone .rchip { min-height: 38px; padding-top: 0; padding-bottom: 0; }
+html.phone .jb, html.phone .jbtns button { min-height: 40px; min-width: 52px; padding: 0 12px; font-size: 13.5px; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -1090,6 +1217,7 @@ table.pt tbody tr:not(.emp) td { padding-top: 2px !important; padding-bottom: 2p
   <aside class="nav" id="nav" aria-label="画面の切り替え"></aside>
   <div class="scrim" id="scrim" data-act="closeNav"></div>
   <main id="main"><noscript>このアプリを使うには JavaScript を有効にしてください。</noscript></main>
+  <nav class="tabbar" id="tabbar" aria-label="画面の切り替え" hidden></nav>
 </div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <div id="print-root" class="pgroot"></div>
@@ -2406,10 +2534,17 @@ let navPref = { side: 'left', pinned: true };
 try { navPref = Object.assign(navPref, JSON.parse(lsGet(NAVPREF_KEY) || '{}')); } catch (e) { /* ignore */ }
 let navOpen = false;
 const isWide = () => window.matchMedia('(min-width: 900px)').matches;
-const navPinnedNow = () => navPref.pinned && isWide();
+// スマホ専用の画面: 自動で判定（幅600px以下、または指で操作する小さい画面）。メニューで「スマホ版／PC版」に固定もできる
+function phoneAuto() {
+  try { const small = Math.min(screen.width, screen.height) < 600, coarse = window.matchMedia('(pointer: coarse)').matches; return window.innerWidth <= 600 || (coarse && small); }
+  catch (e) { return window.innerWidth <= 600; }
+}
+const isPhone = () => navPref.ui === 'phone' ? true : navPref.ui === 'pc' ? false : phoneAuto();
+const navPinnedNow = () => navPref.pinned && isWide() && !isPhone();
 function saveNavPref() { try { lsSet(NAVPREF_KEY, JSON.stringify(navPref)); } catch (e) { /* ignore */ } }
 function applyNavLayout() {
   const app = $('#app');
+  document.documentElement.classList.toggle('phone', isPhone());
   app.classList.toggle('side-right', navPref.side === 'right');
   app.classList.toggle('side-left', navPref.side !== 'right');
   app.classList.toggle('pinned', navPinnedNow());
@@ -2420,7 +2555,7 @@ function applyNavLayout() {
   app.classList.toggle('navrail', navPinnedNow() && left < 760);
   app.classList.toggle('pvslim', pvOn && left < 640);
 }
-window.addEventListener('resize', () => { applyNavLayout(); sizeFills(); fitProgram(); bindLenses(); schedulePreview(); });
+window.addEventListener('resize', () => { if (isPhone() !== document.documentElement.classList.contains('phone')) { render(); return; } applyNavLayout(); sizeFills(); fitProgram(); bindLenses(); schedulePreview(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && navOpen) { navOpen = false; applyNavLayout(); } });
 
 let renderQueued = false;
@@ -2440,6 +2575,7 @@ function render() {
   rememberLenses();
   renderTop();
   renderNav();
+  renderTabbar();
   applyNavLayout();
   document.documentElement.style.setProperty('--toph', $('#top').offsetHeight + 'px');
   const fn = VIEWS[view] || VIEWS.home;
@@ -2449,6 +2585,7 @@ function render() {
   $('#main').innerHTML =
     (PV_VIEWS.includes(view) && !previewOn() ? '<div class="pv-off"><button class="btn sm" data-act="pvToggle">' + icon('print', 'ic sm') + '印刷プレビューを表示</button></div>' : '') + pvShell(html);
   liftHeading();
+  if (isPhone()) cardTables();
   paintNote();
   updateFrameStyle();
   sizeFills();
@@ -2502,6 +2639,27 @@ function fitProgram() {
   if (el.style.maxHeight) el.style.maxHeight = Math.max(240, parseFloat(el.style.maxHeight) - shift) + 'px';
 }
 // 各画面の名前と説明は上部のバーに出す（画面の中はその分だけ広く使う）
+// スマホ版: 横に長い表は1行ずつのカードにする（見出しを各欄のラベルに。横スクロールなしで入力できる）
+function cardTables() {
+  document.querySelectorAll('#main table.t:not(.pt):not(.pts)').forEach(t => {
+    const hr = t.tHead && t.tHead.rows[t.tHead.rows.length - 1];
+    if (!hr) return;
+    const names = [];
+    [...hr.cells].forEach(th => { const n = th.textContent.trim(); for (let k = 0; k < (th.colSpan || 1); k++) names.push(n); });
+    if (names.length < 3) return;
+    t.classList.add('cards');
+    [...t.tBodies].forEach(tb => [...tb.rows].forEach(tr => {
+      let c = 0;
+      [...tr.cells].forEach(td => {
+        const n = names[c] || ''; c += td.colSpan || 1;
+        td.dataset.th = n;
+        if (td.colSpan > 1 || td.querySelector('textarea')) td.classList.add('cw');
+        if (!n && td.querySelector('button')) td.classList.add('cact');
+        else if (!td.querySelector('input, select, textarea, button')) td.classList.add('ro');
+      });
+    }));
+  });
+}
 function liftHeading() {
   const h = document.querySelector('#main h1.view'), t = $('#toptitle'), d = $('#topdesc');
   if (!h) { if (d) d.textContent = ''; return; }
@@ -2800,6 +2958,7 @@ function backupReminder() {
   return '';
 }
 function renderTop() {
+  if (isPhone()) { renderTopPhone(); return; }
   const ch = D.checks || [];
   const ne = ch.filter(c => c.level === 'error').length, nw = ch.filter(c => c.level === 'warn').length;
   const locked = isLocked();
@@ -2821,6 +2980,30 @@ function renderTop() {
     '<button type="button" class="bellbtn" id="bell" data-act="notes" title="通知の一覧" aria-label="通知の一覧">' + icon('bell') + '<span class="bdg"></span></button>' +
     '<div class="notes card" id="notes" hidden></div></div></div>';
 }
+// スマホ版の上部: 1行（アイコン・画面名・1部2部・ベル）＋通知モニター1行。画面の切り替えは下のタブで
+function renderTopPhone() {
+  const locked = isLocked();
+  const cur = NAV.flatMap(g => g[1]).find(x => x[0] === view);
+  $('#top').innerHTML =
+    '<div class="ph-row"><img class="logo" src="' + APP_ICON + '" alt="">' +
+    '<div class="brand-t"><small>' + esc(state.settings.meetName || 'スイム大会運営ボード') + '</small><strong id="toptitle">' + esc(cur ? cur[1] : '') + '</strong></div>' +
+    (locked ? '<button class="ph-lock" data-act="lock" title="当日モード中（押すと解除）" aria-label="当日モード中">' + icon('lock', 'ic sm') + '</button>' : '') +
+    '<span class="seg mini partseg" role="group" aria-label="1部・2部">' + PARTS.map(([v, l]) => '<button type="button" class="segbtn ' + (PART === v ? 'on' : '') + '" data-act="part" data-v="' + v + '">' + l + '</button>').join('') + '</span></div>' +
+    '<div class="tmon"><div class="tnote" id="tnote" role="status" aria-live="polite"></div>' +
+    '<button type="button" class="bellbtn" id="bell" data-act="notes" title="通知の一覧" aria-label="通知の一覧">' + icon('bell') + '<span class="bdg"></span></button>' +
+    '<div class="notes card" id="notes" hidden></div></div>';
+}
+// スマホ版の下のタブ（親指で届く位置）。よく使う4画面＋その他（全画面の一覧・当日モード・元に戻す など）
+const PHONE_TABS = [['home', '本部'], ['schedule', '進行'], ['program', '記録入力'], ['flash', '速報']];
+function renderTabbar() {
+  const tb = $('#tabbar'); if (!tb) return;
+  if (!isPhone()) { tb.hidden = true; tb.innerHTML = ''; return; }
+  tb.hidden = false;
+  const inTabs = PHONE_TABS.some(([v]) => v === view);
+  const ne = (D.checks || []).filter(c => c.level === 'error').length;
+  tb.innerHTML = PHONE_TABS.map(([v, l]) => '<button type="button" class="tab' + (view === v && !navOpen ? ' on' : '') + (v === 'program' ? ' main' : '') + '" data-act="go" data-v="' + v + '"' + (view === v ? ' aria-current="page"' : '') + '>' + icon(v) + '<span>' + l + '</span></button>').join('') +
+    '<button type="button" class="tab' + ((!inTabs || navOpen) ? ' on' : '') + '" data-act="toggleNav" aria-expanded="' + navOpen + '">' + icon('menu') + '<span>' + (inTabs ? 'その他' : esc(QLABEL[view] || 'その他')) + '</span>' + (ne ? '<i class="qdot"></i>' : '') + '</button>';
+}
 // 簡易アクセス: アイコン＋短い名前のボタン（押すだけ。見て分かる・指で押しやすい大きさ）
 const QLABEL = { home: '本部', settings: '設定', entries: '個人', relays: 'リレー', schedule: '進行', program: '記録入力', flash: '速報', ranking: '順位', certs: '証書', prints: '印刷', awards: '表彰', check: 'チェック', data: 'データ' };
 function quickBar() {
@@ -2835,6 +3018,12 @@ function renderNav() {
   const wide = isWide();
   $('#nav').innerHTML =
     '<div class="navhead"><b>画面の切り替え</b><button class="iconbtn sm" data-act="closeNav" aria-label="閉じる" title="閉じる">' + icon('close') + '</button></div>' +
+    (isPhone() ? '<div class="ph-tools">' +
+      '<button class="ph-t' + (isLocked() ? ' on' : '') + '" data-act="lock">' + icon(isLocked() ? 'lock' : 'unlock') + '<span>' + (isLocked() ? '当日モード中' : '当日モード') + '</span></button>' +
+      '<button class="ph-t" data-act="undo" ' + (undoStack.length ? '' : 'disabled') + '>' + icon('undo') + '<span>元に戻す</span></button>' +
+      '<button class="ph-t" data-act="redo" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '<span>やり直し</span></button>' +
+      '<button class="ph-t" data-act="backup">' + icon('save') + '<span>バックアップ</span></button></div>' : '') +
+    '<div class="uimode"><span>画面</span><span class="seg mini" role="group" aria-label="画面の種類">' + [['auto', '自動'], ['phone', 'スマホ版'], ['pc', 'PC版']].map(([v, l]) => '<button type="button" class="segbtn ' + ((navPref.ui || 'auto') === v ? 'on' : '') + '" data-act="uiMode" data-v="' + v + '">' + l + '</button>').join('') + '</span></div>' +
     '<div class="navprefs">' +
     '<div class="seg h mini" data-seg-id="navside"><span class="lens" aria-hidden="true"></span>' +
     [['left', '左に表示'], ['right', '右に表示']].map(([v, l]) => '<button type="button" class="segbtn ' + (navPref.side === v ? 'on' : '') + '" data-seg data-act="navSide" data-v="' + v + '">' + l + '</button>').join('') + '</div>' +
@@ -3234,9 +3423,9 @@ VIEWS.program = () => {
   let curHeat = p.heats.some(h => h.heat === ui.progHeat) ? ui.progHeat : null;
   if (curHeat === null) { const h0 = p.heats.find(h => h.items.some(it => it.status === '未入力')) || p.heats[0]; curHeat = h0 ? h0.heat : null; }
   return '<div class="vhead"><div><h1 class="view">プログラム・記録入力</h1><p class="lead">公式タイムを入れて Enter で次のレーンへ進みます。棄権・失格は「判定」で選びます（失格でも泳いだタイムは入れられます）。黄色の行は打ち間違いの可能性があります。当日モード中でも入力できます。</p></div></div>' +
-    '<div class="bar progbar"><button class="btn" data-act="progStep" data-d="-1" ' + (idx <= 0 ? 'disabled' : '') + '>← 前</button>' +
+    '<div class="bar progbar"><button class="btn" data-act="progStep" data-d="-1" ' + (idx <= 0 ? 'disabled' : '') + ' aria-label="前の種目">' + (isPhone() ? '←' : '← 前') + '</button>' +
     sel('ui:prog', ui.prog, opts.map(n => { const s = D.sched.rows.find(r => r.name === n); const its = D.ind.concat(D.rel).filter(it => it.program === n && it.event); const dn = its.filter(it => it.status !== '未入力').length; return [n, (s ? 'No.' + s.no + ' ' : '') + n + (its.length ? (dn === its.length ? '　✓' : dn ? '　' + dn + '/' + its.length : '') : '　（なし）')]; }), 'class="progsel" aria-label="種目"') +
-    '<button class="btn" data-act="progStep" data-d="1" ' + (idx >= opts.length - 1 ? 'disabled' : '') + '>次 →</button>' +
+    '<button class="btn" data-act="progStep" data-d="1" ' + (idx >= opts.length - 1 ? 'disabled' : '') + ' aria-label="次の種目">' + (isPhone() ? '→' : '次 →') + '</button>' +
     (ui.prog ? '<span class="pill mute">' + (p.sch ? 'No.' + p.sch.no + '・開始 ' + (p.sch.start !== null ? C.fmtClock(p.sch.start) : '—') : '<span style="color:var(--err)">スケジュール未登録</span>') + '</span><span class="pill mute">' + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組</span>' +
       '<span class="pill ' + (allDone ? 'ok' : 'info') + '">入力 ' + p.done + ' / ' + p.items.length + '</span>' + (p.items.some(it => it.seatFixed) ? '<span class="pill mute" title="「組・レーンを入れ替え」で手で並べた位置を使っています">手で並べ替え済み</span>' : '') : '') +
     '<button class="btn sm" data-act="clearOut" data-all="0" ' + (p.items.some(it => it.status === '対象外') ? '' : 'disabled') + '>対象外を一括解除</button><button class="btn sm" data-act="clearOut" data-all="1" ' + (D.ind.concat(D.rel).some(it => it.status === '対象外') ? '' : 'disabled') + '>全種目の対象外を解除</button>' +
@@ -3798,6 +3987,7 @@ const ACTIONS = {
     render();
   },
   closeNav: () => { if (navPinnedNow()) { navPref.pinned = false; saveNavPref(); } navOpen = false; render(); },
+  uiMode: t => { navPref.ui = t.dataset.v === 'auto' ? undefined : t.dataset.v; saveNavPref(); navOpen = false; render(); window.scrollTo(0, 0); toast(t.dataset.v === 'phone' ? 'スマホ版の画面にしました' : t.dataset.v === 'pc' ? 'PC版の画面にしました' : '画面の種類を自動にしました（' + (isPhone() ? 'スマホ版' : 'PC版') + '）'); },
   navSide: t => { navPref.side = t.dataset.v; saveNavPref(); render(); },
   navPin: () => { navPref.pinned = !navPref.pinned; saveNavPref(); navOpen = !navPref.pinned; render(); },
   setui: t => setUI(t.dataset.key, t.dataset.v),
@@ -4344,7 +4534,7 @@ function printCerts(test) {
 const PV_VIEWS = ['schedule', 'program', 'flash', 'ranking', 'certs', 'awards', 'prints'];
 const PV_MAX = 24;
 let pvTimer = 0;
-function previewOn() { return navPref.pv !== false; }
+function previewOn() { return navPref.pv !== false && !isPhone(); }
 function pvShell(inner) {
   if (!PV_VIEWS.includes(view)) return inner;
   if (!previewOn()) return inner;
