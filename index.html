@@ -1014,6 +1014,38 @@ p.small, .small.muted { text-wrap: pretty; }
 .ctargets label em { font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums; }
 .ctargets input { text-align: right; min-height: 34px; }
 .qnav { justify-content: center; }
+
+/* ---------- 丸いメニューボタン・丸いアプリアイコン ---------- */
+.iconbtn.menu, .navhead .iconbtn, .nav .x { width: 40px !important; height: 40px !important; border-radius: 50% !important; display: inline-grid; place-items: center; padding: 0; }
+.logo { border-radius: 50% !important; }
+/* ---------- 記録入力: ほどよい大きさ・どの行も同じ高さ（空きレーンも） ---------- */
+table.pt td.nm .one:first-child { font-size: 15.5px; }
+table.pt .lane { width: 28px !important; height: 28px !important; font-size: 13px !important; }
+table.pt input.tin { min-height: 40px; font-size: 17px; }
+table.pt .tbox .prev { height: 40px; }
+table.pt .jb { min-height: 36px; font-size: 12.5px; padding: 4px 10px; }
+table.pt col.c-jd { width: 160px; } table.pt col.c-tm { width: 136px; }
+table.pt tbody tr td, table.pt tbody tr.emp td { height: 54px; padding-top: 4px !important; padding-bottom: 4px !important; box-sizing: border-box; }
+.progbar .btn, .progbar select.progsel { min-height: 40px; font-size: 14px; }
+.heattabs .segbtn { min-height: 36px; font-size: 13.5px; }
+@container (max-width: 700px) { table.pt tbody tr, table.pt tbody tr.emp { min-height: 96px; } table.pt tbody tr td, table.pt tbody tr.emp td { height: auto; } }
+/* ---------- 入れ替え: どのレーンも同じ大きさ・同じ形 ---------- */
+.arrbar { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.arrbar select { max-width: 420px; }
+.arr-sep { margin: 12px 4px 6px; font-size: 14px; }
+.slot { height: 52px; grid-template-columns: 28px minmax(0, 1fr) 34px !important; }
+.pcard, .slot-empty, .slot-q { height: 46px !important; min-height: 46px !important; box-sizing: border-box; overflow: hidden; border-radius: 14px !important; }
+.slot-empty { grid-column: 2 / -1; }
+.slot-q { grid-column: 2 / -1; position: relative; display: flex; align-items: center; overflow: visible; }
+.slot-q input { height: 46px; min-height: 46px; width: 100%; border: 2px solid #e0a800; padding-right: 36px; }
+.sq-x { position: absolute; right: 6px; top: 8px; width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--track); cursor: pointer; }
+.sq-list { position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 60; max-height: 240px; overflow: auto; background: var(--drawer, #fff); border-radius: 14px; box-shadow: 0 12px 30px rgba(10, 30, 60, .22); padding: 4px; }
+.sq-list button { display: flex; width: 100%; justify-content: space-between; gap: 8px; padding: 8px 10px; border: 0; background: transparent; border-radius: 10px; cursor: pointer; text-align: left; font-size: 13.5px; }
+.sq-list button:hover { background: var(--track); }
+.sq-list span { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.sq-list p { margin: 8px; color: var(--muted); font-size: 13px; }
+.arh-h .hlock { min-height: 32px !important; padding: 0 12px !important; font-size: 12px !important; }
+table.pt tbody tr td, table.pt tbody tr.emp td { height: 60px; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2413,7 +2445,7 @@ function fitProgCells(root) {
   });
 }
 function fitProgram() {
-  const arr = document.querySelector('.arr'); if (arr) fitProgCells(arr);
+  document.querySelectorAll('.arr').forEach(fitProgCells);
   const el = document.querySelector('.heats.prog-h'), tabs = document.querySelector('.heattabs');
   if (!el) return;
   el.classList.remove('paged');
@@ -3192,28 +3224,40 @@ function arrSearch(p) {
 }
 // 組・レーンの入れ替え（ドラッグ＆ドロップ、またはタップで選んで行き先をタップ）
 function arrangePanel(p, lanes) {
+  // 組・レーンの入れ替え。説明文や検索欄は置かず、レーンの枠の中で操作する（空きレーンを押すとその枠で検索）。
+  // 「ほかの種目も並べる」で別の種目を下に並べると、種目をまたいでタップ／ドラッグで移せる
+  const relay = p.relay;
+  const others = programOptions().filter(n => n !== ui.prog && C.isRelayName(n) === relay && programData(n).items.length);
+  if (ui.arrOther && others.indexOf(ui.arrOther) < 0) ui.arrOther = '';
+  const anyFixed = p.items.some(it => it.seatFixed);
+  const bar = '<div class="arrbar">' + sel('ui:arrOther', ui.arrOther || '', [['', 'ほかの種目は並べない']].concat(others.map(n => [n, 'ほかの種目も並べる: ' + n])), 'aria-label="ほかの種目も並べる"') +
+    '<span class="grow"></span><button class="btn sm" data-act="seatReset" ' + (anyFixed ? '' : 'disabled') + '>ロックを外して自動に戻す</button></div>';
+  return bar + '<div class="arr-wrap fill" data-fill-id="arr">' + arrHeats(p, ui.prog, lanes) + (ui.arrOther ? '<h3 class="arr-sep">' + esc(ui.arrOther) + '</h3>' + arrHeats(programData(ui.arrOther), ui.arrOther, lanes) : '') + '</div>';
+}
+function arrHeats(p, prog, lanes) {
   const maxH = Math.max(0, ...p.items.map(it => it.heat || 0));
-  const fixedN = p.items.filter(it => it.seatFixed).length, movedN = p.items.filter(it => it.seatMoved).length;
   const card = it => {
     const who = p.relay ? it.teamDisp : it.np.kanji;
     const entry = it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '';
-    const q = C.normKey(ui.arrQ || ''), hit = q && C.normKey(it.name + (it.teamDisp || '') + (it.members || []).join('') + it.club).indexOf(q) >= 0;
-    return '<button type="button" class="pcard' + (ui.arrSel === it.id ? ' sel' : '') + (q ? (hit ? ' hit' : ' dim') : '') + (it.seatFixed ? ' locked' : '') + '" data-act="seatPick" data-id="' + esc(it.id) + '" aria-label="' + esc(who) + '（第' + it.heat + '組 ' + it.lane + 'レーン）">' +
+    return '<button type="button" class="pcard' + (ui.arrSel === it.id ? ' sel' : '') + (it.seatFixed ? ' locked' : '') + '" data-act="seatPick" data-id="' + esc(it.id) + '" data-prog="' + esc(prog) + '" aria-label="' + esc(who) + '（第' + it.heat + '組 ' + it.lane + 'レーン）">' +
       '<span class="fit nm"><b>' + (p.relay ? esc(who) : rubyName(it.np)) + '</b></span><span class="fit sub">' + (p.relay ? rubyMembers(it) : esc(it.club)) + '・' + esc(it.cat) + '</span><span class="et">' + esc(entry) + '</span></button>';
+  };
+  const tgt = (h, l) => ui.arrTarget && ui.arrTarget.prog === prog && ui.arrTarget.h === h && ui.arrTarget.l === l;
+  const emptySlot = (h, l) => {
+    if (!tgt(h, l)) return '<button type="button" class="slot-empty" data-act="seatPick" data-prog="' + esc(prog) + '" aria-label="第' + h + '組 ' + l + 'レーン（空き）">空き</button>';
+    const q = C.normKey(ui.arrQ || ''), pool = p.items.concat(ui.arrOther && prog !== ui.arrOther ? programData(ui.arrOther).items : ui.arrOther ? programData(ui.prog).items : []);
+    const list = pool.filter(it => !q || C.normKey(it.name + (it.teamDisp || '') + (it.members || []).join('') + it.club).indexOf(q) >= 0).slice(0, 12);
+    return '<div class="slot-q"><input data-k="ui:arrQ" value="' + esc(ui.arrQ || '') + '" placeholder="名前で検索して入れる" aria-label="このレーンに入れる選手を検索"><button type="button" class="sq-x" data-act="arrTargetOff" aria-label="やめる">×</button>' +
+      '<div class="sq-list">' + (list.length ? list.map(it => '<button type="button" data-act="arrPut" data-id="' + esc(it.id) + '"><b>' + esc(p.relay ? it.teamDisp : it.np.kanji) + '</b><span>' + esc((it.program !== prog ? it.program + '・' : '') + '第' + it.heat + '組' + it.lane + 'レーン') + '</span></button>').join('') : '<p>見つかりません</p>') + '</div></div>';
   };
   const heat = (h, isNew) => {
     const its = p.items.filter(it => it.heat === h);
     const allLocked = its.length && its.every(it => it.seatFixed);
-    return '<div class="arh card' + (isNew ? ' newh' : '') + (allLocked ? ' hlocked' : '') + '"><div class="arh-h"><b>' + (isNew ? '新しい組（第 ' + h + ' 組）' : '第 ' + h + ' 組') + '</b><span class="muted small">' + (isNew ? 'ここへ入れると組が増えます' : its.length + (p.relay ? 'チーム' : '人')) + '</span>' +
-      (!isNew && its.length ? '<button type="button" class="btn sm hlock' + (allLocked ? ' on' : '') + '" data-act="heatLock" data-h="' + h + '">' + icon(allLocked ? 'lock' : 'unlock', 'ic sm') + (allLocked ? '組をロック中' : '組をロック') + '</button>' : '') + '</div>' +
-      lanes.map(l => { const it = its.find(x => x.lane === l); return '<div class="slot" data-h="' + h + '" data-l="' + l + '"><span class="lane">' + l + '</span>' + (it ? card(it) + '<button type="button" class="lockb' + (it.seatFixed ? ' on' : '') + '" data-act="seatLock" data-id="' + esc(it.id) + '" title="' + (it.seatFixed ? 'ロック中（自動の組分けで動かない）。押すと解除' : 'この組・レーンにロックする') + '" aria-label="ロック">' + icon(it.seatFixed ? 'lock' : 'unlock', 'ic sm') + '</button>' : '<button type="button" class="slot-empty' + (ui.arrTarget && ui.arrTarget.h === h && ui.arrTarget.l === l ? ' tgt' : '') + '" data-act="seatPick" aria-label="第' + h + '組 ' + l + 'レーン（空き）">' + (ui.arrTarget && ui.arrTarget.h === h && ui.arrTarget.l === l ? 'ここに入れる選手を検索 ↑' : '空き（押すと検索して入れられます）') + '</button>') + '</div>'; }).join('') + '</div>';
+    return '<div class="arh card' + (isNew ? ' newh' : '') + (allLocked ? ' hlocked' : '') + '"><div class="arh-h"><b>' + (isNew ? '新しい組（第' + h + '組）' : '第' + h + '組') + '</b>' +
+      (!isNew ? '<button type="button" class="btn sm hlock' + (allLocked ? ' on' : '') + '" data-act="heatLock" data-h="' + h + '" data-prog="' + esc(prog) + '" ' + (its.length ? '' : 'disabled') + '>' + icon(allLocked ? 'lock' : 'unlock', 'ic sm') + (allLocked ? 'ロック中' : '組ロック') + '</button>' : '') + '</div>' +
+      lanes.map(l => { const it = its.find(x => x.lane === l); return '<div class="slot" data-h="' + h + '" data-l="' + l + '" data-prog="' + esc(prog) + '"><span class="lane">' + l + '</span>' + (it ? card(it) + '<button type="button" class="lockb' + (it.seatFixed ? ' on' : '') + '" data-act="seatLock" data-id="' + esc(it.id) + '" aria-label="ロック">' + icon(it.seatFixed ? 'lock' : 'unlock', 'ic sm') + '</button>' : emptySlot(h, l)) + '</div>'; }).join('') + '</div>';
   };
-  return '<div class="notice info arr-help"><span class="grow">' + (isLocked() ? '<b>当日モード中は入れ替えできません。</b>上部の「当日モード」を解除してください。' : '選手を別のレーンへドラッグ（スマホは長押ししてから）、またはタップで選んで行き先をタップすると入れ替わります。動かした選手は自動でロック（🔒）され、自動の組分けで動きません。') + (ui.arrSel ? '　<b>選択中：行き先をタップ</b>' : '') + '</span>' +
-    '<input data-k="ui:arrQ" value="' + esc(ui.arrQ || '') + '" placeholder="選手・チームを検索" style="max-width:200px" aria-label="選手を検索">' +
-    (fixedN ? '<button class="btn sm" data-act="seatReset">ロックを全部外して自動に戻す</button>' : '') + '</div>' +
-    arrSearch(p) +
-    (movedN ? '<div class="notice warn">手で入れ替えた後に申込が変わったため、' + movedN + (p.relay ? 'チーム' : '人') + 'を空いているレーンへ自動で入れました。位置を確認してください。</div>' : '') +
-    '<div class="arr fill" data-fill-id="arr">' + Array.from({ length: maxH }, (_, i) => heat(i + 1)).join('') + heat(maxH + 1, true) + '</div>';
+  return '<div class="arr">' + Array.from({ length: maxH }, (_, i) => heat(i + 1)).join('') + heat(maxH + 1, true) + '</div>';
 }
 
 /* ---------------------------------------------------------------- 画面: 速報 */
@@ -3755,9 +3799,9 @@ const ACTIONS = {
   },
   printClubSum: () => printDocs([docClubSum()], 'クラブ総合得点（1部・2部合算）を印刷します'),
   arrTargetOff: () => { ui.arrTarget = null; render(); },
-  arrPut: t => { const tg = ui.arrTarget; if (!tg) return; ui.arrTarget = null; ui.arrQ = ''; seatMove(t.dataset.id, tg.h, tg.l); },
+  arrPut: t => { const tg = ui.arrTarget; if (!tg) return; ui.arrTarget = null; ui.arrQ = ''; seatMove(t.dataset.id, tg.h, tg.l, tg.prog); },
   heatLock: t => {
-    const h = +t.dataset.h, name = ui.prog, relay = C.isRelayName(name);
+    const h = +t.dataset.h, name = t.dataset.prog || ui.prog, relay = C.isRelayName(name);
     const its = (relay ? D.rel : D.ind).filter(it => it.program === name && it.heat === h), lock = !its.every(it => it.seatFixed);
     if (commit((lock ? '組をロック' : '組のロックを解除') + '（' + name + ' 第' + h + '組）', s => { const map = new Map((relay ? s.relays : s.entries).map(o => [o.id, o])); its.forEach(it => { const o = map.get(it.id); if (!o) return; if (lock) o.seat = { p: name, h: it.heat, l: it.lane }; else delete o.seat; }); }))
       toast('第' + h + '組を' + (lock ? 'ロックしました（自動の組分けで動きません）' : 'ロック解除しました'), null, 6000, { label: '元に戻す', fn: undo });
@@ -3771,12 +3815,12 @@ const ACTIONS = {
     const id = t.dataset.id || null, slot = t.closest('.slot');
     if (!ui.arrSel) {
       if (id) { ui.arrSel = id; ui.arrTarget = null; render(); return; }
-      if (slot) { ui.arrTarget = { h: +slot.dataset.h, l: +slot.dataset.l }; render(); const q = document.querySelector('[data-k="ui:arrQ"]'); if (q) q.focus(); }   // 空きレーン → 検索して入れる
+      if (slot) { ui.arrTarget = { prog: slot.dataset.prog || ui.prog, h: +slot.dataset.h, l: +slot.dataset.l }; ui.arrQ = ''; render(); const q = document.querySelector('.slot-q input'); if (q) q.focus(); }   // 空きレーン → 検索して入れる
       return;
     }
     if (id === ui.arrSel) { ui.arrSel = null; render(); return; }
     const from = ui.arrSel; ui.arrSel = null;
-    if (slot) seatMove(from, +slot.dataset.h, +slot.dataset.l); else render();
+    if (slot) seatMove(from, +slot.dataset.h, +slot.dataset.l, slot.dataset.prog); else render();
   },
   seatReset: () => {
     const name = ui.prog, relay = C.isRelayName(name);
@@ -4339,8 +4383,29 @@ function exportXlsx() {
 
 /* ---------------------------------------------------------------- 組・レーンの入れ替え */
 // 1人を (組 h, レーン l) へ。そこに誰かいれば入れ替え。入れ替えた種目の全員の位置を固定する（後から申込が増えても他の人は動かない）
-function seatMove(id, h, l) {
-  const name = ui.prog, relay = C.isRelayName(name);
+// 別の種目へ移す: 種目名（合同レースなら区分に合う種目）を付け替え、移した先のレーンに固定する。相手がいれば入れ替える
+function eventForProg(it, prog) {
+  const comb = (state.settings.combined || []).find(c => c.name === prog);
+  if (!comb) return prog;
+  const pair = (comb.pairs || []).find(x => x && x.event && x.cat === it.cat) || (comb.pairs || []).find(x => x && x.event);
+  return pair ? pair.event : prog;
+}
+function seatMove(id, h, l, prog) {
+  const a0 = D.byId.get(id);
+  if (a0 && prog && a0.program !== prog) {
+    const relay = C.isRelayName(a0.program);
+    if (C.isRelayName(prog) !== relay) { toast('個人とリレーの間では移せません', 'err'); render(); return; }
+    const b = (relay ? D.rel : D.ind).find(it => it.program === prog && it.heat === h && it.lane === l);
+    const evA = eventForProg(a0, prog), evB = b ? eventForProg(b, a0.program) : null, nm = it => relay ? it.teamDisp : it.np.kanji;
+    const ok = commit('種目をまたいで入れ替え（' + a0.program + ' → ' + prog + '）', s => {
+      const list = relay ? s.relays : s.entries, oa = list.find(o => o.id === a0.id);
+      oa.event = evA; oa.seat = { p: prog, h, l };
+      if (b) { const ob = list.find(o => o.id === b.id); ob.event = evB; ob.seat = { p: a0.program, h: a0.heat, l: a0.lane }; }
+    });
+    if (ok) toast(nm(a0) + ' を「' + prog + '」第' + h + '組 ' + l + 'レーンへ' + (b ? '（' + nm(b) + ' と入れ替え）' : ''), null, 9000, { label: '元に戻す', fn: undo });
+    return;
+  }
+  const name = prog || ui.prog, relay = C.isRelayName(name);
   const items = (relay ? D.rel : D.ind).filter(it => it.program === name && it.heat && it.lane);
   const a = items.find(it => it.id === id);
   if (!a || !h || !l) { render(); return; }
@@ -4377,7 +4442,7 @@ function seatMoveGhost(x, y) {
   const t = seatTarget(x, y);
   if (t !== d.over) { if (d.over) d.over.classList.remove('over'); d.over = t; if (t) t.classList.add('over'); }
   // 端に近づいたら自動でスクロール
-  const box = document.querySelector('.arr.fill');
+  const box = document.querySelector('.arr-wrap.fill');
   cancelAnimationFrame(d.raf);
   const step = () => {
     let vy = 0; const br = box && box.style.maxHeight ? box.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
@@ -4399,7 +4464,7 @@ function seatEnd(drop, x, y) {
   seatDrag.justDropped = true; setTimeout(() => { seatDrag.justDropped = false; }, 350);
   const t = drop ? seatTarget(x, y) : null;
   ui.arrSel = null;
-  if (t) seatMove(d.id, +t.dataset.h, +t.dataset.l); else render();
+  if (t) seatMove(d.id, +t.dataset.h, +t.dataset.l, t.dataset.prog); else render();
 }
 document.addEventListener('pointerdown', e => {
   const c = e.target.closest && e.target.closest('.arr .pcard');
