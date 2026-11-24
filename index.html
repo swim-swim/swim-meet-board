@@ -868,6 +868,51 @@ table.pts { font-size: 15px; }
 table.pts td, table.pts th { padding: 5px 8px; }
 .rkn { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; font-weight: 800; font-size: 13px; background: var(--track); }
 .rkn.r1 { background: #c9a227; color: #fff; } .rkn.r2 { background: #9aa3ad; color: #fff; } .rkn.r3 { background: #b07040; color: #fff; }
+
+/* ---------- 上部バー2段目: 左に元に戻す等／中央に通知モニター（簡易ボタンと同じ幅） ---------- */
+.topbar .trow2 { display: contents; }
+.topbar .tools { grid-row: 2; grid-column: 1; justify-self: start; }
+.topbar .tmon { grid-row: 2; grid-column: 2; justify-self: stretch; position: relative; display: flex; gap: 6px; align-items: center; min-width: 0; }
+.tmon .tnote { flex: 1 1 auto; }
+.bellbtn { flex: 0 0 auto; height: 36px; min-width: 36px; padding: 0 10px; display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; border: 1px solid var(--btn-edge); background: var(--btn-bg); color: var(--btn-ink); cursor: pointer; }
+.bellbtn .ic { width: 18px; height: 18px; }
+.bellbtn .bdg { font: 700 12px/1 system-ui, sans-serif; color: #fff; background: var(--err); border-radius: 999px; padding: 3px 6px; display: none; }
+.bellbtn.has .bdg { display: inline-block; }
+@media (max-width: 1279px) {
+  .topbar { grid-template-columns: minmax(0, 1fr) auto auto !important; }
+  .topbar .tl { grid-row: 1; grid-column: 1; }
+  .topbar .tools { grid-row: 1; grid-column: 2; }
+  .topbar .tr { grid-row: 1; grid-column: 3; }
+  .topbar .qnav { grid-row: 2 !important; grid-column: 1 / -1 !important; justify-self: stretch !important; }
+  .topbar .qnav .qn { flex: 1 1 0; }
+  .topbar .tmon { grid-row: 3; grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+  .topbar { grid-template-columns: minmax(0, 1fr) auto !important; }
+  .topbar .tl { grid-column: 1 / -1; }
+  .topbar .tools { grid-row: 2; grid-column: 2; }
+  .topbar .tr { grid-row: 2; grid-column: 1; justify-content: flex-start; }
+  .topbar .qnav { grid-row: 3 !important; }
+  .topbar .qnav .qn { flex: 0 0 auto; }
+  .topbar .tmon { grid-row: 4; }
+}
+/* 簡易ボタンも丸く（帯もガラスも丸） */
+.qnav.seg { border-radius: 999px !important; padding: 4px; }
+.qnav.seg > .lens { border-radius: 999px !important; }
+.qn { border-radius: 999px !important; padding: 3px 10px; }
+/* ---------- 本部ボード: 進行・入力状況（1枚）＋得点 ---------- */
+.hq.hq3 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 10px; align-items: start; }
+@media (max-width: 900px) { .hq.hq3 { grid-template-columns: minmax(0, 1fr); } }
+.hq-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin: -4px 0 10px; }
+.hq-kpi { display: flex; flex-direction: column; min-width: 0; }
+.hq-kpi > span { font-size: 11.5px; color: var(--muted); }
+.hq-kpi b { font-size: 17px; white-space: nowrap; }
+.hq-kpi b small { font-size: 12px; font-weight: 500; color: var(--muted); }
+.hq-kpi .prog { width: 160px; margin-top: 4px; }
+.hq-head .btn.primary { margin-left: auto; }
+.evchip b { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
+.evchip b small { font-size: 10px; font-weight: 500; color: var(--muted); }
+.evchip.cur { box-shadow: inset 0 0 0 3px var(--accent); }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2071,6 +2116,9 @@ function noteAct(id) { const n = NOTES.find(x => x.id === id); if (n && n.action
 function alertsNow() {      // 消えない「要対応」の通知
   const a = [];
   if (saveError) a.push({ kind: 'err', msg: '保存エラー: ' + saveError, act: 'backup', label: '今すぐ書き出す' });
+  const ch = D.checks || [], ne = ch.filter(c => c.level === 'error').length, nw = ch.filter(c => c.level === 'warn').length;
+  if (ne || nw) a.push({ kind: ne ? 'err' : 'info', msg: (ne ? '入力エラー ' + ne + '件' : '') + (ne && nw ? '・' : '') + (nw ? '注意 ' + nw + '件' : ''), act: 'go', v: 'check', label: '確認する' });
+  if (meta.sample) a.push({ kind: 'info', msg: 'サンプル（架空の）データを表示中です', act: 'go', v: 'data', label: 'データ管理へ' });
   if (state.entries.length || state.relays.length) {
     const age = Date.now() - (meta.lastBackup || 0);
     if (meta.lastBackup ? (meta.changesSinceBackup > 0 && age > 60 * 60 * 1000) : meta.changesSinceBackup >= 30)
@@ -2082,14 +2130,14 @@ function paintNote() {
   const slot = $('#tnote'); if (!slot) return;
   const al = alertsNow();
   const n = noteCur;
-  slot.className = 'tnote' + (n ? (n.kind === 'err' ? ' err' : ' on') : al.length ? ' warn' : '');
+  slot.className = 'tnote' + (n ? (n.kind === 'err' ? ' err' : ' on') : al.length ? (al[0].kind === 'err' ? ' err' : ' warn') : '');
   slot.innerHTML = n ? '<span class="tn-msg">' + esc(n.msg) + '</span>' + (n.action ? '<button type="button" class="tn-btn" data-note="' + n.id + '">' + esc(n.action.label) + '</button>' : '')
-    : al.length ? '<span class="tn-msg">' + esc(al[0].msg) + '</span><button type="button" class="tn-btn" data-act="' + al[0].act + '">' + esc(al[0].label) + '</button>' : '<span class="tn-msg tn-idle">通知はありません</span>';
-  const bell = $('#bell'); if (bell) { const unread = NOTES.filter(x => x.t > notesSeen).length + al.length; bell.querySelector('.bdg').textContent = unread ? String(unread) : ''; bell.classList.toggle('has', !!unread); }
+    : al.length ? '<span class="tn-msg">' + esc(al[0].msg) + '</span><button type="button" class="tn-btn" data-act="' + al[0].act + '"' + (al[0].v ? ' data-v="' + al[0].v + '"' : '') + '>' + esc(al[0].label) + '</button>' : '<span class="tn-msg tn-idle">' + (saveError ? '' : '✓ 保存済み・') + '通知はありません</span>';
+  const bell = $('#bell'); if (bell) { const unread = NOTES.filter(x => x.t > notesSeen).length + al.length; bell.querySelector('.bdg').textContent = unread ? String(unread > 99 ? '99+' : unread) : ''; bell.classList.toggle('has', !!unread); }
   const panel = $('#notes'); if (panel) {
     panel.hidden = !notesOpen;
     if (notesOpen) panel.innerHTML = '<div class="nt-h"><b>通知</b><span class="grow"></span><button type="button" class="btn sm" data-act="notesClose">閉じる</button></div>' +
-      (al.length ? al.map(x => '<div class="nt-i ' + x.kind + '"><span class="grow">' + esc(x.msg) + '</span><button type="button" class="btn sm" data-act="' + x.act + '">' + esc(x.label) + '</button></div>').join('') : '') +
+      (al.length ? al.map(x => '<div class="nt-i ' + x.kind + '"><span class="grow">' + esc(x.msg) + '</span><button type="button" class="btn sm" data-act="' + x.act + '"' + (x.v ? ' data-v="' + x.v + '"' : '') + '>' + esc(x.label) + '</button></div>').join('') : '') +
       (NOTES.length ? NOTES.map(x => '<div class="nt-i ' + (x.kind === 'err' ? 'err' : '') + '"><span class="nt-t">' + new Date(x.t).toTimeString().slice(0, 5) + '</span><span class="grow">' + esc(x.msg) + '</span>' + (x.action ? '<button type="button" class="btn sm" data-note="' + x.id + '">' + esc(x.action.label) + '</button>' : '') + '</div>').join('') : '<p class="small muted" style="margin:6px 4px">まだ通知はありません。</p>');
   }
 }
@@ -2560,17 +2608,14 @@ function renderTop() {
     quickBar() +
     '<div class="tr"><div class="chips">' +
     '<span class="seg mini partseg" role="group" aria-label="1部・2部">' + PARTS.map(([v, l]) => '<button type="button" class="segbtn ' + (PART === v ? 'on' : '') + '" data-act="part" data-v="' + v + '" title="' + l + 'のデータに切り替え">' + l + '</button>').join('') + '</span>' +
-    (meta.sample ? '<span class="chip warn">サンプル</span>' : '') +
-    (saveError ? '<button class="chip err" data-act="backup"><span class="dot"></span>保存エラー</button>' : '<span class="chip quiet" title="入力のたびにこのブラウザへ自動保存しています"><span class="dot"></span>保存済み</span>') +
-    '<button class="chip ' + (ne ? 'err' : nw ? 'warn' : 'ok') + '" data-act="go" data-v="check" title="入力チェックを開く">' + (ne ? 'エラー ' + ne : nw ? '' : '問題なし') + (nw ? (ne ? '・' : '') + '注意 ' + nw : '') + '</button>' +
     '<button class="chip toggle ' + (locked ? 'lock' : '') + '" data-act="lock" aria-pressed="' + locked + '" title="大会当日は設定・エントリーを誤って変えないようにロックできます。記録入力はできます">' + icon(locked ? 'lock' : 'unlock', 'ic sm') + (locked ? '当日モード中' : '当日モード') + '</button>' +
     '</div>' + (navPref.side === 'right' ? menuBtn : '') + '</div>' +
     '<div class="trow2"><div class="tools"><button class="iconbtn" data-act="undo" title="元に戻す (Ctrl+Z)" aria-label="元に戻す" ' + (undoStack.length ? '' : 'disabled') + '>' + icon('undo') + '</button>' +
     '<button class="iconbtn" data-act="redo" title="やり直し (Ctrl+Y)" aria-label="やり直し" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '</button>' +
     '<button class="btn sm tinted" data-act="backup">' + icon('save', 'ic sm') + '<span class="hide-sm">バックアップ</span></button></div>' +
-    '<div class="tnote" id="tnote" role="status" aria-live="polite"></div>' +
-    '<button type="button" class="iconbtn bell" id="bell" data-act="notes" title="通知の一覧" aria-label="通知の一覧">' + icon('bell') + '<i class="bdg"></i></button>' +
-    '<div class="notes card" id="notes" hidden></div></div>';
+    '<div class="tmon"><div class="tnote" id="tnote" role="status" aria-live="polite"></div>' +
+    '<button type="button" class="bellbtn" id="bell" data-act="notes" title="通知の一覧" aria-label="通知の一覧">' + icon('bell') + '<span class="bdg"></span></button>' +
+    '<div class="notes card" id="notes" hidden></div></div></div>';
 }
 // 簡易アクセス: アイコン＋短い名前のボタン（押すだけ。見て分かる・指で押しやすい大きさ）
 const QLABEL = { home: '本部', settings: '設定', entries: '個人', relays: 'リレー', schedule: '進行', program: '記録入力', flash: '速報', ranking: '順位', certs: '証書', prints: '印刷', awards: '表彰', check: 'チェック', data: 'データ' };
@@ -2673,18 +2718,18 @@ function readiness() {
 function hqBoard() {
   const P = meetProgress(), cur = P.cur, dl = delayText(cur, P.started);
   const rd = readiness(), bad = rd.filter(x => !x.ok && !x.soft).length;
-  const chip = x => '<button type="button" class="evchip ' + x.state + (cur && x === cur ? ' cur' : '') + '" data-act="openprog" data-p="' + esc(x.r.name) + '" title="' + esc(x.r.name + '　' + x.done + '/' + x.n) + '"><b>' + x.r.no + '</b><span>' + esc(x.r.name.replace(/^(男子|女子|混合)\s*/, m => m.trim().slice(0, 1) + ' ')) + '</span><i>' + (x.state === 'empty' ? '—' : x.done + '/' + x.n) + '</i></button>';
-  return '<div class="hq hq2">' +
-    '<div class="card hq-now">' + (P.finished ? '<span class="muted small">進行</span><div class="hq-title">全種目の記録入力が終わりました</div><div class="bar" style="margin-top:8px"><button class="btn primary" data-act="go" data-v="awards">表彰者を確認</button><button class="btn" data-act="go" data-v="certs">記録証・賞状を印刷</button></div>' :
-      cur ? '<span class="muted small">いまの種目</span><div class="hq-title">No.' + cur.r.no + '　' + esc(cur.r.name) + '</div>' +
-        '<div class="hq-meta"><span>開始予定 <b>' + C.fmtClock(cur.r.start) + '</b></span><span>入力 <b>' + cur.done + ' / ' + cur.n + '</b></span>' + (dl ? '<span class="pill ' + dl.cls + '">' + dl.t + '</span>' : '') + '</div>' +
-        '<div class="prog"><i style="width:' + (cur.n ? Math.round(cur.done / cur.n * 100) : 0) + '%"></i></div>' +
-        (() => { const ev = P.rows.filter(x => x.state !== 'empty'), fin = ev.filter(x => x.state === 'done').length; return '<div class="hq-all"><span>全体の進行</span><b>' + fin + ' / ' + ev.length + ' 種目</b><div class="prog"><i style="width:' + (ev.length ? Math.round(fin / ev.length * 100) : 0) + '%"></i></div></div>'; })() +
-        '<div class="bar" style="margin:10px 0 0"><button class="btn primary" data-act="openprog" data-p="' + esc(cur.r.name) + '">記録入力を開く</button><button class="btn" data-act="openflash" data-p="' + esc(cur.r.name) + '">速報を開く</button>' + (P.next ? '<span class="muted small">次: No.' + P.next.r.no + ' ' + esc(P.next.r.name) + '（' + C.fmtClock(P.next.r.start) + '）</span>' : '') + '</div>'
-      : '<span class="muted small">進行</span><div class="hq-title">スケジュールに種目がありません</div><button class="btn" data-act="go" data-v="schedule">進行スケジュールへ</button>') +
-    '</div>' +
+  const chip = x => '<button type="button" class="evchip ' + x.state + (cur && x === cur ? ' cur' : '') + '" data-act="openprog" data-p="' + esc(x.r.name) + '" title="' + esc(x.r.name + '　' + x.done + '/' + x.n) + '"><b>' + x.r.no + '<small>' + (x.r.start !== null && x.r.start !== undefined ? C.fmtClock(x.r.start) : '') + '</small></b><span>' + esc(x.r.name.replace(/^(男子|女子|混合)\s*/, m => m.trim().slice(0, 1) + ' ')) + '</span><i>' + (x.state === 'empty' ? '—' : x.done + '/' + x.n) + '</i></button>';
+  const ev = P.rows.filter(x => x.state !== 'empty'), fin = ev.filter(x => x.state === 'done').length;
+  const head = '<div class="hq-head">' +
+    '<div class="hq-kpi"><span>進行</span><b>' + fin + ' / ' + ev.length + '<small> 種目終了</small></b><div class="prog"><i style="width:' + (ev.length ? Math.round(fin / ev.length * 100) : 0) + '%"></i></div></div>' +
+    (P.finished ? '<div class="hq-kpi"><span>状況</span><b>全種目終了</b></div><button class="btn primary" data-act="go" data-v="awards">表彰者を確認</button>' :
+      cur ? '<div class="hq-kpi"><span>予定との差</span><b>' + (dl ? '<span class="pill ' + dl.cls + '">' + dl.t + '</span>' : '<span class="pill ok">予定どおり</span>') + '</b></div>' +
+        (P.next ? '<div class="hq-kpi"><span>次</span><b>No.' + P.next.r.no + '<small> ' + esc(P.next.r.name) + '・' + C.fmtClock(P.next.r.start) + '</small></b></div>' : '') +
+        '<button class="btn primary" data-act="openprog" data-p="' + esc(cur.r.name) + '">記録入力（No.' + cur.r.no + '）</button>' : '') + '</div>';
+  return '<div class="hq hq3">' +
+    '<div class="card hq-list"><h2>進行・入力状況 <span class="muted small">（種目を押すと記録入力へ。青い枠がいまの種目）</span></h2>' + head + '<div class="evgrid">' + P.rows.map(chip).join('') + '</div></div>' +
     pointsCard() +
-    '<div class="card hq-list"><h2>全種目の入力状況 <span class="muted small">（押すと記録入力へ）</span></h2><div class="evgrid">' + P.rows.map(chip).join('') + '</div></div>' +
+    '</div>' +
     '<details class="card hq-ready" ' + (bad ? 'open' : '') + '><summary>開催前の確認 ' + (bad ? '<span class="pill warn">要確認 ' + bad + '</span>' : '<span class="pill ok">準備OK</span>') + '</summary><div class="ready">' +
     rd.map(x => '<button class="ritem ' + (x.ok ? 'ok' : x.soft ? 'soft' : 'ng') + '" ' + (x.go ? 'data-act="go" data-v="' + x.go + '"' : 'data-act="' + x.act + '"') + '><span>' + (x.ok ? '✓' : '!') + '</span>' + esc(x.t) + '</button>').join('') + '</div></details>' +
     '</div>';
