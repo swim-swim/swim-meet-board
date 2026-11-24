@@ -1046,6 +1046,9 @@ table.pt tbody tr td, table.pt tbody tr.emp td { height: 54px; padding-top: 4px 
 .sq-list p { margin: 8px; color: var(--muted); font-size: 13px; }
 .arh-h .hlock { min-height: 32px !important; padding: 0 12px !important; font-size: 12px !important; }
 table.pt tbody tr td, table.pt tbody tr.emp td { height: 60px; }
+
+/* 簡易ボタン: 指でなぞってもブラウザに横スクロールを取られない（横に並びきる画面） */
+@media (min-width: 601px) { .qnav, .qnav .segbtn.qn { touch-action: none !important; } }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2641,6 +2644,13 @@ function endLensDrag(e, cancel) {
 document.addEventListener('pointerup', e => endLensDrag(e, false));
 document.addEventListener('dragstart', e => { if (e.target.closest && e.target.closest('.seg')) e.preventDefault(); });
 document.addEventListener('pointercancel', e => endLensDrag(e, true));
+// ガラスが指・カーソルから離れなくなるのを防ぐ: 離したのにアプリへ届かなかった場合も必ず終わらせる
+function endAllLens(cancel) { for (const id in LENS) { const st = LENS[id]; if (st.drag) endLensDrag({ pointerId: st.drag.id }, cancel); } }
+document.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && e.buttons === 0) for (const id in LENS) { const st = LENS[id]; if (st.drag && st.drag.id === e.pointerId) endLensDrag(e, false); } }, true);   // ウィンドウの外で離した
+document.addEventListener('lostpointercapture', e => setTimeout(() => { for (const id in LENS) { const st = LENS[id]; if (st.drag && st.drag.id === e.pointerId) endLensDrag(e, true); } }, 0), true);   // 途中で画面が描き直された
+window.addEventListener('blur', () => endAllLens(true));
+document.addEventListener('visibilitychange', () => { if (document.hidden) endAllLens(true); });
+document.addEventListener('mouseleave', e => { if (!e.buttons) endAllLens(false); });
 // レンズの縁で背景が曲がって見える屈折（虹色のにじみ付き）。Chrome / Edge のみ。ほかのブラウザは透明ガラスだけで表示
 (function setupRefraction() {
   const ua = navigator.userAgent;
