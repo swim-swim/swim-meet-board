@@ -913,6 +913,58 @@ table.pts td, table.pts th { padding: 5px 8px; }
 .evchip b { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
 .evchip b small { font-size: 10px; font-weight: 500; color: var(--muted); }
 .evchip.cur { box-shadow: inset 0 0 0 3px var(--accent); }
+
+/* ---------- 本部ボード（1画面に収める・パネルの高さをそろえる） ---------- */
+.kstrip { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; padding: 10px 12px; margin-bottom: 8px; }
+.kpi { flex: 1 1 140px; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 6px 12px; border-radius: 14px; background: var(--track); }
+.kpi > span { font-size: 11.5px; color: var(--muted); }
+.kpi > b { font-size: 20px; line-height: 1.2; white-space: nowrap; }
+.kpi > b em { font-size: 12px; font-style: normal; font-weight: 500; color: var(--muted); }
+.kpi > small { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kpi .prog { display: block; height: 6px; margin-top: 3px; }
+.kbtn { flex: 0 0 auto; align-self: center; min-height: 48px !important; font-size: 15px !important; padding: 0 22px !important; }
+.rstrip { display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin-bottom: 8px; min-width: 0; }
+.rstrip > b { white-space: nowrap; font-size: 13.5px; }
+.rchips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-width: 0; flex: 1 1 auto; }
+.rchips::-webkit-scrollbar { display: none; }
+.rchip { flex: 0 0 auto; border-radius: 999px; border: 1px solid var(--hairline); padding: 4px 12px; font-size: 12.5px; background: var(--btn-bg); cursor: pointer; white-space: nowrap; max-width: 320px; overflow: hidden; text-overflow: ellipsis; }
+.rchip.ng { background: var(--warn-soft); color: var(--warn); border-color: transparent; font-weight: 600; }
+.rchip.ok { color: var(--ok); }
+.hrow { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); gap: 8px; min-height: 280px; margin-bottom: 8px; overflow: hidden; }
+.hrow.fill { height: var(--fillh, auto); }
+.hpanel { display: flex; flex-direction: column; min-height: 0; overflow: hidden; padding: 10px 12px; }
+.hp-h { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex: 0 0 auto; }
+.hp-h h2 { margin: 0; font-size: 16px; }
+.hp-b { flex: 1 1 auto; min-height: 0; overflow: auto; }
+.hpanel .evgrid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.hextra summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.hx { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 10px; }
+.hx h3 { margin: 0 0 6px; font-size: 14px; }
+.medals { display: flex; gap: 14px; font-size: 14px; } .medals b { font-size: 20px; }
+.ctargets { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.ctargets label { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 13px; }
+@media (max-width: 900px) { .hrow { grid-template-columns: minmax(0, 1fr); } .hrow.fill { height: auto; } .hpanel { max-height: none; } }
+
+/* ---------- 通知モニター（流れる・光る） ---------- */
+.tnote { position: relative; overflow: hidden; }
+.tnote .tn-dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.tnote.k-err { background: var(--err) !important; color: #fff !important; } .tnote.k-err .tn-dot { background: #fff; }
+.tnote.k-warn { background: var(--warn-soft) !important; color: var(--warn) !important; } .tnote.k-warn .tn-dot { background: var(--warn); }
+.tnote.k-new, .tnote.k-note { background: color-mix(in srgb, var(--accent) 14%, var(--btn-bg)) !important; color: var(--ink) !important; } .tnote.k-new .tn-dot, .tnote.k-note .tn-dot { background: var(--accent); }
+.tnote.k-info { background: var(--track) !important; color: var(--ink) !important; } .tnote.k-info .tn-dot { background: var(--accent); }
+.tnote.k-ok { background: var(--track) !important; color: var(--muted) !important; } .tnote.k-ok .tn-dot { background: var(--ok); }
+.tnote.slide .tn-msg { animation: tnIn .45s cubic-bezier(.2, .8, .3, 1); }
+@keyframes tnIn { from { transform: translateY(70%); opacity: 0; } to { transform: none; opacity: 1; } }
+.tnote.flash { animation: tnGlow 1.1s ease-out 2; }
+@keyframes tnGlow { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent); } 100% { box-shadow: 0 0 0 10px transparent; } }
+.tnote.k-err.flash { animation-name: tnGlowR; } @keyframes tnGlowR { 0% { box-shadow: 0 0 0 0 rgba(220, 40, 40, .55); } 100% { box-shadow: 0 0 0 10px transparent; } }
+.tnote .tn-dot { animation: tnPulse 1.6s ease-in-out infinite; }
+@keyframes tnPulse { 50% { opacity: .35; } }
+.tn-cnt { flex: 0 0 auto; font-size: 11px; color: inherit; opacity: .6; font-variant-numeric: tabular-nums; padding-right: 8px; }
+@media (prefers-reduced-motion: reduce) { .tnote.slide .tn-msg, .tnote.flash, .tnote .tn-dot { animation: none; } }
+/* パネルの高さをそろえる（同じ段のカードは同じ高さ） */
+.grid.g2:not([style*="align-items"]), .grid.g3 { align-items: stretch; }
+.card + .card { margin-top: 0; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2126,13 +2178,30 @@ function alertsNow() {      // 消えない「要対応」の通知
   }
   return a;
 }
-function paintNote() {
+// 通知モニター: 警告・最近の通知・進行状況・保存状態を順に流して表示（新しい通知は光る）
+let tickIdx = 0, lastFlash = 0;
+function tickerItems() {
+  const items = alertsNow().map(x => ({ kind: x.kind === 'err' ? 'err' : 'warn', msg: x.msg, act: x.act, v: x.v, label: x.label }));
+  NOTES.slice(0, 4).filter(n => Date.now() - n.t < 30 * 60 * 1000).forEach(n => items.push({ kind: n.kind === 'err' ? 'err' : 'note', msg: n.msg, t: n.t, note: n.action ? n.id : null, label: n.action ? n.action.label : '' }));
+  try { const P = meetProgress(), ev = P.rows.filter(x => x.state !== 'empty'), fin = ev.filter(x => x.state === 'done').length;
+    if (ev.length) items.push({ kind: 'info', msg: '進行 ' + fin + '/' + ev.length + ' 種目' + (P.cur ? '・いま No.' + P.cur.r.no + ' ' + P.cur.r.name + '（' + P.cur.done + '/' + P.cur.n + '）' : '') });
+    if (P.next) items.push({ kind: 'info', msg: '次: No.' + P.next.r.no + ' ' + P.next.r.name + '（' + C.fmtClock(P.next.r.start) + '）' }); } catch (e) { /* 表示だけ */ }
+  if (!saveError) items.push({ kind: 'ok', msg: '✓ 自動保存済み' + (meta.lastBackup ? '・バックアップ ' + ago(meta.lastBackup) : '') });
+  return items;
+}
+function paintNote(rotated) {
   const slot = $('#tnote'); if (!slot) return;
   const al = alertsNow();
-  const n = noteCur;
-  slot.className = 'tnote' + (n ? (n.kind === 'err' ? ' err' : ' on') : al.length ? (al[0].kind === 'err' ? ' err' : ' warn') : '');
-  slot.innerHTML = n ? '<span class="tn-msg">' + esc(n.msg) + '</span>' + (n.action ? '<button type="button" class="tn-btn" data-note="' + n.id + '">' + esc(n.action.label) + '</button>' : '')
-    : al.length ? '<span class="tn-msg">' + esc(al[0].msg) + '</span><button type="button" class="tn-btn" data-act="' + al[0].act + '"' + (al[0].v ? ' data-v="' + al[0].v + '"' : '') + '>' + esc(al[0].label) + '</button>' : '<span class="tn-msg tn-idle">' + (saveError ? '' : '✓ 保存済み・') + '通知はありません</span>';
+  const n = noteCur, items = tickerItems();
+  const it = n ? { kind: n.kind === 'err' ? 'err' : 'new', msg: n.msg, note: n.action ? n.id : null, label: n.action ? n.action.label : '' } : items[tickIdx % Math.max(1, items.length)];
+  const cls = it ? it.kind : 'ok';
+  const fresh = n && n.t > lastFlash;
+  if (fresh) lastFlash = n.t;
+  slot.className = 'tnote k-' + cls + (rotated || fresh ? ' slide' : '') + (fresh ? ' flash' : '');
+  slot.innerHTML = it ? '<span class="tn-dot"></span><span class="tn-msg">' + esc(it.msg) + '</span>' +
+      (it.note ? '<button type="button" class="tn-btn" data-note="' + it.note + '">' + esc(it.label) + '</button>' : it.act ? '<button type="button" class="tn-btn" data-act="' + it.act + '"' + (it.v ? ' data-v="' + it.v + '"' : '') + '>' + esc(it.label) + '</button>' : '') +
+      (!n && items.length > 1 ? '<span class="tn-cnt">' + ((tickIdx % items.length) + 1) + '/' + items.length + '</span>' : '')
+    : '<span class="tn-msg tn-idle">通知はありません</span>';
   const bell = $('#bell'); if (bell) { const unread = NOTES.filter(x => x.t > notesSeen).length + al.length; bell.querySelector('.bdg').textContent = unread ? String(unread > 99 ? '99+' : unread) : ''; bell.classList.toggle('has', !!unread); }
   const panel = $('#notes'); if (panel) {
     panel.hidden = !notesOpen;
@@ -2141,6 +2210,7 @@ function paintNote() {
       (NOTES.length ? NOTES.map(x => '<div class="nt-i ' + (x.kind === 'err' ? 'err' : '') + '"><span class="nt-t">' + new Date(x.t).toTimeString().slice(0, 5) + '</span><span class="grow">' + esc(x.msg) + '</span>' + (x.action ? '<button type="button" class="btn sm" data-note="' + x.id + '">' + esc(x.action.label) + '</button>' : '') + '</div>').join('') : '<p class="small muted" style="margin:6px 4px">まだ通知はありません。</p>');
   }
 }
+setInterval(() => { if (!noteCur && !notesOpen && !document.hidden) { tickIdx++; paintNote(true); } }, 4500);
 document.addEventListener('click', e => {
   const b = e.target.closest && e.target.closest('[data-note]'); if (b) { e.preventDefault(); noteAct(b.dataset.note); return; }
   if (notesOpen && !(e.target.closest && e.target.closest('#notes, #bell'))) { notesOpen = false; paintNote(); }
@@ -2328,6 +2398,7 @@ function sizeFills() {
     if (!big) { el.style.maxHeight = ''; return; }
     const top = el.getBoundingClientRect().top + window.scrollY;
     el.style.maxHeight = Math.max(260, window.innerHeight - top - 16) + 'px';
+    if (el.classList.contains('hrow')) el.style.height = el.style.maxHeight;   // 本部ボード: 左右のパネルを同じ高さで画面の下まで
   });
 }
 
@@ -2715,6 +2786,38 @@ function readiness() {
     { ok: isLocked(), t: isLocked() ? '当日モード（設定ロック）中です' : '当日は「当日モード」にすると設定の誤変更を防げます', act: 'lock', soft: true }
   ];
 }
+// 本部ボード（重複をまとめ、1画面に収める）: 数字の帯 → 開催前の確認（1行）→ 進行・入力状況 ｜ クラブ（得点・申込）→ 集客・売上・メダル（閉じた欄）
+function homeBoard() {
+  const d = D.dash, S = state.settings, P = meetProgress(), cur = P.cur, dl = delayText(cur, P.started);
+  const ev = P.rows.filter(x => x.state !== 'empty'), fin = ev.filter(x => x.state === 'done').length;
+  const rd = readiness(), bad = rd.filter(x => !x.ok && !x.soft);
+  const kpi = (label, val, sub, cls) => '<div class="kpi ' + (cls || '') + '"><span>' + label + '</span><b>' + val + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</div>';
+  const strip = '<div class="card kstrip">' +
+    kpi('進行', fin + ' / ' + ev.length + '<em> 種目</em>', '<i class="prog"><i style="width:' + (ev.length ? Math.round(fin / ev.length * 100) : 0) + '%"></i></i>') +
+    kpi('予定との差', P.finished ? '終了' : dl ? '<span class="pill ' + dl.cls + '">' + dl.t + '</span>' : '<span class="pill ok">予定どおり</span>', cur ? 'いま No.' + cur.r.no : '') +
+    kpi('次の種目', P.next ? 'No.' + P.next.r.no : '—', P.next ? esc(P.next.r.name) + '・' + C.fmtClock(P.next.r.start) : '') +
+    kpi('申込者', d.applicants + '<em> 名</em>', '定員 ' + d.capacity + '・目標 ' + d.target + '（' + (d.diffTarget > 0 ? '+' : '') + d.diffTarget + '）') +
+    kpi('競技終了予定', D.sched.end !== null ? C.fmtClock(D.sched.end) : '—', '開始 ' + esc(S.schedule.start)) +
+    (P.finished ? '<button class="btn primary kbtn" data-act="go" data-v="awards">表彰者を確認</button>' : cur ? '<button class="btn primary kbtn" data-act="openprog" data-p="' + esc(cur.r.name) + '">記録入力 No.' + cur.r.no + '</button>' : '') + '</div>';
+  const ready = '<div class="card rstrip"><b>開催前の確認</b>' + (bad.length ? '<span class="pill warn">要確認 ' + bad.length + '</span>' : '<span class="pill ok">準備OK</span>') +
+    '<div class="rchips">' + rd.map(x => '<button class="rchip ' + (x.ok ? 'ok' : x.soft ? 'soft' : 'ng') + '" ' + (x.go ? 'data-act="go" data-v="' + x.go + '"' : 'data-act="' + x.act + '"') + ' title="' + esc(x.t) + '">' + (x.ok ? '✓ ' : '! ') + esc(x.t) + '</button>').join('') + '</div></div>';
+  const chip = x => '<button type="button" class="evchip ' + x.state + (cur && x === cur ? ' cur' : '') + '" data-act="openprog" data-p="' + esc(x.r.name) + '" title="' + esc(x.r.name + '　' + x.done + '/' + x.n) + '"><b>' + x.r.no + '<small>' + (x.r.start !== null && x.r.start !== undefined ? C.fmtClock(x.r.start) : '') + '</small></b><span>' + esc(x.r.name.replace(/^(男子|女子|混合)\s*/, m => m.trim().slice(0, 1) + ' ')) + '</span><i>' + (x.state === 'empty' ? '—' : x.done + '/' + x.n) + '</i></button>';
+  const cs = clubSums(), part = PART ? '2部' : '1部';
+  const clubRows = cs.rows.map(r => { const c = d.clubs.find(x => x.name === r.name) || {}; return '<tr><td class="num"><span class="rkn r' + Math.min(r.rank, 4) + '">' + r.rank + '</span></td><td>' + esc(r.name) + '</td><td class="num">' + (c.actual === undefined ? '' : c.actual + (c.target ? '<small class="muted">/' + c.target + '</small>' : '')) + '</td>' + (cs.hasOther ? '<td class="num">' + r.a + '</td><td class="num">' + r.b + '</td>' : '') + '<td class="num"><b>' + r.sum + '</b></td></tr>'; }).join('');
+  const lower = '<div class="hrow fill" data-fill-id="home">' +
+    '<div class="card hpanel"><div class="hp-h"><h2>進行・入力状況</h2><span class="muted small">押すと記録入力へ・青枠がいまの種目</span></div><div class="hp-b"><div class="evgrid">' + P.rows.map(chip).join('') + '</div></div></div>' +
+    '<div class="card hpanel"><div class="hp-h"><h2>クラブ</h2><span class="muted small">' + (cs.hasOther ? '得点は1部・2部合算' : '得点は' + part + 'のみ') + '</span><span class="grow"></span><button class="btn sm" data-act="printClubSum">' + icon('print', 'ic sm') + '印刷</button></div>' +
+      (d.otherClubs.length ? '<div class="notice warn small"><span class="grow">リストにないチーム: ' + esc(d.otherClubs.join('、')) + '</span><button class="btn sm" data-act="fix" data-f="clubs">追加</button></div>' : '') +
+      '<div class="hp-b">' + (cs.rows.length ? '<table class="t pts"><thead><tr><th class="num">順位</th><th>クラブ</th><th class="num">申込</th>' + (cs.hasOther ? '<th class="num">1部</th><th class="num">2部</th>' : '') + '<th class="num">得点</th></tr></thead><tbody>' + clubRows + '</tbody></table>' : '<p class="small muted">大会設定でクラブを登録すると、申込と得点が出ます。</p>') + '</div></div>' +
+    '</div>';
+  const extra = '<details class="card hextra"' + (ui.homeExtra ? ' open' : '') + ' data-det="homeExtra"><summary>集客・売上・メダル・クラブの目標（設定）</summary><div class="hx">' +
+    '<div><h3>売上・集客</h3><div class="fields">' + field('定員（名）', inp('set:dashboard.capacity', S.dashboard.capacity, 'inputmode="numeric"')) + field('申込目標（名）', inp('set:dashboard.target', S.dashboard.target, 'inputmode="numeric"')) + field('参加単価（税抜・円）', inp('set:dashboard.price', S.dashboard.price, 'inputmode="numeric"')) + field('消費税率（%）', inp('set:dashboard.tax', S.dashboard.tax, 'inputmode="decimal"')) + '</div>' +
+    '<p class="small">税込単価 <b>' + yen(d.priceIn) + '</b>・現在の売上 <b>' + yen(d.sales) + '</b>・目標 ' + yen(d.targetSales) + '（差 ' + yen(d.salesDiff) + '）</p></div>' +
+    '<div><h3>メダル発注</h3><p class="small muted">区分×種目ごとに申込1名以上で金、2名以上で銀、3名以上で銅。</p><p class="medals"><span>金 <b>' + d.medals.gold + '</b></span><span>銀 <b>' + d.medals.silver + '</b></span><span>銅 <b>' + d.medals.bronze + '</b></span></p></div>' +
+    '<div><h3>クラブの申込目標</h3><div class="ctargets">' + d.clubs.map(c => '<label>' + esc(c.name) + inp('clubt:' + c.name, (S.clubs.find(x => x.name === c.name) || {}).target, 'inputmode="numeric" style="width:64px;text-align:right"') + '</label>').join('') + '</div></div>' +
+    '</div></details>';
+  return strip + ready + lower + extra;
+}
 function hqBoard() {
   const P = meetProgress(), cur = P.cur, dl = delayText(cur, P.started);
   const rd = readiness(), bad = rd.filter(x => !x.ok && !x.soft).length;
@@ -2745,32 +2848,7 @@ VIEWS.home = () => {
       '</div>';
   }
   const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
-  return '<h1 class="view">本部ボード</h1><p class="lead">いま進めている種目、予定との遅れ、全種目の入力状況、開催前の確認、申込・売上・メダル・クラブ得点をまとめて表示します。</p>' +
-    hqBoard() +
-    '<div class="stats">' +
-    '<div class="stat hl"><span>現在の申込者数</span><b>' + d.applicants + ' 名</b><span>定員 ' + d.capacity + ' 名・空き ' + d.vacancy + ' 名</span></div>' +
-    '<div class="stat"><span>申込目標との差</span><b>' + (d.diffTarget > 0 ? '+' : '') + d.diffTarget + ' 名</b><span>目標 ' + d.target + ' 名（' + pct(d.applicants, d.target) + '）</span></div>' +
-    '<div class="stat"><span>個人エントリー／リレー</span><b>' + d.entries + '／' + d.relays + '</b><span>記録入力済み ' + d.done + ' 件</span></div>' +
-    '<div class="stat"><span>競技終了予定</span><b>' + (D.sched.end !== null ? C.fmtClock(D.sched.end) : '—') + '</b><span>競技開始 ' + esc(S.schedule.start) + '・閉会式 ' + esc(S.schedule.closing) + '</span></div>' +
-    '</div>' +
-    '<div class="dash">' +
-    '<div class="card"><h2>売上・集客管理</h2><div class="fields">' +
-    field('定員（名）', inp('set:dashboard.capacity', S.dashboard.capacity, 'inputmode="numeric"')) +
-    field('申込目標（名）', inp('set:dashboard.target', S.dashboard.target, 'inputmode="numeric"')) +
-    field('参加単価（税抜・円）', inp('set:dashboard.price', S.dashboard.price, 'inputmode="numeric"')) +
-    field('消費税率（%）', inp('set:dashboard.tax', S.dashboard.tax, 'inputmode="decimal"')) +
-    '</div><table class="t" style="margin-top:10px"><tbody>' +
-    '<tr><td>参加単価（税込）</td><td class="num">' + yen(d.priceIn) + '</td></tr>' +
-    '<tr><td>目標売上（税込）</td><td class="num">' + yen(d.targetSales) + '</td></tr>' +
-    '<tr><td>現在の売上（税込）</td><td class="num"><b>' + yen(d.sales) + '</b></td></tr>' +
-    '<tr><td>目標との売上差</td><td class="num">' + yen(d.salesDiff) + '</td></tr></tbody></table></div>' +
-    '<div class="card"><h2>メダル発注シミュレーター</h2><p class="small muted">区分×種目ごとに、申込が1名以上なら金、2名以上なら銀、3名以上なら銅を1つ。リレーは泳者の人数分を数えます。</p>' +
-    '<div class="stats"><div class="stat"><span>金メダル</span><b>' + d.medals.gold + '</b></div><div class="stat"><span>銀メダル</span><b>' + d.medals.silver + '</b></div><div class="stat"><span>銅メダル</span><b>' + d.medals.bronze + '</b></div></div></div>' +
-    '<div class="card clubs"><h2>クラブ別 申込状況・総合得点</h2>' +
-    (d.otherClubs.length ? '<div class="notice warn"><span class="grow">クラブリストにないチーム名があります: ' + esc(d.otherClubs.join('、')) + '（集計されません）</span><button class="btn sm" data-act="fix" data-f="clubs">クラブリストに追加</button></div>' : '') +
-    '<div class="tablewrap fill" data-fill-id="club"><table class="t"><thead><tr><th>クラブ名</th><th class="num">目標</th><th class="num">実績</th><th class="num">差</th><th class="num">割合</th><th class="num">総合得点</th><th class="num">チーム順位</th></tr></thead><tbody>' +
-    d.clubs.map((c, i) => '<tr><td>' + esc(c.name) + '</td><td class="num">' + inp('clubt:' + c.name, (S.clubs.find(x => x.name === c.name) || {}).target,'style="width:70px;text-align:right" inputmode="numeric"') + '</td><td class="num">' + c.actual + '</td><td class="num">' + (c.diff === null ? '' : (c.diff > 0 ? '+' : '') + c.diff) + '</td><td class="num">' + (c.share === null ? '' : (c.share * 100).toFixed(1) + '%') + '</td><td class="num"><b>' + c.score + '</b></td><td class="num">' + c.rank + '</td></tr>').join('') +
-    '</tbody></table></div></div></div>';
+  return '<h1 class="view">本部ボード</h1><p class="lead">進行・入力状況・クラブ得点・申込をひと目で。</p>' + homeBoard();
 };
 // 本部ボード: クラブ得点（この部の順位と、もう一方の部があれば合算）をすぐ見られるように
 function pointsCard() {
