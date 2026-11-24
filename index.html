@@ -1063,6 +1063,24 @@ td.stcell input.st { width: 72px; text-align: center; font-weight: 700; }
 td.stcell.fixed input.st { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
 td.stcell.over input.st { border-color: #d97706; background: rgba(217, 119, 6, .12); color: #b45309; }
 td.stcell .x { margin-left: 4px; vertical-align: middle; }
+
+/* スマホ幅の記録入力: 空きレーンも選手の行も同じ高さ（2段のカード） */
+@container (max-width: 700px) {
+  table.pt tbody tr td, table.pt tbody tr.emp td { height: auto !important; }
+  table.pt tbody tr, table.pt tbody tr.emp { height: 118px; min-height: 118px; box-sizing: border-box; align-content: center; }
+}
+
+/* 本部の数字の帯は広い画面では1行（折り返して本部ボードが画面からはみ出さない） */
+@media (min-width: 700px) {
+  .kstrip { flex-wrap: nowrap; }
+  .kstrip .kpi { flex: 1 1 0; }
+  .kstrip .kbtn { flex: 0 0 auto; }
+  .kpi > b { overflow: hidden; text-overflow: ellipsis; }
+}
+/* 記録入力の行: Safari でも 60px に収まるよう上下の余白を少し詰める */
+table.pt tbody tr:not(.emp) td { padding-top: 2px !important; padding-bottom: 2px !important; }
+/* 本部ボード: 低い画面ではパネルを縮めて中でスクロール（画面全体は動かさない） */
+@media (min-width: 901px) { .hrow { min-height: 180px; } }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2501,9 +2519,13 @@ function sizeFills() {
   document.querySelectorAll('.fill').forEach(el => {
     if (!big) { el.style.maxHeight = ''; return; }
     const top = el.getBoundingClientRect().top + window.scrollY;
-    el.style.maxHeight = Math.max(260, window.innerHeight - top - 16) + 'px';
+    let below = 0;                 // 本部ボード: 下に続く欄（設定の折りたたみ）の分もあけて、1画面に収める
+    if (el.classList.contains('hrow')) for (let s = el.nextElementSibling; s; s = s.nextElementSibling) { const cs = getComputedStyle(s); if (cs.display !== 'none') below += s.offsetHeight + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0) + 8; }
+    el.style.maxHeight = Math.max(el.classList.contains('hrow') ? 180 : 260, window.innerHeight - top - 16 - below) + 'px';
     if (el.classList.contains('hrow')) el.style.height = el.style.maxHeight;   // 本部ボード: 左右のパネルを同じ高さで画面の下まで
   });
+  const hr = big && document.querySelector('.hrow.fill');   // まだ数px はみ出すなら、その分だけ縮めて画面の中に収める
+  if (hr) { const over = document.documentElement.scrollHeight - window.innerHeight; if (over > 0) { const h = Math.max(180, parseFloat(hr.style.height) - over) + 'px'; hr.style.height = h; hr.style.maxHeight = h; } }
 }
 
 // ---------------------------------------------------------------- 液体ガラスのレンズ（参考動画の iOS セグメントと同じ動き）
