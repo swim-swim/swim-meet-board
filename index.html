@@ -1208,6 +1208,33 @@ html.phone .arrbar { display: flex; flex-wrap: wrap; gap: 8px; }
 html.phone .arrbar > * { flex: 1 1 100%; min-width: 0; max-width: 100%; white-space: normal; }
 html.phone .rchip { min-height: 38px; padding-top: 0; padding-bottom: 0; }
 html.phone .jb, html.phone .jbtns button { min-height: 40px; min-width: 52px; padding: 0 12px; font-size: 13.5px; }
+
+/* リレーの組替え: 泳者の追加・交代ボタンと不足表示 */
+.arr.rel .slot { grid-template-columns: 28px minmax(0, 1fr) 34px 34px !important; }
+.lockb.memb { color: var(--accent); }
+.lockb.memb.short { background: #e0a800; border-color: #e0a800; color: #fff; }
+.pcard .et.short { color: #b45309; font-weight: 700; background: rgba(224, 168, 0, .18); border-radius: 999px; padding: 1px 8px; }
+.rm-modal { width: min(560px, calc(100vw - 24px)); }
+.rm .rm-team { margin-top: -6px; }
+.rm-rows { display: grid; gap: 6px; margin: 10px 0 8px; }
+.rm-row { display: flex; align-items: center; gap: 6px; }
+.rm-pick { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 4px 14px; border-radius: 16px; border: 1px solid var(--hairline); background: var(--btn-bg); color: var(--ink); text-align: left; font: inherit; cursor: pointer; }
+.rm-row.none .rm-pick { border-style: dashed; color: var(--muted); }
+.rm-row.tgt .rm-pick { border: 2px solid #e0a800; background: color-mix(in srgb, #ffd54a 22%, transparent); color: var(--ink); }
+.rm-no { flex: 0 0 auto; font-size: 12px; color: var(--muted); font-weight: 600; }
+.rm-nm { font-size: 16px; font-weight: 700; min-width: 0; }
+.rm-hint { margin: 4px 0 6px; }
+.rm-q { width: 100%; min-height: 46px; border: 2px solid #e0a800; font-size: 16px; }
+.rm-list { display: grid; gap: 6px; margin-top: 8px; max-height: min(40vh, 340px); overflow-y: auto; padding: 2px; }
+.rm-cand { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 48px; padding: 6px 14px; border-radius: 16px; border: 1px solid var(--hairline); background: var(--btn-bg); color: var(--ink); text-align: left; font: inherit; cursor: pointer; }
+.rm-cand:hover:not([disabled]) { background: var(--accent-soft); }
+.rm-cand[disabled] { opacity: .45; cursor: not-allowed; }
+.rm-cand .rm-nm { font-size: 15px; }
+.rm-sub { font-size: 12px; color: var(--muted); }
+.rm-sub em { font-style: normal; color: #b45309; }
+.rm-new { border-style: dashed; }
+html.phone .rm-modal { width: 100% !important; max-width: none !important; margin: 0 !important; max-height: 88vh; overflow-y: auto; box-sizing: border-box; }
+html.phone .modal-bg:has(.rm-modal) { padding: 8px !important; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -3483,8 +3510,9 @@ function arrHeats(p, prog, lanes) {
   const card = it => {
     const who = p.relay ? it.teamDisp : it.np.kanji;
     const entry = it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '';
+    const nMem = p.relay ? it.members.filter(Boolean).length : 4;
     return '<button type="button" class="pcard' + (ui.arrSel === it.id ? ' sel' : '') + (it.seatFixed ? ' locked' : '') + '" data-act="seatPick" data-id="' + esc(it.id) + '" data-prog="' + esc(prog) + '" aria-label="' + esc(who) + '（第' + it.heat + '組 ' + it.lane + 'レーン）">' +
-      '<span class="fit nm"><b>' + (p.relay ? esc(who) : rubyName(it.np)) + '</b></span><span class="fit sub">' + (p.relay ? rubyMembers(it) : esc(it.club)) + '・' + esc(it.cat) + '</span><span class="et">' + esc(entry) + '</span></button>';
+      '<span class="fit nm"><b>' + (p.relay ? esc(who) : rubyName(it.np)) + '</b></span><span class="fit sub">' + (p.relay ? rubyMembers(it) : esc(it.club)) + '・' + esc(it.cat) + '</span>' + (p.relay && nMem < 4 ? '<span class="et short" title="泳者が足りません">' + nMem + '/4人</span>' : '<span class="et">' + esc(entry) + '</span>') + '</button>';
   };
   const tgt = (h, l) => ui.arrTarget && ui.arrTarget.prog === prog && ui.arrTarget.h === h && ui.arrTarget.l === l;
   const emptySlot = (h, l) => {
@@ -3499,9 +3527,9 @@ function arrHeats(p, prog, lanes) {
     const allLocked = its.length && its.every(it => it.seatFixed);
     return '<div class="arh card' + (isNew ? ' newh' : '') + (allLocked ? ' hlocked' : '') + '"><div class="arh-h"><b>' + (isNew ? '新しい組（第' + h + '組）' : '第' + h + '組') + '</b>' +
       (!isNew ? '<button type="button" class="btn sm hlock' + (allLocked ? ' on' : '') + '" data-act="heatLock" data-h="' + h + '" data-prog="' + esc(prog) + '" ' + (its.length ? '' : 'disabled') + '>' + icon(allLocked ? 'lock' : 'unlock', 'ic sm') + (allLocked ? 'ロック中' : '組ロック') + '</button>' : '') + '</div>' +
-      lanes.map(l => { const it = its.find(x => x.lane === l); return '<div class="slot" data-h="' + h + '" data-l="' + l + '" data-prog="' + esc(prog) + '"><span class="lane">' + l + '</span>' + (it ? card(it) + '<button type="button" class="lockb' + (it.seatFixed ? ' on' : '') + '" data-act="seatLock" data-id="' + esc(it.id) + '" aria-label="ロック">' + icon(it.seatFixed ? 'lock' : 'unlock', 'ic sm') + '</button>' : emptySlot(h, l)) + '</div>'; }).join('') + '</div>';
+      lanes.map(l => { const it = its.find(x => x.lane === l); return '<div class="slot" data-h="' + h + '" data-l="' + l + '" data-prog="' + esc(prog) + '"><span class="lane">' + l + '</span>' + (it ? card(it) + (p.relay ? '<button type="button" class="lockb memb' + (it.members.filter(Boolean).length < 4 ? ' short' : '') + '" data-act="relMem" data-id="' + esc(it.id) + '" aria-label="泳者を検索して追加・交代" title="泳者を検索して追加・交代">' + icon('entries', 'ic sm') + '</button>' : '') + '<button type="button" class="lockb' + (it.seatFixed ? ' on' : '') + '" data-act="seatLock" data-id="' + esc(it.id) + '" aria-label="ロック">' + icon(it.seatFixed ? 'lock' : 'unlock', 'ic sm') + '</button>' : emptySlot(h, l)) + '</div>'; }).join('') + '</div>';
   };
-  return '<div class="arr">' + Array.from({ length: maxH }, (_, i) => heat(i + 1)).join('') + heat(maxH + 1, true) + '</div>';
+  return '<div class="arr' + (p.relay ? ' rel' : '') + '">' + Array.from({ length: maxH }, (_, i) => heat(i + 1)).join('') + heat(maxH + 1, true) + '</div>';
 }
 
 /* ---------------------------------------------------------------- 画面: 速報 */
@@ -4066,6 +4094,7 @@ const ACTIONS = {
       toast((relay ? it.teamDisp : it.np.kanji) + (lock ? ' を第' + it.heat + '組 ' + it.lane + 'レーンにロックしました（自動の組分けで動きません）' : ' のロックを解除しました（自動の組分けに戻ります）'), null, 6000, { label: '元に戻す', fn: undo });
   },
   printClubSum: () => printDocs([docClubSum()], 'クラブ総合得点（1部・2部合算）を印刷します'),
+  relMem: t => relMemDialog(t.dataset.id),
   arrTargetOff: () => { ui.arrTarget = null; render(); },
   arrPut: t => { const tg = ui.arrTarget; if (!tg) return; ui.arrTarget = null; ui.arrQ = ''; seatMove(t.dataset.id, tg.h, tg.l, tg.prog); },
   heatLock: t => {
@@ -4657,6 +4686,86 @@ function eventForProg(it, prog) {
   if (!comb) return prog;
   const pair = (comb.pairs || []).find(x => x && x.event && x.cat === it.cat) || (comb.pairs || []).find(x => x && x.event);
   return pair ? pair.event : prog;
+}
+// リレーの泳者を検索して追加・交代（欠場や不足が出たとき。当日モード中も使える）
+const JAC = (typeof Intl !== 'undefined' && Intl.Collator) ? new Intl.Collator('ja') : { compare: (a, b) => a < b ? -1 : a > b ? 1 : 0 };
+function swimmerPool() {
+  const map = new Map(), ks = state.settings.kanaStyle;
+  const add = (name, club, cat) => {
+    const nv = C.normName(String(name || ''), ks), np = C.splitName(nv, ks);
+    if (!np.kanji) return;
+    const key = C.normKey(np.kanji) + '|' + club;
+    if (!map.has(key)) map.set(key, { name: nv, np, club: club || '', cat: cat || '' });
+  };
+  state.entries.forEach(e => add(e.name, C.str(e.club), C.str(e.cat)));
+  state.relays.forEach(r => (r.members || []).forEach(m => add(m, C.str(r.team), C.str(r.cat))));
+  return [...map.values()];
+}
+function relMemState(id, slot, q) {
+  const r = state.relays.find(x => x.id === id);
+  if (!r) return null;
+  const mem = [0, 1, 2, 3].map(i => C.str((r.members || [])[i] || ''));
+  const tgt = slot >= 0 ? slot : mem.findIndex(m => !m);
+  const keyOf = m => C.normKey(C.splitName(m).kanji);
+  const inTeam = new Set(mem.filter(Boolean).map(keyOf));
+  const others = new Map();     // 同じ種目の別チームにいる人
+  state.relays.forEach(x => { if (x.id !== id && C.str(x.event) === C.str(r.event)) (x.members || []).forEach(m => { if (m) others.set(keyOf(m), C.str(x.team) + (x.mark ? ' ' + x.mark : '')); }); });
+  const k = C.normKey(q), team = C.str(r.team), cat = C.str(r.cat);
+  const list = swimmerPool().filter(s => !inTeam.has(C.normKey(s.np.kanji)) && (!k || C.normKey(s.name + s.club).indexOf(k) >= 0))
+    .sort((a, b) => (b.club === team) - (a.club === team) || (b.cat === cat) - (a.cat === cat) || JAC.compare(a.np.kana || a.np.kanji, b.np.kana || b.np.kanji))
+    .slice(0, 30);
+  return { r, mem, tgt, list, others, team, cat };
+}
+function relMemDialog(id) {
+  let slot = -1, q = '', cur = null;
+  const html = () => {
+    cur = relMemState(id, slot, q);
+    if (!cur) return '<p>チームが見つかりません</p><div class="actions"><button class="btn primary" data-close>閉じる</button></div>';
+    const { r, mem, tgt, list, others, team, cat } = cur;
+    const full = tgt < 0;
+    return '<h2>泳者の追加・交代</h2><p class="muted small rm-team">' + esc(team + (r.mark ? ' ' + r.mark : '') + '・' + C.str(r.event) + '・' + cat) + '</p>' +
+      '<div class="rm-rows">' + mem.map((m, i) => '<div class="rm-row' + (i === tgt ? ' tgt' : '') + (m ? '' : ' none') + '">' +
+        '<button type="button" class="rm-pick" data-i="' + i + '"><span class="rm-no">第' + (i + 1) + '泳者</span><span class="rm-nm">' + (m ? rubyName(C.splitName(m)) : '（未定）') + '</span></button>' +
+        (m ? '<button type="button" class="x rm-del" data-i="' + i + '" aria-label="第' + (i + 1) + '泳者を外す" title="外す">×</button>' : '') + '</div>').join('') + '</div>' +
+      '<p class="small rm-hint">' + (full ? '4人そろっています。交代するときは、上で替える泳者を押してから選んでください。' : '<b>第' + (tgt + 1) + '泳者</b>に入れます（上の行を押すと入れる所を変えられます）') + '</p>' +
+      '<input id="rm-q" class="rm-q" value="' + esc(q) + '" placeholder="名前・クラブで検索（同じクラブが上）" aria-label="泳者を検索" autocomplete="off">' +
+      '<div class="rm-list">' + (list.length ? list.map((s, j) => { const o = others.get(C.normKey(s.np.kanji)); return '<button type="button" class="rm-cand" data-j="' + j + '"' + (full ? ' disabled' : '') + '><span class="rm-nm">' + rubyName(s.np) + '</span><span class="rm-sub">' + esc(s.club + (s.cat ? '・' + s.cat : '')) + (o ? '<em>（' + esc(o) + 'にも登録）</em>' : '') + '</span></button>'; }).join('') : '<p class="muted small">一覧に見つかりません</p>') +
+      (q.trim() && !full ? '<button type="button" class="rm-cand rm-new" data-new="1"><span class="rm-nm">「' + esc(q.trim()) + '」を新しく入れる</span><span class="rm-sub">一覧にいない選手（フリガナはリレーエントリーで後から入れられます）</span></button>' : '') + '</div>' +
+      '<div class="actions"><button class="btn primary" data-close>閉じる</button></div>';
+  };
+  modal('<div class="rm" id="rm-body"></div>', (m, close) => {
+    m.classList.add('rm-modal');
+    const host = m.querySelector('#rm-body');
+    const paint = focusQ => {
+      host.innerHTML = html();
+      host.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', close));
+      const inp = host.querySelector('#rm-q');
+      if (!inp) return;
+      inp.addEventListener('input', e => { if (e.isComposing) return; q = inp.value; paint(true); });
+      inp.addEventListener('compositionend', () => { q = inp.value; paint(true); });
+      if (focusQ) { inp.focus(); try { inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) { /* ignore */ } }
+    };
+    const setMem = (i, nv, label) => {
+      commit(label, s => { const r = s.relays.find(x => x.id === id); if (!r) return; r.members = [0, 1, 2, 3].map(j => (r.members || [])[j] || ''); r.members[i] = nv; }, { allowLocked: true });
+    };
+    host.addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b || b.disabled || !cur) return;
+      if (b.classList.contains('rm-pick')) { slot = +b.dataset.i; paint(false); return; }
+      if (b.classList.contains('rm-del')) { const i = +b.dataset.i; setMem(i, '', '第' + (i + 1) + '泳者を外す'); slot = i; paint(false); return; }
+      if (b.classList.contains('rm-cand')) {
+        const i = cur.tgt;
+        if (i < 0) return;
+        const nv = b.dataset.new ? C.normName(C.fixName(q.trim()), state.settings.kanaStyle) : cur.list[+b.dataset.j].name;
+        const kanji = C.splitName(nv).kanji;
+        setMem(i, nv, '第' + (i + 1) + '泳者に ' + kanji + ' を入れる');
+        toast('第' + (i + 1) + '泳者に「' + kanji + '」を入れました', null, 6000, { label: '元に戻す', fn: undo });
+        slot = -1; q = ''; paint(false);
+      }
+    });
+    paint(false);
+    setTimeout(() => { m.scrollTop = 0; const inp = host.querySelector('#rm-q'); if (inp && !isPhone()) inp.focus({ preventScroll: true }); else if (document.activeElement) document.activeElement.blur(); }, 0);
+  });
 }
 function seatMove(id, h, l, prog) {
   const a0 = D.byId.get(id);
