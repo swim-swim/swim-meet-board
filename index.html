@@ -1235,6 +1235,24 @@ html.phone .jb, html.phone .jbtns button { min-height: 40px; min-width: 52px; pa
 .rm-new { border-style: dashed; }
 html.phone .rm-modal { width: 100% !important; max-width: none !important; margin: 0 !important; max-height: 88vh; overflow-y: auto; box-sizing: border-box; }
 html.phone .modal-bg:has(.rm-modal) { padding: 8px !important; }
+
+/* リレーの組替え: カードを読みやすく（チーム名・泳者が重ならない、文字を縮めない） */
+.arr.rel .slot { height: 78px !important; }
+.arr.rel .pcard, .arr.rel .slot-empty, .arr.rel .slot-q { height: 72px !important; min-height: 72px !important; }
+.pcard.rcard { display: flex !important; flex-direction: column; justify-content: center; align-items: stretch; gap: 3px; padding: 6px 12px !important; text-align: left; }
+.rcard .rc-top { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.rcard .rc-team { flex: 0 1 auto; min-width: 0; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rcard .rc-cat { flex: 0 0 auto; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.rcard .et { margin-left: auto; flex: 0 0 auto; font-size: 12.5px; white-space: nowrap; }
+.rcard .rc-mem { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; font-size: 13px; line-height: 1.35; color: var(--ink); word-break: keep-all; overflow-wrap: anywhere; }
+.rcard .rc-sep { color: var(--muted); }
+.rcard .rc-none { font-style: normal; color: #b45309; font-weight: 600; }
+html.phone .arr.rel .slot { height: 84px !important; }
+html.phone .arr.rel .pcard, html.phone .arr.rel .slot-empty, html.phone .arr.rel .slot-q { height: 78px !important; min-height: 78px !important; }
+.arr.rel { grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
+.rcard .rc-team { flex: 1 1 auto; font-size: 15.5px; }
+.rcard .rc-mem .rc-cat { display: inline-block; margin-right: 6px; padding: 0 6px; border-radius: 999px; background: var(--track); font-size: 11.5px; color: var(--muted); }
+.rcard .rc-m { white-space: nowrap; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2916,7 +2934,9 @@ document.addEventListener('click', e => {
 // 押したボタンが入れ替わり、クリックが空振りする（もう一度押さないと反応しない）のを防ぐ。離した直後に描き直す。
 let ptrDown = 0, renderHeld = false;
 function releasePtr() { if (!ptrDown) return; ptrDown = 0; if (renderHeld) { renderHeld = false; setTimeout(render, 0); } }
-window.addEventListener('pointerdown', e => { if (e.isPrimary && e.button <= 0) ptrDown = performance.now(); }, true);
+// 選択欄（種目の切り替えなど）は開いたリストで指を離すため「離した」が届かない → 押している扱いにしない（選んだらすぐ切り替える）
+window.addEventListener('pointerdown', e => { if (e.isPrimary && e.button <= 0 && !(e.target && e.target.closest && e.target.closest('select, option, input[type=file]'))) ptrDown = performance.now(); }, true);
+document.addEventListener('change', e => { if (e.target && e.target.tagName === 'SELECT') releasePtr(); }, true);
 window.addEventListener('pointerup', releasePtr, true);
 window.addEventListener('pointercancel', releasePtr, true);
 window.addEventListener('blur', releasePtr);
@@ -3511,6 +3531,12 @@ function arrHeats(p, prog, lanes) {
     const who = p.relay ? it.teamDisp : it.np.kanji;
     const entry = it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '';
     const nMem = p.relay ? it.members.filter(Boolean).length : 4;
+    if (p.relay) {     // リレー: 1行目にチーム名（大きく）、2行目以降に泳者4人（漢字・2行まで）。文字は縮めない
+      const mem = it.memberNames.map(m => m.kanji ? '<span class="rc-m">' + esc(m.kanji.replace(/　/g, ' ')) + '</span>' : '<i class="rc-none">未定</i>').concat(Array(Math.max(0, 4 - it.memberNames.length)).fill('<i class="rc-none">未定</i>')).slice(0, 4);
+      return '<button type="button" class="pcard rcard' + (ui.arrSel === it.id ? ' sel' : '') + (it.seatFixed ? ' locked' : '') + '" data-act="seatPick" data-id="' + esc(it.id) + '" data-prog="' + esc(prog) + '" aria-label="' + esc(who) + '（第' + it.heat + '組 ' + it.lane + 'レーン）">' +
+        '<span class="rc-top"><b class="rc-team">' + esc(who) + '</b>' + (nMem < 4 ? '<span class="et short" title="泳者が足りません">' + nMem + '/4人</span>' : entry ? '<span class="et">' + esc(entry) + '</span>' : '') + '</span>' +
+        '<span class="rc-mem"><span class="rc-cat">' + esc(it.cat) + '</span>' + mem.join('<span class="rc-sep">・</span>') + '</span></button>';
+    }
     return '<button type="button" class="pcard' + (ui.arrSel === it.id ? ' sel' : '') + (it.seatFixed ? ' locked' : '') + '" data-act="seatPick" data-id="' + esc(it.id) + '" data-prog="' + esc(prog) + '" aria-label="' + esc(who) + '（第' + it.heat + '組 ' + it.lane + 'レーン）">' +
       '<span class="fit nm"><b>' + (p.relay ? esc(who) : rubyName(it.np)) + '</b></span><span class="fit sub">' + (p.relay ? rubyMembers(it) : esc(it.club)) + '・' + esc(it.cat) + '</span>' + (p.relay && nMem < 4 ? '<span class="et short" title="泳者が足りません">' + nMem + '/4人</span>' : '<span class="et">' + esc(entry) + '</span>') + '</button>';
   };
