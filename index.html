@@ -105,7 +105,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 /* ---------- 枠組み ---------- */
 .app { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 8px;
-  padding: 6px max(8px, env(safe-area-inset-right)) 8px max(8px, env(safe-area-inset-left)); min-height: 100vh; }
+  padding: 6px max(8px, env(safe-area-inset-right)) 8px max(8px, env(safe-area-inset-left)); min-height: calc(var(--vh, 1vh) * 100); }
 .app.pinned.side-left { grid-template-columns: 222px minmax(0, 1fr); }
 .app.pinned.side-right { grid-template-columns: minmax(0, 1fr) 222px; }
 .topbar { grid-column: 1 / -1; position: sticky; top: max(8px, env(safe-area-inset-top)); z-index: 30; display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap;
@@ -130,7 +130,7 @@ button.chip { cursor: pointer; }
 
 /* 画面切り替えパネル: 「常に表示」なら列として並べ、そうでなければ左右から滑り出す */
 .nav { padding: 10px; border-radius: var(--r-lg); display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
-.app.pinned .nav { position: sticky; top: calc(var(--toph, 64px) + 18px); align-self: start; max-height: calc(100vh - var(--toph, 64px) - 30px); }
+.app.pinned .nav { position: sticky; top: calc(var(--toph, 64px) + 18px); align-self: start; max-height: calc(calc(var(--vh, 1vh) * 100) - var(--toph, 64px) - 30px); }
 .app.pinned.side-left .nav { grid-column: 1; grid-row: 2; }
 .app.pinned.side-left main { grid-column: 2; grid-row: 2; }
 .app.pinned.side-right .nav { grid-column: 2; grid-row: 2; }
@@ -139,7 +139,7 @@ button.chip { cursor: pointer; }
 main { position: relative; z-index: 0; }
 .topbar { z-index: 30; }
 .app:not(.pinned) .nav { -webkit-backdrop-filter: none; backdrop-filter: none; }
-.app:not(.pinned) .nav { position: fixed; z-index: 60; top: max(10px, env(safe-area-inset-top)); bottom: max(10px, env(safe-area-inset-bottom)); width: min(300px, calc(100vw - 40px));
+.app:not(.pinned) .nav { position: fixed; z-index: 60; top: max(10px, env(safe-area-inset-top)); bottom: max(10px, env(safe-area-inset-bottom)); width: min(300px, calc(calc(var(--vw, 1vw) * 100) - 40px));
   background: var(--drawer); transition: transform .42s cubic-bezier(.2, .9, .25, 1.05), opacity .3s; opacity: 0; pointer-events: none; }
 .app.side-left:not(.pinned) .nav { left: max(10px, env(safe-area-inset-left)); transform: translateX(calc(-100% - 24px)); }
 .app.side-right:not(.pinned) .nav { right: max(10px, env(safe-area-inset-right)); transform: translateX(calc(100% + 24px)); }
@@ -298,11 +298,11 @@ tr.off td { color: var(--muted); opacity: .75; }
 
 /* ---------- モーダル・トースト ---------- */
 .modal-bg { position: fixed; inset: 0; background: rgba(8, 18, 32, .28); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); display: grid; place-items: center; z-index: 100; padding: 16px; animation: fade .18s ease-out; }
-.modal { background: var(--glass-strong); border-radius: 28px; width: min(720px, 100%); max-height: calc(100vh - 32px); overflow: auto; padding: 24px; animation: pop .22s cubic-bezier(.2, .9, .3, 1.2); }
+.modal { background: var(--glass-strong); border-radius: 28px; width: min(720px, 100%); max-height: calc(calc(var(--vh, 1vh) * 100) - 32px); overflow: auto; padding: 24px; animation: pop .22s cubic-bezier(.2, .9, .3, 1.2); }
 .modal h2 { margin: 0 0 10px; font: 700 20px/1.3 var(--font-display); }
 .modal .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
 @keyframes fade { from { opacity: 0; } } @keyframes pop { from { opacity: 0; transform: scale(.94) translateY(8px); } }
-.toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(18px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; z-index: 120; width: min(460px, calc(100vw - 32px)); }
+.toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(18px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; z-index: 120; width: min(460px, calc(calc(var(--vw, 1vw) * 100) - 32px)); }
 
 .toast { background: rgba(20, 28, 40, .82); color: #fff; -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255,255,255,.14); border-radius: 18px; padding: 12px 16px; display: flex; gap: 12px; align-items: center; box-shadow: 0 12px 32px rgba(0,0,0,.25); animation: pop .22s ease-out; }
@@ -452,7 +452,7 @@ table.pt tr.pc th:first-child { padding: 3px 2px; }
 table.pt td .one { white-space: nowrap; overflow: hidden; }
 table.pt td .one.wrap { white-space: normal; overflow: visible; line-height: 1.3; }
 table.pt td.nm .one:first-child { font-size: 14px; }
-@media (min-width: 1100px) { .withpv.pv-program { grid-template-columns: minmax(0, 1fr) clamp(220px, 19vw, 290px); } }
+@media (min-width: 1100px) { .withpv.pv-program { grid-template-columns: minmax(0, 1fr) clamp(220px, calc(var(--vw, 1vw) * 19), 290px); } }
 table.pt td .sub { font-size: 12px; color: var(--muted); line-height: 1.35; }
 table.pt td.mt { font-size: 12.5px; }
 table.pt tr.emp td { padding-top: 2px; padding-bottom: 2px; height: 30px; }
@@ -516,7 +516,7 @@ table.pt td.rk { white-space: nowrap; font-size: 13px; }
 
 /* ---------- 印刷プレビュー（右側に常に表示。隠すこともできる） ---------- */
 #print-root.pgroot { }
-.withpv { display: grid; grid-template-columns: minmax(0, 1fr) clamp(230px, 22vw, 330px); gap: 10px; align-items: start; }
+.withpv { display: grid; grid-template-columns: minmax(0, 1fr) clamp(230px, calc(var(--vw, 1vw) * 22), 330px); gap: 10px; align-items: start; }
 .pv-main { min-width: 0; }
 .pv { position: sticky; top: calc(var(--toph, 64px) + 18px); padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .pv-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -831,7 +831,7 @@ table.pt tr.ph th { font-size: 16px; }
 .bell { position: relative; flex: 0 0 auto; }
 .bell .bdg { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--err); color: #fff; font: 700 11px/18px system-ui; font-style: normal; display: none; text-align: center; }
 .bell.has .bdg { display: block; }
-.notes { position: absolute; right: 0; top: calc(100% + 8px); width: min(460px, 92vw); max-height: 60vh; overflow: auto; z-index: 80; padding: 10px; box-shadow: 0 16px 40px rgba(10, 30, 60, .25); background: var(--drawer, #fff); }
+.notes { position: absolute; right: 0; top: calc(100% + 8px); width: min(460px, calc(var(--vw, 1vw) * 92)); max-height: calc(var(--vh, 1vh) * 60); overflow: auto; z-index: 80; padding: 10px; box-shadow: 0 16px 40px rgba(10, 30, 60, .25); background: var(--drawer, #fff); }
 .notes[hidden] { display: none; }
 .nt-h { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .nt-i { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 12px; font-size: 13px; }
@@ -846,7 +846,7 @@ table.pt tr.ph th { font-size: 16px; }
 .jb { padding-left: 12px; padding-right: 12px; }
 /* ---------- 印刷プレビュー: 左右どちらにも固定・狭いときは自動で細く ---------- */
 @media (min-width: 1100px) {
-  .withpv.pvl { grid-template-columns: clamp(230px, 22vw, 330px) minmax(0, 1fr) !important; }
+  .withpv.pvl { grid-template-columns: clamp(230px, calc(var(--vw, 1vw) * 22), 330px) minmax(0, 1fr) !important; }
   .withpv.pvl > .pv { order: -1; }
   .app.pvslim .withpv { grid-template-columns: minmax(0, 1fr) 210px !important; }
   .app.pvslim .withpv.pvl { grid-template-columns: 210px minmax(0, 1fr) !important; }
@@ -1101,7 +1101,7 @@ html.phone .ph-lock { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 
 html.phone .topbar .tmon { display: flex !important; align-items: center; gap: 6px; margin-top: 6px; width: auto !important; position: relative; }
 html.phone .topbar .tmon .tnote { flex: 1 1 auto; min-width: 0; min-height: 36px; font-size: 13px; }
 html.phone .topbar .bellbtn { flex: 0 0 auto; min-height: 36px; }
-html.phone .topbar .notes { position: fixed !important; left: 8px !important; right: 8px !important; top: calc(var(--toph, 96px) + 4px) !important; width: auto !important; max-height: 60vh; }
+html.phone .topbar .notes { position: fixed !important; left: 8px !important; right: 8px !important; top: calc(var(--toph, 96px) + 4px) !important; width: auto !important; max-height: calc(var(--vh, 1vh) * 60); }
 html.phone #main { padding: 10px 10px calc(88px + env(safe-area-inset-bottom)) !important; margin: 0 !important; min-width: 0; }
 
 /* 下のタブ */
@@ -1116,7 +1116,7 @@ html.phone .tabbar .tab:active { transform: scale(.95); }
 html.phone .tabbar .qdot { position: absolute; top: 8px; right: calc(50% - 18px); width: 9px; height: 9px; border-radius: 50%; background: var(--danger, #e5484d); }
 
 /* その他: 下から出るシート（大きなタイルで全画面へ） */
-html.phone .nav { position: fixed !important; left: 0 !important; right: 0 !important; top: auto !important; bottom: 0 !important; width: auto !important; max-width: none !important; height: auto !important; max-height: 82vh;
+html.phone .nav { position: fixed !important; left: 0 !important; right: 0 !important; top: auto !important; bottom: 0 !important; width: auto !important; max-width: none !important; height: auto !important; max-height: calc(var(--vh, 1vh) * 82);
   border-radius: 26px 26px 0 0 !important; padding: 12px 14px calc(92px + env(safe-area-inset-bottom)) !important; overflow-y: auto; transform: translateY(105%) !important; opacity: 1; z-index: 35; }
 html.phone .app.nav-open .nav { transform: none !important; }
 html.phone .nav .navprefs, html.phone .nav .lens { display: none !important; }
@@ -1214,7 +1214,7 @@ html.phone .jb, html.phone .jbtns button { min-height: 40px; min-width: 52px; pa
 .lockb.memb { color: var(--accent); }
 .lockb.memb.short { background: #e0a800; border-color: #e0a800; color: #fff; }
 .pcard .et.short { color: #b45309; font-weight: 700; background: rgba(224, 168, 0, .18); border-radius: 999px; padding: 1px 8px; }
-.rm-modal { width: min(560px, calc(100vw - 24px)); }
+.rm-modal { width: min(560px, calc(calc(var(--vw, 1vw) * 100) - 24px)); }
 .rm .rm-team { margin-top: -6px; }
 .rm-rows { display: grid; gap: 6px; margin: 10px 0 8px; }
 .rm-row { display: flex; align-items: center; gap: 6px; }
@@ -1225,7 +1225,7 @@ html.phone .jb, html.phone .jbtns button { min-height: 40px; min-width: 52px; pa
 .rm-nm { font-size: 16px; font-weight: 700; min-width: 0; }
 .rm-hint { margin: 4px 0 6px; }
 .rm-q { width: 100%; min-height: 46px; border: 2px solid #e0a800; font-size: 16px; }
-.rm-list { display: grid; gap: 6px; margin-top: 8px; max-height: min(40vh, 340px); overflow-y: auto; padding: 2px; }
+.rm-list { display: grid; gap: 6px; margin-top: 8px; max-height: min(calc(var(--vh, 1vh) * 40), 340px); overflow-y: auto; padding: 2px; }
 .rm-cand { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 48px; padding: 6px 14px; border-radius: 16px; border: 1px solid var(--hairline); background: var(--btn-bg); color: var(--ink); text-align: left; font: inherit; cursor: pointer; }
 .rm-cand:hover:not([disabled]) { background: var(--accent-soft); }
 .rm-cand[disabled] { opacity: .45; cursor: not-allowed; }
@@ -1233,7 +1233,7 @@ html.phone .jb, html.phone .jbtns button { min-height: 40px; min-width: 52px; pa
 .rm-sub { font-size: 12px; color: var(--muted); }
 .rm-sub em { font-style: normal; color: #b45309; }
 .rm-new { border-style: dashed; }
-html.phone .rm-modal { width: 100% !important; max-width: none !important; margin: 0 !important; max-height: 88vh; overflow-y: auto; box-sizing: border-box; }
+html.phone .rm-modal { width: 100% !important; max-width: none !important; margin: 0 !important; max-height: calc(var(--vh, 1vh) * 88); overflow-y: auto; box-sizing: border-box; }
 html.phone .modal-bg:has(.rm-modal) { padding: 8px !important; }
 
 /* リレーの組替え: カードを読みやすく（チーム名・泳者が重ならない、文字を縮めない） */
@@ -1378,7 +1378,7 @@ table.pt.prel td.rnm .rcat { display: none; margin-left: 6px; padding: 0 6px; bo
 .bar.frow > label > select, .bar.frow > label > input:not([type=checkbox]) { margin-top: 2px; }
 .bar.frow > span:not(.grow):not(.pmodes) { min-width: 0; }
 /* 画面一覧を常に表示したとき: 上端・下端を本部ボードのパネルにそろえる */
-.app.pinned .nav { top: calc(var(--toph, 64px) + 14px) !important; height: calc(100vh - var(--toph, 64px) - 38px) !important; max-height: calc(100vh - var(--toph, 64px) - 38px) !important; margin-top: 0 !important; box-sizing: border-box; }
+.app.pinned .nav { top: calc(var(--toph, 64px) + 14px) !important; height: calc(calc(var(--vh, 1vh) * 100) - var(--toph, 64px) - 38px) !important; max-height: calc(calc(var(--vh, 1vh) * 100) - var(--toph, 64px) - 38px) !important; margin-top: 0 !important; box-sizing: border-box; }
 
 /* 組替え: 2つの種目を左右に、組は縦に */
 .arr-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
@@ -1514,6 +1514,8 @@ html.final #main input:disabled, html.final #main select:disabled, html.final #m
 .tround .btn.rb.rb-s .rbc .ic { width: 19px; height: 19px; }
 #toptitle.two { font-size: 13.5px !important; line-height: 1.15; white-space: normal; overflow: visible; }
 .brand-t:has(#toptitle.two) small { display: none; }
+@media print { html { zoom: 1 !important; } }
+.navfit { display: grid; gap: 4px; margin: 6px 0; } .navfit .seg { width: 100%; } .navfit .segbtn { flex: 1 1 0; padding-left: 4px; padding-right: 4px; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2896,26 +2898,26 @@ const IC_GRID = '<rect x="3" y="4" width="15.5" height="14.5" rx="1.8"/><path d=
 const IC_DOC = '<path d="M13.5 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21H11"/><path d="M13.5 3 19 8.5V11M13.5 3v5.5H19"/>';
 const ICON_SVG = {
   home: { m: '<path d="M3.5 11.2 12 4l8.5 7.2"/><path d="M5.8 9.6V19a1 1 0 0 0 1 1h3.4v-5.2h3.6V20h3.4a1 1 0 0 0 1-1V9.6"/>' },
-  settings: { m: '<circle cx="12" cy="12" r="3"/><path d="M19.4 13.5l1.6 1.2-2 3.4-1.9-.7a7 7 0 0 1-2.2 1.3L14.6 21h-4l-.4-2.1a7 7 0 0 1-2.2-1.3l-1.9.7-2-3.4 1.6-1.2a7 7 0 0 1 0-2.6L4.1 9.9l2-3.4 1.9.7a7 7 0 0 1 2.2-1.3L10.6 3h4l.4 2.1a7 7 0 0 1 2.2 1.3l1.9-.7 2 3.4-1.6 1.2a7 7 0 0 1 0 2.6z"/>' },
+  settings: { m: '<path d="M10.19 5.24L10.50 2.52A9.6 9.6 0 0 1 13.50 2.52L13.81 5.24A7.0 7.0 0 0 1 15.50 5.94L17.64 4.23A9.6 9.6 0 0 1 19.77 6.36L18.06 8.50A7.0 7.0 0 0 1 18.76 10.19L21.48 10.50A9.6 9.6 0 0 1 21.48 13.50L18.76 13.81A7.0 7.0 0 0 1 18.06 15.50L19.77 17.64A9.6 9.6 0 0 1 17.64 19.77L15.50 18.06A7.0 7.0 0 0 1 13.81 18.76L13.50 21.48A9.6 9.6 0 0 1 10.50 21.48L10.19 18.76A7.0 7.0 0 0 1 8.50 18.06L6.36 19.77A9.6 9.6 0 0 1 4.23 17.64L5.94 15.50A7.0 7.0 0 0 1 5.24 13.81L2.52 13.50A9.6 9.6 0 0 1 2.52 10.50L5.24 10.19A7.0 7.0 0 0 1 5.94 8.50L4.23 6.36A9.6 9.6 0 0 1 6.36 4.23L8.50 5.94A7.0 7.0 0 0 1 10.19 5.24Z"/><circle cx="12" cy="12" r="3"/>' },
   entries: { m: '<circle cx="12" cy="8" r="3.8"/><path d="M4.5 20.2c.7-3.9 3.7-6.2 7.5-6.2s6.8 2.3 7.5 6.2"/>' },
   relays: { m: '<circle cx="12" cy="7.3" r="3"/><path d="M6.6 19.6c.5-3.3 2.7-5.3 5.4-5.3s4.9 2 5.4 5.3"/><circle cx="5.2" cy="9.6" r="2.2"/><path d="M1.8 17.6c.3-2.1 1.6-3.5 3.4-3.7"/><circle cx="18.8" cy="9.6" r="2.2"/><path d="M22.2 17.6c-.3-2.1-1.6-3.5-3.4-3.7"/>' },
   schedule: { m: '<rect x="3" y="5" width="15.5" height="14.5" rx="2"/><path d="M3 9.6h15.5M7.2 3v4M14.3 3v4"/>', b: [18, 18, 'M18 15.4v2.8l1.8 1.1'] },
   program: { m: '<path d="M8 4.5H6.3a1.6 1.6 0 0 0-1.6 1.6v13.3A1.6 1.6 0 0 0 6.3 21H11"/><path d="M16 4.5h1.7a1.6 1.6 0 0 1 1.6 1.6V10"/><rect x="8" y="2.8" width="8" height="3.4" rx="1"/><path d="M8 10.5h7.3M8 14.3h3.6"/>', b: [17.6, 17.6, 'M17.6 15.6v2.3l1.5.9M16.6 13.3h2'] },
-  flash: { m: '<path d="M3.5 9.8h3.3L16 5v14l-9.2-4.8H3.5z"/><path d="M7.3 14.4 8.6 20h2.6l-1.2-5.2"/><path d="M19 9.4a3.6 3.6 0 0 1 0 5.2"/>' },
+  flash: { m: '<circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><path d="M8.2 8.2a5.4 5.4 0 0 0 0 7.6M15.8 8.2a5.4 5.4 0 0 1 0 7.6M5.2 5.2a9.6 9.6 0 0 0 0 13.6M18.8 5.2a9.6 9.6 0 0 1 0 13.6"/>' },
   ranking: { m: '<path d="M2.5 21h19M8.5 21V11h7v10M2.5 21v-6h6M15.5 21v-4h6v4"/><path d="M11.2 14.3l1.1-.8V18"/><path fill="currentColor" stroke="none" d="m12 2.6 1.2 2.4 2.65.38-1.92 1.87.45 2.64L12 8.64 9.62 9.89l.45-2.64L8.15 5.38l2.65-.38z"/>' },
-  certs: { m: '<rect x="2.5" y="4" width="19" height="13" rx="1.6"/><path d="M6.5 8h11M6.5 11.5h5.5"/>', b: [16.8, 16.2, 'M16.8 14.4a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2z'] },
-  awards: { m: '<path d="M7.5 2.8h3.3l2.2 5.4M16.5 2.8h-3.3l-.9 2.3"/><circle cx="12" cy="15" r="6"/><path fill="currentColor" stroke="none" d="m12 11.7 1.05 2.13 2.35.34-1.7 1.66.4 2.34L12 17.07l-2.1 1.1.4-2.34-1.7-1.66 2.35-.34z"/>' },
-  check: { m: '<path d="M10.5 6.5H20M10.5 12H20M10.5 17.5H20"/><path d="M3.6 6.6l1.5 1.5 2.7-2.8M3.6 12.1l1.5 1.5 2.7-2.8M3.6 17.6l1.5 1.5 2.7-2.8"/>' },
-  data: { m: '<path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.8l2 2.5h8.2A1.5 1.5 0 0 1 21 9v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/><path d="M3 10.5h18"/>' },
-  print: { m: IC_PRINTER + '<circle cx="17.3" cy="11" r=".7" fill="currentColor" stroke="none"/>' },
-  printAll: { m: IC_PRINTER + '<path d="M9.5 3.5V2h9.5v6.5"/>' },              // 紙が重なっている = 全部
+  certs: { m: '<rect x="2.5" y="3.5" width="19" height="13" rx="1.6"/><path d="M7 7.5h10M8.5 10.5h7"/>', b: [12, 17.2, 'M12 15.4a1.8 1.8 0 1 0 0 3.6 1.8 1.8 0 0 0 0-3.6z'] },
+  awards: { m: '<path d="M8 3h2.8L12 7.6 13.2 3H16"/><path d="M8 3l2.6 6.3M16 3l-2.6 6.3"/><circle cx="12" cy="15" r="6"/><path fill="currentColor" stroke="none" d="m12 11.7 1.05 2.13 2.35.34-1.7 1.66.4 2.34L12 17.07l-2.1 1.1.4-2.34-1.7-1.66 2.35-.34z"/>' },
+  check: { m: '<path d="M12 3 5 5.8v5.7c0 4.3 2.9 7.8 7 9.5 4.1-1.7 7-5.2 7-9.5V5.8z"/><path d="M8.8 12.2l2.3 2.3 4.1-4.4"/>' },
+  data: { m: '<rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M4.5 9v9.5A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4"/>' },
+  print: { m: IC_PRINTER },
+  printAll: { m: IC_PRINTER + '<path d="M8.6 1.8h6.8M10 11.5h4"/>' },              // 紙が重なっている = 全部
   sheetEye: { m: IC_PRINTER, b: [18.6, 5.4, 'M17.9 4.1l1.1-.9v4.6'] },        // 「1」= 1枚だけ試す
   printOne: { m: IC_PRINTER, b: [18.6, 5.4, 'M18.6 3.2a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2zM16.7 8.1c.3-1.1 1-1.7 1.9-1.7s1.6.6 1.9 1.7'] },   // 人 = この人だけ
   table: { m: IC_GRID, b: [18.2, 18.2, 'M18.2 15.8v4.8M15.8 18.2h4.8'] },        // 表＋ = Excel を作る
   tableIn: { m: IC_GRID, b: [18.2, 18.2, 'M18.2 15.6v5M16.1 18.5l2.1 2.1 2.1-2.1'] },   // 表↓ = Excel を読み込む
   tableOut: { m: IC_GRID, b: [18.2, 18.2, 'M18.2 20.8v-5M16.1 17.9l2.1-2.1 2.1 2.1'] },  // 表↑ = Excel に書き出す
   docOut: { m: IC_DOC, b: [17.8, 18, 'M17.8 20.6v-5M15.7 17.7l2.1-2.1 2.1 2.1'] },       // 書類↑ = CSV に書き出す
-  paste: { m: '<rect x="5" y="4.5" width="14" height="16.5" rx="2"/><rect x="8.5" y="2.8" width="7" height="3.4" rx="1"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4"/>' },
+  paste: { m: '<rect x="5" y="4.5" width="14" height="16.5" rx="2"/><rect x="8.5" y="2.8" width="7" height="3.4" rx="1"/><path d="M8.5 11h7M8.5 14.5h7M10 18h4"/>' },
   plus: { m: '<path d="M12 4.5v15M4.5 12h15"/>' },
   prev: { m: '<path d="M15 4.5 7.5 12l7.5 7.5"/>' },
   next: { m: '<path d="M9 4.5l7.5 7.5L9 19.5"/>' },
@@ -2930,12 +2932,12 @@ const ICON_SVG = {
   snap: { m: '<circle cx="11" cy="12" r="8"/><path d="M11 7.5V12l2.8 1.7"/>', b: [18.4, 18.4, 'M18.4 16v4.8M16 18.4h4.8'] },       // 時計＋ = 今を残す
   trash: { m: '<path d="M4 6.5h16M9.5 6.5V4.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2"/><path d="M6 6.5l1 13a1.5 1.5 0 0 0 1.5 1.4h7a1.5 1.5 0 0 0 1.5-1.4l1-13M10 10.5V17M14 10.5V17"/>' },
   timeX: { m: '<circle cx="11" cy="13" r="7.5"/><path d="M9 2.8h4M11 9v4l2.4 1.5"/>', b: [18.4, 18.4, 'M16.6 16.6l3.6 3.6M20.2 16.6l-3.6 3.6'] },   // ストップウォッチ× = 記録を消す
-  erase: { m: '<path d="M16.2 4.2l4.6 4.6a1.5 1.5 0 0 1 0 2.1l-8.3 8.3H8.4l-4.2-4.2a1.5 1.5 0 0 1 0-2.1l9.9-8.7a1.5 1.5 0 0 1 2.1 0z"/><path d="M9.2 9.1l6.7 6.7M12.5 19.2H20"/>' },
-  edit: { m: '<path d="M4 20h4.2L19.4 8.8a2 2 0 0 0 0-2.8l-1.4-1.4a2 2 0 0 0-2.8 0L4 15.8z"/><path d="M13.6 6.2l4.2 4.2"/>' },
+  erase: { m: '<circle cx="12" cy="12" r="9"/><path d="M8.8 8.8l6.4 6.4M15.2 8.8l-6.4 6.4"/>' },
+  edit: { m: '<path d="M9.5 3.5h5v12.8L12 20.5l-2.5-4.2z"/><path d="M9.5 7h5M9.5 16.3h5"/>' },
   merge: { m: '<path d="M6 21v-5.5a6 6 0 0 1 6-6M18 21v-5.5a6 6 0 0 0-6-6V3M8.5 6.5 12 3l3.5 3.5"/>' },   // 2本が1本に = 合同
   lock: { m: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5v-3a4 4 0 0 1 8 0v3M12 14.5V17"/>' },
   unlock: { m: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5v-3a4 4 0 0 1 7.7-1.5M12 14.5V17"/>' },
-  seal: { m: '<path d="M12 2.8l2.2 1.6 2.7-.2.9 2.6 2.2 1.6-.9 2.6.9 2.6-2.2 1.6-.9 2.6-2.7-.2L12 21.2l-2.2-1.6-2.7.2-.9-2.6-2.2-1.6.9-2.6-.9-2.6 2.2-1.6.9-2.6 2.7.2z"/><path d="M8.6 12.1l2.4 2.4 4.4-4.8"/>' },   // 確定の印
+  seal: { m: '<circle cx="12" cy="5" r="2.4"/><path d="M10.4 7v4.5M13.6 7v4.5"/><rect x="4.5" y="11.5" width="15" height="5" rx="1.5"/><path d="M4.5 20.5h15"/>' },   // 確定の印
   copy: { m: '<rect x="8" y="8" width="12" height="13" rx="1.6"/><path d="M16 8V4.6A1.6 1.6 0 0 0 14.4 3H5.6A1.6 1.6 0 0 0 4 4.6v10.8A1.6 1.6 0 0 0 5.6 17H8"/>' },
   sample: { m: '<path d="M9 3h6M10 3v6.5L4.8 18a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3L14 9.5V3"/><path d="M7.2 15h9.6"/>' },
   close: { m: '<path d="M6 6l12 12M18 6 6 18"/>' }
@@ -2993,7 +2995,7 @@ Object.assign(ICON_PATHS, {
   printAll: 'M7 9V4h10v5M4 9h16v8h-3M7 17H4M7 14h10v6H7zM9.5 4V2.5h7.5V7',   // 重なった紙 = 全部印刷
   printOne: 'M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-2M7 14h10v6H7zM12 17.5v-3l-1 .8',   // 1人分
   sample: 'M9 3h6M10 3v6.5L4.8 18a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3L14 9.5V3M7.2 15h9.6',   // フラスコ = お試しデータ
-  wrench: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z',
+  wrench: 'M9 3.2a5 5 0 0 0 1.2 8.6V19a1.8 1.8 0 0 0 3.6 0v-7.2A5 5 0 0 0 15 3.2V7l-3 1.6L9 7z',
   merge: 'M6 3v4a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3M12 13v8M9 18l3 3 3-3',   // 2本が1本に = 合同
   copyGear: 'M8 8h11v11H8zM5 16V5h11'
 });
@@ -3064,7 +3066,7 @@ const NAVPREF_KEY = 'swim-meet-app/navpref';
 let navPref = { side: 'left', pinned: true };
 try { navPref = Object.assign(navPref, JSON.parse(lsGet(NAVPREF_KEY) || '{}')); } catch (e) { /* ignore */ }
 let navOpen = false;
-const isWide = () => window.matchMedia('(min-width: 900px)').matches;
+const isWide = () => viewW() >= 900;
 // スマホ専用の画面: 自動で判定（幅600px以下、または指で操作する小さい画面）。メニューで「スマホ版／PC版」に固定もできる
 function phoneAuto() {
   try { const small = Math.min(screen.width, screen.height) < 600, coarse = window.matchMedia('(pointer: coarse)').matches; return window.innerWidth <= 600 || (coarse && small); }
@@ -3082,12 +3084,12 @@ function applyNavLayout() {
   app.classList.toggle('pinned', navPinnedNow());
   app.classList.toggle('nav-open', !navPinnedNow() && navOpen);
   // 画面一覧とプレビューを両方固定しても横スクロールしないよう、狭いときは画面一覧をアイコンだけの細い帯にする
-  let pvOn = false; try { pvOn = PV_VIEWS.includes(view) && previewOn() && window.innerWidth >= 1100; } catch (e) { /* 読み込み途中 */ }
-  const left = window.innerWidth - (navPinnedNow() ? 222 : 0) - (pvOn ? Math.min(330, Math.max(230, window.innerWidth * 0.22)) : 0);
+  let pvOn = false; try { pvOn = PV_VIEWS.includes(view) && previewOn() && viewW() >= 1100; } catch (e) { /* 読み込み途中 */ }
+  const left = viewW() - (navPinnedNow() ? 222 : 0) - (pvOn ? Math.min(330, Math.max(230, viewW() * 0.22)) : 0);
   app.classList.toggle('navrail', navPinnedNow() && left < 760);
   app.classList.toggle('pvslim', pvOn && left < 640);
 }
-window.addEventListener('resize', () => { fitCertPrev(); if ($('#toptitle')) fitTitle($('#toptitle')); if (isPhone() !== document.documentElement.classList.contains('phone')) { render(); return; } applyNavLayout(); sizeFills(); fitProgram(); bindLenses(); schedulePreview(); });
+window.addEventListener('resize', () => { applyFit(); fitCertPrev(); if ($('#toptitle')) fitTitle($('#toptitle')); if (isPhone() !== document.documentElement.classList.contains('phone')) { render(); return; } applyNavLayout(); sizeFills(); fitProgram(); bindLenses(); schedulePreview(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && navOpen) { navOpen = false; applyNavLayout(); } });
 
 let renderQueued = false;
@@ -3174,12 +3176,12 @@ function fitProgram() {
   fitProgCells(el);
   el.classList.remove('paged'); if (tabs) tabs.hidden = true;
   if (!tabs) return;
-  const avail = () => (parseFloat(el.style.maxHeight) || (window.innerHeight - el.getBoundingClientRect().top - window.scrollY - 16));
-  const before = el.getBoundingClientRect().top;
+  const avail = () => (parseFloat(el.style.maxHeight) || (viewH() - rectL(el).top - window.scrollY / FITZR - 16));
+  const before = rectL(el).top;
   if (el.scrollHeight <= avail() + 2) return;
   tabs.hidden = false;
   el.classList.add('paged');
-  const shift = el.getBoundingClientRect().top - before;        // タブの分だけ表が下がるので高さを合わせる
+  const shift = rectL(el).top - before;        // タブの分だけ表が下がるので高さを合わせる
   if (el.style.maxHeight) el.style.maxHeight = Math.max(240, parseFloat(el.style.maxHeight) - shift) + 'px';
 }
 // 各画面の名前と説明は上部のバーに出す（画面の中はその分だけ広く使う）
@@ -3225,19 +3227,81 @@ function liftHeading() {
   h.remove(); if (lead) lead.remove();
   if (box && box !== $('#main') && box.matches('.vhead > div') && !box.children.length && !box.textContent.trim()) box.remove();
 }
+// ---------------------------------------------------------------- 画面に合わせて自動調整（どの端末でも同じ配置）
+//  幅 1280px で作った画面を、そのまま拡大・縮小して表示する（ページ全体の zoom）。配置は変わらず、大きさだけが変わる。
+//  幅で切り替わる CSS（@media の幅・高さ）も、この 1280px の画面として判定し直す（小さい画面でも同じ並び）。
+const FIT_BASE = 1280;
+let FITZ = 1, FITZR = 1;     // FITZ: 拡大率、FITZR: getBoundingClientRect の値が何倍で返るか（ブラウザで違う）
+function fitScale() {
+  const f = navPref.fit || 'auto';
+  if (f === 'off') return 1;
+  const k = f === 'small' ? 0.9 : f === 'large' ? 1.1 : 1;
+  return Math.max(0.5, Math.min(1.8, window.innerWidth / FIT_BASE * k));
+}
+const viewW = () => window.innerWidth / FITZ, viewH = () => window.innerHeight / FITZ;   // 中の長さでの画面の幅・高さ
+function rectL(el) {        // 要素の位置と大きさを、中の長さ（CSS の px）で
+  const r = el.getBoundingClientRect(), k = FITZR;
+  return k === 1 ? r : { top: r.top / k, bottom: r.bottom / k, left: r.left / k, right: r.right / k, width: r.width / k, height: r.height / k, x: r.left / k, y: r.top / k };
+}
+const MQ_RE = /^\(\s*(min|max)-(width|height)\s*:\s*([\d.]+)px\s*\)$/;
+function mqEval(text, W, H) {          // 幅・高さだけの条件なら true/false、それ以外は null（さわらない）
+  const parts = text.split(',').map(x => x.trim()).filter(Boolean);
+  let any = false;
+  for (const part of parts) {
+    let ok = true;
+    for (const tk of part.split(/\s+and\s+/i).map(x => x.trim())) {
+      if (/^(screen|all)$/i.test(tk)) continue;
+      const m = tk.match(MQ_RE); if (!m) return null;
+      const v = m[2] === 'width' ? W : H, n = +m[3];
+      if (m[1] === 'min' ? v < n : v > n) ok = false;
+    }
+    if (ok) any = true;
+  }
+  return any;
+}
+function fitMedia() {
+  const on = FITZ !== 1 || (navPref.fit || 'auto') !== 'off', W = viewW(), H = viewH();
+  const walk = rules => { for (const r of rules) {
+    if (r.media && r.cssRules && r.type === 4) {
+      if (r.__mq === undefined) r.__mq = r.media.mediaText;
+      const want = on ? (v => v === null ? r.__mq : v ? 'all' : 'not all')(mqEval(r.__mq, W, H)) : r.__mq;
+      if (r.media.mediaText !== want) r.media.mediaText = want;
+      walk(r.cssRules);
+    } else if (r.cssRules) walk(r.cssRules);
+  } };
+  for (const sh of document.styleSheets) { try { walk(sh.cssRules); } catch (e) { /* 読めないシート */ } }
+}
+function applyFit() {
+  const z = fitScale(), de = document.documentElement;
+  FITZ = z; de.style.zoom = z === 1 ? '' : String(z);
+  const p = document.createElement('div'); p.style.cssText = 'position:absolute;left:0;top:0;width:100px;height:1px;visibility:hidden;pointer-events:none';
+  document.body.appendChild(p); FITZR = (p.getBoundingClientRect().width / 100) || 1; p.remove();
+  if (Math.abs(FITZR - 1) < 0.002) FITZR = 1;
+  de.style.setProperty('--vh', (window.innerHeight / z / 100).toFixed(3) + 'px');
+  de.style.setProperty('--vw', (window.innerWidth / z / 100).toFixed(3) + 'px');
+  fitMedia();
+}
+window.addEventListener('beforeprint', () => { document.documentElement.style.zoom = ''; });
+window.addEventListener('afterprint', () => { applyFit(); });
+
 // 画面の下まで使う領域（表など）は、ページ全体ではなく中だけをスクロールさせる
 function sizeFills() {
-  const big = window.innerWidth >= 700 && window.innerHeight >= 560;
+  const big = viewW() >= 700 && viewH() >= 560;
   document.querySelectorAll('.fill').forEach(el => {
     if (!big) { el.style.maxHeight = ''; return; }
-    const top = el.getBoundingClientRect().top + window.scrollY;
+    const top = rectL(el).top + window.scrollY / FITZR;
     let below = 0;                 // 本部ボード: 下に続く欄（設定の折りたたみ）の分もあけて、1画面に収める
     if (el.classList.contains('hrow')) for (let s = el.nextElementSibling; s; s = s.nextElementSibling) { const cs = getComputedStyle(s); if (cs.display !== 'none') below += (s.matches('details[open]') ? s.offsetHeight - ((s.querySelector(':scope > :not(summary)') || {}).offsetHeight || 0) : s.offsetHeight) + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0) + 8; }
-    el.style.maxHeight = Math.max(el.classList.contains('hrow') ? 180 : 260, window.innerHeight - top - 16 - below) + 'px';
+    el.style.maxHeight = Math.max(el.classList.contains('hrow') ? 180 : 260, viewH() - top - 16 - below) + 'px';
     if (el.classList.contains('hrow') || el.classList.contains('cgrid') || el.classList.contains('dgrid')) el.style.height = el.style.maxHeight;   // 本部ボード: 左右のパネルを同じ高さで画面の下まで
   });
-  const hr = big && document.querySelector('.hrow.fill, .cgrid.fill, .dgrid.fill');   // まだ数px はみ出すなら、その分だけ縮めて画面の中に収める
-  if (hr) { const xo = [...document.querySelectorAll('#main details[open] > :not(summary)')].reduce((t, d) => t + d.offsetHeight, 0); const over = document.documentElement.scrollHeight - window.innerHeight - xo; if (over > 0) { const h = Math.max(180, parseFloat(hr.style.height) - over) + 'px'; hr.style.height = h; hr.style.maxHeight = h; } }
+  const hr = big && (document.querySelector('.hrow.fill, .cgrid.fill, .dgrid.fill') || [...document.querySelectorAll('#main .fill')].find(e => e.offsetParent && e.style.maxHeight));   // まだ数px はみ出すなら、その分だけ縮めて画面の中に収める
+  if (hr) {
+    const xo = [...document.querySelectorAll('#main details[open] > :not(summary)')].reduce((t, d) => t + d.offsetHeight, 0);
+    const se = document.scrollingElement || document.documentElement, over = (se.scrollHeight - se.clientHeight) / FITZR - xo;
+    const grid = hr.matches('.hrow, .cgrid, .dgrid');
+    if (over > 0 && over < 200) { const h = Math.max(grid ? 180 : 200, parseFloat(hr.style.maxHeight) - over) + 'px'; hr.style.maxHeight = h; if (grid) hr.style.height = h; }
+  }
 }
 
 // ---------------------------------------------------------------- 液体ガラスのレンズ（参考動画の iOS セグメントと同じ動き）
@@ -3349,17 +3413,17 @@ function followPointer(st, cx, cy) {
   const first = itemRect(items[0]), last = itemRect(items[items.length - 1]);
   const soft = (v, lo, hi) => v < lo ? lo - (lo - v) * 0.18 : v > hi ? hi + (v - hi) * 0.18 : v;   // 端の外へは少しだけ
   if (st.grid) {          // 格子状（本部ボードの全種目）: 縦横どちらにも指に付いてくる
-    const px = cx - box.left + seg.scrollLeft, py = cy - box.top + seg.scrollTop;
+    const px = (cx - box.left) / FITZR + seg.scrollLeft, py = (cy - box.top) / FITZR + seg.scrollTop;
     const near = nearestItem(st, { x: px, y: py }), nr = near ? itemRect(near) : first;
     const maxX = Math.max(...items.map(it => it.offsetLeft + it.offsetWidth)), maxY = Math.max(...items.map(it => it.offsetTop + it.offsetHeight));
     st.t = { x: soft(px - nr.w / 2, first.x, maxX - nr.w), y: soft(py - nr.h / 2, first.y, maxY - nr.h), w: nr.w, h: nr.h };
   } else if (st.vert) {
-    const near = nearestItem(st, cy - box.top + seg.scrollTop), nr = near ? itemRect(near) : first;
-    const h = nr.h, y = soft(cy - box.top + seg.scrollTop - h / 2, first.y, last.y + last.h - h);
+    const near = nearestItem(st, (cy - box.top) / FITZR + seg.scrollTop), nr = near ? itemRect(near) : first;
+    const h = nr.h, y = soft((cy - box.top) / FITZR + seg.scrollTop - h / 2, first.y, last.y + last.h - h);
     st.t = { x: nr.x, y, w: nr.w, h };
   } else {
-    const near = nearestItem(st, cx - box.left + seg.scrollLeft), nr = near ? itemRect(near) : first;
-    const w = d.size.w + (nr.w - d.size.w) * 0.5, x = soft(cx - box.left + seg.scrollLeft - w / 2, first.x, last.x + last.w - w);
+    const near = nearestItem(st, (cx - box.left) / FITZR + seg.scrollLeft), nr = near ? itemRect(near) : first;
+    const w = d.size.w + (nr.w - d.size.w) * 0.5, x = soft((cx - box.left) / FITZR + seg.scrollLeft - w / 2, first.x, last.x + last.w - w);
     st.t = { x, y: nr.y, w, h: nr.h };
   }
   kickLens(st);
@@ -3468,8 +3532,8 @@ function showTip(item) {
   tip.innerHTML = '<b>' + esc(item.dataset.tipTitle || '') + '</b><span>' + esc(item.dataset.tip) + '</span>';
   const r = item.getBoundingClientRect();
   tip.classList.add('on');
-  const w = tip.offsetWidth, x = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width / 2 - w / 2));
-  tip.style.left = x + 'px'; tip.style.top = (r.bottom + 10) + 'px';
+  const rl = rectL(item), w = tip.offsetWidth, x = Math.max(8, Math.min(viewW() - w - 8, rl.left + rl.width / 2 - w / 2));
+  tip.style.left = x + 'px'; tip.style.top = (rl.bottom + 10) + 'px';
   tipFor = item;
 }
 function hideTip() { clearTimeout(tipTimer); tipTimer = 0; tipFor = null; const t = $('#tip'); if (t) t.classList.remove('on'); }
@@ -3590,6 +3654,8 @@ function renderNav() {
       '<button class="ph-t" data-act="redo" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '<span>やり直し</span></button>' +
       '<button class="ph-t" data-act="backup">' + icon('save') + '<span>バックアップ</span></button></div>' : '') +
     '<div class="navprefs">' +
+    '<div class="navfit"><span class="small muted">画面の大きさ（どのパソコンでも同じ並びで、画面に合わせて自動で拡大・縮小）</span><div class="seg h mini" data-seg-id="navfit"><span class="lens" aria-hidden="true"></span>' +
+    [['auto', '自動'], ['small', '小さめ'], ['large', '大きめ'], ['off', '調整しない']].map(([v, l]) => '<button type="button" class="segbtn ' + ((navPref.fit || 'auto') === v ? 'on' : '') + '" data-seg data-act="navFit" data-v="' + v + '">' + l + '</button>').join('') + '</div></div>' +
     '<div class="seg h mini" data-seg-id="navside"><span class="lens" aria-hidden="true"></span>' +
     [['left', '左に表示'], ['right', '右に表示']].map(([v, l]) => '<button type="button" class="segbtn ' + (navPref.side === v ? 'on' : '') + '" data-seg data-act="navSide" data-v="' + v + '">' + l + '</button>').join('') + '</div>' +
     '<button type="button" class="pinbtn ' + (navPref.pinned ? 'on' : '') + '" data-act="navPin" aria-pressed="' + navPref.pinned + '" ' + (wide ? '' : 'disabled title="画面の幅が広いときに使えます"') + '>' + icon('pin', 'ic sm') + '常に表示</button>' +
@@ -4632,6 +4698,7 @@ const ACTIONS = {
   closeNav: () => { if (navPinnedNow()) { navPref.pinned = false; saveNavPref(); } navOpen = false; render(); },
   uiMode: t => { navPref.ui = t.dataset.v === 'auto' ? undefined : t.dataset.v; saveNavPref(); navOpen = false; render(); window.scrollTo(0, 0); toast(t.dataset.v === 'phone' ? 'スマホ版の画面にしました' : t.dataset.v === 'pc' ? 'PC版の画面にしました' : '画面の種類を自動にしました（' + (isPhone() ? 'スマホ版' : 'PC版') + '）'); },
   navSide: t => { navPref.side = t.dataset.v; saveNavPref(); render(); },
+  navFit: t => { navPref.fit = t.dataset.v; saveNavPref(); applyFit(); render(); toast('画面の大きさ: ' + t.textContent.trim()); },
   navPin: () => { navPref.pinned = !navPref.pinned; saveNavPref(); navOpen = !navPref.pinned; render(); },
   setui: t => setUI(t.dataset.key, t.dataset.v),
   lock: () => {
@@ -4964,7 +5031,7 @@ function fitPages(root) {
   root.querySelectorAll('.pg').forEach(pg => {
     const b = pg.querySelector('.pg-b'), z = pg.querySelector('.pg-z');
     const H = b.clientHeight * 0.98, W = b.clientWidth;
-    const scaleNeed = () => { z.style.zoom = 1; const r = z.getBoundingClientRect(); return Math.min(1, H / r.height, W / r.width); };
+    const scaleNeed = () => { z.style.zoom = 1; const r = rectL(z); return Math.min(1, H / r.height, W / r.width); };
     z.classList.remove('two');
     const s1 = scaleNeed();
     if (z.classList.contains('fixedpg')) return;      // プログラム: 大きさは固定（どのページも同じ）
@@ -4985,18 +5052,18 @@ function fitPages(root) {
     let sc = scaleNeed();
     for (let i = 0; i < 4 && sc < 1; i++) {
       z.style.zoom = Math.max(0.3, (parseFloat(z.style.zoom) || 1) * sc * 0.99);
-      const r = z.getBoundingClientRect();
+      const r = rectL(z);
       sc = Math.min(1, H / r.height, W / r.width);
     }
     // プログラム: 余白が大きく残るときは、行の高さを広げて用紙を使い切る（手書きの記入欄も書きやすくなる）
     z.style.removeProperty('--rp');
     if (z.classList.contains('col1') && sc >= 1) {
       const rows = z.querySelectorAll('.ptab tbody tr:not(.emp)').length;
-      const extra = H - z.getBoundingClientRect().height;
+      const extra = H - rectL(z).height;
       if (rows && extra > 20) {
         const per = Math.min(44, extra / rows) / 2;
         z.style.setProperty('--rp', per.toFixed(1) + 'px');
-        for (let i = 0; i < 3 && z.getBoundingClientRect().height > H; i++) z.style.setProperty('--rp', (parseFloat(z.style.getPropertyValue('--rp')) * 0.85).toFixed(1) + 'px');
+        for (let i = 0; i < 3 && rectL(z).height > H; i++) z.style.setProperty('--rp', (parseFloat(z.style.getPropertyValue('--rp')) * 0.85).toFixed(1) + 'px');
       }
     }
   });
@@ -5012,11 +5079,11 @@ function fitFixed(zs) {
   const tables = zs.flatMap(z => [...z.querySelectorAll('table.fixrow')]);
   if (!tables.length) return;
   const set = v => tables.forEach(t => t.style.setProperty('--rowh', v.toFixed(2) + 'mm'));
-  const over = () => Math.max(...zs.map(z => { z.style.zoom = 1; return z.getBoundingClientRect().height / (z.parentElement.clientHeight * 0.985); }));
+  const over = () => Math.max(...zs.map(z => { z.style.zoom = 1; return rectL(z).height / (z.parentElement.clientHeight * 0.985); }));
   // 文字（フリガナ付きの名前）が入る一番低い行の高さを測る。これより低くはしない（枠や丸が文字より小さくならない）
   set(0.5);
   const pxmm = 96 / 25.4;
-  const nat = Math.max(...tables.flatMap(t => [...t.querySelectorAll('tbody tr:not(.emp)')].map(tr => tr.getBoundingClientRect().height))) / pxmm;
+  const nat = Math.max(...tables.flatMap(t => [...t.querySelectorAll('tbody tr:not(.emp)')].map(tr => rectL(tr).height))) / pxmm;
   const minH = Math.max(4.6, (isFinite(nat) ? nat : 0) + 0.3);
   const start = Math.max(minH, parseFloat(tables[0].style.getPropertyValue('--rowh')) || 8);
   set(start);
@@ -5198,8 +5265,10 @@ function printDocs(docs, msg) {
   // 記録証・賞状を A5 横にしたとき: 証書だけなら用紙全体を A5 横に。ほかの印刷物と一緒なら証書のページだけ A5 横（名前付きページ）
   const isCert = d => /^cert/.test(d.key || ''), a5 = certPaper() === 'A5' && docs.some(isCert), onlyCert = docs.every(isCert);
   $('#page-style').textContent = a5 && onlyCert ? '@page { size: A5 landscape; margin: 8mm 7mm }' : '@page { size: A4 portrait; margin: 15.5mm 7mm }' + (a5 ? ' @page a5l { size: A5 landscape; margin: 8mm 7mm } .cert.a5 { page: a5l }' : '');   // 中身は 196×266mm。Chrome/Edge は上下中央に、Safari・iPhone・iPad は各自の余白でも1枚に収まる
+  // 印刷は拡大・縮小なし（等倍）で行うので、ページの合わせ込みも等倍で測る（端末によって結果が変わらないように）
+  const zoomed = FITZ !== 1; if (zoomed) { document.documentElement.style.zoom = ''; FITZR = 1; }
   fitPages(root);
-  setTimeout(() => { try { window.print(); } catch (e) { toast('印刷を開始できませんでした: ' + e.message, 'err'); } }, 80);
+  setTimeout(() => { try { window.print(); } catch (e) { toast('印刷を開始できませんでした: ' + e.message, 'err'); } if (zoomed) applyFit(); }, 80);
   const pages = docs.reduce((a, d) => a + d.pages, 0);
   toast((msg || '印刷します') + '（' + (a5 && onlyCert ? 'A5 横' : a5 ? 'A4 縦・証書は A5 横' : 'A4 縦') + '・' + pages + '枚）');
 }
@@ -5520,7 +5589,7 @@ function seatStart() {
   d.started = true;
   const r = d.el.getBoundingClientRect();
   d.dx = d.x - r.left; d.dy = d.y - r.top;
-  const g = d.el.cloneNode(true); g.className = 'pcard pghost'; g.removeAttribute('data-act'); g.style.width = r.width + 'px';
+  const g = d.el.cloneNode(true); g.className = 'pcard pghost'; g.removeAttribute('data-act'); g.style.width = (r.width / FITZR) + 'px';
   document.body.appendChild(g); d.ghost = g;
   d.el.classList.add('lifting'); document.documentElement.classList.add('dragging-seat');
   seatMoveGhost(d.x, d.y);
@@ -5528,7 +5597,7 @@ function seatStart() {
 }
 function seatMoveGhost(x, y) {
   const d = seatDrag.on; if (!d || !d.ghost) return;
-  d.ghost.style.left = (x - d.dx) + 'px'; d.ghost.style.top = (y - d.dy) + 'px';
+  d.ghost.style.left = ((x - d.dx) / FITZR) + 'px'; d.ghost.style.top = ((y - d.dy) / FITZR) + 'px';
   const t = seatTarget(x, y);
   if (t !== d.over) { if (d.over) d.over.classList.remove('over'); d.over = t; if (t) t.classList.add('over'); }
   // 端に近づいたら自動でスクロール
@@ -6160,6 +6229,7 @@ function makeSample() {
 /* ---------------------------------------------------------------- 起動 */
 (function boot() {
   load();
+  applyFit();
   view = (location.hash || '#home').slice(1) || 'home';
   if (!VIEWS[view]) view = 'home';
   recompute();
