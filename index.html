@@ -1293,6 +1293,39 @@ html.phone .rbar .pmodes, html.phone .rbar [data-act="printProg"] { display: non
 .progbar > .pill { flex: 0 0 auto; }
 html.phone .kstrip .kbtn.rb { flex: 0 0 56px !important; width: 56px !important; min-height: 56px !important; font-size: 10px !important; margin-left: auto; }
 html.phone .progbar > .btn.rb[data-act="progStep"] { width: 48px !important; height: 48px !important; min-width: 48px !important; min-height: 48px !important; flex-basis: 48px !important; }
+
+/* リレーの泳者: 2列×2行のマス（1〜4泳者）。名前は切らない */
+.mgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px 10px; width: 100%; min-width: 0; }
+.mg { display: flex; align-items: baseline; gap: 4px; min-width: 0; white-space: nowrap; font-size: 13px; line-height: 1.3; }
+.mg > i { flex: 0 0 auto; font-style: normal; font-size: 10px; font-weight: 700; color: var(--muted); width: 13px; height: 13px; border-radius: 50%; background: var(--track); display: inline-grid; place-items: center; align-self: center; }
+.mg > b { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.mg > em { font-style: normal; color: #b45309; font-weight: 600; }
+.mgrid.rb4 .mg { line-height: 1.15; }
+.mgrid.rb4 ruby rt { font-size: 8.5px; }
+/* 組替えカード（リレー）: チーム名＋区分 / 泳者のマス */
+.rcard .mgrid { margin-top: 1px; }
+.rcard .rc-cat { padding: 0 6px; border-radius: 999px; background: var(--track); font-size: 11px; }
+/* 記録入力（リレー）: 行は全部同じ高さで、泳者4人がすべて読める高さ */
+table.pt.prel tbody tr td, table.pt.prel tbody tr.emp td { height: 84px !important; }
+table.pt.prel td.rnm { white-space: normal; }
+table.pt.prel td.rnm .one { font-size: 15px; margin-bottom: 2px; }
+@container (max-width: 700px) { table.pt.prel tbody tr, table.pt.prel tbody tr.emp { height: 150px !important; min-height: 150px !important; } table.pt.prel tbody tr td { height: auto !important; } }
+/* 空きレーンの検索: × は入力欄の縦の真ん中 */
+.slot-q .sq-x { top: 50% !important; transform: translateY(-50%); }
+.sq-list .sq-mem { display: block; width: 100%; font-size: 11.5px; color: var(--muted); white-space: normal; line-height: 1.3; }
+.sq-list button { flex-wrap: wrap; }
+table.pt.prel td.rnm .rcat { display: none; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: var(--track); font-size: 11px; font-weight: 600; color: var(--muted); }
+@container (max-width: 700px) {
+  table.pt.prel tbody tr:not(.emp) { grid-template-areas: "ln nm nm" "rk tm jd" !important; }
+  table.pt.prel tbody tr:not(.emp) td.mt { display: none !important; }
+  table.pt.prel td.rnm .rcat { display: inline-block; }
+  table.pt.prel tbody tr, table.pt.prel tbody tr.emp { height: 138px !important; min-height: 138px !important; }
+}
+.pcard.rcard { padding: 4px 12px !important; gap: 2px; }
+.rcard .mg { line-height: 1.25; }
+.rcard .rc-top { line-height: 1.25; }
+.rm-del.ph { visibility: hidden; display: inline-block; flex: 0 0 36px; }
+.rm-row .rm-del { flex: 0 0 36px; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -3223,6 +3256,12 @@ function rubyName(np) {
   return '<ruby>' + esc(np.kanji) + '<rt>' + esc(np.kana) + '</rt></ruby>';
 }
 // リレーの泳者4人（途中で改行しない）
+// リレーの泳者4人は、第1〜第4泳者を 2列×2行 のマスに1人ずつ（名前が途中で切れない・番号で誰か分かる）
+function relayGrid(it, ruby) {
+  const ms = [0, 1, 2, 3].map(i => (it.memberNames || [])[i] || {});
+  return '<span class="mgrid' + (ruby ? ' rb4' : '') + '">' + ms.map((m, i) => '<span class="mg" title="第' + (i + 1) + '泳者 ' + esc(m.kanji || '未定') + '"><i>' + (i + 1) + '</i>' +
+    (m.kanji ? (ruby ? rubyName(m) : '<b>' + esc(m.kanji.replace(/　/g, ' ')) + '</b>') : '<em>未定</em>') + '</span>').join('') + '</span>';
+}
 function rubyMembers(it, sep) { return it.memberNames.filter(m => m.kanji).map(m => '<span class="nw">' + rubyName(m) + '</span>').join(sep || ' / '); }
 // 判定（棄権・失格・対象外）はボタンで。押すと設定、もう一度押すと解除
 const JUDGES = ['棄権', '失格', '対象外'];
@@ -3610,7 +3649,7 @@ VIEWS.program = () => {
         const byLane = new Map(h.items.map(it => [it.lane, it]));
         const noLane = h.items.filter(it => !it.lane);
         const hDone = h.items.every(it => it.status !== '未入力');
-        return '<div class="tablewrap pw' + (h.heat === curHeat ? ' cur' : '') + '" data-heat="' + h.heat + '"><table class="t pt"><colgroup><col class="c-ln"><col><col class="c-mt"><col class="c-tm"><col class="c-jd"><col class="c-rk"></colgroup>' +
+        return '<div class="tablewrap pw' + (h.heat === curHeat ? ' cur' : '') + '" data-heat="' + h.heat + '"><table class="t pt' + (p.relay ? ' prel' : '') + '"><colgroup><col class="c-ln"><col><col class="c-mt"><col class="c-tm"><col class="c-jd"><col class="c-rk"></colgroup>' +
           '<thead><tr class="ph"><th colspan="6">第 ' + h.heat + ' 組' + (hDone ? '　<span class="pill ok">✓ 入力済み</span>' : '') + '</th></tr><tr class="pc"><th class="c">レーン</th><th>' + (p.relay ? 'チーム・泳者' : '氏名・チーム') + '</th><th>区分・申込</th><th>公式タイム</th><th>判定</th><th class="c">順位</th></tr></thead><tbody>' +
           lanes.map(ln => byLane.get(ln)).concat(noLane).map((it, j) => {
             if (!it) return '<tr class="emp"><td class="c ln"><span class="lane">' + lanes[j] + '</span></td><td colspan="5" class="muted small">（空き）</td></tr>';
@@ -3620,7 +3659,8 @@ VIEWS.program = () => {
             const who = p.relay ? it.teamDisp : it.np.kanji, sub = p.relay ? it.memberText : it.club;
             const entry = it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '';
             return '<tr data-row="' + it.id + '" class="' + (iss.length ? 'warn' : '') + '" title="' + esc(iss.map(x => x.msg).join('\n')) + '"><td class="c ln"><span class="lane">' + (it.lane || '?') + '</span></td>' +
-              '<td class="nm"><div class="one fit"><b>' + (p.relay ? esc(who) : rubyName(it.np)) + '</b></div><div class="one sub fit">' + (iss.length ? '<span class="pill warn">要確認</span> ' : '') + (p.relay ? rubyMembers(it) : esc(sub)) + '</div></td>' +
+              (p.relay ? '<td class="nm rnm"><div class="one"><b>' + esc(who) + '</b><span class="rcat">' + esc(it.cat) + '</span>' + (iss.length ? ' <span class="pill warn">要確認</span>' : '') + '</div>' + relayGrid(it, true) + '</td>' :
+              '<td class="nm"><div class="one fit"><b>' + rubyName(it.np) + '</b></div><div class="one sub fit">' + (iss.length ? '<span class="pill warn">要確認</span> ' : '') + esc(sub) + '</div></td>') +
               '<td class="mt"><div class="one fit">' + esc(it.cat) + (it.event !== ui.prog ? ' <span class="pill mute">' + esc(it.event.split(' ')[0]) + '</span>' : '') + '</div><div class="one sub num">' + (entry ? '申込 ' + entry : '　') + '</div></td>' +
               '<td class="tm"><div class="tbox">' + timeCell(pre + 'officialTime', src.officialTime, '', 'data-col="prog" aria-label="' + esc(who) + ' 公式タイム"') + '</div></td>' +
               '<td class="jd">' + judgeBtns(pre + 'judge', src.judge) + '</td><td class="c rk"><b>' + (it.rank ? it.rank + '位' : it.status === '失格' || it.status === '棄権' || it.status === '対象外' ? '<span class="pill ' + (it.status === '失格' ? 'err' : it.status === '対象外' ? 'mute' : 'warn') + '">' + it.status + '</span>' : '') + '</b></td></tr>';
@@ -3655,10 +3695,9 @@ function arrHeats(p, prog, lanes) {
     const entry = it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '';
     const nMem = p.relay ? it.members.filter(Boolean).length : 4;
     if (p.relay) {     // リレー: 1行目にチーム名（大きく）、2行目以降に泳者4人（漢字・2行まで）。文字は縮めない
-      const mem = it.memberNames.map(m => m.kanji ? '<span class="rc-m">' + esc(m.kanji.replace(/　/g, ' ')) + '</span>' : '<i class="rc-none">未定</i>').concat(Array(Math.max(0, 4 - it.memberNames.length)).fill('<i class="rc-none">未定</i>')).slice(0, 4);
       return '<button type="button" class="pcard rcard' + (ui.arrSel === it.id ? ' sel' : '') + (it.seatFixed ? ' locked' : '') + '" data-act="seatPick" data-id="' + esc(it.id) + '" data-prog="' + esc(prog) + '" aria-label="' + esc(who) + '（第' + it.heat + '組 ' + it.lane + 'レーン）">' +
-        '<span class="rc-top"><b class="rc-team">' + esc(who) + '</b>' + (nMem < 4 ? '<span class="et short" title="泳者が足りません">' + nMem + '/4人</span>' : entry ? '<span class="et">' + esc(entry) + '</span>' : '') + '</span>' +
-        '<span class="rc-mem"><span class="rc-cat">' + esc(it.cat) + '</span>' + mem.join('<span class="rc-sep">・</span>') + '</span></button>';
+        '<span class="rc-top"><b class="rc-team">' + esc(who) + '</b><span class="rc-cat">' + esc(it.cat) + '</span>' + (nMem < 4 ? '<span class="et short" title="泳者が足りません">' + nMem + '/4人</span>' : entry ? '<span class="et">' + esc(entry) + '</span>' : '') + '</span>' +
+        relayGrid(it, false) + '</button>';
     }
     return '<button type="button" class="pcard' + (ui.arrSel === it.id ? ' sel' : '') + (it.seatFixed ? ' locked' : '') + '" data-act="seatPick" data-id="' + esc(it.id) + '" data-prog="' + esc(prog) + '" aria-label="' + esc(who) + '（第' + it.heat + '組 ' + it.lane + 'レーン）">' +
       '<span class="fit nm"><b>' + (p.relay ? esc(who) : rubyName(it.np)) + '</b></span><span class="fit sub">' + (p.relay ? rubyMembers(it) : esc(it.club)) + '・' + esc(it.cat) + '</span>' + (p.relay && nMem < 4 ? '<span class="et short" title="泳者が足りません">' + nMem + '/4人</span>' : '<span class="et">' + esc(entry) + '</span>') + '</button>';
@@ -3669,7 +3708,7 @@ function arrHeats(p, prog, lanes) {
     const q = C.normKey(ui.arrQ || ''), pool = p.items.concat(ui.arrOther && prog !== ui.arrOther ? programData(ui.arrOther).items : ui.arrOther ? programData(ui.prog).items : []);
     const list = pool.filter(it => !q || C.normKey(it.name + (it.teamDisp || '') + (it.members || []).join('') + it.club).indexOf(q) >= 0).slice(0, 12);
     return '<div class="slot-q"><input data-k="ui:arrQ" value="' + esc(ui.arrQ || '') + '" placeholder="名前で検索して入れる" aria-label="このレーンに入れる選手を検索"><button type="button" class="sq-x" data-act="arrTargetOff" aria-label="やめる">×</button>' +
-      '<div class="sq-list">' + (list.length ? list.map(it => '<button type="button" data-act="arrPut" data-id="' + esc(it.id) + '"><b>' + esc(p.relay ? it.teamDisp : it.np.kanji) + '</b><span>' + esc((it.program !== prog ? it.program + '・' : '') + '第' + it.heat + '組' + it.lane + 'レーン') + '</span></button>').join('') : '<p>見つかりません</p>') + '</div></div>';
+      '<div class="sq-list">' + (list.length ? list.map(it => '<button type="button" data-act="arrPut" data-id="' + esc(it.id) + '"><b>' + esc(p.relay ? it.teamDisp : it.np.kanji) + '</b><span>' + esc((it.program !== prog ? it.program + '・' : '') + '第' + it.heat + '組' + it.lane + 'レーン') + '</span>' + (p.relay ? '<small class="sq-mem">' + esc(it.memberNames.filter(m => m.kanji).map(m => m.kanji.replace(/　/g, ' ')).join('・')) + '</small>' : '') + '</button>').join('') : '<p>見つかりません</p>') + '</div></div>';
   };
   const heat = (h, isNew) => {
     const its = p.items.filter(it => it.heat === h);
@@ -3708,7 +3747,7 @@ VIEWS.ranking = () => {
   const body = cats.map(c => {
     const list = src.filter(it => it.event === ui.rankEv && it.cat === c && it.rank).sort((a, b) => a.rankOrder - b.rankOrder);
     return '<div class="tablewrap" style="margin-bottom:10px"><table class="t"><thead><tr><th colspan="5" style="color:var(--ink);font-size:13px">' + esc(ui.rankEv) + '　' + esc(c) + '</th></tr><tr><th class="c">順位</th><th>' + (relay ? 'チーム名' : '氏名') + '</th><th>' + (relay ? '出場メンバー' : 'チーム名') + '</th><th>区分</th><th class="num">公式タイム</th></tr></thead><tbody>' +
-      (list.length ? list.map(it => '<tr><td class="c"><b>' + it.rank + '</b></td><td>' + (relay ? esc(it.teamDisp) : rubyName(it.np)) + '</td><td>' + (relay ? rubyMembers(it) : esc(it.club)) + '</td><td>' + esc(it.cat) + '</td><td class="num">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="5" class="muted">記録がまだありません</td></tr>') +
+      (list.length ? list.map(it => '<tr><td class="c"><b>' + it.rank + '</b></td><td>' + (relay ? esc(it.teamDisp) : rubyName(it.np)) + '</td><td>' + (relay ? relayGrid(it, true) : esc(it.club)) + '</td><td>' + esc(it.cat) + '</td><td class="num">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="5" class="muted">記録がまだありません</td></tr>') +
       '</tbody></table></div>';
   }).join('');
   return '<h1 class="view">公式ランキング</h1><p class="lead">種目・区分ごとの公式順位です。同タイムは同順位になります。</p>' +
@@ -4875,7 +4914,7 @@ function relMemDialog(id) {
     return '<h2>泳者の追加・交代</h2><p class="muted small rm-team">' + esc(team + (r.mark ? ' ' + r.mark : '') + '・' + C.str(r.event) + '・' + cat) + '</p>' +
       '<div class="rm-rows">' + mem.map((m, i) => '<div class="rm-row' + (i === tgt ? ' tgt' : '') + (m ? '' : ' none') + '">' +
         '<button type="button" class="rm-pick" data-i="' + i + '"><span class="rm-no">第' + (i + 1) + '泳者</span><span class="rm-nm">' + (m ? rubyName(C.splitName(m)) : '（未定）') + '</span></button>' +
-        (m ? '<button type="button" class="x rm-del" data-i="' + i + '" aria-label="第' + (i + 1) + '泳者を外す" title="外す">×</button>' : '') + '</div>').join('') + '</div>' +
+        (m ? '<button type="button" class="x rm-del" data-i="' + i + '" aria-label="第' + (i + 1) + '泳者を外す" title="外す">×</button>' : '<span class="x rm-del ph" aria-hidden="true"></span>') + '</div>').join('') + '</div>' +
       '<p class="small rm-hint">' + (full ? '4人そろっています。交代するときは、上で替える泳者を押してから選んでください。' : '<b>第' + (tgt + 1) + '泳者</b>に入れます（上の行を押すと入れる所を変えられます）') + '</p>' +
       '<input id="rm-q" class="rm-q" value="' + esc(q) + '" placeholder="名前・クラブで検索（同じクラブが上）" aria-label="泳者を検索" autocomplete="off">' +
       '<div class="rm-list">' + (list.length ? list.map((s, j) => { const o = others.get(C.normKey(s.np.kanji)); return '<button type="button" class="rm-cand" data-j="' + j + '"' + (full ? ' disabled' : '') + '><span class="rm-nm">' + rubyName(s.np) + '</span><span class="rm-sub">' + esc(s.club + (s.cat ? '・' + s.cat : '')) + (o ? '<em>（' + esc(o) + 'にも登録）</em>' : '') + '</span></button>'; }).join('') : '<p class="muted small">一覧に見つかりません</p>') +
