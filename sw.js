@@ -1,5 +1,5 @@
 // オフラインでも開けるようにする（常に最新を取りに行き、つながらないときだけ保存済みを使う）
-const CACHE = 'swim-meet-board-v3';
+const CACHE = 'swim-meet-board-v4';
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', e => {
