@@ -1516,6 +1516,35 @@ html.final #main input:disabled, html.final #main select:disabled, html.final #m
 .brand-t:has(#toptitle.two) small { display: none; }
 @media print { html { zoom: 1 !important; } }
 .navfit { display: grid; gap: 4px; margin: 6px 0; } .navfit .seg { width: 100%; } .navfit .segbtn { flex: 1 1 0; padding-left: 4px; padding-right: 4px; }
+
+/* ===== 2026-11-27: 画面一覧の設定は横1行ずつ・説明なし／関連ボタンは1行／大会名は2段目に全文 ===== */
+.navprefs { display: flex !important; flex-wrap: nowrap !important; gap: 6px; align-items: center; padding: 0 2px; margin-top: 4px; }
+.navprefs .nside { flex: 1 1 0; min-width: 0; display: flex; }
+.navprefs .nside .segbtn { flex: 1 1 0; min-height: 34px; padding: 0 6px; font-size: 13px; }
+.navprefs .pinbtn { flex: 1.3 1 0; min-width: 0; min-height: 34px; padding: 0 8px; justify-content: center; font-size: 12.5px; white-space: nowrap; }
+.navfit { display: flex !important; align-items: center; gap: 6px; margin: 6px 0 4px; padding: 0 2px; }
+.navfit .nfl { flex: 0 0 auto; font-size: 12px; color: var(--muted); font-weight: 600; }
+.navfit .seg { flex: 1 1 auto; min-width: 0; width: auto !important; display: flex; }
+.navfit .segbtn { flex: 1 1 0; min-height: 34px; padding: 0 4px !important; font-size: 13px; }
+.nav a { white-space: normal !important; line-height: 1.25; }
+.nav a > span { overflow: visible !important; }
+/* 丸ボタンと選択欄・検索欄を同じ1行に */
+.bar.rbar.mixed { align-items: center !important; }
+.bar.rbar.mixed > select, .bar.rbar.mixed > input:not([type=checkbox]):not([type=radio]):not([type=file]) { flex: 0 1 200px; min-width: 120px; height: 44px; min-height: 44px; border-radius: 22px; padding: 0 16px; font-size: 14px; box-sizing: border-box; }
+.bar.rbar.mixed > label:has(> input[type=checkbox]) { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid var(--btn-edge); background: var(--btn-bg); font-size: 13.5px; white-space: nowrap; cursor: pointer; }
+.bar.rbar.mixed > label:has(> input[type=checkbox]:checked) { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.bar.rbar.mixed > .seg { flex: 0 0 auto; }
+.bar.rbar.mixed > span:not(.grow) { flex: 0 1 auto; min-width: 0; white-space: nowrap; }
+.bar.rbar.mixed > .grow { display: block !important; flex: 1 1 0; min-width: 0; }
+/* 大会名: 2段目の左に全文（長いときは文字を小さく） */
+.tmon .tmeet { flex: 0 1 auto; min-width: 0; max-width: 48%; display: flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 999px; background: var(--track); }
+.tmon .tmeet b { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink); }
+.brand-t small { display: none; }
+.topbar .brand-t small, .brand .brand-t small { display: none !important; }
+.bar.rbar.mixed > select { flex: 0 0 auto !important; min-width: 0; width: auto; max-width: 260px; padding-right: 34px; }
+.bar.rbar.mixed > input:not([type=checkbox]):not([type=radio]):not([type=file]) { flex: 0 1 220px !important; min-width: 150px !important; }
+.topbar .tmon { width: 0 !important; min-width: 100% !important; }
+.tmon .tnote { flex: 1 1 0 !important; min-width: 160px; } .tmon .tmeet { flex: 0 0 auto !important; max-width: 50%; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -3050,6 +3079,10 @@ function roundify(root) {
     if (!rbs.length) return;
     const others = [...bar.children].filter(c => !c.classList.contains('rb') && !c.classList.contains('grow') && !c.classList.contains('pmodes') && (c.textContent.trim() || c.querySelector('input, select, textarea')));
     if (!others.length) { bar.classList.add('rbar'); const pm = bar.querySelector(':scope > .pmodes'); if (pm) { const f = document.createElement('div'); f.className = 'bar frow'; f.appendChild(pm); bar.after(f); } return; }
+    // まずは丸と選択欄・検索欄を同じ1行に（関連するボタンは横並び）。入りきらないときだけ、丸の列と欄の列に分ける
+    bar.classList.add('rbar', 'mixed');
+    if (bar.isConnected && bar.offsetParent && bar.scrollWidth <= bar.clientWidth + 2) return;
+    bar.classList.remove('rbar', 'mixed');
     const row = document.createElement('div'); row.className = 'bar rbar';
     rbs.forEach(b => row.appendChild(b));
     bar.parentNode.insertBefore(row, bar);
@@ -3135,6 +3168,8 @@ function render() {
   updateFrameStyle();
   sizeFills();
   fitCertPrev();
+  if ($('#toptitle')) fitTitle($('#toptitle'));
+  if ($('.tmeet b')) fitMeet($('.tmeet b'));
   fitProgram();
   schedulePreview();
   document.querySelectorAll('.fill[data-fill-id]').forEach(el => { if (fillScroll[el.dataset.fillId]) el.scrollTop = fillScroll[el.dataset.fillId]; });
@@ -3207,13 +3242,21 @@ function cardTables() {
   });
 }
 // 上部の画面名: 長い名前（プログラム作成・記録入力 など）は、切らずに文字を少し小さくして全部見せる
+function fitMeet(b) {      // 大会名: 切らずに全文が入るまで文字を小さく（11px まで）
+  b.style.fontSize = ''; let fs = parseFloat(getComputedStyle(b).fontSize) || 13;
+  for (let i = 0; i < 8 && b.scrollWidth > b.clientWidth && fs > 10.5; i++) { fs -= 0.5; b.style.fontSize = fs + 'px'; }
+  b.title = b.textContent;
+}
 function fitTitle(t) {
+  if (t.classList.contains('two')) { t.textContent = t.textContent; t.classList.remove('two'); }
   t.style.fontSize = ''; t.style.whiteSpace = 'nowrap';
   let fs = parseFloat(getComputedStyle(t).fontSize) || 16;
   for (let i = 0; i < 4 && t.scrollWidth > t.clientWidth + 1 && fs > 13.5; i++) { fs -= 1; t.style.fontSize = fs + 'px'; }
   t.classList.remove('two');
-  if (t.scrollWidth > t.clientWidth + 1 && /・/.test(t.textContent)) {   // まだ入らなければ「・」で2行に（切らない）
-    const [a, ...b] = t.textContent.split('・'); t.innerHTML = esc(a) + '・<br>' + esc(b.join('・')); t.classList.add('two'); t.style.whiteSpace = 'normal'; t.style.fontSize = '';
+  if (t.scrollWidth > t.clientWidth + 1) {   // まだ入らなければ2行に（「・」があればそこで分ける。切らない）
+    const txt = t.textContent;
+    if (/・/.test(txt)) { const [a, ...b] = txt.split('・'); t.innerHTML = esc(a) + '・<br>' + esc(b.join('・')); }
+    t.classList.add('two'); t.style.whiteSpace = 'normal'; t.style.fontSize = '';
   }
 }
 function liftHeading() {
@@ -3221,6 +3264,7 @@ function liftHeading() {
   if (!h) { if (d) d.textContent = ''; return; }
   const lead = h.nextElementSibling && h.nextElementSibling.classList.contains('lead') ? h.nextElementSibling : (h.parentElement.querySelector(':scope > .lead'));
   if (t) { t.textContent = h.textContent; fitTitle(t); }
+  const mt = $('.tmeet b'); if (mt) fitMeet(mt);
   if (d) d.textContent = '';
   if (t) t.title = lead ? lead.textContent : '';
   const box = h.parentElement;
@@ -3606,7 +3650,7 @@ function renderTop() {
     '<div class="trow2"><div class="tools"><button class="iconbtn" data-act="undo" title="元に戻す (Ctrl+Z)" aria-label="元に戻す" ' + (undoStack.length ? '' : 'disabled') + '>' + icon('undo') + '</button>' +
     '<button class="iconbtn" data-act="redo" title="やり直し (Ctrl+Y)" aria-label="やり直し" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '</button>' +
     '</div>' +
-    '<div class="tmon"><div class="tnote" id="tnote" role="status" aria-live="polite"></div>' +
+    '<div class="tmon"><div class="tmeet" title="大会名"><b>' + esc(state.settings.meetName || 'スイム大会運営ボード') + '</b></div><div class="tnote" id="tnote" role="status" aria-live="polite"></div>' +
     '<button type="button" class="bellbtn" id="bell" data-act="notes" title="通知の一覧" aria-label="通知の一覧">' + icon('bell') + '<span class="bdg"></span></button>' +
     '<div class="notes card" id="notes" hidden></div></div></div>';
 }
@@ -3654,12 +3698,12 @@ function renderNav() {
       '<button class="ph-t" data-act="redo" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '<span>やり直し</span></button>' +
       '<button class="ph-t" data-act="backup">' + icon('save') + '<span>バックアップ</span></button></div>' : '') +
     '<div class="navprefs">' +
-    '<div class="navfit"><span class="small muted">画面の大きさ（どのパソコンでも同じ並びで、画面に合わせて自動で拡大・縮小）</span><div class="seg h mini" data-seg-id="navfit"><span class="lens" aria-hidden="true"></span>' +
-    [['auto', '自動'], ['small', '小さめ'], ['large', '大きめ'], ['off', '調整しない']].map(([v, l]) => '<button type="button" class="segbtn ' + ((navPref.fit || 'auto') === v ? 'on' : '') + '" data-seg data-act="navFit" data-v="' + v + '">' + l + '</button>').join('') + '</div></div>' +
-    '<div class="seg h mini" data-seg-id="navside"><span class="lens" aria-hidden="true"></span>' +
-    [['left', '左に表示'], ['right', '右に表示']].map(([v, l]) => '<button type="button" class="segbtn ' + (navPref.side === v ? 'on' : '') + '" data-seg data-act="navSide" data-v="' + v + '">' + l + '</button>').join('') + '</div>' +
-    '<button type="button" class="pinbtn ' + (navPref.pinned ? 'on' : '') + '" data-act="navPin" aria-pressed="' + navPref.pinned + '" ' + (wide ? '' : 'disabled title="画面の幅が広いときに使えます"') + '>' + icon('pin', 'ic sm') + '常に表示</button>' +
+    '<div class="seg h mini nside" data-seg-id="navside"><span class="lens" aria-hidden="true"></span>' +
+    [['left', '左'], ['right', '右']].map(([v, l]) => '<button type="button" class="segbtn ' + (navPref.side === v ? 'on' : '') + '" data-seg data-act="navSide" data-v="' + v + '" title="画面一覧を' + l + 'に表示">' + l + '</button>').join('') + '</div>' +
+    '<button type="button" class="pinbtn ' + (navPref.pinned ? 'on' : '') + '" data-act="navPin" aria-pressed="' + navPref.pinned + '" ' + (wide ? 'title="画面一覧をいつも表示"' : 'disabled title="画面の幅が広いときに使えます"') + '>' + icon('pin', 'ic sm') + '常に表示</button>' +
     '</div>' +
+    '<div class="navfit" title="画面に合わせて全体を自動で拡大・縮小します（どのパソコンでも同じ並び）"><span class="nfl">大きさ</span><div class="seg h mini" data-seg-id="navfit"><span class="lens" aria-hidden="true"></span>' +
+    [['auto', '自動'], ['small', '小'], ['large', '大'], ['off', '等倍']].map(([v, l]) => '<button type="button" class="segbtn ' + ((navPref.fit || 'auto') === v ? 'on' : '') + '" data-seg data-act="navFit" data-v="' + v + '">' + l + '</button>').join('') + '</div></div>' +
     '<div class="seg v" data-seg-id="nav"><span class="lens" aria-hidden="true"></span>' +
     NAV.map(([h, items]) => '<div class="navgrp"><h6>' + h + '</h6>' + items.map(([v, label]) =>
       '<a href="#' + v + '" draggable="false" class="' + (view === v ? 'on' : '') + '" data-seg data-act="go" data-v="' + v + '" data-tip="' + esc(PAGE_TIPS[v] || '') + '" data-tip-title="' + esc(label) + '"' + (view === v ? ' aria-current="page"' : '') + '>' + icon(v) +
@@ -4383,8 +4427,8 @@ VIEWS.awards = () => {
           '<td class="num muted">' + (r.base > 0 ? C.fmtTime(r.base) : '<span class="pill err">未設定</span>') + '</td><td class="num">' + (r.state === 'nobase' ? '基準未設定' : r.state === 'error' ? '入力エラー' : rate(r.rate)) + '</td></tr>';
       }).join('') + '</tbody></table></div>' : '<div class="empty">種目が1つも設定されていません。マスタ設定③で種目名を入れてください。</div>') + '</div>';
   return '<div class="vhead"><div><h1 class="view">最優秀・優秀選手</h1><p class="lead">基準タイムに対する達成率（基準÷記録）で選びます。最優秀選手は男女各1名。優秀選手は区分×男女ごとに1位を選び、最優秀選手と重なったら2位を繰り上げます。入力は自動で再計算されます。</p></div>' +
-    seg('awTab', [['board', '表彰ボード'], ['cand', '上位候補'], ['input', '記録入力'], ['master', 'マスタ設定']], AT) + '</div>' +
-    '<div class="bar"><button class="btn primary" data-act="awImport">大会結果（1〜3位）から取り込む</button><button class="btn" data-act="awCopyMaster">区分・種目を大会設定からコピー</button><span class="grow"></span><button class="btn" data-act="printAwards">表彰ボードを印刷（A4）</button><button class="btn danger" data-act="awClear">入力をクリア</button></div>' +
+    '</div>' +
+    '<div class="bar">' + seg('awTab', [['board', '表彰ボード'], ['cand', '上位候補'], ['input', '記録入力'], ['master', 'マスタ設定']], AT) + '<button class="btn primary" data-act="awImport">大会結果（1〜3位）から取り込む</button><button class="btn" data-act="awCopyMaster">区分・種目を大会設定からコピー</button><span class="grow"></span><button class="btn" data-act="printAwards">表彰ボードを印刷（A4）</button><button class="btn danger" data-act="awClear">入力をクリア</button></div>' +
     (parts[AT] || parts.board);
 };
 
