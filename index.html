@@ -4066,7 +4066,7 @@ const PAPER = {
 // A5 横（210×148mm）: 文字は小さくせず、フレームの飾り（上下の帯・四隅・両脇）を避けて中央（約 27〜117mm）にまとめる
 PAPER.A5 = { w: 210, h: 148, size: 'A5 landscape', label: 'A5 横',
   ind: { title: [25.5, 23], name: [40.5, 18], club: [48.5, 11], rank: [54.5, 14], event: [61.5, 11.5], record: [68, 12.5], meet: [75, 10.5], lines: [82, 10.5, 5], date: [104.5, 10], org: [112, 12] },
-  rel: { title: [25.5, 23], name: [39, 17], mem1: [49, 10.5], mem2: [55, 10.5], rank: [61, 14], event: [68, 11.5], record: [74, 12.5], lines: [81, 10.5, 4.7], meet: [101, 10.5], date: [106.5, 10], org: [112.5, 12] } };
+  rel: { title: [25.5, 23], name: [39, 17], mem1: [49, 10.5], mem2: [56, 10.5], rank: [62, 14], event: [68.5, 11.5], record: [74.5, 12.5], lines: [81.5, 10.5, 4.6], meet: [101, 10.5], date: [106.5, 10], org: [112.5, 12] } };
 function certPaper() { return (state.settings.print || {}).certPaper === 'A5' ? 'A5' : 'A4'; }
 // A5 横の文言（空欄は A4 と同じ）
 function certTitle(W) { return certPaper() === 'A5' && W.a5 && C.str(W.a5.title) ? W.a5.title : W.title; }
