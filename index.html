@@ -1326,6 +1326,71 @@ table.pt.prel td.rnm .rcat { display: none; margin-left: 6px; padding: 0 6px; bo
 .rcard .rc-top { line-height: 1.25; }
 .rm-del.ph { visibility: hidden; display: inline-block; flex: 0 0 36px; }
 .rm-row .rm-del { flex: 0 0 36px; }
+
+/* 記録証・賞状 A5 横（210×148mm。印刷できる範囲 196×132mm） */
+.pgroot .cert.a5 { height: 132mm; }
+.sheet > .cert.a5 { width: 196mm !important; height: 132mm !important; }
+.cert.a5 .cl { padding: 0 16mm; }
+@media print { #print-root .cert.a5 { height: 132mm !important; } }
+.cpaper select { min-height: 36px; margin-left: 4px; }
+.sheet.a5sheet { width: 210mm; height: 148mm; padding: 8mm 7mm; }
+
+/* =====================================================================
+   丸ボタン v2: 丸の中はアイコンだけ、名前は丸の下（文字が窮屈にならない）
+   ===================================================================== */
+.btn.rb { width: 68px !important; min-width: 68px !important; height: auto !important; min-height: 0 !important; flex: 0 0 68px !important; padding: 0 !important; border-radius: 12px !important;
+  background: transparent !important; border: 0 !important; box-shadow: none !important; color: var(--ink); display: inline-flex !important; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px; overflow: visible; font-size: 11.5px !important; }
+.btn.rb .rbc { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--btn-bg); border: 1px solid var(--btn-edge); color: var(--btn-ink); box-shadow: 0 1px 2px rgba(10, 30, 60, .1); transition: background .15s, transform .12s; }
+.btn.rb .ic { width: 21px; height: 21px; }
+.btn.rb .rbl { display: block; max-width: 68px; font-size: 11.5px; font-weight: 600; line-height: 1.2; color: var(--ink); white-space: nowrap; overflow: visible; letter-spacing: 0; }
+@media (hover: hover) { .btn.rb:hover .rbc { background: var(--fill-hover, var(--accent-soft)); } }
+.btn.rb:active:not(:disabled) { transform: none !important; }
+.btn.rb:active:not(:disabled) .rbc { transform: scale(.94); }
+.btn.rb.primary .rbc { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.rb.tinted .rbc { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.btn.rb.danger .rbc { color: var(--err, #d4343a); border-color: rgba(212, 52, 58, .35); }
+.btn.rb.danger .rbl { color: var(--err, #d4343a); }
+.btn.rb[disabled] { opacity: .4; }
+.btn.rb.on .rbc, .btn.rb.hlock.on .rbc { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.rb.hlock.on, .btn.rb[data-act="heatLock"].on { background: transparent !important; color: var(--ink) !important; }
+.btn.rb.rb-s { width: 56px !important; min-width: 56px !important; flex: 0 0 56px !important; gap: 3px; }
+.btn.rb.rb-s .rbc { width: 38px; height: 38px; }
+.btn.rb.rb-s .ic { width: 17px; height: 17px; }
+.btn.rb.rb-s .rbl { font-size: 10.5px; max-width: 64px; }
+.bar.rbar { gap: 6px; align-items: flex-start; padding: 2px 2px 2px; }
+.progbar > .btn.rb[data-act="progStep"] { width: 60px !important; min-width: 60px !important; flex: 0 0 60px !important; height: auto !important; border-radius: 12px !important; font-size: 11.5px !important; }
+.progbar { align-items: flex-start; }
+.progbar > .progsel, .progbar > .pill { margin-top: 6px; }
+.kstrip .kbtn.rb { align-self: center; }
+
+/* 判定（棄権・失格・対象外）: 少し大きい丸で文字に余裕 */
+.jb { width: 48px !important; height: 48px !important; min-width: 48px !important; min-height: 48px !important; flex: 0 0 48px; font-size: 12.5px !important; letter-spacing: 0; }
+.tn-btn { width: 38px !important; height: 38px !important; min-width: 38px; flex: 0 0 38px; font-size: 11.5px !important; }
+
+/* 選択欄・検索欄の列: どのパネルも同じ高さ・同じ形（丸ボタンの列とは分ける） */
+.bar.frow { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; align-items: center; margin-bottom: 8px; }
+.bar.frow > .grow { display: none; }
+.bar.frow select, .bar.frow input:not([type=checkbox]):not([type=radio]):not([type=file]) { width: 100%; min-width: 0; height: 44px; min-height: 44px; border-radius: 22px; padding: 0 16px; font-size: 14px; box-sizing: border-box; }
+.bar.frow > label, .bar.frow > .pmodes { min-width: 0; }
+.bar.frow > .pmodes { display: contents; }
+.bar.frow > label:has(> input[type=checkbox]) { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--btn-edge); background: var(--btn-bg); font-size: 13.5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar.frow > label:has(> input[type=checkbox]:checked) { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.bar.frow > label > select, .bar.frow > label > input:not([type=checkbox]) { margin-top: 2px; }
+.bar.frow > span:not(.grow):not(.pmodes) { min-width: 0; }
+/* 画面一覧を常に表示したとき: 上端・下端を本部ボードのパネルにそろえる */
+.app.pinned .nav { top: calc(var(--toph, 64px) + 14px) !important; height: calc(100vh - var(--toph, 64px) - 38px) !important; max-height: calc(100vh - var(--toph, 64px) - 38px) !important; margin-top: 0 !important; box-sizing: border-box; }
+
+/* 組替え: 2つの種目を左右に、組は縦に */
+.arr-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.arr-cols .arr { grid-template-columns: minmax(0, 1fr) !important; }
+.arr-cols .arr-sep { position: sticky; top: 0; z-index: 2; margin: 0 0 8px; padding: 8px 12px; border-radius: 14px; background: var(--glass-strong, #fff); font-size: 15px; display: flex; align-items: center; gap: 6px; }
+/* 合同の印（画面の中だけ。印刷物には出さない） */
+.pill.comb { background: #fff1d6; color: #a15c00; border: 1px solid #f0c674; font-weight: 700; }
+.cb-field { display: grid; gap: 4px; margin: 10px 0; }
+.cb-field input { height: 46px; font-size: 17px; font-weight: 700; border-radius: 14px; padding: 0 14px; }
+.evc { white-space: nowrap; } .evc .cbm { margin-left: 6px; vertical-align: middle; }
+.bar.frow { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.btn.rb .rbc { flex: 0 0 auto; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -1531,7 +1596,8 @@ const Core = (() => {
   }
   function combinedOf(S, event, cat) {
     const rules = S.combined || [];
-    for (let p = 0; p < 3; p++) {
+    const maxP = Math.max(3, ...rules.map(r => (r.pairs || []).length));
+    for (let p = 0; p < maxP; p++) {
       for (const r of rules) {
         const pr = (r.pairs || [])[p];
         if (r.name && pr && str(pr.event) === event && str(pr.cat) === cat && event && cat) return str(r.name);
@@ -2234,8 +2300,7 @@ const Core = (() => {
 
 
 /* ---------------------------------------------------------------- 記録証・賞状のフレーム（A4 210×297mm。拡大しても粗くならないベクター） */
-const Frames = (() => {
-  const W = 210, H = 297;
+const makeFrames = (W, H) => {
   const svg = (defs, body) => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none"><defs>' + defs + '</defs>' + body + '</svg>';
   const gold = '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a9791d"/><stop offset=".28" stop-color="#e9cd7a"/><stop offset=".5" stop-color="#b98a2a"/><stop offset=".72" stop-color="#f0d98e"/><stop offset="1" stop-color="#9c6f18"/></linearGradient>';
   const silver = '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d868f"/><stop offset=".3" stop-color="#d9dee3"/><stop offset=".55" stop-color="#8f99a3"/><stop offset=".8" stop-color="#e3e7ea"/><stop offset="1" stop-color="#6f7881"/></linearGradient>';
@@ -2330,7 +2395,8 @@ const Frames = (() => {
     return cache[key];
   }
   return { designs, url, list: Object.keys(designs).map(k => [k, designs[k].name]) };
-})();
+};
+const Frames = makeFrames(210, 297), FramesA5 = makeFrames(210, 148);   // A4 縦 ／ A5 横
 
 // ---- 自分の画像フレーム（この端末のブラウザにだけ保存。公開サイトには送られない）
 const FRAME_IMG_KEY = k => 'swim-meet-app/frame-img/' + k;
@@ -2347,7 +2413,7 @@ function frameUrlFor(kind) {
   if (!f.show[kind]) return '';
   const slot = f.same ? 'record' : kind, key = f[slot];
   if (key === 'custom') return frameImg(slot);
-  return Frames.url(key);
+  return (certPaper() === 'A5' ? FramesA5 : Frames).url(key);
 }
 function loadFrameImage(file, slot) {
   const fr = new FileReader();
@@ -2664,6 +2730,7 @@ ICON_PATHS.copy = 'M8 8h11v11H8zM5 16V5h11';
 ICON_PATHS.camera = 'M4 8h4l2-2h4l2 2h4v11H4zM12 11a3 3 0 1 0 0 6 3 3 0 0 0 0-6z';
 ICON_PATHS.flag = 'M6 20V4M6 5h11l-2 4 2 4H6';
 ICON_PATHS.done = 'M5 12l5 5 9-10';
+ICON_PATHS.merge = 'M6 4v5a5 5 0 0 0 5 5h7M6 20v-6M15 11l3 3-3 3';
 const RB_ACT = {
   openprog: b => ['program', (b.textContent.match(/No\.\s*\d+/) || ['入力'])[0].replace(/\s/g, '')],
   printClubSum: ['print', '印刷'], printSched: ['print', '印刷'], printFlash: ['print', '印刷'], printRank: ['print', '印刷'], printAwards: ['print', '印刷'], printProg: ['print', '印刷'],
@@ -2683,7 +2750,7 @@ const RB_ACT = {
   delSnaps: ['trash', '控え削除'], restoreSnap: ['undo', '戻す'], snapNow: ['camera', '控える'],
   sample: ['flag', 'サンプル'], clearResults: ['erase', '記録消去'], resetAll: ['trash', '全消去'],
   hubPrint: ['print', 'まとめ印刷'], hubFocus: b => b.dataset.v ? ['eye', '見る'] : ['prev', '戻る'],
-  rename: ['fix', '変更'], heatLock: b => /ロック中/.test(b.textContent) ? ['lock', 'ロック中'] : ['unlock', '組ロック'],
+  rename: ['fix', '変更'], combineOther: ['merge', '合同にする'], heatLock: b => /ロック中/.test(b.textContent) ? ['lock', 'ロック中'] : ['unlock', '組ロック'],
   hubPick: b => { const t = b.textContent; return /外す/.test(t) ? ['close', '選択解除'] : /記録入り/.test(t) ? ['program', '記録入り'] : /プログラム/.test(t) ? ['program', 'プログラム'] : /記録証/.test(t) ? ['certs', '記録証'] : /賞状/.test(t) ? ['awards', '賞状'] : /速報/.test(t) ? ['flash', '速報'] : /ランキング/.test(t) ? ['ranking', '順位'] : null; }
 };
 const RB_TEXT = [[/記入済み.*読み込む/, ['upload', 'Excel読込']], [/バックアップから復元/, ['undo', '復元']], [/Excelファイルを読み込む/, ['upload', 'Excel読込']]];
@@ -2702,7 +2769,7 @@ function roundify(root) {
     if (!sp) { (window.__rbMiss = window.__rbMiss || new Set()).add((b.dataset.act || '') + ':' + b.textContent.trim().slice(0, 20)); return; }
     const full = b.textContent.trim().replace(/\s+/g, ' ');
     const input = b.querySelector('input');      // ファイルを選ぶ欄（label の中）は残す
-    b.innerHTML = icon(sp[0]) + '<span class="rbl">' + esc(sp[1]) + '</span>';
+    b.innerHTML = '<span class="rbc">' + icon(sp[0]) + '</span><span class="rbl">' + esc(sp[1]) + '</span>';
     if (input) b.appendChild(input);
     b.classList.add('rb'); if (RB_SMALL.has(b.dataset.act) || b.closest('.notice')) b.classList.add('rb-s'); b.classList.remove('sm');
     if (!b.title) b.title = full;
@@ -2714,11 +2781,14 @@ function roundify(root) {
     const rbs = [...bar.children].filter(c => c.classList.contains('rb'));
     if (!rbs.length) return;
     const others = [...bar.children].filter(c => !c.classList.contains('rb') && !c.classList.contains('grow') && !c.classList.contains('pmodes') && (c.textContent.trim() || c.querySelector('input, select, textarea')));
-    if (!others.length) { bar.classList.add('rbar'); return; }
+    if (!others.length) { bar.classList.add('rbar'); const pm = bar.querySelector(':scope > .pmodes'); if (pm) { const f = document.createElement('div'); f.className = 'bar frow'; f.appendChild(pm); bar.after(f); } return; }
     const row = document.createElement('div'); row.className = 'bar rbar';
     rbs.forEach(b => row.appendChild(b));
     bar.parentNode.insertBefore(row, bar);
+    bar.classList.add('frow');
   });
+  // 丸ボタンが無い、選択欄・検索欄だけの列も同じ形にそろえる
+  (root || document).querySelectorAll('.bar:not(.progbar):not(.rbar):not(.frow)').forEach(bar => { if (bar.querySelector(':scope > select, :scope > input, :scope > label > select, :scope > label > input')) bar.classList.add('frow'); });
 }
 // 通知モニターの「次の種目へ」などは丸に入る短い名前で
 function shortAct(label) { return ({ '次の種目へ': '次へ', '元に戻す': '戻す', '確認する': '確認', 'バックアップ': '保存', '書き出す': '保存' })[label] || String(label || '').slice(0, 3); }
@@ -2734,7 +2804,7 @@ function phoneAuto() {
   try { const small = Math.min(screen.width, screen.height) < 600, coarse = window.matchMedia('(pointer: coarse)').matches; return window.innerWidth <= 600 || (coarse && small); }
   catch (e) { return window.innerWidth <= 600; }
 }
-const isPhone = () => navPref.ui === 'phone' ? true : navPref.ui === 'pc' ? false : phoneAuto();
+const isPhone = () => false;   // スマホ版は廃止（PC版のみ）
 const navPinnedNow = () => navPref.pinned && isWide() && !isPhone();
 function saveNavPref() { try { lsSet(NAVPREF_KEY, JSON.stringify(navPref)); } catch (e) { /* ignore */ } }
 function applyNavLayout() {
@@ -3226,7 +3296,6 @@ function renderNav() {
       '<button class="ph-t" data-act="undo" ' + (undoStack.length ? '' : 'disabled') + '>' + icon('undo') + '<span>元に戻す</span></button>' +
       '<button class="ph-t" data-act="redo" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '<span>やり直し</span></button>' +
       '<button class="ph-t" data-act="backup">' + icon('save') + '<span>バックアップ</span></button></div>' : '') +
-    '<div class="uimode"><span>画面</span><span class="seg mini" role="group" aria-label="画面の種類">' + [['auto', '自動'], ['phone', 'スマホ版'], ['pc', 'PC版']].map(([v, l]) => '<button type="button" class="segbtn ' + ((navPref.ui || 'auto') === v ? 'on' : '') + '" data-act="uiMode" data-v="' + v + '">' + l + '</button>').join('') + '</span></div>' +
     '<div class="navprefs">' +
     '<div class="seg h mini" data-seg-id="navside"><span class="lens" aria-hidden="true"></span>' +
     [['left', '左に表示'], ['right', '右に表示']].map(([v, l]) => '<button type="button" class="segbtn ' + (navPref.side === v ? 'on' : '') + '" data-seg data-act="navSide" data-v="' + v + '">' + l + '</button>').join('') + '</div>' +
@@ -3457,11 +3526,12 @@ VIEWS.settings = () => {
     '<div class="bar">' + sel('ui:renKind', ui.renKind || 'events', [['events', '種目'], ['categories', '区分'], ['clubs', 'クラブ']], L) +
     sel('ui:renFrom', ui.renFrom || '', blankOpt('変更前の名前').concat(renameCandidates(ui.renKind || 'events')), L) +
     '<span>→</span>' + inp('ui:renTo', ui.renTo || '', 'placeholder="新しい名前" ' + L) + '<button class="btn primary" data-act="rename" ' + L + '>変更する</button></div></div>';
+  const NP = Math.max(3, ...comb.map(r => (r.pairs || []).length + ((r.pairs || []).length >= 3 ? 1 : 0)));
   parts.comb =
     '<div class="card"><h2>合同レース</h2><p class="small muted">人数の少ない区分どうしを1つのレースにまとめます。順位は区分ごとに付きます。プログラム表示名を進行スケジュールに入れてください。</p>' +
-    '<div class="tablewrap"><table class="t"><thead><tr><th>プログラム表示名</th><th>種目1</th><th>区分1</th><th>種目2</th><th>区分2</th><th>種目3</th><th>区分3</th><th></th></tr></thead><tbody>' +
+    '<div class="tablewrap"><table class="t"><thead><tr><th>プログラム表示名</th>' + Array.from({ length: NP }, (_, k) => '<th>種目' + (k + 1) + '</th><th>区分' + (k + 1) + '</th>').join('') + '<th></th></tr></thead><tbody>' +
     comb.map((r, i) => '<tr><td>' + inp('comb:' + i + ':name', r.name, 'placeholder="例: 合同 25M 自由形" ' + L) + '</td>' +
-      [0, 1, 2].map(p => { const pr = (r.pairs || [])[p] || {}; return '<td>' + sel('comb:' + i + ':' + p + ':event', pr.event || '', blankOpt().concat(events.filter(Boolean)), L) + '</td><td>' + sel('comb:' + i + ':' + p + ':cat', pr.cat || '', blankOpt().concat(cats.filter(Boolean)), L) + '</td>'; }).join('') +
+      Array.from({ length: NP }, (_, p) => p).map(p => { const pr = (r.pairs || [])[p] || {}; return '<td>' + sel('comb:' + i + ':' + p + ':event', pr.event || '', blankOpt().concat(events.filter(Boolean)), L) + '</td><td>' + sel('comb:' + i + ':' + p + ':cat', pr.cat || '', blankOpt().concat(cats.filter(Boolean)), L) + '</td>'; }).join('') +
       '<td>' + (r.name || (r.pairs || []).some(p => p && (p.event || p.cat)) ? '<button class="x" data-act="delcomb" data-i="' + i + '" title="この行を削除" ' + L + '>×</button>' : '') + '</td></tr>').join('') +
     '</tbody></table></div></div>';
   parts.time =
@@ -3534,7 +3604,7 @@ VIEWS.entries = () => {
           '<td>' + inp(k + 'nameK', it.np.kanji, 'style="min-width:130px" placeholder="苗字 名前" aria-label="氏名" ' + L) + '</td><td>' + inp(k + 'nameF', it.np.kana, 'style="min-width:130px" placeholder="' + (state.settings.kanaStyle === 'hira' ? 'みょうじ なまえ' : 'ミョウジ ナマエ') + '" aria-label="フリガナ" ' + L) + '</td>' +
           '<td>' + sel(k + 'club', e.club, blankOpt().concat(clubs), L) + '</td>' +
           '<td>' + sel(k + 'cat', e.cat, blankOpt().concat(cats), L) + '</td>' +
-          '<td>' + sel(k + 'event', e.event, blankOpt().concat(evs), 'style="min-width:150px" ' + L) + '</td>' +
+          '<td class="evc">' + sel(k + 'event', e.event, blankOpt().concat(evs), 'style="min-width:150px" ' + L) + (it.combined ? '<span class="pill comb cbm" title="合同レース「' + esc(it.combined) + '」で泳ぐ（記録証・順位はエントリー種目のまま）">合同</span>' : '') + '</td>' +
           '<td>' + timeCell(k + 'entryTime', e.entryTime, '', L) + '</td>' +
           '<td>' + timeCell(k + 'officialTime', e.officialTime, '', 'data-col="off"') + '</td>' +
           '<td>' + judgeBtns(k + 'judge', e.judge) + '</td>' +
@@ -3566,7 +3636,7 @@ VIEWS.relays = () => {
         const cls = iss.some(x => x.level === 'error') ? 'err' : iss.some(x => x.level === 'warn') ? 'warn' : '';
         return '<tr class="' + cls + '" data-row="' + r.id + '" title="' + esc(iss.map(x => x.msg).join('\n')) + '"><td class="num muted">' + (it.idx + 1) + '</td>' +
           '<td>' + sel(k + 'team', r.team, blankOpt().concat(clubs), L) + '</td><td>' + inp(k + 'mark', r.mark, 'style="width:48px" ' + L) + '</td>' +
-          '<td>' + sel(k + 'cat', r.cat, blankOpt().concat(cats), L) + '</td><td>' + sel(k + 'event', r.event, blankOpt().concat(evs), L) + '</td>' +
+          '<td>' + sel(k + 'cat', r.cat, blankOpt().concat(cats), L) + '</td><td class="evc">' + sel(k + 'event', r.event, blankOpt().concat(evs), L) + (it.combined ? '<span class="pill comb cbm" title="合同レース「' + esc(it.combined) + '」で泳ぐ（記録証・順位はエントリー種目のまま）">合同</span>' : '') + '</td>' +
           [0, 1, 2, 3].map(m => { const np = it.memberNames[m] || { kanji: '', kana: '' }; return '<td class="mcell">' + inp(k + 'mK' + m, np.kanji, 'placeholder="苗字 名前" aria-label="第' + (m + 1) + '泳者 氏名" ' + L) + inp(k + 'mF' + m, np.kana, 'class="kin" placeholder="フリガナ" aria-label="第' + (m + 1) + '泳者 フリガナ" ' + L) + '</td>'; }).join('') +
           '<td>' + timeCell(k + 'entryTime', r.entryTime, '', L) + '</td><td>' + timeCell(k + 'officialTime', r.officialTime, '', 'data-col="roff"') + '</td>' +
           '<td>' + judgeBtns(k + 'judge', r.judge) + '</td>' +
@@ -3595,7 +3665,9 @@ VIEWS.schedule = () => {
     D.sched.rows.map((o, i) => {
       const r = o.row, k = 'sch:' + r.id + ':';
       const dupe = state.schedule.filter(x => C.str(x.name) === o.name && o.name && o.name !== '休憩').length > 1;
-      return '<tr class="' + (dupe ? 'warn' : '') + '" data-row="' + r.id + '"><td class="num">' + o.no + '</td><td>' + sel(k + 'name', r.name, blankOpt().concat(progs).concat(['休憩']), 'style="min-width:200px" ' + L) + '</td>' +
+      const into = o.name && !o.isBreak && !o.n ? [...new Set((S.combined || []).filter(c => c.name && (c.pairs || []).some(pp => pp && pp.event === o.name)).map(c => c.name))] : [];
+      return '<tr class="' + (dupe ? 'warn' : '') + '" data-row="' + r.id + '"><td class="num">' + o.no + '</td><td class="evc">' + sel(k + 'name', r.name, blankOpt().concat(progs).concat(['休憩']), 'style="min-width:200px" ' + L) +
+        (isCombProg(o.name) ? '<span class="pill comb cbm">合同</span>' : '') + (into.length ? '<span class="pill comb cbm" title="この種目の選手は「' + esc(into.join('」「')) + '」で泳ぎます">0名・合同へ</span>' : '') + '</td>' +
         '<td class="num">' + (o.n === undefined ? '' : o.n) + '</td><td class="num">' + (o.heats === undefined ? '' : o.heats) + '</td><td class="num">' + (o.dur !== undefined ? C.fmtDuration(o.dur) : '') + '</td>' +
         '<td class="num stcell' + (o.fixed ? ' fixed' : '') + (o.overlap ? ' over' : '') + '"' + (o.overlap ? ' title="前の種目が終わる前の時刻です"' : '') + '>' + (o.name ? inp(k + 'at', o.start !== undefined && o.start !== null ? C.fmtClock(o.start) : '', 'class="num st" inputmode="numeric" title="開始時刻を入れると、その時刻に固定（空欄で自動に戻す）"') + (o.fixed ? '<button class="x" data-act="schAuto" data-id="' + r.id + '" title="自動の時刻に戻す">↺</button>' : '') : '') + '</td><td class="num">' + (o.end !== undefined && o.end !== null ? C.fmtClock(o.end) : '') + '</td>' +
         '<td class="num">' + inp(k + 'adj', r.adj, 'style="width:64px;text-align:right" inputmode="numeric"') + '</td>' +
@@ -3633,7 +3705,7 @@ VIEWS.program = () => {
   if (curHeat === null) { const h0 = p.heats.find(h => h.items.some(it => it.status === '未入力')) || p.heats[0]; curHeat = h0 ? h0.heat : null; }
   return '<div class="vhead"><div><h1 class="view">プログラム・記録入力</h1><p class="lead">公式タイムを入れて Enter で次のレーンへ進みます。棄権・失格は「判定」で選びます（失格でも泳いだタイムは入れられます）。黄色の行は打ち間違いの可能性があります。当日モード中でも入力できます。</p></div></div>' +
     '<div class="bar progbar"><button class="btn" data-act="progStep" data-d="-1" ' + (idx <= 0 ? 'disabled' : '') + ' aria-label="前の種目">' + '←' + '</button>' +
-    sel('ui:prog', ui.prog, opts.map(n => { const s = D.sched.rows.find(r => r.name === n); const its = D.ind.concat(D.rel).filter(it => it.program === n && it.event); const dn = its.filter(it => it.status !== '未入力').length; return [n, (s ? 'No.' + s.no + ' ' : '') + n + (its.length ? (dn === its.length ? '　✓' : dn ? '　' + dn + '/' + its.length : '') : '　（なし）')]; }), 'class="progsel" aria-label="種目"') +
+    sel('ui:prog', ui.prog, opts.map(n => { const s = D.sched.rows.find(r => r.name === n); const its = D.ind.concat(D.rel).filter(it => it.program === n && it.event); const dn = its.filter(it => it.status !== '未入力').length; return [n, (isCombProg(n) ? '［合同］' : '') + (s ? 'No.' + s.no + ' ' : '') + n + (its.length ? (dn === its.length ? '　✓' : dn ? '　' + dn + '/' + its.length : '') : '　（なし）')]; }), 'class="progsel" aria-label="種目"') +
     '<button class="btn" data-act="progStep" data-d="1" ' + (idx >= opts.length - 1 ? 'disabled' : '') + ' aria-label="次の種目">' + '→' + '</button>' +
     (ui.prog ? '<span class="pill mute">' + (p.sch ? 'No.' + p.sch.no + '・開始 ' + (p.sch.start !== null ? C.fmtClock(p.sch.start) : '—') : '<span style="color:var(--err)">スケジュール未登録</span>') + '</span><span class="pill mute">' + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組</span>' +
       '<span class="pill ' + (allDone ? 'ok' : 'info') + '">入力 ' + p.done + ' / ' + p.items.length + '</span>' + (p.items.some(it => it.seatFixed) ? '<span class="pill mute" title="「組・レーンを入れ替え」で手で並べた位置を使っています">手で並べ替え済み</span>' : '') : '') +
@@ -3661,7 +3733,7 @@ VIEWS.program = () => {
             return '<tr data-row="' + it.id + '" class="' + (iss.length ? 'warn' : '') + '" title="' + esc(iss.map(x => x.msg).join('\n')) + '"><td class="c ln"><span class="lane">' + (it.lane || '?') + '</span></td>' +
               (p.relay ? '<td class="nm rnm"><div class="one"><b>' + esc(who) + '</b><span class="rcat">' + esc(it.cat) + '</span>' + (iss.length ? ' <span class="pill warn">要確認</span>' : '') + '</div>' + relayGrid(it, true) + '</td>' :
               '<td class="nm"><div class="one fit"><b>' + rubyName(it.np) + '</b></div><div class="one sub fit">' + (iss.length ? '<span class="pill warn">要確認</span> ' : '') + esc(sub) + '</div></td>') +
-              '<td class="mt"><div class="one fit">' + esc(it.cat) + (it.event !== ui.prog ? ' <span class="pill mute">' + esc(it.event.split(' ')[0]) + '</span>' : '') + '</div><div class="one sub num">' + (entry ? '申込 ' + entry : '　') + '</div></td>' +
+              '<td class="mt"><div class="one fit">' + esc(it.cat) + (it.combined ? ' <span class="pill comb" title="合同レース「' + esc(it.combined) + '」で泳ぐ（記録証・順位はエントリー種目のまま）">合同</span>' : '') + (it.event !== ui.prog ? ' <span class="pill mute">' + esc(it.event.split(' ')[0]) + '</span>' : '') + '</div><div class="one sub num">' + (entry ? '申込 ' + entry : '　') + '</div></td>' +
               '<td class="tm"><div class="tbox">' + timeCell(pre + 'officialTime', src.officialTime, '', 'data-col="prog" aria-label="' + esc(who) + ' 公式タイム"') + '</div></td>' +
               '<td class="jd">' + judgeBtns(pre + 'judge', src.judge) + '</td><td class="c rk"><b>' + (it.rank ? it.rank + '位' : it.status === '失格' || it.status === '棄権' || it.status === '対象外' ? '<span class="pill ' + (it.status === '失格' ? 'err' : it.status === '対象外' ? 'mute' : 'warn') + '">' + it.status + '</span>' : '') + '</b></td></tr>';
           }).join('') + '</tbody></table></div>';
@@ -3684,9 +3756,12 @@ function arrangePanel(p, lanes) {
   const others = programOptions().filter(n => n !== ui.prog && C.isRelayName(n) === relay && programData(n).items.length);
   if (ui.arrOther && others.indexOf(ui.arrOther) < 0) ui.arrOther = '';
   const anyFixed = p.items.some(it => it.seatFixed);
-  const bar = '<div class="arrbar">' + sel('ui:arrOther', ui.arrOther || '', [['', 'ほかの種目は並べない']].concat(others.map(n => [n, 'ほかの種目も並べる: ' + n])), 'aria-label="ほかの種目も並べる"') +
-    '<span class="grow"></span><button class="btn sm" data-act="seatReset" ' + (anyFixed ? '' : 'disabled') + '>ロックを外して自動に戻す</button></div>';
-  return bar + '<div class="arr-wrap fill" data-fill-id="arr">' + arrHeats(p, ui.prog, lanes) + (ui.arrOther ? '<h3 class="arr-sep">' + esc(ui.arrOther) + '</h3>' + arrHeats(programData(ui.arrOther), ui.arrOther, lanes) : '') + '</div>';
+  const bar = '<div class="bar arrbar">' + sel('ui:arrOther', ui.arrOther || '', [['', 'ほかの種目は並べない']].concat(others.map(n => [n, 'ほかの種目も並べる: ' + n])), 'aria-label="ほかの種目も並べる"') +
+    '<span class="grow"></span><button class="btn sm" data-act="seatReset" ' + (anyFixed ? '' : 'disabled') + '>ロックを外して自動に戻す</button>' + (ui.arrOther ? '<button class="btn" data-act="combineOther">「' + esc(ui.arrOther) + '」と合同にする</button>' : '') + '</div>';
+  const head = n => '<h3 class="arr-sep">' + (isCombProg(n) ? '<span class="pill comb">合同</span> ' : '') + esc(n) + '</h3>';
+  if (!ui.arrOther) return bar + '<div class="arr-wrap fill" data-fill-id="arr">' + arrHeats(p, ui.prog, lanes) + '</div>';
+  // 2つの種目を並べるときは、種目を左右に・組は縦に（隣同士で見比べてドラッグ）
+  return bar + '<div class="arr-wrap fill arr-cols" data-fill-id="arr"><div class="arr-col">' + head(ui.prog) + arrHeats(p, ui.prog, lanes) + '</div><div class="arr-col">' + head(ui.arrOther) + arrHeats(programData(ui.arrOther), ui.arrOther, lanes) + '</div></div>';
 }
 function arrHeats(p, prog, lanes) {
   const maxH = Math.max(0, ...p.items.map(it => it.heat || 0));
@@ -3747,7 +3822,7 @@ VIEWS.ranking = () => {
   const body = cats.map(c => {
     const list = src.filter(it => it.event === ui.rankEv && it.cat === c && it.rank).sort((a, b) => a.rankOrder - b.rankOrder);
     return '<div class="tablewrap" style="margin-bottom:10px"><table class="t"><thead><tr><th colspan="5" style="color:var(--ink);font-size:13px">' + esc(ui.rankEv) + '　' + esc(c) + '</th></tr><tr><th class="c">順位</th><th>' + (relay ? 'チーム名' : '氏名') + '</th><th>' + (relay ? '出場メンバー' : 'チーム名') + '</th><th>区分</th><th class="num">公式タイム</th></tr></thead><tbody>' +
-      (list.length ? list.map(it => '<tr><td class="c"><b>' + it.rank + '</b></td><td>' + (relay ? esc(it.teamDisp) : rubyName(it.np)) + '</td><td>' + (relay ? relayGrid(it, true) : esc(it.club)) + '</td><td>' + esc(it.cat) + '</td><td class="num">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="5" class="muted">記録がまだありません</td></tr>') +
+      (list.length ? list.map(it => '<tr><td class="c"><b>' + it.rank + '</b></td><td>' + (relay ? esc(it.teamDisp) : rubyName(it.np)) + (it.combined ? ' <span class="pill comb" title="合同レース「' + esc(it.combined) + '」で泳ぐ（記録証・順位はエントリー種目のまま）">合同</span>' : '') + '</td><td>' + (relay ? relayGrid(it, true) : esc(it.club)) + '</td><td>' + esc(it.cat) + '</td><td class="num">' + esc(it.officialText) + '</td></tr>').join('') : '<tr><td colspan="5" class="muted">記録がまだありません</td></tr>') +
       '</tbody></table></div>';
   }).join('');
   return '<h1 class="view">公式ランキング</h1><p class="lead">種目・区分ごとの公式順位です。同タイムは同順位になります。</p>' +
@@ -3764,6 +3839,9 @@ const PAPER = {
     ind: { title: [18, 28], name: [44, 21], club: [55, 12], rank: [64, 17], event: [76, 13.5], record: [86, 15], meet: [98, 12], lines: [110, 12, 6.6], date: [138, 11], org: [150, 14] },
     rel: { title: [16, 28], name: [40, 20], mem1: [51, 11.5], mem2: [57.5, 11.5], rank: [66, 16], event: [77, 13.5], record: [86, 15], lines: [97, 12, 6.6], meet: [124, 12], date: [138, 11], org: [150, 14] } }
 };
+// A5 横: B5 横の配置を A5 の大きさにそのまま縮めたもの
+PAPER.A5 = (() => { const k = 148 / 182, sc = o => Object.fromEntries(Object.entries(o).map(([n, v]) => [n, v.map(x => +(x * k).toFixed(2))])); return { w: 210, h: 148, size: 'A5 landscape', label: 'A5 横', ind: sc(PAPER.B5.ind), rel: sc(PAPER.B5.rel) }; })();
+function certPaper() { return (state.settings.print || {}).certPaper === 'A5' ? 'A5' : 'A4'; }
 function certData(it, relay, prize) {
   const S = state.settings, W = prize ? S.award : S.cert;
   const blank = '　　分　　秒　　';
@@ -3785,7 +3863,7 @@ function certData(it, relay, prize) {
 }
 function certHTML(it, relay, prize, paper, preview) {
   // 位置は用紙の高さに対する割合で置く（プリンターの余白があっても、用紙いっぱいに同じ配置で収まる）
-  const P = PAPER.A4, L = relay ? P.rel : P.ind, S = state.settings, d = certData(it, relay, prize);
+  const P = PAPER[certPaper()], L = relay ? P.rel : P.ind, S = state.settings, d = certData(it, relay, prize);
   const sc = (C.num(S.print.scale) || 100) / 100, dy = C.num(S.print.offsetTop), dx = C.num(S.print.offsetLeft);
   const pct = mm => (mm / P.h * 100).toFixed(3) + '%';
   const at = (key, txt, extra, html) => { const [top, pt] = L[key]; return '<div class="cl ' + (extra || '') + (html && /<rt>/.test(html) ? ' hasruby' : '') + '" style="left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + pct(top * sc + dy) + ';font-size:' + (pt * sc) + 'pt">' + (html || esc(txt)) + '</div>'; };
@@ -3800,7 +3878,7 @@ function certHTML(it, relay, prize, paper, preview) {
   const kind = prize ? 'prize' : 'record';
   const fr = frameUrlFor(kind) ? '<div class="cframe fr-' + kind + '"></div>' : '';
   const style = preview ? 'width:' + P.w + 'mm;height:' + P.h + 'mm;transform:scale(' + preview + ');transform-origin:top left' : '';
-  return '<div class="cert' + (preview ? ' pvcert' : '') + '" style="' + style + '">' + fr + h + '</div>';
+  return '<div class="cert' + (P === PAPER.A5 ? ' a5' : '') + (preview ? ' pvcert' : '') + '" style="' + style + '">' + fr + h + '</div>';
 }
 // フレーム画像は1か所（style）にだけ置き、全員分の証書から参照する（大きな画像でも重くならない）
 function updateFrameStyle() {
@@ -3820,8 +3898,7 @@ VIEWS.certs = () => {
   const list = certList();
   const f = ui.certFilter || {};
   const from = Math.max(1, parseInt(ui.certFrom, 10) || 1), to = Math.min(list.length, parseInt(ui.certTo, 10) || list.length);
-  ui.certPaper = 'A4';
-  const P = PAPER.A4;
+  const P = PAPER[certPaper()];
   const pv = 0.34;
   const clubs = relay ? S.clubs.map(c => c.name) : S.clubs.map(c => c.name);
   return '<h1 class="view">記録証・賞状</h1><p class="lead">対象者を絞り込んでまとめて印刷します。記録が未入力の人は「　分　秒」の手書き用になります。用紙の印刷位置がずれる場合は、下の「位置の調整」で直せます。最初は1枚だけテスト印刷すると安心です。</p>' +
@@ -3833,7 +3910,7 @@ VIEWS.certs = () => {
     field(relay ? 'チーム' : 'クラブ', sel('cf:club', f.club || '', blankOpt('すべて').concat(clubs.filter(Boolean)))) +
     field('状態', sel('cf:status', f.status || '', blankOpt('すべて').concat(['完泳', '失格', '棄権', '対象外', '未入力']))) +
     '</div><div class="bar" style="margin-top:10px"><input data-k="ui:certQ" value="' + esc(ui.certQ || '') + '" placeholder="' + (relay ? 'チーム・泳者' : '選手名・クラブ') + 'で検索して1人ずつ印刷" style="max-width:300px" aria-label="証書の対象を検索"></div>' +
-    (ui.certQ ? '<div class="certhits">' + (list.length ? list.slice(0, 40).map((it, i) => '<div class="chit' + (from === i + 1 ? ' on' : '') + '"><span class="grow"><b>' + (relay ? esc(it.teamDisp) : rubyName(it.np)) + '</b>　<span class="muted small">' + esc(it.cat + ' ' + it.event) + '　' + (it.rank ? it.rank + '位' : it.status) + '</span></span><button class="btn sm" data-act="certSee" data-i="' + (i + 1) + '">見る</button><button class="btn sm primary" data-act="certOne" data-i="' + (i + 1) + '">' + icon('print', 'ic sm') + 'この人を印刷</button></div>').join('') + (list.length > 40 ? '<p class="small muted">ほか ' + (list.length - 40) + '件。名前を詳しく入れると絞り込めます。</p>' : '') : '<p class="small muted">見つかりません。</p>') + '</div>' : '') +
+    (ui.certQ ? '<div class="certhits">' + (list.length ? list.slice(0, 40).map((it, i) => '<div class="chit' + (from === i + 1 ? ' on' : '') + '"><span class="grow"><b>' + (relay ? esc(it.teamDisp) : rubyName(it.np)) + '</b>　<span class="muted small">' + esc(it.cat + ' ' + it.event) + (it.combined ? ' <span class="pill comb">合同</span>' : '') + '　' + (it.rank ? it.rank + '位' : it.status) + '</span></span><button class="btn sm" data-act="certSee" data-i="' + (i + 1) + '">見る</button><button class="btn sm primary" data-act="certOne" data-i="' + (i + 1) + '">' + icon('print', 'ic sm') + 'この人を印刷</button></div>').join('') + (list.length > 40 ? '<p class="small muted">ほか ' + (list.length - 40) + '件。名前を詳しく入れると絞り込めます。</p>' : '') : '<p class="small muted">見つかりません。</p>') + '</div>' : '') +
     '<div class="bar" style="margin-top:12px"><b>対象 ' + list.length + ' 枚</b><span class="muted">印刷する範囲</span>' +
     '<span class="nowrap"><input data-k="ui:certFrom" value="' + from + '" style="width:64px" inputmode="numeric"> 〜 <input data-k="ui:certTo" value="' + (list.length ? to : '') + '" style="width:64px" inputmode="numeric"> 枚目</span><span class="grow"></span>' +
     '<button class="btn" data-act="printCert" data-test="1" ' + (list.length ? '' : 'disabled') + '>1枚だけテスト印刷</button><button class="btn primary" data-act="printCert" ' + (list.length ? '' : 'disabled') + '>印刷する（' + (list.length ? to - from + 1 : 0) + '枚）</button></div></div>' +
@@ -3847,6 +3924,7 @@ VIEWS.certs = () => {
     (prize ? '' : field('記録の印字', sel('set:cert.printRecord', S.cert.printRecord ? '1' : '0', [['1', '印字する'], ['0', '印字しない（手書き用）']]))) +
     '</div><div class="bar" style="margin:10px 0 0">' +
     (prize ? '' : '<label class="small"><input type="checkbox" data-k="set:cert.skipPrize" ' + (S.cert.skipPrize ? 'checked' : '') + '> 賞状の対象者（' + (S.prizeMaxRank || 10) + '位以内）には記録証を出さない</label>') +
+    '<label class="small cpaper">用紙 ' + sel('set:print.certPaper', certPaper(), [['A4', 'A4 縦'], ['A5', 'A5 横']], 'aria-label="記録証・賞状の用紙"') + '</label>' +
     '<label class="small"><input type="checkbox" data-k="set:print.certKana" ' + (S.print.certKana !== false ? 'checked' : '') + '> 名前の上にフリガナを印刷する</label>' +
     '</div><h3>位置の調整（すべての証書に共通）</h3><div class="fields">' +
     field('文字の大きさ（%）', inp('set:print.scale', S.print.scale, 'inputmode="numeric"')) +
@@ -4283,6 +4361,7 @@ const ACTIONS = {
   },
   printClubSum: () => printDocs([docClubSum()], 'クラブ総合得点（1部・2部合算）を印刷します'),
   relMem: t => relMemDialog(t.dataset.id),
+  combineOther: () => combineDialog(ui.prog, ui.arrOther),
   arrTargetOff: () => { ui.arrTarget = null; render(); },
   arrPut: t => { const tg = ui.arrTarget; if (!tg) return; ui.arrTarget = null; ui.arrQ = ''; seatMove(t.dataset.id, tg.h, tg.l, tg.prog); },
   heatLock: t => {
@@ -4725,11 +4804,13 @@ function printDocs(docs, msg) {
   updateFrameStyle();
   const root = $('#print-root');
   root.innerHTML = docs.map(d => d.html()).join('');
-  $('#page-style').textContent = '@page { size: A4 portrait; margin: 15.5mm 7mm }';   // 中身は 196×266mm。Chrome/Edge は上下中央に、Safari・iPhone・iPad は各自の余白でも1枚に収まる
+  // 記録証・賞状を A5 横にしたとき: 証書だけなら用紙全体を A5 横に。ほかの印刷物と一緒なら証書のページだけ A5 横（名前付きページ）
+  const isCert = d => /^cert/.test(d.key || ''), a5 = certPaper() === 'A5' && docs.some(isCert), onlyCert = docs.every(isCert);
+  $('#page-style').textContent = a5 && onlyCert ? '@page { size: A5 landscape; margin: 8mm 7mm }' : '@page { size: A4 portrait; margin: 15.5mm 7mm }' + (a5 ? ' @page a5l { size: A5 landscape; margin: 8mm 7mm } .cert.a5 { page: a5l }' : '');   // 中身は 196×266mm。Chrome/Edge は上下中央に、Safari・iPhone・iPad は各自の余白でも1枚に収まる
   fitPages(root);
   setTimeout(() => { try { window.print(); } catch (e) { toast('印刷を開始できませんでした: ' + e.message, 'err'); } }, 80);
   const pages = docs.reduce((a, d) => a + d.pages, 0);
-  toast((msg || '印刷します') + '（A4 縦・' + pages + '枚）');
+  toast((msg || '印刷します') + '（' + (a5 && onlyCert ? 'A5 横' : a5 ? 'A4 縦・証書は A5 横' : 'A4 縦') + '・' + pages + '枚）');
 }
 function printSchedule() { printDocs([docSchedule()], 'スケジュールを印刷します'); }
 function printProgram(all) {
@@ -4782,7 +4863,7 @@ function buildPreview() {
   body.innerHTML = '';
   sheets.forEach((el, i) => {
     const box = document.createElement('div'); box.className = 'sheetbox';
-    const sh = document.createElement('div'); sh.className = 'sheet pgroot';
+    const sh = document.createElement('div'); sh.className = 'sheet pgroot' + (el.classList.contains('a5') ? ' a5sheet' : '');
     sh.appendChild(el); box.appendChild(sh); body.appendChild(box);
     const scale = box.clientWidth / sh.offsetWidth;
     sh.style.transform = 'scale(' + scale + ')';
@@ -4955,19 +5036,70 @@ function relMemDialog(id) {
     setTimeout(() => { m.scrollTop = 0; const inp = host.querySelector('#rm-q'); if (inp && !isPhone()) inp.focus({ preventScroll: true }); else if (document.activeElement) document.activeElement.blur(); }, 0);
   });
 }
+// ---------------------------------------------------------------- 合同種目（2つの種目を1つのレースにする）
+// 記録証・賞状・順位・優秀選手は、それぞれのエントリー種目のまま（合同はレースの組分けだけ）
+function isCombProg(n) { return (state.settings.combined || []).some(r => r.name && r.name === n); }
+function autoCombName(a, b) {
+  const sexRe = /^(男子|女子|混合|合同|男女)\s*/;
+  const rest = n => C.str(n).replace(sexRe, '').trim();
+  const ra = rest(a), rb = rest(b);
+  const base = '合同 ' + (ra === rb ? ra : ra + '・' + rb);
+  const taken = new Set(C.programNames(state));
+  let name = base, k = 2;
+  while (taken.has(name)) name = base + '（' + (k++) + '）';
+  return name;
+}
+function pairsOf(prog) {
+  const src = C.isRelayName(prog) ? D.rel : D.ind, m = new Map();
+  src.filter(it => it.program === prog && it.event && it.cat).forEach(it => m.set(it.event + '\u0001' + it.cat, { event: it.event, cat: it.cat }));
+  return [...m.values()];
+}
+function combineDialog(progA, progB, onDone) {
+  if (!progA || !progB || progA === progB) return;
+  if (C.isRelayName(progA) !== C.isRelayName(progB)) { toast('個人とリレーは合同にできません', 'err'); render(); return; }
+  const keepName = isCombProg(progA);
+  const name0 = keepName ? progA : autoCombName(progA, progB);
+  const nA = pairsOf(progA), nB = pairsOf(progB);
+  modal('<h2>合同種目にする</h2>' +
+    '<p>「<b>' + esc(progB) + '</b>」を「<b>' + esc(progA) + '</b>」と同じレース（合同）にします。</p>' +
+    '<p class="small muted">記録証・賞状・順位・優秀選手は、それぞれのエントリー種目のままです。画面では「合同」の印が付きます（印刷物には出ません）。</p>' +
+    '<label class="field cb-field"><span>合同種目の名前' + (keepName ? '' : '（自動で決めました。変えられます）') + '</span><input id="cb-name" value="' + esc(name0) + '"' + (keepName ? ' readonly' : '') + ' autocomplete="off"></label>' +
+    '<p class="small muted">まとめる区分: ' + esc(nA.concat(nB).map(p => p.event.replace(/\s+/g, ' ') + '・' + p.cat).join(' ／ ') || '（なし）') + '</p>' +
+    '<div class="actions"><button class="btn" data-close>やめる</button><button class="btn primary" id="cb-ok">合同にする</button></div>', (m, close) => {
+    const inp = m.querySelector('#cb-name');
+    setTimeout(() => { inp.focus(); inp.select(); }, 0);
+    const go = () => {
+      const name = inp.value.trim();
+      if (!name) { toast('合同種目の名前を入れてください', 'err'); return; }
+      if (!keepName && C.programNames(state).indexOf(name) >= 0) { toast('「' + name + '」はもう使われています。別の名前にしてください', 'err'); return; }
+      close();
+      const add = nA.concat(nB);
+      const ok = commit('合同種目にする（' + name + '）', s => {
+        s.settings.combined = (s.settings.combined || []).filter(o => o.name || (o.pairs || []).some(p => p && (p.event || p.cat)));
+        let r = s.settings.combined.find(o => o.name === name);
+        if (!r) { r = { name, pairs: [] }; s.settings.combined.push(r); }
+        r.pairs = (r.pairs || []).filter(p => p && p.event && p.cat);
+        const have = new Set(r.pairs.map(p => p.event + '\u0001' + p.cat));
+        add.forEach(p => { const k = p.event + '\u0001' + p.cat; if (!have.has(k)) { have.add(k); r.pairs.push({ event: p.event, cat: p.cat }); } });
+        s.settings.combined.forEach(o => { if (o !== r) o.pairs = (o.pairs || []).filter(p => !(p && have.has(p.event + '\u0001' + p.cat))); });
+        s.settings.combined = s.settings.combined.filter(o => o === r || (o.pairs || []).some(p => p && p.event));
+        // 進行スケジュール: 合同種目が無ければ A の行を合同種目にする（B の行は 0名のまま残る＝並べ替え・削除は自由）
+        if (!s.schedule.some(x => C.str(x.name) === name)) {
+          const rowA = s.schedule.find(x => C.str(x.name) === progA);
+          if (rowA) rowA.name = name; else s.schedule.push({ id: uid(), name, adj: '' });
+        }
+        if (onDone) onDone(s, name);
+      });
+      if (ok) { ui.prog = name; ui.arrOther = ''; render(); toast('「' + name + '」にまとめました（記録証・順位はそれぞれのエントリー種目のまま）', null, 9000, { label: '元に戻す', fn: undo }); }
+    };
+    m.querySelector('#cb-ok').addEventListener('click', go);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) go(); });
+  });
+}
 function seatMove(id, h, l, prog) {
   const a0 = D.byId.get(id);
-  if (a0 && prog && a0.program !== prog) {
-    const relay = C.isRelayName(a0.program);
-    if (C.isRelayName(prog) !== relay) { toast('個人とリレーの間では移せません', 'err'); render(); return; }
-    const b = (relay ? D.rel : D.ind).find(it => it.program === prog && it.heat === h && it.lane === l);
-    const evA = eventForProg(a0, prog), evB = b ? eventForProg(b, a0.program) : null, nm = it => relay ? it.teamDisp : it.np.kanji;
-    const ok = commit('種目をまたいで入れ替え（' + a0.program + ' → ' + prog + '）', s => {
-      const list = relay ? s.relays : s.entries, oa = list.find(o => o.id === a0.id);
-      oa.event = evA; oa.seat = { p: prog, h, l };
-      if (b) { const ob = list.find(o => o.id === b.id); ob.event = evB; ob.seat = { p: a0.program, h: a0.heat, l: a0.lane }; }
-    });
-    if (ok) toast(nm(a0) + ' を「' + prog + '」第' + h + '組 ' + l + 'レーンへ' + (b ? '（' + nm(b) + ' と入れ替え）' : ''), null, 9000, { label: '元に戻す', fn: undo });
+  if (a0 && prog && a0.program !== prog) {     // 別の種目へ移す → 2つの種目を合同にする（エントリー種目は変えない）
+    combineDialog(prog, a0.program, (st, name) => { const o = (C.isRelayName(prog) ? st.relays : st.entries).find(x => x.id === a0.id); if (o) o.seat = { p: name, h, l }; });
     return;
   }
   const name = prog || ui.prog, relay = C.isRelayName(name);
