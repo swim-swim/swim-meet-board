@@ -1391,6 +1391,59 @@ table.pt.prel td.rnm .rcat { display: none; margin-left: 6px; padding: 0 6px; bo
 .evc { white-space: nowrap; } .evc .cbm { margin-left: 6px; vertical-align: middle; }
 .bar.frow { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 .btn.rb .rbc { flex: 0 0 auto; }
+
+/* =====================================================================
+   記録証・賞状: 1画面で（上: 切り替えと印刷／下: 対象｜プレビュー｜設定）
+   ===================================================================== */
+.bar.chead { display: flex; flex-wrap: nowrap; align-items: center; gap: 10px; margin-bottom: 8px; overflow-x: auto; scrollbar-width: none; }
+.bar.chead > .seg { flex: 0 0 auto; }
+.bar.chead > .rb { flex: 0 0 68px; }
+.cgrid { display: grid; grid-template-columns: minmax(250px, 300px) minmax(0, 1fr) minmax(300px, 360px); gap: 10px; min-height: 420px; }
+.ccol { display: flex; flex-direction: column; min-height: 0; overflow: hidden; padding: 10px 12px !important; margin: 0 !important; }
+.ccol .chd { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; min-width: 0; }
+.ccol .chd h2 { margin: 0; font-size: 15px; }
+.cfil { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex: 0 0 auto; }
+.cfil select, .cfil input { width: 100%; min-width: 0; height: 40px; min-height: 40px; border-radius: 20px; padding: 0 12px; font-size: 13px; box-sizing: border-box; }
+.cfil .cq { grid-column: 1 / -1; }
+.clist { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 8px -4px 6px; padding: 0 4px; display: flex; flex-direction: column; gap: 3px; }
+.crow { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; grid-template-areas: "n b s" "n e e"; align-items: center; column-gap: 6px; text-align: left; padding: 5px 8px; border-radius: 12px; border: 1px solid transparent; background: transparent; color: var(--ink); font: inherit; cursor: pointer; }
+.crow:hover { background: var(--fill-hover, rgba(0,0,0,.04)); }
+.crow.on { background: var(--accent-soft); border-color: var(--accent); }
+.crow.out { opacity: .5; }
+.crow i { grid-area: n; font-style: normal; font-size: 11px; color: var(--muted); text-align: right; }
+.crow b { grid-area: b; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.crow small { grid-area: s; font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.crow span { grid-area: e; font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.crow em.pill { font-style: normal; font-size: 10px; padding: 0 5px; }
+.crange { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+.crange input { width: 58px; height: 36px; min-height: 36px; border-radius: 18px; text-align: center; padding: 0 6px; }
+.cmid .cnav { justify-content: center; }
+.cmid .cwho { display: flex; flex-direction: column; align-items: center; min-width: 0; flex: 0 1 260px; text-align: center; }
+.cmid .cwho b { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.cmid .cwho span { font-size: 11.5px; color: var(--muted); }
+.cstage { flex: 1 1 auto; min-height: 0; display: flex; align-items: flex-start; justify-content: center; overflow: hidden; background: color-mix(in srgb, var(--track) 60%, transparent); border-radius: 14px; padding: 8px; }
+.cpaper-box { transform-origin: top left; background: #fff; box-shadow: 0 2px 10px rgba(10, 30, 60, .18); flex: 0 0 auto; position: relative; }
+.cpaper-box > .cert { position: absolute; inset: 0; width: 100% !important; height: 100% !important; transform: none !important; }
+.cright .cbody { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-right: 2px; }
+.cright .chd .seg { width: 100%; }
+.cright .chd .seg .segbtn { flex: 1 1 0; }
+.cnote { margin: 0 0 6px; }
+.cform { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 8px; }
+.cform .field { margin: 0; gap: 2px; }
+.cform .field.wide { grid-column: 1 / -1; }
+.cform .field > span { font-size: 11.5px; }
+.cform input, .cform select { height: 38px; min-height: 38px; border-radius: 12px; font-size: 14px; }
+.cchips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip-ck { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 18px; border: 1px solid var(--btn-edge); background: var(--btn-bg); font-size: 12.5px; cursor: pointer; }
+.chip-ck:has(input:checked) { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.cright .frgrid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 6px !important; }
+.cright .frtile { min-height: 0 !important; height: auto !important; padding: 4px !important; font-size: 11px !important; }
+.cright .frtile .frimg { aspect-ratio: 210 / 297; height: auto !important; width: 100%; }
+html.a5p .cright .frtile .frimg { aspect-ratio: 210 / 148; }
+.cright .frbox .bar { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.cert.a5 .cl { padding: 0 28mm !important; overflow: visible !important; }
+@media (max-width: 1100px) { .cgrid { grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(260px, 300px); } }
+.cform .field > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2358,7 +2411,7 @@ const makeFrames = (W, H) => {
     });
     return s;
   }
-  const designs = {
+  const designsP = {
     kin: { name: '金・伝統', make() {
       const band = '<rect x="7.5" y="7.5" width="195" height="282" fill="none" stroke="url(#g)" stroke-width="2"/><rect x="10.6" y="10.6" width="188.8" height="275.8" fill="none" stroke="url(#g)" stroke-width=".45"/>' +
         '<rect x="14" y="14" width="182" height="269" fill="none" stroke="url(#g)" stroke-width=".8"/><rect x="8.9" y="8.9" width="192.2" height="279.2" fill="none" stroke="url(#p)" stroke-width="2.4"/>';
@@ -2388,6 +2441,57 @@ const makeFrames = (W, H) => {
       return svg(silver, lines + corners(corner) + mid);
     } }
   };
+  // ---- A5 横（210×148mm）専用: 飾りは上下の帯と四隅・両脇に寄せ、文字の入る中央（約 28〜118mm）をあける
+  const L = W > H;
+  const tailL = side => '<g transform="translate(0 6) scale(1 .5)">' + tail(side) + '</g>';
+  function bottomBandL() {
+    const y = H - 22;
+    let s = '<rect x="14" y="' + y + '" width="182" height="8" fill="url(#p)" opacity=".5"/><path d="M14 ' + y + ' H196" stroke="url(#g)" stroke-width=".5"/>';
+    for (let i = 0; i < 13; i++) {
+      const x = 20 + i * 14, b = H - 14.4;
+      s += '<path d="M' + x + ' ' + b + ' c -2 -3 -.6 -5.6 1.6 -6.4 c .5 2 .4 4.4 -1.6 6.4 z" fill="url(#g)"/><path d="M' + (x + 5) + ' ' + b + ' c 2 -2.6 1 -5 -.8 -5.8 c -.5 2 -.4 4 .8 5.8 z" fill="url(#g)" opacity=".8"/>';
+    }
+    return s;
+  }
+  function sprigsL() {
+    let s = '';
+    [[17.5, 1], [192.5, -1]].forEach(([x, d]) => {
+      for (let y = 92; y <= 116; y += 12) s += '<path d="M' + x + ' ' + y + ' q ' + (d * 4) + ' -2.4 ' + (d * 5.6) + ' -6.4" fill="none" stroke="url(#g)" stroke-width=".45"/><circle cx="' + (x + d * 5.6) + '" cy="' + (y - 6.4) + '" r=".9" fill="url(#g)"/>';
+    });
+    return s;
+  }
+  const B = H;   // 下端
+  const designsL = {
+    kin: { name: '金・伝統', make() {
+      const band = '<rect x="7.5" y="7.5" width="195" height="' + (B - 15) + '" fill="none" stroke="url(#g)" stroke-width="2"/><rect x="10.6" y="10.6" width="188.8" height="' + (B - 21.2) + '" fill="none" stroke="url(#g)" stroke-width=".45"/>' +
+        '<rect x="14" y="14" width="182" height="' + (B - 28) + '" fill="none" stroke="url(#g)" stroke-width=".8"/><rect x="8.9" y="8.9" width="192.2" height="' + (B - 17.8) + '" fill="none" stroke="url(#p)" stroke-width="2.4"/>';
+      const corner = '<circle cx="14" cy="14" r="3.4" fill="#fff" stroke="url(#g)" stroke-width=".7"/><circle cx="14" cy="14" r="1.5" fill="url(#g)"/>';
+      return svg(gold + '<pattern id="p" width="3.2" height="3.2" patternUnits="userSpaceOnUse"><circle cx="1.6" cy="1.6" r=".55" fill="#c79b3b"/></pattern>',
+        band + corners(corner) + '<g transform="translate(105 15.5) scale(.62) translate(-105 -22)">' + crest(105, 22) + '</g>' + tailL(-1) + tailL(1) + bottomBandL() + sprigsL());
+    } },
+    kinSimple: { name: '金・シンプル', make() {
+      const lines = '<rect x="10" y="10" width="190" height="' + (B - 20) + '" fill="none" stroke="url(#g)" stroke-width="1.6"/><rect x="13.5" y="13.5" width="183" height="' + (B - 27) + '" fill="none" stroke="url(#g)" stroke-width=".5"/>';
+      const corner = '<path d="M13.5 26 L 26 26 L 26 13.5" fill="none" stroke="url(#g)" stroke-width=".7"/><rect x="17" y="17" width="5.5" height="5.5" fill="url(#g)" transform="rotate(45 19.75 19.75)"/>';
+      const mid = '<path d="M95 13.5 q 10 7 20 0 M95 ' + (B - 13.5) + ' q 10 -7 20 0" fill="none" stroke="url(#g)" stroke-width=".7"/><circle cx="105" cy="17.5" r="1.4" fill="url(#g)"/><circle cx="105" cy="' + (B - 17.5) + '" r="1.4" fill="url(#g)"/>';
+      return svg(gold, lines + corners(corner) + mid);
+    } },
+    swim: { name: '水泳（波とコースロープ）', make() {
+      const navy = '#0b3a6e', aqua = '#2fa3dc';
+      const wave = (y, flip) => { let d = 'M10 ' + y; for (let x = 10; x < 200; x += 12) d += ' q 3 ' + (flip ? 2 : -2) + ' 6 0 t 6 0'; return '<path d="' + d + '" fill="none" stroke="' + aqua + '" stroke-width=".8" stroke-linecap="round"/>'; };
+      let rope = '';
+      for (let x = 16, i = 0; x <= 194; x += 5, i++) { const c = i % 2 ? '#ffffff' : '#d8353c'; rope += '<circle cx="' + x + '" cy="17.5" r="1.5" fill="' + c + '" stroke="#c7cfd8" stroke-width=".2"/><circle cx="' + x + '" cy="' + (B - 17.5) + '" r="1.5" fill="' + c + '" stroke="#c7cfd8" stroke-width=".2"/>'; }
+      const frame = '<rect x="9" y="9" width="192" height="' + (B - 18) + '" rx="3" fill="none" stroke="' + navy + '" stroke-width="1.6"/><rect x="12.5" y="12.5" width="185" height="' + (B - 25) + '" rx="2" fill="none" stroke="' + navy + '" stroke-width=".4"/>';
+      const sides = '<path d="M16 28 V ' + (B - 28) + ' M194 28 V ' + (B - 28) + '" stroke="' + aqua + '" stroke-width=".5" stroke-dasharray="1.5 2.5"/>';
+      return svg('', frame + wave(22.5, false) + wave(B - 22.5, true) + rope + sides);
+    } },
+    gin: { name: '銀・モダン', make() {
+      const lines = '<rect x="10" y="10" width="190" height="' + (B - 20) + '" fill="none" stroke="url(#g)" stroke-width="1.2"/><rect x="14" y="14" width="182" height="' + (B - 28) + '" fill="none" stroke="url(#g)" stroke-width=".35"/>';
+      const corner = '<path d="M14 34 L 22 34 L 22 22 L 34 22 L 34 14" fill="none" stroke="url(#g)" stroke-width=".7"/><path d="M14 28 L 28 14" stroke="url(#g)" stroke-width=".35"/><circle cx="18" cy="18" r="1.2" fill="url(#g)"/>';
+      const mid = '<path d="M80 10 L 105 16 L 130 10 M80 ' + (B - 10) + ' L 105 ' + (B - 16) + ' L 130 ' + (B - 10) + '" fill="none" stroke="url(#g)" stroke-width=".5"/>';
+      return svg(silver, lines + corners(corner) + mid);
+    } }
+  };
+  const designs = L ? designsL : designsP;
   const cache = {};
   function url(key) {
     if (!designs[key]) return '';
@@ -2750,7 +2854,7 @@ const RB_ACT = {
   delSnaps: ['trash', '控え削除'], restoreSnap: ['undo', '戻す'], snapNow: ['camera', '控える'],
   sample: ['flag', 'サンプル'], clearResults: ['erase', '記録消去'], resetAll: ['trash', '全消去'],
   hubPrint: ['print', 'まとめ印刷'], hubFocus: b => b.dataset.v ? ['eye', '見る'] : ['prev', '戻る'],
-  rename: ['fix', '変更'], combineOther: ['merge', '合同にする'], heatLock: b => /ロック中/.test(b.textContent) ? ['lock', 'ロック中'] : ['unlock', '組ロック'],
+  rename: ['fix', '変更'], certOne: ['print', '1人印刷'], combineOther: ['merge', '合同にする'], heatLock: b => /ロック中/.test(b.textContent) ? ['lock', 'ロック中'] : ['unlock', '組ロック'],
   hubPick: b => { const t = b.textContent; return /外す/.test(t) ? ['close', '選択解除'] : /記録入り/.test(t) ? ['program', '記録入り'] : /プログラム/.test(t) ? ['program', 'プログラム'] : /記録証/.test(t) ? ['certs', '記録証'] : /賞状/.test(t) ? ['awards', '賞状'] : /速報/.test(t) ? ['flash', '速報'] : /ランキング/.test(t) ? ['ranking', '順位'] : null; }
 };
 const RB_TEXT = [[/記入済み.*読み込む/, ['upload', 'Excel読込']], [/バックアップから復元/, ['undo', '復元']], [/Excelファイルを読み込む/, ['upload', 'Excel読込']]];
@@ -2777,7 +2881,7 @@ function roundify(root) {
     const bar = b.parentElement;
   });
   // 丸ボタンは、その列の検索欄や選択欄とは別の「丸だけの列」にまとめる（どの画面でも左上から同じ並び）
-  (root || document).querySelectorAll('.bar:not(.progbar)').forEach(bar => {
+  (root || document).querySelectorAll('.bar:not(.progbar):not(.chead)').forEach(bar => {
     const rbs = [...bar.children].filter(c => c.classList.contains('rb'));
     if (!rbs.length) return;
     const others = [...bar.children].filter(c => !c.classList.contains('rb') && !c.classList.contains('grow') && !c.classList.contains('pmodes') && (c.textContent.trim() || c.querySelector('input, select, textarea')));
@@ -2810,6 +2914,7 @@ function saveNavPref() { try { lsSet(NAVPREF_KEY, JSON.stringify(navPref)); } ca
 function applyNavLayout() {
   const app = $('#app');
   document.documentElement.classList.toggle('phone', isPhone());
+  try { document.documentElement.classList.toggle('a5p', certPaper() === 'A5'); } catch (e) { /* 読み込み途中 */ }
   app.classList.toggle('side-right', navPref.side === 'right');
   app.classList.toggle('side-left', navPref.side !== 'right');
   app.classList.toggle('pinned', navPinnedNow());
@@ -2820,7 +2925,7 @@ function applyNavLayout() {
   app.classList.toggle('navrail', navPinnedNow() && left < 760);
   app.classList.toggle('pvslim', pvOn && left < 640);
 }
-window.addEventListener('resize', () => { if (isPhone() !== document.documentElement.classList.contains('phone')) { render(); return; } applyNavLayout(); sizeFills(); fitProgram(); bindLenses(); schedulePreview(); });
+window.addEventListener('resize', () => { fitCertPrev(); if (isPhone() !== document.documentElement.classList.contains('phone')) { render(); return; } applyNavLayout(); sizeFills(); fitProgram(); bindLenses(); schedulePreview(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && navOpen) { navOpen = false; applyNavLayout(); } });
 
 let renderQueued = false;
@@ -2860,6 +2965,7 @@ function render() {
   paintNote();
   updateFrameStyle();
   sizeFills();
+  fitCertPrev();
   fitProgram();
   schedulePreview();
   document.querySelectorAll('.fill[data-fill-id]').forEach(el => { if (fillScroll[el.dataset.fillId]) el.scrollTop = fillScroll[el.dataset.fillId]; });
@@ -2951,9 +3057,9 @@ function sizeFills() {
     let below = 0;                 // 本部ボード: 下に続く欄（設定の折りたたみ）の分もあけて、1画面に収める
     if (el.classList.contains('hrow')) for (let s = el.nextElementSibling; s; s = s.nextElementSibling) { const cs = getComputedStyle(s); if (cs.display !== 'none') below += s.offsetHeight + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0) + 8; }
     el.style.maxHeight = Math.max(el.classList.contains('hrow') ? 180 : 260, window.innerHeight - top - 16 - below) + 'px';
-    if (el.classList.contains('hrow')) el.style.height = el.style.maxHeight;   // 本部ボード: 左右のパネルを同じ高さで画面の下まで
+    if (el.classList.contains('hrow') || el.classList.contains('cgrid')) el.style.height = el.style.maxHeight;   // 本部ボード: 左右のパネルを同じ高さで画面の下まで
   });
-  const hr = big && document.querySelector('.hrow.fill');   // まだ数px はみ出すなら、その分だけ縮めて画面の中に収める
+  const hr = big && document.querySelector('.hrow.fill, .cgrid.fill');   // まだ数px はみ出すなら、その分だけ縮めて画面の中に収める
   if (hr) { const over = document.documentElement.scrollHeight - window.innerHeight; if (over > 0) { const h = Math.max(180, parseFloat(hr.style.height) - over) + 'px'; hr.style.height = h; hr.style.maxHeight = h; } }
 }
 
@@ -3839,9 +3945,16 @@ const PAPER = {
     ind: { title: [18, 28], name: [44, 21], club: [55, 12], rank: [64, 17], event: [76, 13.5], record: [86, 15], meet: [98, 12], lines: [110, 12, 6.6], date: [138, 11], org: [150, 14] },
     rel: { title: [16, 28], name: [40, 20], mem1: [51, 11.5], mem2: [57.5, 11.5], rank: [66, 16], event: [77, 13.5], record: [86, 15], lines: [97, 12, 6.6], meet: [124, 12], date: [138, 11], org: [150, 14] } }
 };
-// A5 横: B5 横の配置を A5 の大きさにそのまま縮めたもの
-PAPER.A5 = (() => { const k = 148 / 182, sc = o => Object.fromEntries(Object.entries(o).map(([n, v]) => [n, v.map(x => +(x * k).toFixed(2))])); return { w: 210, h: 148, size: 'A5 landscape', label: 'A5 横', ind: sc(PAPER.B5.ind), rel: sc(PAPER.B5.rel) }; })();
+// A5 横（210×148mm）: 文字は小さくせず、フレームの飾り（上下の帯・四隅・両脇）を避けて中央（約 27〜117mm）にまとめる
+PAPER.A5 = { w: 210, h: 148, size: 'A5 landscape', label: 'A5 横',
+  ind: { title: [27, 23], name: [39, 18], club: [47.5, 11], rank: [53.5, 14], event: [61, 11.5], record: [67.5, 12.5], meet: [75, 10.5], lines: [82, 10.5, 5], date: [104.5, 10], org: [112, 12] },
+  rel: { title: [27, 23], name: [38.5, 17], mem1: [47, 10.5], mem2: [52, 10.5], rank: [59, 14], event: [66.5, 11.5], record: [73, 12.5], lines: [80.5, 10.5, 4.8], meet: [101, 10.5], date: [106.5, 10], org: [112.5, 12] } };
 function certPaper() { return (state.settings.print || {}).certPaper === 'A5' ? 'A5' : 'A4'; }
+// A5 横の文言（空欄は A4 と同じ）
+function certTitle(W) { return certPaper() === 'A5' && W.a5 && C.str(W.a5.title) ? W.a5.title : W.title; }
+function certLines(W) { const t = certPaper() === 'A5' && W.a5 && W.a5.lines; return t && t.some(x => C.str(x)) ? W.lines.map((x, i) => C.str(t[i]) ? t[i] : '') : W.lines; }
+// 位置の調整は用紙ごと（A5 は print.a5.*、未設定なら共通の値）
+function certAdj(k) { const p = state.settings.print || {}; return certPaper() === 'A5' && p.a5 && C.str(p.a5[k]) !== '' && p.a5[k] !== undefined ? p.a5[k] : p[k]; }
 function certData(it, relay, prize) {
   const S = state.settings, W = prize ? S.award : S.cert;
   const blank = '　　分　　秒　　';
@@ -3856,15 +3969,15 @@ function certData(it, relay, prize) {
   else if (!C.str((relay ? it.r : it.e).officialTime) || !S.cert.printRecord) rank = '第　　位';
   else rank = it.rank ? '第 ' + it.rank + ' 位' : '';
   return {
-    title: W.title, name: (relay ? it.teamDisp : it.np.kanji) + '  殿', club: !relay && it.club ? 'クラブ名： ' + it.club : '',
+    title: certTitle(W), name: (relay ? it.teamDisp : it.np.kanji) + '  殿', club: !relay && it.club ? 'クラブ名： ' + it.club : '',
     mem1: relay ? [it.memberNames[0].kanji, it.memberNames[1].kanji].filter(Boolean).join('　/　') : '', mem2: relay ? [it.memberNames[2].kanji, it.memberNames[3].kanji].filter(Boolean).join('　/　') : '',
-    rank, event: '種目： ' + it.cat + ' ' + it.event, record: '記録： ' + record, meet: S.meetName, lines: W.lines, date: C.reiwa(W.date), org: W.organizer
+    rank, event: '種目： ' + it.cat + ' ' + it.event, record: '記録： ' + record, meet: S.meetName, lines: certLines(W), date: C.reiwa(W.date), org: W.organizer
   };
 }
 function certHTML(it, relay, prize, paper, preview) {
   // 位置は用紙の高さに対する割合で置く（プリンターの余白があっても、用紙いっぱいに同じ配置で収まる）
   const P = PAPER[certPaper()], L = relay ? P.rel : P.ind, S = state.settings, d = certData(it, relay, prize);
-  const sc = (C.num(S.print.scale) || 100) / 100, dy = C.num(S.print.offsetTop), dx = C.num(S.print.offsetLeft);
+  const sc = (C.num(certAdj('scale')) || 100) / 100, dy = C.num(certAdj('offsetTop')), dx = C.num(certAdj('offsetLeft'));
   const pct = mm => (mm / P.h * 100).toFixed(3) + '%';
   const at = (key, txt, extra, html) => { const [top, pt] = L[key]; return '<div class="cl ' + (extra || '') + (html && /<rt>/.test(html) ? ' hasruby' : '') + '" style="left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + pct(top * sc + dy) + ';font-size:' + (pt * sc) + 'pt">' + (html || esc(txt)) + '</div>'; };
   const kana = S.print.certKana !== false;      // 証書の名前の上にフリガナ
@@ -3893,45 +4006,75 @@ function certList() {
   return C.certTargets(state, relay ? D.rel : D.ind, relay, certF(), prize);
 }
 VIEWS.certs = () => {
+  // 1画面で操作: 上に切り替えと印刷、下は「対象（左）｜プレビュー（中央・大きく）｜設定（右・タブ）」。各列は中だけスクロール
   const S = state.settings, relay = ui.certTarget === 'rel', prize = ui.certKind === 'prize';
   const W = prize ? S.award : S.cert, wk = prize ? 'award' : 'cert';
+  const paper = certPaper(), A5 = paper === 'A5', P = PAPER[paper];
   const list = certList();
   const f = ui.certFilter || {};
   const from = Math.max(1, parseInt(ui.certFrom, 10) || 1), to = Math.min(list.length, parseInt(ui.certTo, 10) || list.length);
-  const P = PAPER[certPaper()];
-  const pv = 0.34;
-  const clubs = relay ? S.clubs.map(c => c.name) : S.clubs.map(c => c.name);
-  return '<h1 class="view">記録証・賞状</h1><p class="lead">対象者を絞り込んでまとめて印刷します。記録が未入力の人は「　分　秒」の手書き用になります。用紙の印刷位置がずれる場合は、下の「位置の調整」で直せます。最初は1枚だけテスト印刷すると安心です。</p>' +
-    '<div class="card" style="margin-bottom:12px"><div class="bar">' +
-    seg('certKind', [['record', S.cert.skipPrize ? '記録証（賞状の人を除く）' : '記録証（全員）'], ['prize', '賞状（' + (S.prizeMaxRank || 10) + '位以内）']], ui.certKind) +
-    seg('certTarget', [['ind', '個人'], ['rel', 'リレー']], ui.certTarget) + '<span class="pill info">用紙 A4 縦・1人1枚</span></div><div class="fields">' +
-    field('種目', sel('cf:event', f.event || '', blankOpt('すべて').concat(programOptions().filter(n => C.isRelayName(n) === relay)))) +
-    field('区分', sel('cf:cat', f.cat || '', blankOpt('すべて').concat(S.categories.filter(Boolean)))) +
-    field(relay ? 'チーム' : 'クラブ', sel('cf:club', f.club || '', blankOpt('すべて').concat(clubs.filter(Boolean)))) +
-    field('状態', sel('cf:status', f.status || '', blankOpt('すべて').concat(['完泳', '失格', '棄権', '対象外', '未入力']))) +
-    '</div><div class="bar" style="margin-top:10px"><input data-k="ui:certQ" value="' + esc(ui.certQ || '') + '" placeholder="' + (relay ? 'チーム・泳者' : '選手名・クラブ') + 'で検索して1人ずつ印刷" style="max-width:300px" aria-label="証書の対象を検索"></div>' +
-    (ui.certQ ? '<div class="certhits">' + (list.length ? list.slice(0, 40).map((it, i) => '<div class="chit' + (from === i + 1 ? ' on' : '') + '"><span class="grow"><b>' + (relay ? esc(it.teamDisp) : rubyName(it.np)) + '</b>　<span class="muted small">' + esc(it.cat + ' ' + it.event) + (it.combined ? ' <span class="pill comb">合同</span>' : '') + '　' + (it.rank ? it.rank + '位' : it.status) + '</span></span><button class="btn sm" data-act="certSee" data-i="' + (i + 1) + '">見る</button><button class="btn sm primary" data-act="certOne" data-i="' + (i + 1) + '">' + icon('print', 'ic sm') + 'この人を印刷</button></div>').join('') + (list.length > 40 ? '<p class="small muted">ほか ' + (list.length - 40) + '件。名前を詳しく入れると絞り込めます。</p>' : '') : '<p class="small muted">見つかりません。</p>') + '</div>' : '') +
-    '<div class="bar" style="margin-top:12px"><b>対象 ' + list.length + ' 枚</b><span class="muted">印刷する範囲</span>' +
-    '<span class="nowrap"><input data-k="ui:certFrom" value="' + from + '" style="width:64px" inputmode="numeric"> 〜 <input data-k="ui:certTo" value="' + (list.length ? to : '') + '" style="width:64px" inputmode="numeric"> 枚目</span><span class="grow"></span>' +
-    '<button class="btn" data-act="printCert" data-test="1" ' + (list.length ? '' : 'disabled') + '>1枚だけテスト印刷</button><button class="btn primary" data-act="printCert" ' + (list.length ? '' : 'disabled') + '>印刷する（' + (list.length ? to - from + 1 : 0) + '枚）</button></div></div>' +
-    '<div class="grid g2" style="align-items:start"><div class="card fill" data-fill-id="cprev"><h2>プレビュー（1枚目）</h2>' +
-    (list.length ? '<div class="certprev" style="width:' + (P.w * pv) + 'mm;height:' + (P.h * pv) + 'mm">' + certHTML(list[from - 1] || list[0], relay, prize, ui.certPaper, pv) + '</div>' : '<div class="empty">対象者がいません。絞り込み条件を確認してください。</div>') +
-    '</div><div class="card fill" data-fill-id="cword"><h2>' + (prize ? '賞状' : '記録証') + 'の設定</h2>' + frameCard(prize ? 'prize' : 'record') + '<h3>文言</h3><div class="fields" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))">' +
-    field('タイトル', inp('set:' + wk + '.title', W.title)) +
-    W.lines.map((t, i) => field('文言' + '①②③④'[i], inp('set:' + wk + '.lines.' + i, t))).join('') +
+  const cur = list.length ? Math.min(list.length, Math.max(1, parseInt(ui.certPv, 10) || from)) : 0;
+  const it = list[cur - 1];
+  const clubs = S.clubs.map(c => c.name).filter(Boolean);
+  const tab = ['word', 'frame', 'pos'].indexOf(ui.certTab) >= 0 ? ui.certTab : 'word';
+  const label = prize ? '賞状' : '記録証';
+  // ---- 上: 何を・どの用紙で・印刷
+  const head = '<div class="bar chead">' +
+    seg('certKind', [['record', '記録証'], ['prize', '賞状（' + (S.prizeMaxRank || 10) + '位以内）']], ui.certKind) +
+    seg('certTarget', [['ind', '個人'], ['rel', 'リレー']], ui.certTarget) +
+    seg('certPaperSel', [['A4', 'A4 縦'], ['A5', 'A5 横']], paper) +
+    '<span class="grow"></span>' +
+    '<button class="btn" data-act="printCert" data-test="1" ' + (list.length ? '' : 'disabled') + '>1枚だけテスト印刷</button>' +
+    '<button class="btn primary" data-act="printCert" ' + (list.length ? '' : 'disabled') + '>印刷する（' + (list.length ? to - from + 1 : 0) + '枚）</button></div>';
+  // ---- 左: 対象（絞り込み・名前で探す・一覧・範囲）
+  const rows = list.map((x, i) => '<button type="button" class="crow' + (cur === i + 1 ? ' on' : '') + (i + 1 < from || i + 1 > to ? ' out' : '') + '" data-act="certSee" data-i="' + (i + 1) + '"><i>' + (i + 1) + '</i><b>' + esc(relay ? x.teamDisp : x.np.kanji) + '</b><span>' + esc(x.cat + ' ' + x.event) + (x.combined ? ' <em class="pill comb">合同</em>' : '') + '</span><small>' + esc(x.rank && x.status === '完泳' ? x.rank + '位' : x.status) + '</small></button>').join('');
+  const left = '<div class="card ccol cleft"><div class="chd"><h2>対象 <span class="num">' + list.length + '</span> 枚</h2></div>' +
+    '<div class="cfil">' +
+    sel('cf:event', f.event || '', blankOpt('種目: すべて').concat(programOptions().filter(n => C.isRelayName(n) === relay)), 'aria-label="種目"') +
+    sel('cf:cat', f.cat || '', blankOpt('区分: すべて').concat(S.categories.filter(Boolean)), 'aria-label="区分"') +
+    sel('cf:club', f.club || '', blankOpt((relay ? 'チーム' : 'クラブ') + ': すべて').concat(clubs), 'aria-label="' + (relay ? 'チーム' : 'クラブ') + '"') +
+    sel('cf:status', f.status || '', blankOpt('状態: すべて').concat(['完泳', '失格', '棄権', '対象外', '未入力']), 'aria-label="状態"') +
+    '<input data-k="ui:certQ" value="' + esc(ui.certQ || '') + '" placeholder="' + (relay ? 'チーム・泳者' : '名前・クラブ') + 'で探す" aria-label="証書の対象を検索" class="cq"></div>' +
+    '<div class="clist">' + (rows || '<p class="empty small">対象者がいません。絞り込みを確認してください。</p>') + '</div>' +
+    '<div class="crange"><span>範囲</span><input data-k="ui:certFrom" value="' + from + '" inputmode="numeric" aria-label="何枚目から"><span>〜</span><input data-k="ui:certTo" value="' + (list.length ? to : '') + '" inputmode="numeric" aria-label="何枚目まで"><span>枚目</span></div></div>';
+  // ---- 中央: プレビュー（大きく。前・次で1人ずつ）
+  const center = '<div class="card ccol cmid"><div class="chd cnav">' +
+    '<button class="iconbtn" data-act="certStep" data-d="-1" ' + (cur > 1 ? '' : 'disabled') + ' aria-label="前の人">' + icon('prev') + '</button>' +
+    '<div class="cwho">' + (it ? '<b>' + esc(relay ? it.teamDisp : it.np.kanji) + '</b><span>' + cur + ' / ' + list.length + '・' + esc(P.label) + '</span>' : '<span>対象者なし</span>') + '</div>' +
+    '<button class="iconbtn" data-act="certStep" data-d="1" ' + (cur && cur < list.length ? '' : 'disabled') + ' aria-label="次の人">' + icon('next') + '</button>' +
+    (it ? '<button class="btn" data-act="certOne" data-i="' + cur + '">この人だけ印刷</button>' : '') + '</div>' +
+    '<div class="cstage">' + (it ? '<div class="cpaper-box" data-w="' + P.w + '" data-h="' + P.h + '" style="width:' + P.w + 'mm;height:' + P.h + 'mm">' + certHTML(it, relay, prize, paper, 1) + '</div>' : '<div class="empty">対象者がいません</div>') + '</div></div>';
+  // ---- 右: 設定（タブで切り替え。スクロールなしで収まる量に分ける）
+  const A = W.a5 || {};
+  const word = '<p class="small muted cnote">' + (A5 ? '<b>A5 横の文言</b>（空欄は A4 と同じ文言。A5 用に短くできます）' : label + 'の文言') + '</p><div class="cform">' +
+    (A5 ? field('タイトル', inp('set:' + wk + '.a5.title', A.title || '', 'placeholder="' + esc(W.title) + '"'), 'wide') +
+      W.lines.map((t, i) => field('文言' + '①②③④'[i], inp('set:' + wk + '.a5.lines.' + i, (A.lines || [])[i] || '', 'placeholder="' + esc(t) + '"'), 'wide')).join('')
+      : field('タイトル', inp('set:' + wk + '.title', W.title), 'wide') + W.lines.map((t, i) => field('文言' + '①②③④'[i], inp('set:' + wk + '.lines.' + i, t), 'wide')).join('')) +
     field('日付', '<input type="date" data-k="set:' + wk + '.date" value="' + esc(/^\d{4}-\d{2}-\d{2}$/.test(W.date) ? W.date : '') + '">') +
     field('大会主催者名', inp('set:' + wk + '.organizer', W.organizer)) +
-    (prize ? '' : field('記録の印字', sel('set:cert.printRecord', S.cert.printRecord ? '1' : '0', [['1', '印字する'], ['0', '印字しない（手書き用）']]))) +
-    '</div><div class="bar" style="margin:10px 0 0">' +
-    (prize ? '' : '<label class="small"><input type="checkbox" data-k="set:cert.skipPrize" ' + (S.cert.skipPrize ? 'checked' : '') + '> 賞状の対象者（' + (S.prizeMaxRank || 10) + '位以内）には記録証を出さない</label>') +
-    '<label class="small cpaper">用紙 ' + sel('set:print.certPaper', certPaper(), [['A4', 'A4 縦'], ['A5', 'A5 横']], 'aria-label="記録証・賞状の用紙"') + '</label>' +
-    '<label class="small"><input type="checkbox" data-k="set:print.certKana" ' + (S.print.certKana !== false ? 'checked' : '') + '> 名前の上にフリガナを印刷する</label>' +
-    '</div><h3>位置の調整（すべての証書に共通）</h3><div class="fields">' +
-    field('文字の大きさ（%）', inp('set:print.scale', S.print.scale, 'inputmode="numeric"')) +
-    field('上下のずれ（mm, 下へ+）', inp('set:print.offsetTop', S.print.offsetTop, 'inputmode="decimal"')) +
-    field('左右のずれ（mm, 右へ+）', inp('set:print.offsetLeft', S.print.offsetLeft, 'inputmode="decimal"')) +
-    '</div><p class="small muted">印刷時はブラウザの印刷設定で「余白なし」「倍率100%」「背景のグラフィック オフ」を選んでください。</p></div></div>';
+    (prize ? '' : field('記録の印字', sel('set:cert.printRecord', S.cert.printRecord ? '1' : '0', [['1', '印字する'], ['0', '手書き用（印字しない）']]))) +
+    '</div><div class="cchips">' +
+    (prize ? '' : '<label class="chip-ck"><input type="checkbox" data-k="set:cert.skipPrize" ' + (S.cert.skipPrize ? 'checked' : '') + '> 賞状の人には記録証を出さない</label>') +
+    '<label class="chip-ck"><input type="checkbox" data-k="set:print.certKana" ' + (S.print.certKana !== false ? 'checked' : '') + '> 名前にフリガナ</label></div>';
+  const adj = k => { const p = S.print || {}; return A5 ? ((p.a5 || {})[k] !== undefined ? p.a5[k] : '') : p[k]; };
+  const pos = '<p class="small muted cnote"><b>' + esc(P.label) + '</b> の印刷位置（' + (A5 ? '空欄は A4 と同じ値' : 'A5 横は別に調整できます') + '）</p><div class="cform">' +
+    field('文字の大きさ %', inp('set:print.' + (A5 ? 'a5.' : '') + 'scale', adj('scale'), 'inputmode="numeric" placeholder="100"')) +
+    field('上下 mm（下へ＋）', inp('set:print.' + (A5 ? 'a5.' : '') + 'offsetTop', adj('offsetTop'), 'inputmode="decimal" placeholder="0"')) +
+    field('左右 mm（右へ＋）', inp('set:print.' + (A5 ? 'a5.' : '') + 'offsetLeft', adj('offsetLeft'), 'inputmode="decimal" placeholder="0"')) +
+    '</div><p class="small muted">印刷するときは、ブラウザの印刷設定で用紙「' + esc(P.label) + '」・倍率100%・余白なし・ヘッダとフッタなしを選びます。最初は「1枚だけテスト印刷」で位置を確かめると安心です。</p>';
+  const right = '<div class="card ccol cright"><div class="chd">' + seg('certTab', [['word', '文言'], ['frame', 'フレーム'], ['pos', '印刷位置']], tab) + '</div>' +
+    '<div class="cbody">' + (tab === 'word' ? word : tab === 'frame' ? frameCard(prize ? 'prize' : 'record') : pos) + '</div></div>';
+  return '<h1 class="view">記録証・賞状</h1>' + head + '<div class="cgrid fill" data-fill-id="cgrid">' + left + center + right + '</div>';
 };
+// プレビューの証書を、中央の枠いっぱい（縦横どちらも収まる大きさ）に
+function fitCertPrev() {
+  const stage = document.querySelector('.cstage'), box = stage && stage.querySelector('.cpaper-box');
+  if (!box) return;
+  const w = box.offsetWidth, h = box.offsetHeight; if (!w || !h) return;
+  const k = Math.min((stage.clientWidth - 16) / w, (stage.clientHeight - 16) / h);
+  box.style.transform = 'scale(' + Math.max(0.1, k).toFixed(4) + ')';
+  box.style.marginBottom = (h * k - h) + 'px'; box.style.marginRight = (w * k - w) + 'px';
+}
 
 /* ---------------------------------------------------------------- 最優秀・優秀選手 */
 VIEWS.awards = () => {
@@ -4085,7 +4228,7 @@ function frameCard(kind) {
     '<label class="small"><input type="checkbox" data-k="frshow:' + kind + '" ' + (f.show[kind] ? 'checked' : '') + '> ' + label + 'にフレームを付けて印刷する</label>' +
     '<label class="small"><input type="checkbox" data-k="frsame" ' + (f.same ? 'checked' : '') + '> 記録証と賞状で同じフレームにする</label></div>' +
     (f.show[kind] ? '<p class="small muted" style="margin:0 0 6px">' + (f.same ? '記録証・賞状 共通' : label + '用') + 'のフレーム</p><div class="frgrid">' +
-      Frames.list.map(([k, n]) => tile(k, n, Frames.url(k))).join('') +
+      (certPaper() === 'A5' ? FramesA5 : Frames).list.map(([k, n]) => tile(k, n, (certPaper() === 'A5' ? FramesA5 : Frames).url(k))).join('') +
       (img ? tile('custom', '自分の画像', img) : '') +
       '<label class="frtile up"><span class="frimg">＋</span><span>' + (img ? '画像を変える' : '自分の画像を使う') + '</span><input type="file" accept="image/png,image/jpeg" data-file="frame" data-slot="' + slot + '" hidden></label>' +
       '</div>' + (img ? '<div class="bar" style="margin-top:6px"><button class="btn sm danger" data-act="frClear" data-v="' + slot + '">自分の画像を消す</button><span class="small muted">画像はこの端末のブラウザにだけ保存され、公開サイトには送られません。</span></div>' : '<p class="small muted" style="margin:6px 0 0">自分の画像（PNG・JPEG。A4縦、2000ピクセル以上がおすすめ）も使えます。</p>')
@@ -4102,12 +4245,13 @@ function setPath(obj, path, val) {
 function getPath(obj, path) { return path.split('.').reduce((o, k) => (o === undefined || o === null) ? undefined : o[k], obj); }
 const ENT_LOCK_OK = ['officialTime', 'judge'];
 function setUI(f, val) {
+  if (f === 'certPaperSel') { commit('証書の用紙を' + (val === 'A5' ? 'A5 横' : 'A4 縦') + 'に', s => { s.settings.print.certPaper = val; }, { allowLocked: true }); return; }
   if (f === 'awCat') val = +val;
   if (f === 'prog') { ui._focusFirst = true; ui.progHeat = null; ui.arrSel = null; }
   if (f === 'progHeat') { val = +val; ui._focusFirst = true; }
   ui[f] = val;
   if (f.indexOf('ent') === 0 && f !== 'entPage') ui.entPage = 0;
-  if (f === 'certKind' || f === 'certTarget') { ui.certFilter = {}; ui.certFrom = 1; ui.certTo = ''; }
+  if (f === 'certKind' || f === 'certTarget') { ui.certFilter = {}; ui.certFrom = 1; ui.certTo = ''; ui.certPv = 1; }
   if (f === 'renKind') ui.renFrom = '';
   save(); render();
 }
@@ -4135,7 +4279,7 @@ function handleValue(el) {
     return;
   }
   if (kind === 'snap') { const t = +rest[0]; ui.snapSel = (ui.snapSel || []).filter(x => x !== t); if (val) ui.snapSel.push(t); render(); return; }
-  if (kind === 'cf') { ui.certFilter = Object.assign({}, ui.certFilter, { [rest[0]]: val }); ui.certFrom = 1; ui.certTo = ''; render(); return; }
+  if (kind === 'cf') { ui.certFilter = Object.assign({}, ui.certFilter, { [rest[0]]: val }); ui.certFrom = 1; ui.certTo = ''; ui.certPv = 1; render(); return; }
   if (kind === 'set') {
     const path = rest.join(':');
     let v = val;
@@ -4464,7 +4608,8 @@ const ACTIONS = {
   printFlash: () => printFlash(),
   printRank: () => printRanking(),
   printCert: t => printCerts(t.dataset.test === '1'),
-  certSee: t => { ui.certFrom = +t.dataset.i; ui.certTo = ''; render(); },
+  certSee: t => { ui.certPv = +t.dataset.i; render(); },
+  certStep: t => { ui.certPv = Math.max(1, (parseInt(ui.certPv, 10) || Math.max(1, parseInt(ui.certFrom, 10) || 1)) + (+t.dataset.d)); render(); },
   certOne: t => { const i = +t.dataset.i; printDocs([docCerts(ui.certKind, ui.certTarget, certF(), i, i)], '1枚だけ印刷します'); },
   printAwards: () => printAwards(),
   exportXlsx: () => exportXlsx(),
@@ -4829,7 +4974,7 @@ function printCerts(test) {
 }
 
 // ---------------------------------------------------------------- 印刷プレビュー（各印刷画面の右側。表示・非表示を切り替えられる）
-const PV_VIEWS = ['schedule', 'program', 'flash', 'ranking', 'certs', 'awards', 'prints'];
+const PV_VIEWS = ['schedule', 'program', 'flash', 'ranking', 'awards', 'prints'];   // 記録証は画面の中央に大きなプレビューがある
 const PV_MAX = 24;
 let pvTimer = 0;
 function previewOn() { return navPref.pv !== false && !isPhone(); }
@@ -5214,7 +5359,7 @@ document.addEventListener('input', e => {
   if (el.dataset.k === 'ui:entQ' || el.dataset.k === 'ui:relQ' || el.dataset.k === 'ui:certQ' || el.dataset.k === 'ui:arrQ') {
     clearTimeout(searchTimer);
     if (e.isComposing) return;                 // 日本語の変換中は検索しない（変換が確定してから）
-    searchTimer = setTimeout(() => { ui[el.dataset.k.slice(3)] = el.value; ui.entPage = 0; if (el.dataset.k === 'ui:certQ') { ui.certFrom = 1; ui.certTo = ''; } render(); }, 300);
+    searchTimer = setTimeout(() => { ui[el.dataset.k.slice(3)] = el.value; ui.entPage = 0; if (el.dataset.k === 'ui:certQ') { ui.certPv = 1; ui.certFrom = 1; ui.certTo = ''; } render(); }, 300);
   }
 });
 document.addEventListener('toggle', e => { const d = e.target; if (d.dataset && d.dataset.det) ui[d.dataset.det] = d.open; }, true);
