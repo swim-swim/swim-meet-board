@@ -1253,6 +1253,46 @@ html.phone .arr.rel .pcard, html.phone .arr.rel .slot-empty, html.phone .arr.rel
 .rcard .rc-team { flex: 1 1 auto; font-size: 15.5px; }
 .rcard .rc-mem .rc-cat { display: inline-block; margin-right: 6px; padding: 0 6px; border-radius: 999px; background: var(--track); font-size: 11.5px; color: var(--muted); }
 .rcard .rc-m { white-space: nowrap; }
+
+/* =====================================================================
+   丸いボタン（.rb）: 画面の操作ボタンはすべて同じ大きさの丸（アイコン＋短い名前）
+   ボタンの列は折り返さず、いつも同じ並び（狭い画面では横にすべらせる）
+   ===================================================================== */
+.btn.rb { width: 56px !important; height: 56px !important; min-width: 56px !important; min-height: 56px !important; flex: 0 0 56px !important; padding: 0 !important; border-radius: 50% !important;
+  display: inline-flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 2px; white-space: nowrap; line-height: 1.05; font-size: 10px !important; font-weight: 700; letter-spacing: -.02em; }
+.btn.rb .ic { width: 20px; height: 20px; flex: 0 0 auto; margin: 0; }
+.btn.rb .rbl { display: block; max-width: 52px; overflow: hidden; font-size: 10px; }
+.bar.rbar { display: flex !important; flex-wrap: nowrap !important; align-items: center; gap: 8px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; padding: 2px 2px 4px; margin-bottom: 8px; justify-content: flex-start; }
+.bar.rbar::-webkit-scrollbar { display: none; }
+.bar.rbar > .grow { display: none; }
+.bar.rbar > :not(.rb) { flex: 0 0 auto; }
+.bar.rbar .pmodes { display: inline-flex; gap: 6px; margin-left: 4px; }
+.bar.rbar .pmodes select { min-height: 40px; max-width: 220px; }
+/* 判定（棄権・失格・対象外）も丸 */
+.jb { width: 44px !important; height: 44px !important; min-width: 44px !important; min-height: 44px !important; padding: 0 !important; border-radius: 50% !important; font-size: 11.5px !important; display: inline-grid !important; place-items: center; line-height: 1; letter-spacing: -.03em; flex: 0 0 44px; }
+html.phone .jb, html.phone .jbtns button { min-width: 44px !important; padding: 0 !important; }
+/* 前・次（記録入力の種目） */
+.progbar > [data-act="progStep"] { width: 44px !important; height: 44px !important; min-width: 44px !important; padding: 0 !important; border-radius: 50% !important; font-size: 18px; flex: 0 0 44px; }
+/* 通知モニターの「次へ」なども丸 */
+.tn-btn { width: 34px !important; height: 34px !important; min-width: 34px; padding: 0 !important; border-radius: 50% !important; font-size: 10.5px !important; line-height: 1; display: inline-grid !important; place-items: center; flex: 0 0 34px; letter-spacing: -.03em; }
+/* 小さな丸（↑↓×）も同じ大きさ */
+.x { width: 36px; height: 36px; border-radius: 50% !important; }
+/* パネルを広く: 余白を少し詰める */
+#main .card { padding: 12px 14px; }
+#main .vhead { margin-bottom: 6px; }
+.prog { margin: -2px 0 8px !important; }
+html.phone .rbar .pmodes, html.phone .rbar [data-act="printProg"] { display: none !important; }
+.btn.rb.rb-s { width: 46px !important; height: 46px !important; min-width: 46px !important; min-height: 46px !important; flex: 0 0 46px !important; gap: 1px; }
+.btn.rb.rb-s .ic { width: 17px; height: 17px; }
+.btn.rb.rb-s .rbl { font-size: 9.5px; max-width: 42px; }
+.btn.rb.hlock.on, .btn.rb[data-act="heatLock"].on { background: var(--accent); color: #fff; border-color: var(--accent); }
+/* 記録入力の1行目（← 種目 → と情報）: どの画面幅でも同じ並び */
+.progbar { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.progbar::-webkit-scrollbar { display: none; }
+.progbar > .progsel { flex: 0 1 320px; min-width: 180px; }
+.progbar > .pill { flex: 0 0 auto; }
+html.phone .kstrip .kbtn.rb { flex: 0 0 56px !important; width: 56px !important; min-height: 56px !important; font-size: 10px !important; margin-left: auto; }
+html.phone .progbar > .btn.rb[data-act="progStep"] { width: 48px !important; height: 48px !important; min-width: 48px !important; min-height: 48px !important; flex-basis: 48px !important; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2494,7 +2534,7 @@ function paintNote(rotated) {
   if (fresh) lastFlash = n.t;
   slot.className = 'tnote k-' + cls + (rotated || fresh ? ' slide' : '') + (fresh ? ' flash' : '');
   slot.innerHTML = it ? '<span class="tn-dot"></span><span class="tn-msg">' + esc(it.msg) + '</span>' +
-      (it.note ? '<button type="button" class="tn-btn" data-note="' + it.note + '">' + esc(it.label) + '</button>' : it.act ? '<button type="button" class="tn-btn" data-act="' + it.act + '"' + (it.v ? ' data-v="' + it.v + '"' : '') + '>' + esc(it.label) + '</button>' : '') +
+      (it.note ? '<button type="button" class="tn-btn" data-note="' + it.note + '" title="' + esc(it.label) + '" aria-label="' + esc(it.label) + '">' + esc(shortAct(it.label)) + '</button>' : it.act ? '<button type="button" class="tn-btn" data-act="' + it.act + '"' + (it.v ? ' data-v="' + it.v + '"' : '') + ' title="' + esc(it.label) + '" aria-label="' + esc(it.label) + '">' + esc(shortAct(it.label)) + '</button>' : '') +
       (!n && items.length > 1 ? '<span class="tn-cnt">' + ((tickIdx % items.length) + 1) + '/' + items.length + '</span>' : '')
     : '<span class="tn-msg tn-idle">通知はありません</span>';
   const bell = $('#bell'); if (bell) { const unread = NOTES.filter(x => x.t > notesSeen).length + al.length; bell.querySelector('.bdg').textContent = unread ? String(unread > 99 ? '99+' : unread) : ''; bell.classList.toggle('has', !!unread); }
@@ -2573,6 +2613,83 @@ ICON_PATHS.prints = ICON_PATHS.print;
 ICON_PATHS.pin = 'M9 4h6l-1 6 3 3H7l3-3zM12 13v7';
 ICON_PATHS.close = 'M6 6l12 12M18 6 6 18';
 
+// ---------------------------------------------------------------- 丸いボタン（どの画面も同じ形・同じ大きさ・同じ並び）
+//  画面の操作ボタンは「丸の中にアイコン＋短い名前」。正式な名前は押す前に表示（title）・読み上げ（aria-label）
+ICON_PATHS.plus = 'M12 5v14M5 12h14';
+ICON_PATHS.prev = 'M15 5l-7 7 7 7';
+ICON_PATHS.next = 'M9 5l7 7-7 7';
+ICON_PATHS.upload = 'M12 15V4M7 9l5-5 5 5M5 15v4h14v-4';
+ICON_PATHS.download = 'M12 4v11M7 10l5 5 5-5M5 19h14';
+ICON_PATHS.eye = 'M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12zM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z';
+ICON_PATHS.trash = 'M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12';
+ICON_PATHS.swap = 'M7 7h11l-3-3M17 17H6l3 3';
+ICON_PATHS.table = 'M4 5h16v14H4zM4 10h16M4 15h16M10 5v14';
+ICON_PATHS.paste = 'M9 4h6v3H9zM7 5H5v15h14V5h-2';
+ICON_PATHS.fix = 'M14 6a4 4 0 0 0 5 5l-8 8-3-3 8-8z';
+ICON_PATHS.erase = 'M4 16l8-8 6 6-4 4H7zM14 20h6';
+ICON_PATHS.copy = 'M8 8h11v11H8zM5 16V5h11';
+ICON_PATHS.camera = 'M4 8h4l2-2h4l2 2h4v11H4zM12 11a3 3 0 1 0 0 6 3 3 0 0 0 0-6z';
+ICON_PATHS.flag = 'M6 20V4M6 5h11l-2 4 2 4H6';
+ICON_PATHS.done = 'M5 12l5 5 9-10';
+const RB_ACT = {
+  openprog: b => ['program', (b.textContent.match(/No\.\s*\d+/) || ['入力'])[0].replace(/\s/g, '')],
+  printClubSum: ['print', '印刷'], printSched: ['print', '印刷'], printFlash: ['print', '印刷'], printRank: ['print', '印刷'], printAwards: ['print', '印刷'], printProg: ['print', '印刷'],
+  printCert: b => /テスト|1枚/.test(b.textContent) ? ['print', '試し印刷'] : ['print', '全部印刷'],
+  addlane: ['plus', 'レーン追加'], addEntry: ['plus', '追加'], addRelay: ['plus', '追加'],
+  addSched: b => b.dataset.n ? ['plus', '休憩追加'] : ['plus', '行追加'],
+  entryForm: ['table', 'Excel作成'], pasteEntries: ['paste', '貼り付け'],
+  pvToggle: ['eye', 'プレビュー'],
+  progStep: b => b.dataset.d === '-1' ? ['prev', '前へ'] : ['next', '次へ'],
+  clearOut: ['erase', '対象外解除'],
+  progArrange: b => /終/.test(b.textContent) ? ['done', '入替終了'] : ['swap', '入れ替え'],
+  seatReset: ['unlock', '自動に戻す'],
+  awImport: ['download', '結果取込'], awCopyMaster: ['copy', '設定コピー'], awClear: ['erase', 'クリア'],
+  fix: b => /追加/.test(b.textContent) ? ['plus', '追加'] : ['fix', '直す'],
+  go: b => [ICON_PATHS[b.dataset.v] ? b.dataset.v : 'next', QLABEL[b.dataset.v] || '開く'],
+  backup: ['save', '書き出し'], exportXlsx: ['table', 'Excel出力'], exportCsv: ['download', 'CSV出力'],
+  delSnaps: ['trash', '控え削除'], restoreSnap: ['undo', '戻す'], snapNow: ['camera', '控える'],
+  sample: ['flag', 'サンプル'], clearResults: ['erase', '記録消去'], resetAll: ['trash', '全消去'],
+  hubPrint: ['print', 'まとめ印刷'], hubFocus: b => b.dataset.v ? ['eye', '見る'] : ['prev', '戻る'],
+  rename: ['fix', '変更'], heatLock: b => /ロック中/.test(b.textContent) ? ['lock', 'ロック中'] : ['unlock', '組ロック'],
+  hubPick: b => { const t = b.textContent; return /外す/.test(t) ? ['close', '選択解除'] : /記録入り/.test(t) ? ['program', '記録入り'] : /プログラム/.test(t) ? ['program', 'プログラム'] : /記録証/.test(t) ? ['certs', '記録証'] : /賞状/.test(t) ? ['awards', '賞状'] : /速報/.test(t) ? ['flash', '速報'] : /ランキング/.test(t) ? ['ranking', '順位'] : null; }
+};
+const RB_TEXT = [[/記入済み.*読み込む/, ['upload', 'Excel読込']], [/バックアップから復元/, ['undo', '復元']], [/Excelファイルを読み込む/, ['upload', 'Excel読込']]];
+const RB_SMALL = new Set(['heatLock', 'hubFocus', 'restoreSnap', 'fix']);   // 表やパネルの中の丸は少し小さく
+function rbSpec(b) {
+  const f = RB_ACT[b.dataset.act || ''];
+  if (f) return typeof f === 'function' ? f(b) : f;
+  const t = b.textContent;
+  const hit = RB_TEXT.find(([re]) => re.test(t));
+  return hit ? hit[1] : null;
+}
+function roundify(root) {
+  (root || document).querySelectorAll('.btn:not(.rb):not(.keep)').forEach(b => {
+    if (b.closest('.modal .actions, .onboard, .frtile')) return;
+    const sp = rbSpec(b);
+    if (!sp) { (window.__rbMiss = window.__rbMiss || new Set()).add((b.dataset.act || '') + ':' + b.textContent.trim().slice(0, 20)); return; }
+    const full = b.textContent.trim().replace(/\s+/g, ' ');
+    const input = b.querySelector('input');      // ファイルを選ぶ欄（label の中）は残す
+    b.innerHTML = icon(sp[0]) + '<span class="rbl">' + esc(sp[1]) + '</span>';
+    if (input) b.appendChild(input);
+    b.classList.add('rb'); if (RB_SMALL.has(b.dataset.act) || b.closest('.notice')) b.classList.add('rb-s'); b.classList.remove('sm');
+    if (!b.title) b.title = full;
+    b.setAttribute('aria-label', full);
+    const bar = b.parentElement;
+  });
+  // 丸ボタンは、その列の検索欄や選択欄とは別の「丸だけの列」にまとめる（どの画面でも左上から同じ並び）
+  (root || document).querySelectorAll('.bar:not(.progbar)').forEach(bar => {
+    const rbs = [...bar.children].filter(c => c.classList.contains('rb'));
+    if (!rbs.length) return;
+    const others = [...bar.children].filter(c => !c.classList.contains('rb') && !c.classList.contains('grow') && !c.classList.contains('pmodes') && (c.textContent.trim() || c.querySelector('input, select, textarea')));
+    if (!others.length) { bar.classList.add('rbar'); return; }
+    const row = document.createElement('div'); row.className = 'bar rbar';
+    rbs.forEach(b => row.appendChild(b));
+    bar.parentNode.insertBefore(row, bar);
+  });
+}
+// 通知モニターの「次の種目へ」などは丸に入る短い名前で
+function shortAct(label) { return ({ '次の種目へ': '次へ', '元に戻す': '戻す', '確認する': '確認', 'バックアップ': '保存', '書き出す': '保存' })[label] || String(label || '').slice(0, 3); }
+
 // ---------------------------------------------------------------- 画面切り替えパネル（三本線）の表示設定（端末ごと）
 const NAVPREF_KEY = 'swim-meet-app/navpref';
 let navPref = { side: 'left', pinned: true };
@@ -2628,7 +2745,13 @@ function render() {
   try { html = fn(); }
   catch (e) { console.error(e); html = '<div class="notice err">この画面の表示中にエラーが起きました: ' + esc(e.message) + '。<button class="btn sm" data-act="go" data-v="data">データ管理へ</button> でバックアップを書き出してから、ページを再読み込みしてください。</div>'; }
   $('#main').innerHTML =
-    (PV_VIEWS.includes(view) && !previewOn() ? '<div class="pv-off"><button class="btn sm" data-act="pvToggle">' + icon('print', 'ic sm') + '印刷プレビューを表示</button></div>' : '') + pvShell(html);
+    pvShell(html);
+  if (PV_VIEWS.includes(view) && !previewOn() && !isPhone()) {     // プレビューを出すボタンは、その画面のボタンの列の最後に（1行を使わない）
+    const pb = document.createElement('button'); pb.className = 'btn'; pb.dataset.act = 'pvToggle'; pb.textContent = '印刷プレビューを表示';
+    roundify($('#main'));
+    const bar = $('#main .bar.rbar:not(.progbar)') || $('#main .bar:not(.progbar)'); const pm = bar && bar.querySelector(':scope > .pmodes'); if (bar) { if (pm) bar.insertBefore(pb, pm); else bar.appendChild(pb); } else { const d = document.createElement('div'); d.className = 'bar'; d.appendChild(pb); $('#main').prepend(d); }
+  }
+  roundify($('#main'));
   liftHeading();
   if (isPhone()) cardTables();
   paintNote();
@@ -3022,7 +3145,7 @@ function renderTop() {
     '</div>' + (navPref.side === 'right' ? menuBtn : '') + '</div>' +
     '<div class="trow2"><div class="tools"><button class="iconbtn" data-act="undo" title="元に戻す (Ctrl+Z)" aria-label="元に戻す" ' + (undoStack.length ? '' : 'disabled') + '>' + icon('undo') + '</button>' +
     '<button class="iconbtn" data-act="redo" title="やり直し (Ctrl+Y)" aria-label="やり直し" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '</button>' +
-    '<button class="btn sm tinted" data-act="backup">' + icon('save', 'ic sm') + '<span class="hide-sm">バックアップ</span></button></div>' +
+    '</div>' +
     '<div class="tmon"><div class="tnote" id="tnote" role="status" aria-live="polite"></div>' +
     '<button type="button" class="bellbtn" id="bell" data-act="notes" title="通知の一覧" aria-label="通知の一覧">' + icon('bell') + '<span class="bdg"></span></button>' +
     '<div class="notes card" id="notes" hidden></div></div></div>';
@@ -3470,18 +3593,18 @@ VIEWS.program = () => {
   let curHeat = p.heats.some(h => h.heat === ui.progHeat) ? ui.progHeat : null;
   if (curHeat === null) { const h0 = p.heats.find(h => h.items.some(it => it.status === '未入力')) || p.heats[0]; curHeat = h0 ? h0.heat : null; }
   return '<div class="vhead"><div><h1 class="view">プログラム・記録入力</h1><p class="lead">公式タイムを入れて Enter で次のレーンへ進みます。棄権・失格は「判定」で選びます（失格でも泳いだタイムは入れられます）。黄色の行は打ち間違いの可能性があります。当日モード中でも入力できます。</p></div></div>' +
-    '<div class="bar progbar"><button class="btn" data-act="progStep" data-d="-1" ' + (idx <= 0 ? 'disabled' : '') + ' aria-label="前の種目">' + (isPhone() ? '←' : '← 前') + '</button>' +
+    '<div class="bar progbar"><button class="btn" data-act="progStep" data-d="-1" ' + (idx <= 0 ? 'disabled' : '') + ' aria-label="前の種目">' + '←' + '</button>' +
     sel('ui:prog', ui.prog, opts.map(n => { const s = D.sched.rows.find(r => r.name === n); const its = D.ind.concat(D.rel).filter(it => it.program === n && it.event); const dn = its.filter(it => it.status !== '未入力').length; return [n, (s ? 'No.' + s.no + ' ' : '') + n + (its.length ? (dn === its.length ? '　✓' : dn ? '　' + dn + '/' + its.length : '') : '　（なし）')]; }), 'class="progsel" aria-label="種目"') +
-    '<button class="btn" data-act="progStep" data-d="1" ' + (idx >= opts.length - 1 ? 'disabled' : '') + ' aria-label="次の種目">' + (isPhone() ? '→' : '次 →') + '</button>' +
+    '<button class="btn" data-act="progStep" data-d="1" ' + (idx >= opts.length - 1 ? 'disabled' : '') + ' aria-label="次の種目">' + '→' + '</button>' +
     (ui.prog ? '<span class="pill mute">' + (p.sch ? 'No.' + p.sch.no + '・開始 ' + (p.sch.start !== null ? C.fmtClock(p.sch.start) : '—') : '<span style="color:var(--err)">スケジュール未登録</span>') + '</span><span class="pill mute">' + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組</span>' +
       '<span class="pill ' + (allDone ? 'ok' : 'info') + '">入力 ' + p.done + ' / ' + p.items.length + '</span>' + (p.items.some(it => it.seatFixed) ? '<span class="pill mute" title="「組・レーンを入れ替え」で手で並べた位置を使っています">手で並べ替え済み</span>' : '') : '') +
-    '<button class="btn sm" data-act="clearOut" data-all="0" ' + (p.items.some(it => it.status === '対象外') ? '' : 'disabled') + '>対象外を一括解除</button><button class="btn sm" data-act="clearOut" data-all="1" ' + (D.ind.concat(D.rel).some(it => it.status === '対象外') ? '' : 'disabled') + '>全種目の対象外を解除</button>' +
-    '<span class="grow"></span>' + (ui.prog && p.items.length ? (ui.progArrange ? '<button class="btn sm primary" data-act="progArrange">入れ替えを終える</button>' : '<button class="btn sm tinted" data-act="progArrange" title="選手をドラッグして組・レーンを入れ替えます">組・レーンを入れ替え</button>') : '') + '<button class="btn sm" data-act="openflash" data-p="' + esc(ui.prog) + '">速報を見る</button>' + sel('set:print.progMode', state.settings.print.progMode || 'blank', [['blank', '印刷: 手書き用（記録欄が空欄）'], ['result', '印刷: 記録入り']], 'class="pmode" aria-label="プログラムの印刷の形"') + sel('set:print.progFill', state.settings.print.progFill || 'blank', [['blank', '4組に満たない所: 空白'], ['pack', '4組に満たない所: 次の種目を詰める']], 'class="pmode" aria-label="4組に満たないページ"') + '<button class="btn sm" data-act="printProg" data-all="0">この種目を印刷</button><button class="btn sm" data-act="printProg" data-all="1">全種目を印刷</button></div>' +
+    '</div><div class="bar rbar"><button class="btn" data-act="clearOut" data-all="0" ' + (p.items.some(it => it.status === '対象外') ? '' : 'disabled') + '>この種目の対象外を解除</button>' +
+    (ui.prog && p.items.length ? (ui.progArrange ? '<button class="btn primary" data-act="progArrange">入れ替えを終える</button>' : '<button class="btn tinted" data-act="progArrange">組・レーンを入れ替え</button>') : '') + (ui.prog && p.items.length ? '<button class="btn" data-act="printProg" data-all="0">この種目を印刷</button>' : '') + '<span class="pmodes">' + sel('set:print.progMode', state.settings.print.progMode || 'blank', [['blank', '印刷: 手書き用（記録欄が空欄）'], ['result', '印刷: 記録入り']], 'class="pmode" aria-label="プログラムの印刷の形"') + sel('set:print.progFill', state.settings.print.progFill || 'blank', [['blank', '4組に満たない所: 空白'], ['pack', '4組に満たない所: 次の種目を詰める']], 'class="pmode" aria-label="4組に満たないページ"') + '</span></div>' +
     (ui.prog && p.items.length ? '<div class="prog" style="margin:-4px 0 10px"><i style="width:' + pct + '%"></i></div>' : '') +
     (allDone && ui._doneNote !== ui.prog ? (ui._doneNote = ui.prog, setTimeout(() => toast('「' + ui.prog + '」の記録入力が終わりました', null, 10000, idx < opts.length - 1 ? { label: '次の種目へ', fn: () => ACTIONS.progStep({ dataset: { d: '1' } }) } : null), 0), '') : '') +
     (false ? '<div class="notice ok"><span class="grow">この種目の記録入力が終わりました。</span><button class="btn sm" data-act="printFlash1" data-p="' + esc(ui.prog) + '">速報を印刷</button>' + (idx < opts.length - 1 ? '<button class="btn sm primary" data-act="progStep" data-d="1">次の種目へ →</button>' : '') + '</div>' : '') +
     (ui.progArrange && ui.prog && p.items.length ? arrangePanel(p, lanes) :
-    (p.heats.length > 1 ? '<div class="heattabs" hidden><span class="small muted">組</span>' + seg('progHeat', p.heats.map(h => [h.heat, '第' + h.heat + '組' + (h.items.every(it => it.status !== '未入力') ? ' ✓' : '')]), curHeat) + '<span class="small muted">全組が入りきらないので1組ずつ表示しています。Enter で最後のレーンまで入れると次の組へ進みます。</span></div>' : '') +
+    (p.heats.length > 1 ? '<div class="heattabs" hidden><span class="small muted">組</span>' + seg('progHeat', p.heats.map(h => [h.heat, '第' + h.heat + '組' + (h.items.every(it => it.status !== '未入力') ? ' ✓' : '')]), curHeat) + '</div>' : '') +
     (!ui.prog ? '<div class="card empty">種目がありません。大会設定で種目を登録してください。</div>' :
       (p.items.length ? '<div class="heats prog-h fill" data-fill-id="prog">' + p.heats.map(h => {
         const byLane = new Map(h.items.map(it => [it.lane, it]));
@@ -3787,14 +3910,14 @@ VIEWS.data = () => {
     '<div class="bar"><button class="btn primary" data-act="backup">バックアップを書き出す（.json）</button><label class="btn">バックアップから復元…<input type="file" accept=".json,application/json" data-file="json" hidden></label></div>' +
     '<p class="small muted">復元するときは、今のデータを自動で控えに残してから置き換えます。</p></div>' +
     '<div class="card"><h2>Excel</h2><p class="small">今お使いの「大会運営ブック（.xlsx）」と「表彰者算出ブック（.xlsm）」をそのまま読み込めます。このアプリから書き出したExcelも読み込めます。</p>' +
-    '<div class="bar"><label class="btn primary">Excelファイルを読み込む…<input type="file" accept=".xlsx,.xlsm,.xls" data-file="xlsx" hidden></label><button class="btn" data-act="exportXlsx">結果をExcelに書き出す</button><button class="btn" data-act="entryForm">エントリー用Excelを作る</button><label class="btn">記入済みエントリーを読み込む（複数可）<input type="file" accept=".xlsx,.xlsm,.xls" multiple data-file="entryform" hidden></label><button class="btn" data-act="exportCsv">エントリーをCSVで書き出す</button></div>' +
+    '<div class="bar"><label class="btn primary">Excelファイルを読み込む…<input type="file" accept=".xlsx,.xlsm,.xls" data-file="xlsx" hidden></label><button class="btn" data-act="exportXlsx">結果をExcelに書き出す</button><button class="btn" data-act="exportCsv">エントリーをCSVで書き出す</button></div>' +
     '<p class="small muted">Excelの読み書きには、初回だけインターネット接続が必要です（表計算ライブラリを読み込むため）。CSVとバックアップはオフラインでも使えます。</p></div>' +
     '<div class="card"><h2>自動バックアップ（このブラウザ内の控え）</h2><p class="small muted">5分ごと・大きな操作の前に自動で控えを残します（最新15件）。間違えて消したときはここから戻せます。不要な控えは選んで削除できます。</p>' +
     (snaps.length ? '<div class="bar"><label class="small"><input type="checkbox" data-k="ui:snapAll" ' + (snaps.length && snaps.every((x, i) => (ui.snapSel || []).indexOf(x.t) >= 0) ? 'checked' : '') + '> すべて選ぶ</label><span class="grow"></span><button class="btn sm danger" data-act="delSnaps" ' + ((ui.snapSel || []).length ? '' : 'disabled') + '>選んだ控えを削除（' + (ui.snapSel || []).filter(t => snaps.some(x => x.t === t)).length + '件）</button></div>' +
       '<div class="tablewrap" style="max-height:300px"><table class="t"><thead><tr><th></th><th>日時</th><th>きっかけ</th><th class="num">個人</th><th class="num">大きさ</th><th></th></tr></thead><tbody>' +
       snaps.map((s2, i) => '<tr><td><input type="checkbox" data-k="snap:' + s2.t + '" ' + ((ui.snapSel || []).indexOf(s2.t) >= 0 ? 'checked' : '') + ' aria-label="この控えを選ぶ"></td><td style="white-space:nowrap">' + fmtDT(s2.t) + '</td><td>' + esc(s2.label) + '</td><td class="num">' + (s2.n || 0) + '</td><td class="num">' + Math.max(1, Math.round((s2.data || '').length / 1024)) + ' KB</td><td><button class="btn sm" data-act="restoreSnap" data-i="' + i + '">この時点に戻す</button></td></tr>').join('') + '</tbody></table></div>' : '<p class="muted">まだありません。</p>') +
     '<div class="bar" style="margin-top:8px"><button class="btn sm" data-act="snapNow">今の状態を控えておく</button></div></div>' +
-    '<div class="card"><h2>そのほか</h2><div class="bar"><button class="btn" data-act="sample">サンプルデータを読み込む</button><button class="btn danger" data-act="clearResults">記録（公式タイム・判定）だけ消す</button><button class="btn danger" data-act="resetAll">すべて消して最初から</button></div>' +
+    '<div class="card"><h2>そのほか</h2><div class="bar"><button class="btn" data-act="sample">サンプルデータを読み込む</button><button class="btn" data-act="clearOut" data-all="1">全種目の対象外を解除</button><button class="btn danger" data-act="clearResults">記録（公式タイム・判定）だけ消す</button><button class="btn danger" data-act="resetAll">すべて消して最初から</button></div>' +
     '<p class="small muted">使用容量: 約 ' + Math.round(used / 1024) + ' KB（ブラウザの上限はおよそ5,000 KB）</p>' +
     '<h3>同じデータを複数のパソコンで使うとき</h3><p class="small">片方で「バックアップを書き出す」→ もう片方で「バックアップから復元」。同じパソコンで2つのタブを開いて編集すると、あとの保存で前の内容が上書きされるため、1つのタブで作業してください（別タブで変更があると自動で読み込み直します）。</p>' +
     '<h3>キーボード</h3><p class="small"><span class="kbd">Ctrl</span>+<span class="kbd">Z</span> 元に戻す　<span class="kbd">Ctrl</span>+<span class="kbd">Y</span> やり直し（入力欄の外で）　<span class="kbd">Enter</span> 記録入力で次のレーンへ</p></div>' +
@@ -4595,7 +4718,7 @@ function pvShell(inner) {
   if (!previewOn()) return inner;
   return '<div class="withpv pv-' + view + (navPref.pvSide === 'left' ? ' pvl' : '') + '"><div class="pv-main">' + inner + '</div><aside class="pv card" aria-label="印刷プレビュー"><div class="pv-head"><b>印刷プレビュー</b><span class="muted small" id="pv-count"></span><span class="grow"></span>' +
     '<button class="iconbtn sm" data-act="pvSide" title="プレビューを' + (navPref.pvSide === 'left' ? '右' : '左') + 'に固定" aria-label="プレビューの位置を左右に切り替え">' + (navPref.pvSide === 'left' ? '→' : '←') + '</button>' +
-    '<button class="btn sm primary" data-act="pvPrint">印刷</button><button class="iconbtn sm" data-act="pvToggle" title="プレビューを隠す" aria-label="プレビューを隠す">' + icon('close') + '</button></div><div class="pv-body fill" data-fill-id="pv" id="pv-body"><div class="empty small">作成中…</div></div></aside></div>';
+    '<button class="iconbtn sm" data-act="pvToggle" title="プレビューを隠す" aria-label="プレビューを隠す">' + icon('close') + '</button></div><div class="pv-body fill" data-fill-id="pv" id="pv-body"><div class="empty small">作成中…</div></div></aside></div>';
 }
 function schedulePreview() {
   clearTimeout(pvTimer);
