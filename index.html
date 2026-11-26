@@ -1444,6 +1444,70 @@ html.a5p .cright .frtile .frimg { aspect-ratio: 210 / 148; }
 .cert.a5 .cl { padding: 0 28mm !important; overflow: visible !important; }
 @media (max-width: 1100px) { .cgrid { grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(260px, 300px); } }
 .cform .field > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ===== 2026-11-26b: 上部の丸（1部・2部・当日・確定）/ プログラムの1行バー / 印刷の形 / 確定ロック ===== */
+.tround { display: inline-flex; align-items: flex-start; gap: 2px; padding: 2px 0; }
+.tround .btn.rb.rb-s { width: 52px !important; min-width: 52px !important; flex: 0 0 52px !important; }
+.tround .btn.rb.rb-s .rbc { width: 34px; height: 34px; }
+.tround .btn.rb.rb-s .rbl { font-size: 10px; }
+.tround .pnum { font-size: 15px; font-weight: 800; line-height: 1; font-family: var(--font-num, inherit); }
+.tround .tsep { width: 1px; align-self: stretch; margin: 4px 4px 14px; background: var(--line, rgba(10,30,60,.14)); }
+.tround .lockb.on .rbc { background: #e8a317; border-color: #e8a317; color: #fff; }
+.tround .finb.on .rbc { background: #b4232a; border-color: #b4232a; color: #fff; }
+.tround .finb.on .rbl { color: #b4232a; }
+.progbar { align-items: center !important; flex-wrap: nowrap; overflow: visible !important; padding: 4px 2px; }
+.progbar > .progsel, .progbar > .pill { margin-top: 0 !important; }
+.progbar > .progsel { flex: 0 1 300px !important; min-width: 170px !important; }
+.progbar .pinfo { display: flex; flex-direction: column; gap: 1px; font-size: 12px; line-height: 1.3; color: var(--muted); white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.progbar .pinfo b { color: var(--accent); font-weight: 600; }
+.progbar > .grow { flex: 1 1 0; min-width: 0; }
+.progbar > .btn.rb { flex-shrink: 0; }
+.modal.ppick .seg.pick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 4px 0 12px; }
+.modal.ppick .seg.pick > button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--line, #d5dbe3); background: var(--card, #fff); text-align: left; cursor: pointer; color: var(--ink); }
+.modal.ppick .seg.pick > button b { font-size: 15px; }
+.modal.ppick .seg.pick > button small { font-size: 12px; color: var(--muted); }
+.modal.ppick .seg.pick > button.on { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.notice.final-note { background: #fdecec; border-color: rgba(180, 35, 42, .35); color: #7d1a1f; margin-bottom: 8px; }
+html.final #main input:disabled, html.final #main select:disabled, html.final #main textarea:disabled { opacity: .7; cursor: not-allowed; }
+.err-t { color: var(--err, #d4343a); min-height: 1.2em; }
+.progbar.arr .pinfo { display: none; }
+.progbar .arrsel { flex: 0 1 260px; min-width: 150px; min-height: 44px; }
+/* ---- 丸やフォーカス枠（青い線）が箱の端で切れないように ---- */
+.tn-btn { width: 30px !important; height: 30px !important; min-width: 30px !important; flex: 0 0 30px !important; font-size: 10.5px !important; }
+.bar.chead { overflow: visible; padding: 3px 4px; }
+.cright .cbody, .cleft .clist { padding: 4px; }
+.rchips { padding: 4px; margin: -4px 0; }
+.hp-b { padding: 4px; }
+.btn.rb:focus-visible { box-shadow: none !important; }
+.btn.rb:focus-visible .rbc { box-shadow: 0 0 0 3px var(--focus) !important; }
+/* スクロールする箱の中は、枠を内側に描く（端でも欠けない） */
+.hp-b :focus-visible, .clist :focus-visible, .cbody :focus-visible, .rchips :focus-visible, .tablewrap :focus-visible, .arr-wrap :focus-visible, .heats :focus-visible, .sq-list :focus-visible, .modal :focus-visible, .progbar select:focus-visible { box-shadow: inset 0 0 0 3px var(--focus) !important; }
+.hp-b .btn.rb:focus-visible .rbc, .cbody .btn.rb:focus-visible .rbc, .tablewrap .btn.rb:focus-visible .rbc, .arr-wrap .btn.rb:focus-visible .rbc { box-shadow: inset 0 0 0 3px var(--focus) !important; }
+.bar.rbar { padding: 5px 4px 3px !important; margin-left: -4px; margin-right: -4px; }
+.tnote :focus-visible { box-shadow: inset 0 0 0 3px var(--focus) !important; }
+/* ---- データ管理: 1画面（左＝ファイル操作、右＝控えの一覧） ---- */
+.dgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 10px; min-height: 0; }
+.dgrid.fill { height: var(--fillh, auto); }
+.dcol { display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow: auto; padding: 2px; }
+.dcard { margin: 0 !important; padding: 12px 14px !important; }
+.dcard .bar { margin-bottom: 0 !important; }
+.dch { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 6px; }
+.dch h2 { margin: 0; font-size: 15px; }
+.dtip { margin: 6px 0 0; }
+.dsnap { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.snapnew { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.snapnew input { flex: 1 1 auto; min-width: 0; min-height: 44px; }
+.snapnew .btn.rb { flex: 0 0 68px; }
+.dlist { flex: 1 1 auto; min-height: 0; overflow: auto; max-height: none !important; }
+.snapt-t td, .snapt-t th { padding: 4px 6px; vertical-align: middle; }
+.snapt-t .ck { width: 34px; text-align: center; }
+.snapt-t .dt { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.snapt-t .ti input { width: 100%; min-height: 34px; border-color: transparent; background: transparent; font-weight: 600; }
+.snapt-t .ti input:hover, .snapt-t .ti input:focus { border-color: var(--line, #d5dbe3); background: var(--card, #fff); }
+.snapt-t tr.keep .dt::before { content: '★ '; color: #e8a317; }
+.snapt-t .go { width: 60px; text-align: right; }
+.dfoot { display: flex; align-items: center; gap: 8px; padding-top: 8px; }
+@media (max-width: 900px) { .dgrid { grid-template-columns: minmax(0, 1fr); } .dgrid.fill { height: auto !important; max-height: none !important; } }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2616,14 +2680,18 @@ function save() {
 }
 function saveMeta() { try { lsSet(META_KEY, JSON.stringify(meta)); } catch (e) { /* ignore */ } }
 function getSnaps() { try { return JSON.parse(lsGet(SNAP_KEY) || '[]'); } catch (e) { return []; } }
-function snapshot(label, force) {
+function snapshot(label, force, opt) {
   const now = Date.now();
   if (!force && now - meta.lastSnap < 5 * 60 * 1000 && commitsSinceSnap < 40) return;
   const sn = getSnaps();
-  sn.unshift({ t: now, label: label || '自動', data: serialize(), n: state.entries.length });
-  while (sn.length > 15) sn.pop();
+  const o = { t: now, label: label || '自動', data: serialize(), n: state.entries.length };
+  if (opt && opt.title) { o.title = opt.title; o.keep = true; }
+  sn.unshift(o);
+  // 題名なしの控えは最新15件まで。題名を付けた控え（keep）は自動では消さない（多すぎるときだけ古い物から）
+  const trim = () => { for (let k = sn.length - 1; k >= 0 && sn.filter(x => !x.keep).length > 15; k--) if (!sn[k].keep) sn.splice(k, 1); while (sn.length > 40) sn.pop(); };
+  trim();
   try { lsSet(SNAP_KEY, JSON.stringify(sn)); }
-  catch (e) { while (sn.length > 2) { sn.pop(); try { lsSet(SNAP_KEY, JSON.stringify(sn)); break; } catch (e2) { /* keep trimming */ } } }
+  catch (e) { while (sn.length > 2) { const k = sn.map(x => !!x.keep).lastIndexOf(false); sn.splice(k > 0 ? k : sn.length - 1, 1); try { lsSet(SNAP_KEY, JSON.stringify(sn)); break; } catch (e2) { /* keep trimming */ } } }
   meta.lastSnap = now; commitsSinceSnap = 0; saveMeta();
 }
 
@@ -2646,8 +2714,14 @@ window.addEventListener('storage', ev => { if (ev.key === KEY && !bc) onOtherTab
 
 // ---------------------------------------------------------------- 変更・取り消し
 function isLocked() { return !!state.settings.locked; }
+// 大会確定（ロック）: 大会後に記録・エントリー・設定を書き換えられないようにする。解除はパスワード
+function isFinal() { return !!state.settings.finalized; }
+function finalBlocked() { if (!isFinal()) return false; toast('大会確定（ロック）中です。変えるには上部の「確定済み」を押してパスワードで解除してください', 'err'); render(); return true; }
+function pwHash(t) { let h = 2166136261; for (const ch of String(t)) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36); }
+const FINAL_PW = '1sxhzyh';   // パスワードそのものは置かない（ハッシュだけ）
 function commit(label, fn, opt) {
   opt = opt || {};
+  if (isFinal() && !opt.allowFinal) { finalBlocked(); return false; }
   if (isLocked() && !opt.allowLocked) { toast('当日モード（設定ロック）中です。上部の「当日モード」を解除してから変更してください', 'err'); render(); return false; }
   undoStack.push({ label, data: serialize() });
   if (undoStack.length > 60) undoStack.shift();
@@ -2662,7 +2736,7 @@ function commit(label, fn, opt) {
   return true;
 }
 function undo() {
-  if (!undoStack.length) return;
+  if (!undoStack.length || finalBlocked()) return;
   const u = undoStack.pop();
   redoStack.push({ label: u.label, data: serialize() });
   state = migrate(JSON.parse(u.data)); state.rev++;
@@ -2670,7 +2744,7 @@ function undo() {
   toast('取り消しました: ' + u.label);
 }
 function redo() {
-  if (!redoStack.length) return;
+  if (!redoStack.length || finalBlocked()) return;
   const r = redoStack.pop();
   undoStack.push({ label: r.label, data: serialize() });
   state = migrate(JSON.parse(r.data)); state.rev++;
@@ -2834,30 +2908,51 @@ ICON_PATHS.copy = 'M8 8h11v11H8zM5 16V5h11';
 ICON_PATHS.camera = 'M4 8h4l2-2h4l2 2h4v11H4zM12 11a3 3 0 1 0 0 6 3 3 0 0 0 0-6z';
 ICON_PATHS.flag = 'M6 20V4M6 5h11l-2 4 2 4H6';
 ICON_PATHS.done = 'M5 12l5 5 9-10';
-ICON_PATHS.merge = 'M6 4v5a5 5 0 0 0 5 5h7M6 20v-6M15 11l3 3-3 3';
+ICON_PATHS.seal = 'M9 3h6v4l-1.5 3H19v5H5v-5h5.5L9 7zM5 19h14';   // 大会確定 = はんこ（印を押して確定）
+// ---- 2026-11-26b アイコンの見直し: 何をするボタンかが絵で分かるように
+Object.assign(ICON_PATHS, {
+  settings: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 13.5l1.6 1.2-2 3.4-1.9-.7a7 7 0 0 1-2.2 1.3L14.6 21h-4l-.4-2.1a7 7 0 0 1-2.2-1.3l-1.9.7-2-3.4 1.6-1.2a7 7 0 0 1 0-2.6L4.1 9.9l2-3.4 1.9.7a7 7 0 0 1 2.2-1.3L10.6 3h4l.4 2.1a7 7 0 0 1 2.2 1.3l1.9-.7 2 3.4-1.6 1.2a7 7 0 0 1 0 2.6z',   // 歯車
+  program: 'M12 21a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15zM12 9.5v4l2.5 1.5M10 2.5h4M18.5 5.5l1.5 1.5',   // ストップウォッチ = 記録入力
+  ranking: 'M3 20h18M9 20V9h6v11M3 20v-7h6M15 20v-5h6v5M12 4.5l.8 1.6 1.7.2-1.2 1.2.3 1.7-1.6-.8-1.6.8.3-1.7-1.2-1.2 1.7-.2z',   // 表彰台 = 順位
+  awards: 'M8 3l2.5 6M16 3l-2.5 6M12 21a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM12 13.2l.9 1.8 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2L9.1 15.3l2-.3z',   // メダル = 表彰
+  certs: 'M5 4h14v12H5zM8 8h8M8 11h5M15 13.5a2 2 0 1 0 0 .01M14 15.5l-1 4.5 2-1 2 1-1-4.5',   // リボン付きの証書
+  import: 'M12 3v11M7.5 9.5 12 14l4.5-4.5M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5',    // 取り込む（箱へ入れる）
+  export: 'M12 14V3M7.5 7.5 12 3l4.5 4.5M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5',    // 書き出す（箱から出す）
+  edit: 'M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4',   // 鉛筆 = 名前などを変える
+  auto: 'M20 12a8 8 0 1 1-2.4-5.7M20 4v4.5h-4.5',   // くるっと戻る = 自動に戻す
+  userOk: 'M9.5 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 20c.6-3.4 3.2-5.5 6.5-5.5 1.6 0 3 .5 4.1 1.3M15 17.5l2 2 4-4.5',   // 人＋チェック = 対象外を解除（元の状態へ）
+  timeX: 'M12 21a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15zM10 2.5h4M9.6 11.1l4.8 4.8M14.4 11.1l-4.8 4.8',   // ストップウォッチ×= 記録を消す
+  sheetEye: 'M6 3h8l4 4v6M6 3v18h6M14 3v4h4M17.5 20.5c2.2 0 3.5-2 3.5-2s-1.3-2-3.5-2-3.5 2-3.5 2 1.3 2 3.5 2z',   // 試し印刷（1枚だけ確かめる）
+  printAll: 'M7 9V4h10v5M4 9h16v8h-3M7 17H4M7 14h10v6H7zM9.5 4V2.5h7.5V7',   // 重なった紙 = 全部印刷
+  printOne: 'M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-2M7 14h10v6H7zM12 17.5v-3l-1 .8',   // 1人分
+  sample: 'M9 3h6M10 3v6.5L4.8 18a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3L14 9.5V3M7.2 15h9.6',   // フラスコ = お試しデータ
+  wrench: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z',
+  merge: 'M6 3v4a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3M12 13v8M9 18l3 3 3-3',   // 2本が1本に = 合同
+  copyGear: 'M8 8h11v11H8zM5 16V5h11'
+});
 const RB_ACT = {
   openprog: b => ['program', (b.textContent.match(/No\.\s*\d+/) || ['入力'])[0].replace(/\s/g, '')],
   printClubSum: ['print', '印刷'], printSched: ['print', '印刷'], printFlash: ['print', '印刷'], printRank: ['print', '印刷'], printAwards: ['print', '印刷'], printProg: ['print', '印刷'],
-  printCert: b => /テスト|1枚/.test(b.textContent) ? ['print', '試し印刷'] : ['print', '全部印刷'],
+  printCert: b => /テスト|1枚/.test(b.textContent) ? ['sheetEye', '試し印刷'] : ['printAll', '全部印刷'],
   addlane: ['plus', 'レーン追加'], addEntry: ['plus', '追加'], addRelay: ['plus', '追加'],
   addSched: b => b.dataset.n ? ['plus', '休憩追加'] : ['plus', '行追加'],
   entryForm: ['table', 'Excel作成'], pasteEntries: ['paste', '貼り付け'],
   pvToggle: ['eye', 'プレビュー'],
   progStep: b => b.dataset.d === '-1' ? ['prev', '前へ'] : ['next', '次へ'],
-  clearOut: ['erase', '対象外解除'],
+  clearOut: ['userOk', '対象外解除'],
   progArrange: b => /終/.test(b.textContent) ? ['done', '入替終了'] : ['swap', '入れ替え'],
-  seatReset: ['unlock', '自動に戻す'],
-  awImport: ['download', '結果取込'], awCopyMaster: ['copy', '設定コピー'], awClear: ['erase', 'クリア'],
-  fix: b => /追加/.test(b.textContent) ? ['plus', '追加'] : ['fix', '直す'],
+  seatReset: ['auto', '自動に戻す'],
+  awImport: ['import', '結果取込'], awCopyMaster: ['copy', '設定コピー'], awClear: ['erase', 'クリア'],
+  fix: b => /追加/.test(b.textContent) ? ['plus', '追加'] : ['wrench', '直す'],
   go: b => [ICON_PATHS[b.dataset.v] ? b.dataset.v : 'next', QLABEL[b.dataset.v] || '開く'],
-  backup: ['save', '書き出し'], exportXlsx: ['table', 'Excel出力'], exportCsv: ['download', 'CSV出力'],
+  backup: ['export', '保存'], exportXlsx: ['export', 'Excel出力'], exportCsv: ['export', 'CSV出力'],
   delSnaps: ['trash', '控え削除'], restoreSnap: ['undo', '戻す'], snapNow: ['camera', '控える'],
-  sample: ['flag', 'サンプル'], clearResults: ['erase', '記録消去'], resetAll: ['trash', '全消去'],
-  hubPrint: ['print', 'まとめ印刷'], hubFocus: b => b.dataset.v ? ['eye', '見る'] : ['prev', '戻る'],
-  rename: ['fix', '変更'], certOne: ['print', '1人印刷'], combineOther: ['merge', '合同にする'], heatLock: b => /ロック中/.test(b.textContent) ? ['lock', 'ロック中'] : ['unlock', '組ロック'],
+  sample: ['sample', 'サンプル'], clearResults: ['timeX', '記録消去'], resetAll: ['trash', '全消去'],
+  hubPrint: ['printAll', 'まとめ印刷'], hubFocus: b => b.dataset.v ? ['eye', '見る'] : ['prev', '戻る'],
+  rename: ['edit', '名前変更'], certOne: ['printOne', '1人印刷'], combineOther: ['merge', '合同にする'], heatLock: b => /ロック中/.test(b.textContent) ? ['lock', 'ロック中'] : ['unlock', '組ロック'],
   hubPick: b => { const t = b.textContent; return /外す/.test(t) ? ['close', '選択解除'] : /記録入り/.test(t) ? ['program', '記録入り'] : /プログラム/.test(t) ? ['program', 'プログラム'] : /記録証/.test(t) ? ['certs', '記録証'] : /賞状/.test(t) ? ['awards', '賞状'] : /速報/.test(t) ? ['flash', '速報'] : /ランキング/.test(t) ? ['ranking', '順位'] : null; }
 };
-const RB_TEXT = [[/記入済み.*読み込む/, ['upload', 'Excel読込']], [/バックアップから復元/, ['undo', '復元']], [/Excelファイルを読み込む/, ['upload', 'Excel読込']]];
+const RB_TEXT = [[/記入済み.*読み込む/, ['import', 'Excel読込']], [/バックアップから復元/, ['import', '復元']], [/Excelファイルを読み込む/, ['import', 'Excel読込']]];
 const RB_SMALL = new Set(['heatLock', 'hubFocus', 'restoreSnap', 'fix']);   // 表やパネルの中の丸は少し小さく
 function rbSpec(b) {
   const f = RB_ACT[b.dataset.act || ''];
@@ -2954,13 +3049,18 @@ function render() {
   catch (e) { console.error(e); html = '<div class="notice err">この画面の表示中にエラーが起きました: ' + esc(e.message) + '。<button class="btn sm" data-act="go" data-v="data">データ管理へ</button> でバックアップを書き出してから、ページを再読み込みしてください。</div>'; }
   $('#main').innerHTML =
     pvShell(html);
-  if (PV_VIEWS.includes(view) && !previewOn() && !isPhone()) {     // プレビューを出すボタンは、その画面のボタンの列の最後に（1行を使わない）
+  if (PV_VIEWS.includes(view) && !previewOn() && !isPhone() && !(view === 'program' && ui.progArrange)) {     // プレビューを出すボタンは、その画面のボタンの列の最後に（1行を使わない）
     const pb = document.createElement('button'); pb.className = 'btn'; pb.dataset.act = 'pvToggle'; pb.textContent = '印刷プレビューを表示';
     roundify($('#main'));
-    const bar = $('#main .bar.rbar:not(.progbar)') || $('#main .bar:not(.progbar)'); const pm = bar && bar.querySelector(':scope > .pmodes'); if (bar) { if (pm) bar.insertBefore(pb, pm); else bar.appendChild(pb); } else { const d = document.createElement('div'); d.className = 'bar'; d.appendChild(pb); $('#main').prepend(d); }
+    const bar = $('#main .bar.progbar') || $('#main .bar.rbar') || $('#main .bar'); const pm = bar && bar.querySelector(':scope > .pmodes'); if (bar) { if (pm) bar.insertBefore(pb, pm); else bar.appendChild(pb); } else { const d = document.createElement('div'); d.className = 'bar'; d.appendChild(pb); $('#main').prepend(d); }
   }
   roundify($('#main'));
   liftHeading();
+  document.documentElement.classList.toggle('final', isFinal());
+  if (isFinal()) {      // 確定中: 書き換える欄は押せないように（絞り込み・検索・表示の切り替えは使える）
+    $('#main').querySelectorAll('input, select, textarea').forEach(el => { const k = el.dataset.k || ''; if (!/^(ui:|cf:|set:print\.)/.test(k) && !el.closest('.cfil, .pv-side, .pvbar, .modal')) { el.disabled = true; } });
+    $('#main').insertAdjacentHTML('afterbegin', '<div class="notice final-note"><span class="grow"><b>大会確定（ロック）中</b>　見る・印刷・書き出しはできます。データは書き換えられません。</span></div>');
+  }
   if (isPhone()) cardTables();
   paintNote();
   updateFrameStyle();
@@ -3055,12 +3155,12 @@ function sizeFills() {
     if (!big) { el.style.maxHeight = ''; return; }
     const top = el.getBoundingClientRect().top + window.scrollY;
     let below = 0;                 // 本部ボード: 下に続く欄（設定の折りたたみ）の分もあけて、1画面に収める
-    if (el.classList.contains('hrow')) for (let s = el.nextElementSibling; s; s = s.nextElementSibling) { const cs = getComputedStyle(s); if (cs.display !== 'none') below += s.offsetHeight + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0) + 8; }
+    if (el.classList.contains('hrow')) for (let s = el.nextElementSibling; s; s = s.nextElementSibling) { const cs = getComputedStyle(s); if (cs.display !== 'none') below += (s.matches('details[open]') ? s.offsetHeight - ((s.querySelector(':scope > :not(summary)') || {}).offsetHeight || 0) : s.offsetHeight) + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0) + 8; }
     el.style.maxHeight = Math.max(el.classList.contains('hrow') ? 180 : 260, window.innerHeight - top - 16 - below) + 'px';
-    if (el.classList.contains('hrow') || el.classList.contains('cgrid')) el.style.height = el.style.maxHeight;   // 本部ボード: 左右のパネルを同じ高さで画面の下まで
+    if (el.classList.contains('hrow') || el.classList.contains('cgrid') || el.classList.contains('dgrid')) el.style.height = el.style.maxHeight;   // 本部ボード: 左右のパネルを同じ高さで画面の下まで
   });
-  const hr = big && document.querySelector('.hrow.fill, .cgrid.fill');   // まだ数px はみ出すなら、その分だけ縮めて画面の中に収める
-  if (hr) { const over = document.documentElement.scrollHeight - window.innerHeight; if (over > 0) { const h = Math.max(180, parseFloat(hr.style.height) - over) + 'px'; hr.style.height = h; hr.style.maxHeight = h; } }
+  const hr = big && document.querySelector('.hrow.fill, .cgrid.fill, .dgrid.fill');   // まだ数px はみ出すなら、その分だけ縮めて画面の中に収める
+  if (hr) { const xo = [...document.querySelectorAll('#main details[open] > :not(summary)')].reduce((t, d) => t + d.offsetHeight, 0); const over = document.documentElement.scrollHeight - window.innerHeight - xo; if (over > 0) { const h = Math.max(180, parseFloat(hr.style.height) - over) + 'px'; hr.style.height = h; hr.style.maxHeight = h; } }
 }
 
 // ---------------------------------------------------------------- 液体ガラスのレンズ（参考動画の iOS セグメントと同じ動き）
@@ -3336,6 +3436,17 @@ function backupReminder() {
   }
   return '';
 }
+// 上部バー右: 1部・2部・当日モード・大会確定（丸ボタン。画面の丸と同じ形）
+function topRound() {
+  const locked = isLocked(), fin = isFinal();
+  const rb = (cls, attrs, ic, lab, tip) => '<button type="button" class="btn rb rb-s keep ' + cls + '" ' + attrs + ' title="' + esc(tip) + '" aria-label="' + esc(tip) + '"><span class="rbc">' + ic + '</span><span class="rbl">' + lab + '</span></button>';
+  return '<span class="tround" role="group" aria-label="データと保護">' +
+    PARTS.map(([v, l], k) => rb('partb' + (PART === v ? ' on' : ''), 'data-act="part" data-v="' + v + '"' + (PART === v ? ' aria-pressed="true"' : ''), '<b class="pnum">' + (k + 1) + '</b>', l, l + 'のデータに切り替え')).join('') +
+    '<i class="tsep" aria-hidden="true"></i>' +
+    rb('lockb' + (locked ? ' on' : ''), 'data-act="lock" aria-pressed="' + locked + '"', icon(locked ? 'lock' : 'unlock'), locked ? '当日中' : '当日モード', locked ? '当日モード中（押すと解除）。設定・エントリーは変更できません。記録入力はできます' : '当日モードにする: 設定・エントリーを誤って変えないようにロック（記録入力はできます）') +
+    rb('finb' + (fin ? ' on' : ''), 'data-act="finalize" aria-pressed="' + fin + '"', icon('seal'), fin ? '確定済み' : '大会確定', fin ? '大会確定（ロック）中。押すとパスワードで解除' : '大会後に確定: すべてのデータを書き換えられないようにロック（解除はパスワード）') +
+    '</span>';
+}
 function renderTop() {
   if (isPhone()) { renderTopPhone(); return; }
   const ch = D.checks || [];
@@ -3349,8 +3460,7 @@ function renderTop() {
     '<div class="brand" title="' + esc(state.settings.meetName || '') + '"><img class="logo" src="' + APP_ICON + '" alt=""><div class="brand-t"><small>' + esc(state.settings.meetName || 'スイム大会運営ボード') + '</small><strong id="toptitle">' + esc(cur ? cur[1] : '') + '</strong></div></div></div>' +
     quickBar() +
     '<div class="tr"><div class="chips">' +
-    '<span class="seg mini partseg" role="group" aria-label="1部・2部">' + PARTS.map(([v, l]) => '<button type="button" class="segbtn ' + (PART === v ? 'on' : '') + '" data-act="part" data-v="' + v + '" title="' + l + 'のデータに切り替え">' + l + '</button>').join('') + '</span>' +
-    '<button class="chip toggle ' + (locked ? 'lock' : '') + '" data-act="lock" aria-pressed="' + locked + '" title="大会当日は設定・エントリーを誤って変えないようにロックできます。記録入力はできます">' + icon(locked ? 'lock' : 'unlock', 'ic sm') + (locked ? '当日モード中' : '当日モード') + '</button>' +
+    topRound() +
     '</div>' + (navPref.side === 'right' ? menuBtn : '') + '</div>' +
     '<div class="trow2"><div class="tools"><button class="iconbtn" data-act="undo" title="元に戻す (Ctrl+Z)" aria-label="元に戻す" ' + (undoStack.length ? '' : 'disabled') + '>' + icon('undo') + '</button>' +
     '<button class="iconbtn" data-act="redo" title="やり直し (Ctrl+Y)" aria-label="やり直し" ' + (redoStack.length ? '' : 'disabled') + '>' + icon('redo') + '</button>' +
@@ -3810,13 +3920,13 @@ VIEWS.program = () => {
   let curHeat = p.heats.some(h => h.heat === ui.progHeat) ? ui.progHeat : null;
   if (curHeat === null) { const h0 = p.heats.find(h => h.items.some(it => it.status === '未入力')) || p.heats[0]; curHeat = h0 ? h0.heat : null; }
   return '<div class="vhead"><div><h1 class="view">プログラム・記録入力</h1><p class="lead">公式タイムを入れて Enter で次のレーンへ進みます。棄権・失格は「判定」で選びます（失格でも泳いだタイムは入れられます）。黄色の行は打ち間違いの可能性があります。当日モード中でも入力できます。</p></div></div>' +
-    '<div class="bar progbar"><button class="btn" data-act="progStep" data-d="-1" ' + (idx <= 0 ? 'disabled' : '') + ' aria-label="前の種目">' + '←' + '</button>' +
+    '<div class="bar progbar' + (ui.progArrange ? ' arr' : '') + '"><button class="btn" data-act="progStep" data-d="-1" ' + (idx <= 0 ? 'disabled' : '') + ' aria-label="前の種目">' + '←' + '</button>' +
     sel('ui:prog', ui.prog, opts.map(n => { const s = D.sched.rows.find(r => r.name === n); const its = D.ind.concat(D.rel).filter(it => it.program === n && it.event); const dn = its.filter(it => it.status !== '未入力').length; return [n, (isCombProg(n) ? '［合同］' : '') + (s ? 'No.' + s.no + ' ' : '') + n + (its.length ? (dn === its.length ? '　✓' : dn ? '　' + dn + '/' + its.length : '') : '　（なし）')]; }), 'class="progsel" aria-label="種目"') +
     '<button class="btn" data-act="progStep" data-d="1" ' + (idx >= opts.length - 1 ? 'disabled' : '') + ' aria-label="次の種目">' + '→' + '</button>' +
-    (ui.prog ? '<span class="pill mute">' + (p.sch ? 'No.' + p.sch.no + '・開始 ' + (p.sch.start !== null ? C.fmtClock(p.sch.start) : '—') : '<span style="color:var(--err)">スケジュール未登録</span>') + '</span><span class="pill mute">' + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組</span>' +
-      '<span class="pill ' + (allDone ? 'ok' : 'info') + '">入力 ' + p.done + ' / ' + p.items.length + '</span>' + (p.items.some(it => it.seatFixed) ? '<span class="pill mute" title="「組・レーンを入れ替え」で手で並べた位置を使っています">手で並べ替え済み</span>' : '') : '') +
-    '</div><div class="bar rbar"><button class="btn" data-act="clearOut" data-all="0" ' + (p.items.some(it => it.status === '対象外') ? '' : 'disabled') + '>この種目の対象外を解除</button>' +
-    (ui.prog && p.items.length ? (ui.progArrange ? '<button class="btn primary" data-act="progArrange">入れ替えを終える</button>' : '<button class="btn tinted" data-act="progArrange">組・レーンを入れ替え</button>') : '') + (ui.prog && p.items.length ? '<button class="btn" data-act="printProg" data-all="0">この種目を印刷</button>' : '') + '<span class="pmodes">' + sel('set:print.progMode', state.settings.print.progMode || 'blank', [['blank', '印刷: 手書き用（記録欄が空欄）'], ['result', '印刷: 記録入り']], 'class="pmode" aria-label="プログラムの印刷の形"') + sel('set:print.progFill', state.settings.print.progFill || 'blank', [['blank', '4組に満たない所: 空白'], ['pack', '4組に満たない所: 次の種目を詰める']], 'class="pmode" aria-label="4組に満たないページ"') + '</span></div>' +
+    (ui.prog ? '<span class="pinfo"><span>' + (p.sch ? 'No.' + p.sch.no + '・開始 ' + (p.sch.start !== null ? C.fmtClock(p.sch.start) : '—') : '<span style="color:var(--err)">スケジュール未登録</span>') + '</span><span>' + p.items.length + (p.relay ? 'チーム' : '名') + '・' + p.heats.length + '組' + (p.items.some(it => it.seatFixed) ? '・<b title="「組・レーンを入れ替え」で手で並べた位置を使っています">手で並べ替え済み</b>' : '') + '</span></span>' +
+      '<span class="pill ' + (allDone ? 'ok' : 'info') + '">入力 ' + p.done + ' / ' + p.items.length + '</span>' : '') +
+    '<span class="grow"></span>' + (ui.progArrange && ui.prog && p.items.length ? arrTools(p) : '<button class="btn" data-act="clearOut" data-all="0" ' + (p.items.some(it => it.status === '対象外') ? '' : 'disabled') + '>この種目の対象外を解除</button>') +
+    (ui.prog && p.items.length ? (ui.progArrange ? '<button class="btn primary" data-act="progArrange">入れ替えを終える</button>' : '<button class="btn tinted" data-act="progArrange">組・レーンを入れ替え</button>') : '') + (ui.prog && p.items.length && !ui.progArrange ? '<button class="btn" data-act="printProg" data-all="0">この種目を印刷</button>' : '') + '</div>' +
     (ui.prog && p.items.length ? '<div class="prog" style="margin:-4px 0 10px"><i style="width:' + pct + '%"></i></div>' : '') +
     (allDone && ui._doneNote !== ui.prog ? (ui._doneNote = ui.prog, setTimeout(() => toast('「' + ui.prog + '」の記録入力が終わりました', null, 10000, idx < opts.length - 1 ? { label: '次の種目へ', fn: () => ACTIONS.progStep({ dataset: { d: '1' } }) } : null), 0), '') : '') +
     (false ? '<div class="notice ok"><span class="grow">この種目の記録入力が終わりました。</span><button class="btn sm" data-act="printFlash1" data-p="' + esc(ui.prog) + '">速報を印刷</button>' + (idx < opts.length - 1 ? '<button class="btn sm primary" data-act="progStep" data-d="1">次の種目へ →</button>' : '') + '</div>' : '') +
@@ -3855,6 +3965,15 @@ function arrSearch(p) {
       (t ? '<button class="btn sm primary" data-act="arrPut" data-id="' + esc(it.id) + '">ここへ入れる</button>' : '<button class="btn sm" data-act="seatPick" data-id="' + esc(it.id) + '">選ぶ</button>') + '</div>').join('') + '</div>' : '<p class="small muted">見つかりません。</p>') + '</div>';
 }
 // 組・レーンの入れ替え（ドラッグ＆ドロップ、またはタップで選んで行き先をタップ）
+// 入れ替え中の操作: プログラムのボタンの列（1行）に入れる
+function arrTools(p) {
+  const relay = p.relay;
+  const others = programOptions().filter(n => n !== ui.prog && C.isRelayName(n) === relay && programData(n).items.length);
+  if (ui.arrOther && others.indexOf(ui.arrOther) < 0) ui.arrOther = '';
+  const anyFixed = p.items.some(it => it.seatFixed);
+  return sel('ui:arrOther', ui.arrOther || '', [['', '隣に並べる種目: なし']].concat(others.map(n => [n, '隣に並べる: ' + n])), 'class="arrsel" aria-label="隣に並べる種目"') +
+    '<button class="btn" data-act="seatReset" ' + (anyFixed ? '' : 'disabled') + '>ロックを外して自動に戻す</button>' + (ui.arrOther ? '<button class="btn" data-act="combineOther">「' + esc(ui.arrOther) + '」と合同にする</button>' : '');
+}
 function arrangePanel(p, lanes) {
   // 組・レーンの入れ替え。説明文や検索欄は置かず、レーンの枠の中で操作する（空きレーンを押すとその枠で検索）。
   // 「ほかの種目も並べる」で別の種目を下に並べると、種目をまたいでタップ／ドラッグで移せる
@@ -3862,8 +3981,7 @@ function arrangePanel(p, lanes) {
   const others = programOptions().filter(n => n !== ui.prog && C.isRelayName(n) === relay && programData(n).items.length);
   if (ui.arrOther && others.indexOf(ui.arrOther) < 0) ui.arrOther = '';
   const anyFixed = p.items.some(it => it.seatFixed);
-  const bar = '<div class="bar arrbar">' + sel('ui:arrOther', ui.arrOther || '', [['', 'ほかの種目は並べない']].concat(others.map(n => [n, 'ほかの種目も並べる: ' + n])), 'aria-label="ほかの種目も並べる"') +
-    '<span class="grow"></span><button class="btn sm" data-act="seatReset" ' + (anyFixed ? '' : 'disabled') + '>ロックを外して自動に戻す</button>' + (ui.arrOther ? '<button class="btn" data-act="combineOther">「' + esc(ui.arrOther) + '」と合同にする</button>' : '') + '</div>';
+  const bar = '';     // 操作（ほかの種目・自動に戻す・合同）は上の1行（arrTools）に
   const head = n => '<h3 class="arr-sep">' + (isCombProg(n) ? '<span class="pill comb">合同</span> ' : '') + esc(n) + '</h3>';
   if (!ui.arrOther) return bar + '<div class="arr-wrap fill" data-fill-id="arr">' + arrHeats(p, ui.prog, lanes) + '</div>';
   // 2つの種目を並べるときは、種目を左右に・組は縦に（隣同士で見比べてドラッグ）
@@ -3947,8 +4065,8 @@ const PAPER = {
 };
 // A5 横（210×148mm）: 文字は小さくせず、フレームの飾り（上下の帯・四隅・両脇）を避けて中央（約 27〜117mm）にまとめる
 PAPER.A5 = { w: 210, h: 148, size: 'A5 landscape', label: 'A5 横',
-  ind: { title: [27, 23], name: [39, 18], club: [47.5, 11], rank: [53.5, 14], event: [61, 11.5], record: [67.5, 12.5], meet: [75, 10.5], lines: [82, 10.5, 5], date: [104.5, 10], org: [112, 12] },
-  rel: { title: [27, 23], name: [38.5, 17], mem1: [47, 10.5], mem2: [52, 10.5], rank: [59, 14], event: [66.5, 11.5], record: [73, 12.5], lines: [80.5, 10.5, 4.8], meet: [101, 10.5], date: [106.5, 10], org: [112.5, 12] } };
+  ind: { title: [25.5, 23], name: [40.5, 18], club: [48.5, 11], rank: [54.5, 14], event: [61.5, 11.5], record: [68, 12.5], meet: [75, 10.5], lines: [82, 10.5, 5], date: [104.5, 10], org: [112, 12] },
+  rel: { title: [25.5, 23], name: [39, 17], mem1: [49, 10.5], mem2: [55, 10.5], rank: [61, 14], event: [68, 11.5], record: [74, 12.5], lines: [81, 10.5, 4.7], meet: [101, 10.5], date: [106.5, 10], org: [112.5, 12] } };
 function certPaper() { return (state.settings.print || {}).certPaper === 'A5' ? 'A5' : 'A4'; }
 // A5 横の文言（空欄は A4 と同じ）
 function certTitle(W) { return certPaper() === 'A5' && W.a5 && C.str(W.a5.title) ? W.a5.title : W.title; }
@@ -4162,26 +4280,29 @@ function unknownList(kind) {
 
 /* ---------------------------------------------------------------- データ管理 */
 VIEWS.data = () => {
-  const snaps = getSnaps();
+  // 1画面に収める: 左＝ファイル（バックアップ・Excel・そのほか）／右＝控えの一覧（題名を付けられる。中だけスクロール）
+  const snaps = getSnaps(), selN = (ui.snapSel || []).filter(t => snaps.some(x => x.t === t)).length;
   let used = 0; try { used = (lsGet(KEY) || '').length + (lsGet(SNAP_KEY) || '').length; } catch (e) { /* ignore */ }
-  return '<h1 class="view">データ管理・Excel</h1><p class="lead">データはこのブラウザの中だけに自動保存され、インターネット上には送られません。別のパソコンへ移すときや万一に備えて、バックアップファイルを書き出してください。</p>' +
-    '<div class="grid g2">' +
-    '<div class="card"><h2>バックアップ</h2><p class="small">最後に書き出したのは <b>' + ago(meta.lastBackup) + '</b>。この後の変更は ' + meta.changesSinceBackup + ' 回です。</p>' +
-    '<div class="bar"><button class="btn primary" data-act="backup">バックアップを書き出す（.json）</button><label class="btn">バックアップから復元…<input type="file" accept=".json,application/json" data-file="json" hidden></label></div>' +
-    '<p class="small muted">復元するときは、今のデータを自動で控えに残してから置き換えます。</p></div>' +
-    '<div class="card"><h2>Excel</h2><p class="small">今お使いの「大会運営ブック（.xlsx）」と「表彰者算出ブック（.xlsm）」をそのまま読み込めます。このアプリから書き出したExcelも読み込めます。</p>' +
-    '<div class="bar"><label class="btn primary">Excelファイルを読み込む…<input type="file" accept=".xlsx,.xlsm,.xls" data-file="xlsx" hidden></label><button class="btn" data-act="exportXlsx">結果をExcelに書き出す</button><button class="btn" data-act="exportCsv">エントリーをCSVで書き出す</button></div>' +
-    '<p class="small muted">Excelの読み書きには、初回だけインターネット接続が必要です（表計算ライブラリを読み込むため）。CSVとバックアップはオフラインでも使えます。</p></div>' +
-    '<div class="card"><h2>自動バックアップ（このブラウザ内の控え）</h2><p class="small muted">5分ごと・大きな操作の前に自動で控えを残します（最新15件）。間違えて消したときはここから戻せます。不要な控えは選んで削除できます。</p>' +
-    (snaps.length ? '<div class="bar"><label class="small"><input type="checkbox" data-k="ui:snapAll" ' + (snaps.length && snaps.every((x, i) => (ui.snapSel || []).indexOf(x.t) >= 0) ? 'checked' : '') + '> すべて選ぶ</label><span class="grow"></span><button class="btn sm danger" data-act="delSnaps" ' + ((ui.snapSel || []).length ? '' : 'disabled') + '>選んだ控えを削除（' + (ui.snapSel || []).filter(t => snaps.some(x => x.t === t)).length + '件）</button></div>' +
-      '<div class="tablewrap" style="max-height:300px"><table class="t"><thead><tr><th></th><th>日時</th><th>きっかけ</th><th class="num">個人</th><th class="num">大きさ</th><th></th></tr></thead><tbody>' +
-      snaps.map((s2, i) => '<tr><td><input type="checkbox" data-k="snap:' + s2.t + '" ' + ((ui.snapSel || []).indexOf(s2.t) >= 0 ? 'checked' : '') + ' aria-label="この控えを選ぶ"></td><td style="white-space:nowrap">' + fmtDT(s2.t) + '</td><td>' + esc(s2.label) + '</td><td class="num">' + (s2.n || 0) + '</td><td class="num">' + Math.max(1, Math.round((s2.data || '').length / 1024)) + ' KB</td><td><button class="btn sm" data-act="restoreSnap" data-i="' + i + '">この時点に戻す</button></td></tr>').join('') + '</tbody></table></div>' : '<p class="muted">まだありません。</p>') +
-    '<div class="bar" style="margin-top:8px"><button class="btn sm" data-act="snapNow">今の状態を控えておく</button></div></div>' +
-    '<div class="card"><h2>そのほか</h2><div class="bar"><button class="btn" data-act="sample">サンプルデータを読み込む</button><button class="btn" data-act="clearOut" data-all="1">全種目の対象外を解除</button><button class="btn danger" data-act="clearResults">記録（公式タイム・判定）だけ消す</button><button class="btn danger" data-act="resetAll">すべて消して最初から</button></div>' +
-    '<p class="small muted">使用容量: 約 ' + Math.round(used / 1024) + ' KB（ブラウザの上限はおよそ5,000 KB）</p>' +
-    '<h3>同じデータを複数のパソコンで使うとき</h3><p class="small">片方で「バックアップを書き出す」→ もう片方で「バックアップから復元」。同じパソコンで2つのタブを開いて編集すると、あとの保存で前の内容が上書きされるため、1つのタブで作業してください（別タブで変更があると自動で読み込み直します）。</p>' +
-    '<h3>キーボード</h3><p class="small"><span class="kbd">Ctrl</span>+<span class="kbd">Z</span> 元に戻す　<span class="kbd">Ctrl</span>+<span class="kbd">Y</span> やり直し（入力欄の外で）　<span class="kbd">Enter</span> 記録入力で次のレーンへ</p></div>' +
+  const left = '<div class="dcol">' +
+    '<div class="card dcard"><div class="dch"><h2>バックアップ（ファイル）</h2><span class="small muted">最後に書き出し: <b>' + ago(meta.lastBackup) + '</b>・その後の変更 ' + meta.changesSinceBackup + ' 回</span></div>' +
+      '<div class="bar"><button class="btn primary" data-act="backup">バックアップを書き出す（.json）</button><label class="btn">バックアップから復元…<input type="file" accept=".json,application/json" data-file="json" hidden></label></div></div>' +
+    '<div class="card dcard"><div class="dch"><h2>Excel</h2><span class="small muted">大会運営ブック・表彰者算出ブックを読み込めます（初回だけネット接続が必要）</span></div>' +
+      '<div class="bar"><label class="btn primary">Excelファイルを読み込む…<input type="file" accept=".xlsx,.xlsm,.xls" data-file="xlsx" hidden></label><button class="btn" data-act="exportXlsx">結果をExcelに書き出す</button><button class="btn" data-act="exportCsv">エントリーをCSVで書き出す</button></div></div>' +
+    '<div class="card dcard"><div class="dch"><h2>そのほか</h2><span class="small muted">使用容量 約 ' + Math.round(used / 1024) + ' KB / 5,000 KB</span></div>' +
+      '<div class="bar"><button class="btn" data-act="sample">サンプルデータを読み込む</button><button class="btn" data-act="clearOut" data-all="1">全種目の対象外を解除</button><button class="btn danger" data-act="clearResults">記録（公式タイム・判定）だけ消す</button><button class="btn danger" data-act="resetAll">すべて消して最初から</button></div>' +
+      '<p class="small muted dtip">別のパソコンへ移すとき: 書き出す → もう一方で復元。同じパソコンでは1つのタブで作業してください。<span class="kbd">Ctrl</span>+<span class="kbd">Z</span> 元に戻す</p></div>' +
     '</div>';
+  const rows = snaps.map((s2, i) => '<tr class="' + (s2.keep ? 'keep' : '') + '"><td class="ck"><input type="checkbox" data-k="snap:' + s2.t + '" ' + ((ui.snapSel || []).indexOf(s2.t) >= 0 ? 'checked' : '') + ' aria-label="この控えを選ぶ"></td>' +
+    '<td class="dt">' + fmtDT(s2.t) + '</td>' +
+    '<td class="ti"><input class="snapt" data-k="snapt:' + s2.t + '" value="' + esc(s2.title || '') + '" placeholder="' + esc(s2.label || '自動') + '" aria-label="この控えの題名" maxlength="40"></td>' +
+    '<td class="num">' + (s2.n || 0) + '名</td>' +
+    '<td class="go"><button class="btn sm" data-act="restoreSnap" data-i="' + i + '">この時点に戻す</button></td></tr>').join('');
+  const right = '<div class="card dcard dsnap"><div class="dch"><h2>控え（自動バックアップ）</h2><span class="small muted">5分ごと・大きな操作の前に自動で残ります。題名を付けた控えは自動では消えません</span></div>' +
+    '<div class="snapnew"><input data-k="ui:snapTitle" value="' + esc(ui.snapTitle || '') + '" placeholder="題名を付けて今の状態を控える（例: 1部 終了時）" aria-label="控えの題名" maxlength="40"><button class="btn primary" data-act="snapNow">今の状態を控える</button></div>' +
+    (snaps.length ? '<div class="tablewrap dlist"><table class="t snapt-t"><thead><tr><th class="ck"><input type="checkbox" data-k="ui:snapAll" ' + (snaps.every(x => (ui.snapSel || []).indexOf(x.t) >= 0) ? 'checked' : '') + ' aria-label="すべて選ぶ"></th><th>日時</th><th>題名（押して書き換え）</th><th class="num">個人</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<div class="dfoot"><span class="small muted">' + snaps.length + ' 件</span><span class="grow"></span><button class="btn sm danger" data-act="delSnaps" ' + (selN ? '' : 'disabled') + '>選んだ控えを削除（' + selN + '件）</button></div>'
+      : '<p class="muted">まだありません。</p>') + '</div>';
+  return '<h1 class="view">データ管理・Excel</h1><div class="dgrid fill" data-fill-id="data">' + left + right + '</div>';
 };
 
 /* ---------------------------------------------------------------- 印刷まとめ（すべての印刷物・プレビュー・選んで結合印刷） */
@@ -4245,7 +4366,8 @@ function setPath(obj, path, val) {
 function getPath(obj, path) { return path.split('.').reduce((o, k) => (o === undefined || o === null) ? undefined : o[k], obj); }
 const ENT_LOCK_OK = ['officialTime', 'judge'];
 function setUI(f, val) {
-  if (f === 'certPaperSel') { commit('証書の用紙を' + (val === 'A5' ? 'A5 横' : 'A4 縦') + 'に', s => { s.settings.print.certPaper = val; }, { allowLocked: true }); return; }
+  if (f === 'certPaperSel') { commit('証書の用紙を' + (val === 'A5' ? 'A5 横' : 'A4 縦') + 'に', s => { s.settings.print.certPaper = val; }, { allowLocked: true, allowFinal: true }); return; }
+  if (f === 'snapTitle') { ui.snapTitle = val; return; }   // 書き直さない（直後の「控える」ボタンの押下が消えないように）
   if (f === 'awCat') val = +val;
   if (f === 'prog') { ui._focusFirst = true; ui.progHeat = null; ui.arrSel = null; }
   if (f === 'progHeat') { val = +val; ui._focusFirst = true; }
@@ -4278,6 +4400,12 @@ function handleValue(el) {
     commit('フレームの設定', st => { const f = st.settings.certFrame = frameCfg(); if (kind === 'frsame') { f.same = !!val; if (!val) { f.prize = f.record; f.show.prize = f.show.record; if (f.record === 'custom') { const im = frameImg('record'); try { if (im) localStorage.setItem(FRAME_IMG_KEY('prize'), im); } catch (e) { /* ignore */ } } } } else f.show[rest[0]] = !!val; }, { allowLocked: true });
     return;
   }
+  if (kind === 'snapt') {      // 控えの題名（データではないので確定中でも変えられる）
+    const t = +rest[0], sn = getSnaps(), o = sn.find(x => x.t === t); if (!o) return;
+    const v = C.str(val).trim().slice(0, 40); o.title = v; o.keep = !!v;
+    try { lsSet(SNAP_KEY, JSON.stringify(sn)); toast(v ? '題名を「' + v + '」にしました' : '題名を消しました'); } catch (e) { toast('保存できませんでした: ' + e.message, 'err'); }
+    return;
+  }
   if (kind === 'snap') { const t = +rest[0]; ui.snapSel = (ui.snapSel || []).filter(x => x !== t); if (val) ui.snapSel.push(t); render(); return; }
   if (kind === 'cf') { ui.certFilter = Object.assign({}, ui.certFilter, { [rest[0]]: val }); ui.certFrom = 1; ui.certTo = ''; ui.certPv = 1; render(); return; }
   if (kind === 'set') {
@@ -4304,7 +4432,7 @@ function handleValue(el) {
     commit('設定の変更', s => {
       if (path.indexOf('lanes.') === 0) { const i = +path.split('.')[1]; while (s.settings.lanes.length <= i) s.settings.lanes.push(''); s.settings.lanes[i] = v; }
       else setPath(s.settings, path, v);
-    }, { allowLocked: free });
+    }, { allowLocked: free, allowFinal: /^print\./.test(path) });
     return;
   }
   if (kind === 'dur') {
@@ -4430,13 +4558,38 @@ const ACTIONS = {
   navPin: () => { navPref.pinned = !navPref.pinned; saveNavPref(); navOpen = !navPref.pinned; render(); },
   setui: t => setUI(t.dataset.key, t.dataset.v),
   lock: () => {
+    if (finalBlocked()) return;
     const on = !isLocked();
     undoStack.push({ label: '当日モードの切替', data: serialize() });
     state.settings.locked = on; state.rev++; save(); recompute(); render();
     toast(on ? '当日モードにしました。設定・エントリーの変更はできません（記録入力はできます）' : '当日モードを解除しました');
   },
   backup: () => exportJSON(),
+  finalize: () => {
+    if (!isFinal()) {
+      confirmBox('大会を確定してロックしますか？', '<p>記録・エントリー・設定・表彰のデータを<b>書き換えられなく</b>します（' + (PART ? '2部' : '1部') + 'のデータ）。見る・印刷する・書き出すことはできます。</p><p class="small muted">解除するときはパスワードが必要です。確定の前にバックアップを書き出しておくと安心です。</p>', '確定してロック', () => {
+        snapshot('大会確定の前', true);
+        state.settings.finalized = { at: new Date().toISOString() }; state.settings.locked = true; state.rev++;
+        undoStack.length = 0; redoStack.length = 0;      // 「元に戻す」で確定前に戻せないように
+        save(); recompute(); render(); toast('大会を確定しました。データは書き換えられません');
+      });
+      return;
+    }
+    modal('<h2>確定（ロック）を解除</h2><p class="small muted">' + (state.settings.finalized.at ? fmtDT(Date.parse(state.settings.finalized.at)) + ' に確定しました。' : '') + 'データを書き換えるにはパスワードを入れてください。</p>' +
+      '<label class="field"><span>パスワード</span><input id="fin-pw" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></label><p class="small err-t" id="fin-msg"></p>' +
+      '<div class="actions"><button class="btn" data-close>やめる</button><button class="btn primary" id="fin-ok">解除する</button></div>', (m, close) => {
+      const inp = m.querySelector('#fin-pw'); setTimeout(() => inp.focus(), 0);
+      const go = () => {
+        if (pwHash(inp.value) !== FINAL_PW) { m.querySelector('#fin-msg').textContent = 'パスワードが違います'; inp.select(); return; }
+        close(); delete state.settings.finalized; state.rev++; save(); recompute(); render();
+        toast('確定を解除しました。当日モードは入ったままです（必要なら解除してください）');
+      };
+      m.querySelector('#fin-ok').addEventListener('click', go);
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) go(); });
+    });
+  },
   sample: () => {
+    if (finalBlocked()) return;
     const go = () => { snapshot('サンプル読み込み前', true); undoStack.push({ label: 'サンプル読み込み', data: serialize() }); state = migrate(makeSample()); meta.sample = true; state.rev++; save(); recompute(); location.hash = 'home'; render(); toast('サンプルデータを読み込みました（架空の選手です）'); };
     if (state.entries.length || state.relays.length) confirmBox('サンプルデータを読み込みますか？', '<p>今のデータはサンプルに置き換わります。今のデータは自動バックアップに控えるので、「データ管理」からいつでも戻せます。</p>', '読み込む', go);
     else go();
@@ -4604,7 +4757,22 @@ const ACTIONS = {
   pvPrint: () => { const d = viewDocs(); printDocs(d, view === 'prints' ? '選んだ印刷物をまとめて印刷します' : '印刷します'); },
   entryForm: () => openEntryFormMaker(),
   printSched: () => printSchedule(),
-  printProg: t => printProgram(t.dataset.all === '1'),
+  printProg: t => {   // 印刷の形を選んでから印刷（ボタンの列を1行にするため、選択欄はここへ）
+    const all = t.dataset.all === '1', P = state.settings.print;
+    const opt = (k, v, list) => '<div class="seg pick" role="radiogroup">' + list.map(([val, lab, sub]) => '<button type="button" class="' + (v === val ? 'on' : '') + '" data-k2="' + k + '" data-v="' + val + '"><b>' + lab + '</b><small>' + sub + '</small></button>').join('') + '</div>';
+    modal('<h2>' + (all ? 'プログラムを印刷' : 'この種目を印刷') + '</h2>' +
+      '<p class="small muted">記録欄</p>' + opt('progMode', P.progMode || 'blank', [['blank', '手書き用', '記録欄を空欄で'], ['result', '記録入り', '入力した記録を印字']]) +
+      '<p class="small muted">4組に満たないページ</p>' + opt('progFill', P.progFill || 'blank', [['blank', '空白のまま', '種目ごとに新しいページ'], ['pack', '次の種目を詰める', '紙を節約']]) +
+      '<div class="actions"><button class="btn" data-close>やめる</button><button class="btn primary" id="pp-go">印刷する</button></div>', (m, close) => {
+      m.classList.add('ppick');
+      m.querySelectorAll('[data-k2]').forEach(b => b.addEventListener('click', () => {
+        const k = b.dataset.k2, v = b.dataset.v;
+        m.querySelectorAll('[data-k2="' + k + '"]').forEach(x => x.classList.toggle('on', x === b));
+        if ((state.settings.print[k] || 'blank') !== v) commit('印刷の形', s => { s.settings.print[k] = v; }, { allowLocked: true, allowFinal: true, render: false });
+      }));
+      m.querySelector('#pp-go').addEventListener('click', () => { close(); printProgram(all); });
+    });
+  },
   printFlash: () => printFlash(),
   printRank: () => printRanking(),
   printCert: t => printCerts(t.dataset.test === '1'),
@@ -4622,19 +4790,20 @@ const ACTIONS = {
       catch (e) { toast('削除できませんでした: ' + e.message, 'err'); }
     }, { danger: true });
   },
-  snapNow: () => { snapshot('手動で控え', true); render(); toast('今の状態を控えました'); },
+  snapNow: () => { const t = C.str(ui.snapTitle).trim(); snapshot('手動で控え', true, { title: t }); ui.snapTitle = ''; render(); toast(t ? '「' + t + '」として控えました' : '今の状態を控えました'); },
   restoreSnap: t => {
+    if (finalBlocked()) return;
     const s = getSnaps()[+t.dataset.i];
     confirmBox('この時点に戻しますか？', '<p>' + fmtDT(s.t) + '（' + esc(s.label) + '）の状態に戻します。今の状態も自動で控えます。</p>', '戻す', () => {
       snapshot('復元前の状態', true); undoStack.push({ label: '自動バックアップから復元', data: serialize() });
       state = migrate(JSON.parse(s.data)); state.rev++; save(); recompute(); render(); toast('復元しました', null, 7000, { label: '元に戻す', fn: undo });
     });
   },
-  clearResults: () => confirmBox('記録だけ消しますか？', '<p>個人・リレーの公式タイムと判定をすべて消します。エントリーや設定は残ります。</p>', '消す', () => {
+  clearResults: () => finalBlocked() || confirmBox('記録だけ消しますか？', '<p>個人・リレーの公式タイムと判定をすべて消します。エントリーや設定は残ります。</p>', '消す', () => {
     commit('記録のクリア', s => { s.entries.forEach(e => { e.officialTime = ''; e.judge = ''; }); s.relays.forEach(r => { r.officialTime = ''; r.judge = ''; }); }, { snap: '記録クリア前' });
     toast('記録を消しました', null, 7000, { label: '元に戻す', fn: undo });
   }, { danger: true }),
-  resetAll: () => confirmBox('すべてのデータを消しますか？', '<p>エントリー・記録・設定・表彰データをすべて消して、最初の状態に戻します。直前の状態は自動バックアップに残ります。</p>', 'すべて消す', () => {
+  resetAll: () => finalBlocked() || confirmBox('すべてのデータを消しますか？', '<p>エントリー・記録・設定・表彰データをすべて消して、最初の状態に戻します。直前の状態は自動バックアップに残ります。</p>', 'すべて消す', () => {
     snapshot('全消去前', true); undoStack.push({ label: '全消去', data: serialize() });
     state = C.emptyState(); meta.sample = false; state.rev++; save(); recompute(); location.hash = 'home'; render(); toast('すべて消しました', null, 7000, { label: '元に戻す', fn: undo });
   }, { danger: true, typeWord: '削除' })
@@ -5035,6 +5204,7 @@ function exportJSON() {
   } catch (e) { toast('書き出せませんでした: ' + e.message, 'err'); }
 }
 function importJSON(file) {
+  if (finalBlocked()) return;
   const fr = new FileReader();
   fr.onload = () => {
     let s;
@@ -5062,6 +5232,7 @@ function loadXLSX() {
   return xlsxLoading;
 }
 function importXlsx(file) {
+  if (finalBlocked()) return;
   toast('「' + file.name + '」を読み込んでいます…');
   Promise.all([loadXLSX(), file.arrayBuffer()]).then(([X, buf]) => {
     const wb = X.read(buf, { type: 'array' });
@@ -5329,6 +5500,7 @@ document.addEventListener('pointerup', e => { const d = seatDrag.on; if (d && e.
 document.addEventListener('pointercancel', e => { const d = seatDrag.on; if (d && e.pointerId === d.pid) seatEnd(false); });
 document.addEventListener('touchmove', e => { if (seatDrag.on && seatDrag.on.started) e.preventDefault(); }, { passive: false });
 document.addEventListener('contextmenu', e => { if (seatDrag.on || (e.target.closest && e.target.closest('.arr .pcard'))) e.preventDefault(); });
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing && e.target && e.target.dataset && e.target.dataset.k === 'ui:snapTitle') { ui.snapTitle = e.target.value; ACTIONS.snapNow(); } });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && (seatDrag.on || ui.arrSel)) { if (seatDrag.on) seatEnd(false); ui.arrSel = null; render(); } });
 
 /* ---------------------------------------------------------------- イベント */
@@ -5356,13 +5528,14 @@ document.addEventListener('input', e => {
     el.classList.toggle('bad', bad);
     if (pv) { pv.textContent = p.kind === 'time' ? C.fmtTime(p.sec) : p.kind === 'special' ? p.special : bad ? p.msg : ''; pv.classList.toggle('bad', bad); pv.classList.toggle('same', !!pv.textContent && pv.textContent === el.value.trim()); el.classList.toggle('nopv', !bad && (!pv.textContent || pv.classList.contains('same'))); }
   }
+  if (el.dataset.k === 'ui:snapTitle') ui.snapTitle = el.value;
   if (el.dataset.k === 'ui:entQ' || el.dataset.k === 'ui:relQ' || el.dataset.k === 'ui:certQ' || el.dataset.k === 'ui:arrQ') {
     clearTimeout(searchTimer);
     if (e.isComposing) return;                 // 日本語の変換中は検索しない（変換が確定してから）
     searchTimer = setTimeout(() => { ui[el.dataset.k.slice(3)] = el.value; ui.entPage = 0; if (el.dataset.k === 'ui:certQ') { ui.certPv = 1; ui.certFrom = 1; ui.certTo = ''; } render(); }, 300);
   }
 });
-document.addEventListener('toggle', e => { const d = e.target; if (d.dataset && d.dataset.det) ui[d.dataset.det] = d.open; }, true);
+document.addEventListener('toggle', e => { const d = e.target; if (d.dataset && d.dataset.det) { ui[d.dataset.det] = d.open; sizeFills(); if (d.open && d.classList.contains('hextra')) setTimeout(() => d.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 30); else if (!d.open) window.scrollTo({ top: 0 }); } }, true);
 let enterRefocus = 0;
 document.addEventListener('keydown', e => {
   const el = e.target;
@@ -5645,6 +5818,7 @@ function openEntryFormMaker() {
   });
 }
 function importEntryForms(fileList) {
+  if (finalBlocked()) return;
   const files = [...fileList];
   if (!files.length) return;
   toast(files.length + 'ファイルを読み込んでいます…');
