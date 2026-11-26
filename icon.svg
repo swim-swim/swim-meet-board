@@ -1,20 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- スイム大会運営ボード: 泳ぐ人（腕・頭）と水面。紺→青のグラデーション -->
+  <!-- スイム大会運営ボード: 泳ぐ人（腕・頭）と1本の水の流れ。上の明るい青から深い紺へ -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2=".35" y2="1">
-      <stop offset="0" stop-color="#0B2447"/>
-      <stop offset="1" stop-color="#0A63D8"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0E7BE8"/>
+      <stop offset="1" stop-color="#062B6B"/>
     </linearGradient>
-    <radialGradient id="hl" cx=".25" cy="-.05" r=".95">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".20"/>
-      <stop offset=".6" stop-color="#FFFFFF" stop-opacity="0"/>
-    </radialGradient>
   </defs>
   <rect width="512" height="512" fill="url(#bg)"/>
-  <rect width="512" height="512" fill="url(#hl)"/>
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M118 300 C 156 178 262 128 362 172" stroke="#FFFFFF" stroke-width="42"/>
-    <path d="M88 348 q 21 -19 42 0 q 21 19 42 0 q 21 -19 42 0 q 21 19 42 0 q 21 -19 42 0 q 21 19 42 0 q 21 -19 42 0 q 21 19 42 0" stroke="#61D5FF" stroke-width="30"/>
-  </g>
-  <circle cx="384" cy="258" r="44" fill="#FFFFFF"/>
+  <path d="M104 330 C 140 196 264 136 380 182" fill="none" stroke="#FFFFFF" stroke-width="50" stroke-linecap="round"/>
+  <circle cx="392" cy="290" r="50" fill="#FFFFFF"/>
+  <path d="M80 420 C 160 380 240 450 320 410 S 432 390 432 390" fill="none" stroke="#7FE0FF" stroke-width="30" stroke-linecap="round"/>
 </svg>
