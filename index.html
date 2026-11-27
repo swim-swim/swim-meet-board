@@ -1554,6 +1554,98 @@ input, textarea, select, [contenteditable="true"], [contenteditable=""] { -webki
 .arr .rcard .rc-mem { display: block !important; -webkit-line-clamp: unset; line-clamp: none; overflow: visible !important; }
 .arr .mgrid .mg { white-space: normal; flex-wrap: wrap; }
 .arr .mgrid .mg > b { overflow: visible !important; text-overflow: clip !important; overflow-wrap: anywhere; word-break: keep-all; }
+
+/* ---------------------------------------------------------------- タブレット計時（?timer） */
+html.tmode { zoom: 1 !important; }
+html.tmode body { background: var(--bg); min-height: 100vh; min-height: 100dvh; overscroll-behavior: none; }
+html.tmode .app, html.tmode #print-root { display: none !important; }
+#timer-root { touch-action: manipulation; font-family: var(--font-ui); color: var(--ink); }
+.tm-wrap { box-sizing: border-box; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; gap: 12px; padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); }
+.tm-top { display: flex; align-items: center; gap: 12px; }
+.tm-top b { font-size: 22px; }
+.tm-sub { flex: 1; min-width: 0; color: var(--muted); font-size: 13px; }
+.tm-btn { appearance: none; border: 1px solid var(--hairline); background: var(--glass-strong); color: var(--ink); border-radius: 14px; padding: 10px 16px; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; }
+.tm-btn.big { min-height: 64px; font-size: 20px; padding: 12px 18px; }
+.tm-btn.sm { font-size: 13px; padding: 6px 12px; margin: 8px 0 0; }
+.tm-btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.tm-btn:disabled, .tm-step button:disabled { opacity: .38; cursor: default; }
+.tm-race { display: flex; gap: 12px; flex-wrap: wrap; }
+.tm-step { flex: 1 1 260px; display: flex; align-items: center; gap: 10px; background: var(--glass-strong); border-radius: 18px; padding: 8px 12px; }
+.tm-step small { font-size: 15px; color: var(--muted); min-width: 4.5em; }
+.tm-step b { flex: 1; text-align: center; font-size: 40px; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.tm-step button { width: 64px; height: 64px; border-radius: 50%; border: 0; background: var(--accent-soft); color: var(--accent); font-size: 30px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+.tm-clock { text-align: center; font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: clamp(48px, 11vw, 120px); font-weight: 700; line-height: 1; letter-spacing: -.02em; }
+.tm-start { min-height: 96px; border: 0; border-radius: 22px; background: var(--ok); color: #fff; font-size: 34px; font-weight: 800; letter-spacing: .1em; cursor: pointer; }
+.tm-cancel { min-height: 52px; border: 1px solid var(--hairline); border-radius: 16px; background: var(--glass); color: var(--muted); font-size: 16px; cursor: pointer; }
+.tm-cancel.arm, .tm-x.arm { background: var(--err); color: #fff; border-color: transparent; }
+.tm-lanes { flex: 1; display: grid; grid-template-columns: repeat(var(--tmcp, 2), minmax(0, 1fr)); grid-auto-rows: minmax(96px, 1fr); gap: 10px; }
+.tm-lane { position: relative; display: flex; }
+.tm-lbtn { flex: 1; display: flex; align-items: center; gap: 14px; padding: 10px 16px; border: 2px solid var(--accent); border-radius: 20px; background: var(--glass-strong); color: var(--ink); cursor: pointer; text-align: left; font: inherit; }
+.tm-lbtn:not(:disabled):active { background: var(--accent); color: #fff; }
+.tm-lbtn:disabled { border-color: var(--hairline); cursor: default; }
+.tm-lane.done .tm-lbtn { border-color: var(--ok); background: var(--ok-soft); }
+.tm-ln { font-size: 44px; font-weight: 800; font-family: var(--font-num); line-height: 1; display: flex; flex-direction: column; align-items: center; min-width: 1.6em; }
+.tm-ln small { font-size: 12px; font-weight: 600; font-family: var(--font-ui); color: var(--muted); }
+.tm-lt { flex: 1; font-size: 34px; font-weight: 700; font-family: var(--font-num); font-variant-numeric: tabular-nums; text-align: right; }
+.tm-lane:not(.done) .tm-lt { font-size: 17px; font-family: var(--font-ui); color: var(--muted); font-weight: 600; }
+.tm-x { position: absolute; right: 10px; bottom: 8px; border: 1px solid var(--hairline); border-radius: 10px; background: var(--glass-strong); color: var(--muted); font-size: 13px; padding: 4px 10px; cursor: pointer; }
+.tm-lane.done .tm-lbtn { padding-bottom: 42px; }
+.tm-foot { display: flex; gap: 10px; }
+.tm-foot .tm-btn { flex: 1; }
+.tm-hist { background: var(--glass); border-radius: 16px; padding: 10px 14px; }
+.tm-hist summary { cursor: pointer; font-weight: 600; color: var(--muted); }
+.tm-hrow { display: flex; gap: 14px; align-items: center; width: 100%; padding: 10px 6px; border: 0; border-bottom: 1px solid var(--hairline); background: none; color: var(--ink); font: inherit; font-size: 16px; text-align: left; cursor: pointer; }
+.tm-hrow .tm-hat { margin-left: auto; color: var(--muted); font-family: var(--font-num); }
+.tm-ov { position: fixed; inset: 0; z-index: 50; background: #fff; color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 16px; box-sizing: border-box; touch-action: manipulation; font-family: var(--font-ui); }
+.tm-qrbox { width: min(92vw, 60vh); width: min(92vw, 60dvh); aspect-ratio: 1; }
+.tm-qrbox svg { width: 100%; height: 100%; display: block; }
+.tm-qrinfo { text-align: center; max-width: 92vw; }
+.tm-qrinfo b { font-size: 26px; }
+.tm-qrt { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; margin: 6px 0; font-family: var(--font-num); font-size: 20px; font-weight: 700; }
+.tm-qrt small { font-size: 12px; color: #555; margin-right: 4px; font-family: var(--font-ui); }
+.tm-qrinfo p { margin: 4px 0; font-size: 14px; color: #444; }
+.tm-code { font-family: var(--font-num); font-size: 13px; color: #333; word-break: break-all; user-select: text; -webkit-user-select: text; }
+.tm-ovbtns { display: flex; gap: 10px; width: min(560px, 92vw); }
+.tm-ovbtns .tm-btn { flex: 1; }
+.tm-ov .tm-btn:not(.primary) { background: #f1f3f6; color: #000; }
+@media (orientation: landscape) { .tm-lanes { grid-template-columns: repeat(var(--tmcl, 3), minmax(0, 1fr)); } }
+@media (orientation: landscape) and (min-aspect-ratio: 5/4) {
+  .tm-ov:not(.tm-set) { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr auto; align-items: center; justify-items: center; }
+  .tm-ov:not(.tm-set) .tm-qrbox { width: min(56vw, 88vh); width: min(56vw, 88dvh); grid-row: 1 / 3; }
+}
+.tm-set { background: rgba(0, 0, 0, .35); }
+.tm-setbox { background: #fff; color: #000; border-radius: 22px; padding: 20px 22px; width: min(560px, 94vw); max-height: 92vh; overflow: auto; box-sizing: border-box; }
+.tm-setbox h2 { margin: 0 0 12px; }
+.tm-setbox label { display: block; font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+.tm-setbox select { font-size: 20px; padding: 6px 10px; border-radius: 10px; }
+.tm-setbox p { font-size: 14px; color: #333; margin: 6px 0; }
+
+/* パソコン側の読み込みダイアログ */
+.modal.tr-modal { width: min(980px, 100%); }
+.tr-body { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.tr-body[hidden], .tr-result[hidden] { display: none; }
+.tr-cam { position: relative; border-radius: 18px; overflow: hidden; background: #000; aspect-ratio: 4 / 3; }
+.tr-cam video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tr-cam video.mirror { transform: scaleX(-1); }
+.tr-aim { position: absolute; left: 50%; top: 46%; width: 56%; aspect-ratio: 1; transform: translate(-50%, -50%); border: 3px solid rgba(255, 255, 255, .85); border-radius: 18px; box-shadow: 0 0 0 999px rgba(0, 0, 0, .18); pointer-events: none; }
+.tr-msg { position: absolute; left: 10px; right: 10px; bottom: 10px; margin: 0; padding: 8px 12px; border-radius: 12px; background: rgba(0, 0, 0, .6); color: #fff; font-size: 14px; text-align: center; }
+.tr-msg.ng { background: rgba(208, 38, 31, .9); }
+.tr-side .field { display: block; margin: 12px 0; }
+.tr-side .field > span:first-child { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+.tr-row { display: flex; gap: 8px; }
+.tr-row input { flex: 1; min-width: 0; font-family: var(--font-num); }
+.tr-help summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.tr-urlqr { width: 150px; margin: 8px 0; }
+.tr-urlqr svg { width: 100%; height: auto; display: block; border-radius: 8px; }
+.tr-help code { word-break: break-all; user-select: text; -webkit-user-select: text; }
+.tr-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 17px; }
+.tr-t { width: 100%; }
+.tr-t td.nm small { display: block; color: var(--muted); font-size: 12px; }
+.tr-t tr.emp td { color: var(--muted); }
+.tr-t tr.same td { opacity: .7; }
+.tr-t td.tm { font-family: var(--font-num); white-space: nowrap; }
+.tr-t input[type=checkbox] { width: 22px; height: 22px; }
+.tr-done { font-size: 18px; padding: 12px 0; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2655,6 +2747,7 @@ function loadFrameImage(file, slot) {
  * ========================================================================== */
 'use strict';
 const C = Core;
+const TIMER_MODE = /[?&]timer(?:[=&]|$)/.test(location.search);   // タブレット計時の画面（timer.js）
 // 1部・2部など、大会を分けてそれぞれのデータを別々に保存する（PART = '' が1部、'2' が2部）
 const PART_KEY = 'swim-meet-app/part';
 const PART = (() => { try { return localStorage.getItem(PART_KEY) || ''; } catch (e) { return ''; } })();
@@ -3083,6 +3176,7 @@ Object.assign(ICON_PATHS, {
 });
 const RB_ACT = {
   openprog: b => ['program', (b.textContent.match(/No\.\s*\d+/) || ['入力'])[0].replace(/\s/g, '')],
+  tabletRead: ['camera', 'タブレット'],
   printClubSum: ['print', '印刷'], printSched: ['print', '印刷'], printFlash: ['print', '印刷'], printRank: ['print', '印刷'], printAwards: ['print', '印刷'], printProg: ['print', '印刷'],
   printCert: b => /テスト|1枚/.test(b.textContent) ? ['sheetEye', '試し印刷'] : ['printAll', '全部印刷'],
   addlane: ['plus', 'レーン追加'], addEntry: ['plus', '追加'], addRelay: ['plus', '追加'],
@@ -3204,7 +3298,7 @@ function applyNavLayout() {
   app.classList.toggle('navrail', navPinnedNow() && left < 760);
   app.classList.toggle('pvslim', pvOn && left < 640);
 }
-window.addEventListener('resize', () => { applyFit(); fitCertPrev(); if ($('#toptitle')) fitTitle($('#toptitle')); if (isPhone() !== document.documentElement.classList.contains('phone')) { render(); return; } applyNavLayout(); sizeFills(); fitProgram(); bindLenses(); schedulePreview(); });
+window.addEventListener('resize', () => { if (TIMER_MODE) return; applyFit(); fitCertPrev(); if ($('#toptitle')) fitTitle($('#toptitle')); if (isPhone() !== document.documentElement.classList.contains('phone')) { render(); return; } applyNavLayout(); sizeFills(); fitProgram(); bindLenses(); schedulePreview(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && navOpen) { navOpen = false; applyNavLayout(); } });
 
 let renderQueued = false;
@@ -3381,6 +3475,7 @@ function fitMedia() {
   for (const sh of document.styleSheets) { try { walk(sh.cssRules); } catch (e) { /* 読めないシート */ } }
 }
 function applyFit() {
+  if (TIMER_MODE) return;
   const z = fitScale(), de = document.documentElement;
   FITZ = z; de.style.zoom = z === 1 ? '' : String(z);
   const p = document.createElement('div'); p.style.cssText = 'position:absolute;left:0;top:0;width:100px;height:1px;visibility:hidden;pointer-events:none';
@@ -4188,7 +4283,7 @@ VIEWS.program = () => {
         '<span class="pk" title="' + (p.relay ? 'この種目の参加チーム数' : 'この種目の参加人数') + '"><small class="lb">' + (p.relay ? '参加チーム' : '参加人数') + '</small><span class="pkv"><b>' + p.items.length + '</b><small>' + (p.relay ? 'チーム' : '名') + '</small></span></span>' + (p.items.some(it => it.seatFixed) ? '<span class="pk fx" title="「組・レーンを入れ替え」で手で並べた位置を使っています"><small class="lb">組・レーン</small><span class="pkv"><b class="sm">手で調整</b></span></span>' : '') + '</span>' +
       '<span class="pill ' + (allDone ? 'ok' : 'info') + '">入力 ' + p.done + ' / ' + p.items.length + '</span>' : '') +
     '<span class="grow"></span>' + (ui.progArrange && ui.prog && p.items.length ? arrTools(p) : '<button class="btn" data-act="clearOut" data-all="0" ' + (p.items.some(it => it.status === '対象外') ? '' : 'disabled') + '>この種目の対象外を解除</button>') +
-    (ui.prog && p.items.length ? (ui.progArrange ? '<button class="btn primary" data-act="progArrange">入れ替えを終える</button>' : '<button class="btn tinted" data-act="progArrange">組・レーンを入れ替え</button>') : '') + (ui.prog && p.items.length && !ui.progArrange ? '<button class="btn" data-act="printProg" data-all="0">この種目を印刷</button>' : '') + '</div>' +
+    (ui.prog && p.items.length ? (ui.progArrange ? '<button class="btn primary" data-act="progArrange">入れ替えを終える</button>' : '<button class="btn tinted" data-act="progArrange">組・レーンを入れ替え</button>') : '') + (ui.prog && p.items.length && !ui.progArrange ? '<button class="btn" data-act="tabletRead" title="タブレットで計ったタイムをQRで読み込む">タブレットから読み込む</button><button class="btn" data-act="printProg" data-all="0">この種目を印刷</button>' : '') + '</div>' +
     (ui.prog && p.items.length ? '<div class="prog" style="margin:-4px 0 10px"><i style="width:' + pct + '%"></i></div>' : '') +
     (allDone && ui._doneNote !== ui.prog ? (ui._doneNote = ui.prog, setTimeout(() => toast('「' + ui.prog + '」の記録入力が終わりました', null, 10000, idx < opts.length - 1 ? { label: '次の種目へ', fn: () => ACTIONS.progStep({ dataset: { d: '1' } }) } : null), 0), '') : '') +
     (false ? '<div class="notice ok"><span class="grow">この種目の記録入力が終わりました。</span><button class="btn sm" data-act="printFlash1" data-p="' + esc(ui.prog) + '">速報を印刷</button>' + (idx < opts.length - 1 ? '<button class="btn sm primary" data-act="progStep" data-d="1">次の種目へ →</button>' : '') + '</div>' : '') +
@@ -5074,6 +5169,7 @@ const ACTIONS = {
   pvPrint: () => { const d = viewDocs(); printDocs(d, view === 'prints' ? '選んだ印刷物をまとめて印刷します' : '印刷します'); },
   entryForm: () => openEntryFormMaker(),
   printSched: () => printSchedule(),
+  tabletRead: () => openTabletReader(),
   printProg: t => {   // 印刷の形を選んでから印刷（ボタンの列を1行にするため、選択欄はここへ）
     const all = t.dataset.all === '1', P = state.settings.print;
     const opt = (k, v, list) => '<div class="seg pick" role="radiogroup">' + list.map(([val, lab, sub]) => '<button type="button" class="' + (v === val ? 'on' : '') + '" data-k2="' + k + '" data-v="' + val + '"><b>' + lab + '</b><small>' + sub + '</small></button>').join('') + '</div>';
@@ -6010,6 +6106,660 @@ window.addEventListener('hashchange', () => { view = (location.hash || '#home').
 window.addEventListener('beforeunload', e => { if (saveError) { e.preventDefault(); e.returnValue = ''; } });
 window.addEventListener('error', e => { toast('予期しないエラー: ' + (e.message || '') + '（データは保存されています。ページを再読み込みしてください）', 'err', 9000); });
 
+/* ---------------------------------------------------------------- QR コード（作成と読み取り）
+   外部のサービス・ライブラリを使わず、この中だけで処理する（データは端末の外に出ない）。
+   作成: 型番 1〜6・誤り訂正 M・8ビットモード。読み取り: ブラウザの BarcodeDetector が無いときの予備（型番 1〜6・M）。 */
+const QR = (function () {
+  const EXP = new Uint8Array(512), LOG = new Uint8Array(256);
+  for (let i = 0, x = 1; i < 255; i++) { EXP[i] = x; LOG[x] = i; x <<= 1; if (x & 256) x ^= 0x11d; }
+  for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+  const mul = (a, b) => (a && b) ? EXP[LOG[a] + LOG[b]] : 0;
+  const div = (a, b) => a ? EXP[(LOG[a] + 255 - LOG[b]) % 255] : 0;
+  // 誤り訂正 M のブロック構成 [ブロックごとの訂正語数, [個数, データ語数], …]
+  const BLK = [null, [10, [1, 16]], [16, [1, 28]], [26, [1, 44]], [18, [2, 32]], [24, [2, 43]], [16, [4, 27]]];
+  const ALIGN = [null, [], [6, 18], [6, 22], [6, 26], [6, 30], [6, 34]];
+  const MAXV = 6;
+  function blocksOf(v) { const b = BLK[v], data = []; for (let i = 1; i < b.length; i++) for (let k = 0; k < b[i][0]; k++) data.push(b[i][1]); return { ec: b[0], data }; }
+  const genCache = {};
+  function genPoly(n) {
+    if (genCache[n]) return genCache[n];
+    let g = [1];
+    for (let i = 0; i < n; i++) { const ng = new Array(g.length + 1).fill(0); for (let j = 0; j < g.length; j++) { ng[j] ^= g[j]; ng[j + 1] ^= mul(g[j], EXP[i]); } g = ng; }
+    return (genCache[n] = g);
+  }
+  function rsEnc(data, n) {
+    const g = genPoly(n), r = new Array(n).fill(0);
+    for (const d of data) { const f = d ^ r[0]; r.shift(); r.push(0); if (f) for (let j = 0; j < n; j++) r[j] ^= mul(g[j + 1], f); }
+    return r;
+  }
+  // 訂正（Berlekamp-Massey → Chien → Forney）。直せないときは null
+  function rsDec(c, E) {
+    const N = c.length, S = [];
+    let bad = false;
+    for (let j = 0; j < E; j++) { let s = 0; const a = EXP[j]; for (let i = 0; i < N; i++) s = mul(s, a) ^ c[i]; S.push(s); if (s) bad = true; }
+    if (!bad) return c;
+    let C = [1], B = [1], L = 0, m = 1, b = 1;
+    for (let n = 0; n < E; n++) {
+      let d = S[n];
+      for (let i = 1; i <= L; i++) d ^= mul(C[i] || 0, S[n - i]);
+      if (d === 0) { m++; continue; }
+      const T = C.slice(), coef = div(d, b);
+      for (let i = 0; i < B.length; i++) { const k = i + m; while (C.length <= k) C.push(0); C[k] ^= mul(coef, B[i]); }
+      if (2 * L <= n) { L = n + 1 - L; B = T; b = d; m = 1; } else m++;
+    }
+    if (2 * L > E) return null;
+    const evalLow = (P, x) => { let v = 0; for (let i = P.length - 1; i >= 0; i--) v = mul(v, x) ^ P[i]; return v; };
+    const pos = [];
+    for (let p = 0; p < N; p++) { const e = N - 1 - p; if (evalLow(C, EXP[(255 - e % 255) % 255]) === 0) pos.push(p); }
+    if (pos.length !== L) return null;
+    const Om = new Array(E).fill(0);
+    for (let i = 0; i < E; i++) for (let j = 0; j < C.length && i + j < E; j++) Om[i + j] ^= mul(S[i], C[j]);
+    const out = c.slice();
+    for (const p of pos) {
+      const e = N - 1 - p, X = EXP[e % 255], Xi = EXP[(255 - e % 255) % 255];
+      let den = 0;
+      for (let i = 1; i < C.length; i += 2) { let t = C[i]; for (let k = 0; k < i - 1; k++) t = mul(t, Xi); den ^= t; }
+      if (!den) return null;
+      out[p] ^= mul(X, div(evalLow(Om, Xi), den));
+    }
+    for (let j = 0; j < E; j++) { let s = 0; const a = EXP[j]; for (let i = 0; i < N; i++) s = mul(s, a) ^ out[i]; if (s) return null; }
+    return out;
+  }
+  // 決まった模様（位置・タイミング・位置合わせ・形式情報の場所）
+  function base(v) {
+    const n = 17 + 4 * v, m = [], fn = [];
+    for (let i = 0; i < n; i++) { m.push(new Uint8Array(n)); fn.push(new Uint8Array(n)); }
+    const set = (r, c, on) => { m[r][c] = on ? 1 : 0; fn[r][c] = 1; };
+    const finder = (r0, c0) => {
+      for (let r = -1; r <= 7; r++) for (let c = -1; c <= 7; c++) {
+        const rr = r0 + r, cc = c0 + c;
+        if (rr < 0 || cc < 0 || rr >= n || cc >= n) continue;
+        set(rr, cc, r >= 0 && r <= 6 && c >= 0 && c <= 6 && (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)));
+      }
+    };
+    finder(0, 0); finder(0, n - 7); finder(n - 7, 0);
+    for (let i = 8; i < n - 8; i++) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
+    const A = ALIGN[v];
+    for (const r of A) for (const c of A) {
+      if (fn[r][c]) continue;
+      for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) set(r + dr, c + dc, Math.max(Math.abs(dr), Math.abs(dc)) !== 1);
+    }
+    for (let i = 0; i < 9; i++) { if (!fn[8][i]) set(8, i, 0); if (!fn[i][8]) set(i, 8, 0); }
+    for (let i = 0; i < 8; i++) { set(8, n - 1 - i, 0); set(n - 1 - i, 8, 0); }
+    set(n - 8, 8, 1);
+    return { n, m, fn };
+  }
+  const MASK = [
+    (x, y) => (x + y) % 2 === 0, (x, y) => y % 2 === 0, (x, y) => x % 3 === 0, (x, y) => (x + y) % 3 === 0,
+    (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0, (x, y) => x * y % 2 + x * y % 3 === 0,
+    (x, y) => (x * y % 2 + x * y % 3) % 2 === 0, (x, y) => ((x + y) % 2 + x * y % 3) % 2 === 0
+  ];
+  function formatBits(ecl, mask) {
+    const data = ecl << 3 | mask; let rem = data;
+    for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+    return ((data << 10) | (rem & 0x3ff)) ^ 0x5412;
+  }
+  const FORMATS = []; for (let e = 0; e < 4; e++) for (let k = 0; k < 8; k++) FORMATS.push({ bits: formatBits(e, k), ecl: e, mask: k });
+  // 形式情報の場所 [行, 列] を、ビット番号 0〜14 の順に2組
+  function formatCells(n) {
+    const a = [], b = [];
+    for (let i = 0; i <= 5; i++) a.push([i, 8]);
+    a.push([7, 8], [8, 8], [8, 7]);
+    for (let i = 9; i <= 14; i++) a.push([8, 14 - i]);
+    for (let i = 0; i <= 7; i++) b.push([8, n - 1 - i]);
+    for (let i = 8; i <= 14; i++) b.push([n - 15 + i, 8]);
+    return [a, b];
+  }
+  // データを置く順番（右下から2列ずつジグザグ）
+  function dataCells(n, fn) {
+    const out = [];
+    for (let right = n - 1; right >= 1; right -= 2) {
+      if (right === 6) right = 5;
+      for (let vert = 0; vert < n; vert++) for (let j = 0; j < 2; j++) {
+        const x = right - j, up = ((right + 1) & 2) === 0, y = up ? n - 1 - vert : vert;
+        if (!fn[y][x]) out.push([y, x]);
+      }
+    }
+    return out;
+  }
+  function penalty(m, n) {
+    let p = 0;
+    for (let pass = 0; pass < 2; pass++) for (let i = 0; i < n; i++) {
+      let run = 1, line = [];
+      for (let j = 0; j < n; j++) line.push(pass ? m[j][i] : m[i][j]);
+      for (let j = 1; j <= n; j++) { if (j < n && line[j] === line[j - 1]) run++; else { if (run >= 5) p += 3 + run - 5; run = 1; } }
+      const s = line.join('');
+      let k = -1; while ((k = s.indexOf('10111010000', k + 1)) >= 0) p += 40;
+      k = -1; while ((k = s.indexOf('00001011101', k + 1)) >= 0) p += 40;
+    }
+    let dark = 0;
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+      dark += m[r][c];
+      if (r < n - 1 && c < n - 1) { const v = m[r][c]; if (m[r][c + 1] === v && m[r + 1][c] === v && m[r + 1][c + 1] === v) p += 3; }
+    }
+    p += Math.floor(Math.abs(dark * 100 / (n * n) - 50) / 5) * 10;
+    return p;
+  }
+  // 文字列 → 0/1 の行列
+  function encode(text) {
+    const bytes = Array.from(new TextEncoder().encode(String(text)));
+    let v = 1, cap = 0;
+    for (; v <= MAXV; v++) { cap = blocksOf(v).data.reduce((a, b) => a + b, 0); if (12 + bytes.length * 8 <= cap * 8) break; }
+    if (v > MAXV) throw new Error('QRに入れるには長すぎます');
+    const bits = [];
+    const put = (val, len) => { for (let i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1); };
+    put(4, 4); put(bytes.length, 8); bytes.forEach(b => put(b, 8));
+    put(0, Math.min(4, cap * 8 - bits.length));
+    while (bits.length % 8) bits.push(0);
+    const cw = [];
+    for (let i = 0; i < bits.length; i += 8) { let b = 0; for (let k = 0; k < 8; k++) b = b << 1 | bits[i + k]; cw.push(b); }
+    for (let pad = 0xEC; cw.length < cap; pad ^= 0xEC ^ 0x11) cw.push(pad);
+    const bl = blocksOf(v), blocks = [], ecs = [];
+    let o = 0;
+    bl.data.forEach(len => { const d = cw.slice(o, o + len); o += len; blocks.push(d); ecs.push(rsEnc(d, bl.ec)); });
+    const all = [];
+    const maxD = Math.max.apply(null, bl.data);
+    for (let i = 0; i < maxD; i++) blocks.forEach(d => { if (i < d.length) all.push(d[i]); });
+    for (let i = 0; i < bl.ec; i++) ecs.forEach(e => all.push(e[i]));
+    const B = base(v), n = B.n, cells = dataCells(n, B.fn);
+    let best = null;
+    for (let mk = 0; mk < 8; mk++) {
+      const m = B.m.map(r => Uint8Array.from(r));
+      cells.forEach(([y, x], i) => { const bit = i < all.length * 8 ? (all[i >> 3] >>> (7 - (i & 7))) & 1 : 0; m[y][x] = bit ^ (MASK[mk](x, y) ? 1 : 0); });
+      const fb = formatBits(0, mk), fc = formatCells(n);
+      fc.forEach(list => list.forEach(([r, c], i) => { m[r][c] = (fb >>> i) & 1; }));
+      const p = penalty(m, n);
+      if (!best || p < best.p) best = { p, m };
+    }
+    return best.m;
+  }
+  function toSVG(text, opt) {
+    opt = opt || {};
+    const m = encode(text), n = m.length, q = opt.quiet === undefined ? 4 : opt.quiet, W = n + q * 2;
+    let d = '';
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (m[r][c]) d += 'M' + (c + q) + ' ' + (r + q) + 'h1v1h-1z';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + W + '" shape-rendering="crispEdges" class="' + (opt.cls || 'qrsvg') + '" role="img" aria-label="QRコード"><rect width="' + W + '" height="' + W + '" fill="#fff"/><path d="' + d + '" fill="#000"/></svg>';
+  }
+
+  // ---------------------------------------------------------------- 読み取り
+  function binarize(img) {
+    const w = img.width, h = img.height, px = img.data, g = new Uint8Array(w * h);
+    for (let i = 0, j = 0; i < g.length; i++, j += 4) g[i] = (px[j] * 77 + px[j + 1] * 150 + px[j + 2] * 29) >> 8;
+    // 3×3 でならす（カメラのざらつき対策）
+    const g0 = g.slice();
+    const raw = g.slice();
+    for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) { const i = y * w + x; g[i] = (g0[i - w - 1] + g0[i - w] + g0[i - w + 1] + g0[i - 1] + g0[i] + g0[i + 1] + g0[i + w - 1] + g0[i + w] + g0[i + w + 1]) / 9; }
+    const R = Math.max(6, Math.round(Math.min(w, h) / 14));
+    const adapt = g => {
+    const I = new Uint32Array((w + 1) * (h + 1));
+    for (let y = 0; y < h; y++) { let s = 0; for (let x = 0; x < w; x++) { s += g[y * w + x]; I[(y + 1) * (w + 1) + x + 1] = I[y * (w + 1) + x + 1] + s; } }
+    const ad = new Uint8Array(w * h);
+    for (let y = 0; y < h; y++) {
+      const y0 = Math.max(0, y - R), y1 = Math.min(h, y + R + 1);
+      for (let x = 0; x < w; x++) {
+        const x0 = Math.max(0, x - R), x1 = Math.min(w, x + R + 1);
+        const sum = I[y1 * (w + 1) + x1] - I[y0 * (w + 1) + x1] - I[y1 * (w + 1) + x0] + I[y0 * (w + 1) + x0];
+        const mean = sum / ((x1 - x0) * (y1 - y0));
+        ad[y * w + x] = g[y * w + x] < mean - 6 ? 1 : 0;
+      }
+    }
+    return ad;
+    };
+    // 大津の方法（全体で1つのしきい値）も用意しておく
+    const hist = new Array(256).fill(0); for (let i = 0; i < g.length; i++) hist[g[i]]++;
+    let sum = 0; for (let i = 0; i < 256; i++) sum += i * hist[i];
+    let wB = 0, sB = 0, best = 0, th = 128;
+    for (let t = 0; t < 256; t++) { wB += hist[t]; if (!wB) continue; const wF = g.length - wB; if (!wF) break; sB += t * hist[t]; const mB = sB / wB, mF = (sum - sB) / wF, between = wB * wF * (mB - mF) * (mB - mF); if (between > best) { best = between; th = t; } }
+    const ot = new Uint8Array(w * h); for (let i = 0; i < g.length; i++) ot[i] = g[i] <= th ? 1 : 0;
+    return [adapt(g), ot, adapt(raw)];
+  }
+  function ratioOK(c) {
+    const t = c[0] + c[1] + c[2] + c[3] + c[4];
+    if (t < 7) return false;
+    const u = t / 7, tol = u * 0.7;
+    return Math.abs(c[0] - u) < tol && Math.abs(c[1] - u) < tol && Math.abs(c[2] - 3 * u) < 3 * tol && Math.abs(c[3] - u) < tol && Math.abs(c[4] - u) < tol;
+  }
+  // 一直線（縦・横）に 1:1:3:1:1 を確かめて、中心と長さを返す
+  function cross(B, w, h, cx, cy, dx, dy, maxLen) {
+    const at = (x, y) => (x >= 0 && y >= 0 && x < w && y < h) ? B[y * w + x] : -1;
+    const c = [0, 0, 0, 0, 0];
+    let x = cx, y = cy;
+    while (at(x, y) === 1 && c[2] <= maxLen) { c[2]++; x -= dx; y -= dy; }
+    while (at(x, y) === 0 && c[1] <= maxLen) { c[1]++; x -= dx; y -= dy; }
+    while (at(x, y) === 1 && c[0] <= maxLen) { c[0]++; x -= dx; y -= dy; }
+    const back = c[2] + c[1] + c[0];
+    x = cx + dx; y = cy + dy;
+    let fwd2 = 0;
+    while (at(x, y) === 1 && c[2] <= maxLen) { c[2]++; fwd2++; x += dx; y += dy; }
+    while (at(x, y) === 0 && c[3] <= maxLen) { c[3]++; x += dx; y += dy; }
+    while (at(x, y) === 1 && c[4] <= maxLen) { c[4]++; x += dx; y += dy; }
+    if (!ratioOK(c)) return null;
+    // 中心の黒の真ん中（cx,cy からの位置）
+    const off = (fwd2 - (c[2] - fwd2 - 1)) / 2;
+    return { off, total: c[0] + c[1] + c[2] + c[3] + c[4] };
+  }
+  function findFinders(B, w, h) {
+    const found = [];
+    for (let y = 0; y < h; y += 1) {
+      const runs = []; let col = B[y * w], len = 0, start = 0;
+      for (let x = 0; x <= w; x++) {
+        const v = x < w ? B[y * w + x] : -1;
+        if (v === col) len++; else { runs.push([col, len, start]); col = v; len = 1; start = x; }
+      }
+      for (let i = 0; i + 4 < runs.length; i++) {
+        if (runs[i][0] !== 1) continue;
+        const c = [runs[i][1], runs[i + 1][1], runs[i + 2][1], runs[i + 3][1], runs[i + 4][1]];
+        if (runs[i + 4][0] !== 1 || !ratioOK(c)) continue;
+        const tot = c[0] + c[1] + c[2] + c[3] + c[4];
+        let cx = Math.round(runs[i + 2][2] + c[2] / 2 - 0.5);
+        const v = cross(B, w, h, cx, y, 0, 1, tot * 2);
+        if (!v) continue;
+        const cy = Math.round(y + v.off);
+        const hz = cross(B, w, h, cx, cy, 1, 0, tot * 2);
+        if (!hz) continue;
+        const fx = cx + hz.off, fy = cy, ms = (hz.total + v.total) / 14;
+        const vv = cross(B, w, h, Math.round(fx), cy, 0, 1, tot * 2);
+        const fy2 = vv ? cy + vv.off : fy;
+        const hit = found.find(f => Math.abs(f.x - fx) < f.ms * 2.5 && Math.abs(f.y - fy2) < f.ms * 2.5 && Math.abs(f.ms - ms) < f.ms * 0.6);
+        if (hit) { hit.x = (hit.x * hit.n + fx) / (hit.n + 1); hit.y = (hit.y * hit.n + fy2) / (hit.n + 1); hit.ms = (hit.ms * hit.n + ms) / (hit.n + 1); hit.n++; }
+        else found.push({ x: fx, y: fy2, ms, n: 1 });
+        i += 4;
+      }
+    }
+    return found;
+  }
+  function solve(A, b) {
+    const n = b.length;
+    for (let i = 0; i < n; i++) {
+      let p = i; for (let r = i + 1; r < n; r++) if (Math.abs(A[r][i]) > Math.abs(A[p][i])) p = r;
+      if (Math.abs(A[p][i]) < 1e-12) return null;
+      [A[i], A[p]] = [A[p], A[i]]; [b[i], b[p]] = [b[p], b[i]];
+      for (let r = 0; r < n; r++) if (r !== i) { const f = A[r][i] / A[i][i]; for (let k = i; k < n; k++) A[r][k] -= f * A[i][k]; b[r] -= f * b[i]; }
+    }
+    return b.map((v, i) => v / A[i][i]);
+  }
+  // 4点の対応から射影変換（行列のマス座標 → 画像の座標）
+  function homography(src, dst) {
+    const A = [], b = [];
+    for (let i = 0; i < 4; i++) {
+      const [x, y] = src[i], [u, v] = dst[i];
+      A.push([x, y, 1, 0, 0, 0, -u * x, -u * y]); b.push(u);
+      A.push([0, 0, 0, x, y, 1, -v * x, -v * y]); b.push(v);
+    }
+    const h = solve(A, b); if (!h) return null;
+    return (x, y) => { const d = h[6] * x + h[7] * y + 1; return [(h[0] * x + h[1] * y + h[2]) / d, (h[3] * x + h[4] * y + h[5]) / d]; };
+  }
+  const SAMP = [[0, 0], [-0.22, -0.22], [0.22, -0.22], [-0.22, 0.22], [0.22, 0.22]];
+  function readGrid(B, w, h, map, n) {
+    const g = [];
+    for (let r = 0; r < n; r++) {
+      const row = new Uint8Array(n);
+      for (let c = 0; c < n; c++) {
+        let on = 0;
+        for (const [ox, oy] of SAMP) { const [x, y] = map(c + 0.5 + ox, r + 0.5 + oy); const xi = Math.round(x - 0.5), yi = Math.round(y - 0.5); if (xi >= 0 && yi >= 0 && xi < w && yi < h && B[yi * w + xi]) on++; }
+        row[c] = on >= 3 ? 1 : 0;
+      }
+      g.push(row);
+    }
+    return g;
+  }
+  function readMatrix(g, v) {
+    const n = 17 + 4 * v, fc = formatCells(n);
+    let bestF = null;
+    fc.forEach(list => {
+      let bits = 0; list.forEach(([r, c], i) => { if (g[r][c]) bits |= 1 << i; });
+      FORMATS.forEach(f => { let x = f.bits ^ bits, d = 0; while (x) { d += x & 1; x >>>= 1; } if (!bestF || d < bestF.d) bestF = { d, f }; });
+    });
+    if (!bestF || bestF.d > 3 || bestF.f.ecl !== 0) return null;
+    const mk = bestF.f.mask, Bs = base(v), cells = dataCells(n, Bs.fn);
+    const bl = blocksOf(v), total = bl.data.reduce((a, b) => a + b, 0) + bl.ec * bl.data.length;
+    const cw = new Array(total).fill(0);
+    for (let i = 0; i < total * 8; i++) { const [y, x] = cells[i]; const bit = g[y][x] ^ (MASK[mk](x, y) ? 1 : 0); cw[i >> 3] |= bit << (7 - (i & 7)); }
+    const blocks = bl.data.map(() => []);
+    let o = 0;
+    const maxD = Math.max.apply(null, bl.data);
+    for (let i = 0; i < maxD; i++) bl.data.forEach((len, k) => { if (i < len) blocks[k].push(cw[o++]); });
+    for (let i = 0; i < bl.ec; i++) blocks.forEach(b => b.push(cw[o++]));
+    const data = [];
+    for (let k = 0; k < blocks.length; k++) { const fixed = rsDec(blocks[k], bl.ec); if (!fixed) return null; data.push.apply(data, fixed.slice(0, bl.data[k])); }
+    let bp = 0;
+    const take = len => { let v2 = 0; for (let i = 0; i < len; i++) { v2 = v2 << 1 | ((data[(bp >> 3)] >>> (7 - (bp & 7))) & 1); bp++; } return v2; };
+    if (take(4) !== 4) return null;
+    const len = take(8);
+    if (len * 8 + 12 > data.length * 8) return null;
+    const bytes = new Uint8Array(len); for (let i = 0; i < len; i++) bytes[i] = take(8);
+    try { return new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch (e) { return null; }
+  }
+  function tryTriple(B, w, h, A, P, Q) {
+    // A=左上・P=右上・Q=左下（向きを外積で決める）
+    const cr = (P.x - A.x) * (Q.y - A.y) - (P.y - A.y) * (Q.x - A.x);
+    const orders = cr > 0 ? [[P, Q], [Q, P]] : [[Q, P], [P, Q]];
+    const ms = (A.ms + P.ms + Q.ms) / 3;
+    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    const est = ((dist(A, P) + dist(A, Q)) / 2) / ms + 7;
+    // 斜めのときは見かけの大きさがずれるので、型番は近い順に全部試す
+    const vs = [1, 2, 3, 4, 5, 6].sort((a, b) => Math.abs(17 + 4 * a - est) - Math.abs(17 + 4 * b - est));
+    for (const [TR, BL] of orders) for (const v of vs) {
+      const n = 17 + 4 * v, k = n - 7;
+      const ux = [(TR.x - A.x) / k, (TR.y - A.y) / k], uy = [(BL.x - A.x) / k, (BL.y - A.y) / k];
+      const aff = (x, y) => [A.x + (x - 3.5) * ux[0] + (y - 3.5) * uy[0], A.y + (x - 3.5) * ux[1] + (y - 3.5) * uy[1]];
+      const maps = [];
+      if (v >= 2) {
+        // 位置合わせの模様を予想の位置の近くで探す
+        const ap = n - 6.5, [px, py] = aff(ap, ap), rad = Math.ceil(ms * 4);
+        let best = null;
+        for (let dy = -rad; dy <= rad; dy++) for (let dx = -rad; dx <= rad; dx++) {
+          const cx = px + dx, cy = py + dy;
+          let sc = 0;
+          for (let j = -2; j <= 2; j++) for (let i = -2; i <= 2; i++) {
+            const x = Math.round(cx + i * ux[0] + j * uy[0] - 0.5), y = Math.round(cy + i * ux[1] + j * uy[1] - 0.5);
+            const want = Math.max(Math.abs(i), Math.abs(j)) !== 1 ? 1 : 0;
+            if (x >= 0 && y >= 0 && x < w && y < h && B[y * w + x] === want) sc++;
+          }
+          const dd = dx * dx + dy * dy;
+          if (!best || sc > best.sc || (sc === best.sc && dd < best.dd)) best = { sc, dd, cx, cy };
+        }
+        if (best && best.sc >= 21) {
+          const H = homography([[3.5, 3.5], [n - 3.5, 3.5], [3.5, n - 3.5], [ap, ap]], [[A.x, A.y], [TR.x, TR.y], [BL.x, BL.y], [best.cx, best.cy]]);
+          if (H) maps.push(H);
+        }
+      }
+      maps.push(aff);
+      for (const mp of maps) { const t = readMatrix(readGrid(B, w, h, mp, n), v); if (t !== null) return t; }
+    }
+    return null;
+  }
+  function decodeBinary(B, w, h) {
+    const F = findFinders(B, w, h).sort((a, b) => b.n - a.n).slice(0, 8);
+    if (F.length < 3) return null;
+    const tries = [];
+    for (let i = 0; i < F.length; i++) for (let j = i + 1; j < F.length; j++) for (let k = j + 1; k < F.length; k++) {
+      const t = [F[i], F[j], F[k]], mss = t.map(f => f.ms);
+      if (Math.max.apply(null, mss) > Math.min.apply(null, mss) * 1.7) continue;
+      const d = [[1, 2], [0, 2], [0, 1]].map(([a, b]) => Math.hypot(t[a].x - t[b].x, t[a].y - t[b].y));
+      const top = d.indexOf(Math.max.apply(null, d)), o = [0, 1, 2].filter(x => x !== top);
+      const legs = [d[o[0]], d[o[1]]], hyp = d[top];
+      const err = Math.abs(legs[0] - legs[1]) / Math.max(legs[0], legs[1]) + Math.abs(hyp / Math.hypot(legs[0], legs[1]) - 1);
+      if (err > 0.5 || Math.min(legs[0], legs[1]) < t[0].ms * 10) continue;
+      tries.push({ err: err - (F[i].n + F[j].n + F[k].n) * 0.002, A: t[top], P: t[o[0]], Q: t[o[1]] });
+    }
+    tries.sort((a, b) => a.err - b.err);
+    for (const t of tries.slice(0, 6)) { const r = tryTriple(B, w, h, t.A, t.P, t.Q); if (r !== null) return r; }
+    return null;
+  }
+  // 画像（ImageData）→ 文字列（読めなければ null）
+  function decode(img) {
+    const bins = binarize(img);
+    for (const B of bins) { const r = decodeBinary(B, img.width, img.height); if (r !== null) return r; }
+    return null;
+  }
+  return { encode, toSVG, decode, _rs: { rsEnc, rsDec } };
+})();
+
+/* ---------------------------------------------------------------- タブレット計時（?timer で開く）とパソコンでの読み込み
+   タブレット: スタートと各レーンのゴールをタップ → 組ごとの QR を表示。
+   パソコン: カメラで QR を読む → 内容を確認して公式タイムへ。データは端末の外へ送らない。 */
+const TM_KEY = 'swim-meet-app/timer';
+const tmCs = ms => Math.max(0, Math.floor(ms / 10));
+function tmFmt(cs) { if (!(cs >= 0)) return ''; const m = Math.floor(cs / 6000), r = cs - m * 6000, s = Math.floor(r / 100), c = r % 100; return (m ? m + ':' + String(s).padStart(2, '0') : String(s)) + '.' + String(c).padStart(2, '0'); }
+function tmCheck(s) { let v = 0; for (let i = 0; i < s.length; i++) v = (v + s.charCodeAt(i) * (i + 1)) % 1296; return v.toString(36).toUpperCase().padStart(2, '0'); }
+// コード: SMB1|競技No|組|レーン:1/100秒,…|確認
+function tmCode(no, heat, times) {
+  const body = 'SMB1|' + no + '|' + heat + '|' + Object.keys(times).map(Number).sort((a, b) => a - b).map(l => l + ':' + times[l]).join(',');
+  return body + '|' + tmCheck(body);
+}
+function tmParse(text) {
+  const t = String(text || '').trim().replace(/[｜]/g, '|').replace(/[：]/g, ':').replace(/[，、]/g, ',').replace(/\s+/g, '');
+  const m = t.match(/^SMB1\|(\d{1,3})\|(\d{1,3})\|((?:\d{1,2}:\d{1,6},?)*)\|([0-9A-Za-z]{2})$/);
+  if (!m) return { err: 'スイム計時のコードではありません' };
+  const body = t.slice(0, t.lastIndexOf('|'));
+  if (tmCheck(body) !== m[4].toUpperCase()) return { err: 'コードの一部が違います（確認の文字が合いません）' };
+  const times = m[3] ? m[3].split(',').filter(Boolean).map(x => x.split(':').map(Number)) : [];
+  return { no: +m[1], heat: +m[2], times, code: t };
+}
+const tmNow = () => (performance.timeOrigin || Date.now() - performance.now()) + performance.now();
+
+// ---------------------------------------------------------------- タブレットの画面
+const Timer = (function () {
+  let S, root, raf = 0, wake = null, armed = {};
+  function loadS() {
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem(TM_KEY) || 'null'); } catch (e) { s = null; }
+    s = s && typeof s === 'object' ? s : {};
+    return { no: s.no > 0 ? s.no : 1, heat: s.heat > 0 ? s.heat : 1, l0: s.l0 >= 0 ? s.l0 : 1, l1: s.l1 > 0 ? s.l1 : 6, t0: s.t0 || null, times: s.times && typeof s.times === 'object' ? s.times : {}, hist: Array.isArray(s.hist) ? s.hist : [], shown: !!s.shown };
+  }
+  function saveS() { try { localStorage.setItem(TM_KEY, JSON.stringify(S)); } catch (e) { /* 保存できなくても計測は続ける */ } }
+  const lanes = () => { const a = []; for (let l = Math.min(S.l0, S.l1); l <= Math.max(S.l0, S.l1); l++) a.push(l); return a; };
+  const nTimes = () => Object.keys(S.times).length;
+  function keepAwake(on) {
+    try {
+      if (on && !wake && navigator.wakeLock) navigator.wakeLock.request('screen').then(w => { wake = w; w.addEventListener('release', () => { wake = null; }); }).catch(() => {});
+      if (!on && wake) { wake.release(); wake = null; }
+    } catch (e) { /* 対応していない端末 */ }
+  }
+  function draw() {
+    const run = !!S.t0, n = nTimes();
+    const lane = l => {
+      const t = S.times[l];
+      return '<div class="tm-lane' + (t !== undefined ? ' done' : '') + '"><button type="button" class="tm-lbtn" data-lane="' + l + '"' + (run && t === undefined ? '' : ' disabled') + ' aria-label="' + l + 'レーンのゴール"><span class="tm-ln">' + l + '<small>レーン</small></span><span class="tm-lt">' + (t !== undefined ? tmFmt(t) : run ? 'ゴールでタップ' : '—') + '</span></button>' +
+        (t !== undefined ? '<button type="button" class="tm-x' + (armed['x' + l] ? ' arm' : '') + '" data-t="x" data-l="' + l + '">' + (armed['x' + l] ? 'もう一度で取消' : '取消') + '</button>' : '') + '</div>';
+    };
+    root.innerHTML = '<div class="tm-wrap">' +
+      '<header class="tm-top"><b>スイム計時</b><span class="tm-sub">タップした瞬間のタイムを 1/100 秒で記録します（手動計時）</span><button type="button" class="tm-btn" data-t="set">設定</button></header>' +
+      '<div class="tm-race">' +
+        '<div class="tm-step"><small>競技No.</small><button type="button" data-t="no" data-d="-1"' + (run || S.no <= 1 ? ' disabled' : '') + ' aria-label="競技No.を減らす">−</button><b>' + S.no + '</b><button type="button" data-t="no" data-d="1"' + (run ? ' disabled' : '') + ' aria-label="競技No.を増やす">＋</button></div>' +
+        '<div class="tm-step"><small>組</small><button type="button" data-t="heat" data-d="-1"' + (run || S.heat <= 1 ? ' disabled' : '') + ' aria-label="組を減らす">−</button><b>' + S.heat + '</b><button type="button" data-t="heat" data-d="1"' + (run ? ' disabled' : '') + ' aria-label="組を増やす">＋</button></div>' +
+      '</div>' +
+      '<div class="tm-clock" id="tm-clock">' + (run ? tmFmt(tmCs(tmNow() - S.t0)) : '0.00') + '</div>' +
+      (run ? '<button type="button" class="tm-cancel' + (armed.cancel ? ' arm' : '') + '" data-t="cancel">' + (armed.cancel ? 'もう一度押すとスタートを取り消します' : 'スタートを取り消す（フライングなど）') + '</button>'
+        : '<button type="button" class="tm-start" data-t="start">スタート</button>') +
+      '<div class="tm-lanes" style="--tmcl:' + Math.ceil(lanes().length / Math.ceil(lanes().length / 4)) + ';--tmcp:' + Math.ceil(lanes().length / Math.ceil(lanes().length / 2)) + '">' + lanes().map(lane).join('') + '</div>' +
+      '<div class="tm-foot"><button type="button" class="tm-btn big primary" data-t="qr"' + (n ? '' : ' disabled') + '>QRを表示（' + n + 'レーン）</button><button type="button" class="tm-btn big" data-t="next">次の組へ →</button></div>' +
+      (S.hist.length ? '<details class="tm-hist"><summary>これまでの組（' + S.hist.length + '）— もう一度QRを出せます</summary>' +
+        S.hist.slice().reverse().map((h, i) => '<button type="button" class="tm-hrow" data-t="hq" data-i="' + (S.hist.length - 1 - i) + '"><b>No.' + h.no + ' 第' + h.heat + '組</b><span>' + Object.keys(h.times).length + 'レーン</span><span class="tm-hat">' + new Date(h.at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) + '</span></button>').join('') +
+        '<button type="button" class="tm-btn sm" data-t="hclear">' + (armed.hclear ? 'もう一度押すと消します' : 'この一覧を消す') + '</button></details>' : '') +
+      '</div>';
+    tick();
+  }
+  function tick() {
+    cancelAnimationFrame(raf);
+    if (!S.t0) return;
+    const el = document.getElementById('tm-clock');
+    if (el) el.textContent = tmFmt(tmCs(tmNow() - S.t0));
+    raf = requestAnimationFrame(tick);
+  }
+  function arm(k) { const was = armed[k]; armed = {}; if (was) return true; armed[k] = 1; setTimeout(() => { if (armed[k]) { delete armed[k]; draw(); } }, 3000); draw(); return false; }
+  function record() {
+    if (!nTimes()) return;
+    const h = { no: S.no, heat: S.heat, times: Object.assign({}, S.times), at: Date.now() };
+    S.hist = S.hist.filter(x => !(x.no === h.no && x.heat === h.heat));
+    S.hist.push(h); if (S.hist.length > 300) S.hist = S.hist.slice(-300);
+    return h;
+  }
+  function showQR(h) {
+    const code = tmCode(h.no, h.heat, h.times);
+    const ov = document.createElement('div');
+    ov.className = 'tm-ov';
+    ov.innerHTML = '<div class="tm-qrbox">' + QR.toSVG(code, { cls: 'tm-qr' }) + '</div>' +
+      '<div class="tm-qrinfo"><b>No.' + h.no + '　第' + h.heat + '組</b><div class="tm-qrt">' + Object.keys(h.times).map(Number).sort((a, b) => a - b).map(l => '<span><small>' + l + '</small>' + tmFmt(h.times[l]) + '</span>').join('') + '</div>' +
+      '<p>パソコンの「組・記録」→「タブレット」でこのQRをカメラに向けてください。</p><code class="tm-code">' + code + '</code></div>' +
+      '<div class="tm-ovbtns"><button type="button" class="tm-btn big" data-o="close">閉じる</button>' + (h.no === S.no && h.heat === S.heat ? '<button type="button" class="tm-btn big primary" data-o="next">次の組へ →</button>' : '') + '</div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', e => { const b = e.target.closest('[data-o]'); if (!b) return; ov.remove(); if (b.dataset.o === 'next') next(); });
+  }
+  function next() {
+    record();
+    S.t0 = null; S.times = {}; S.heat++; S.shown = false; armed = {};
+    keepAwake(false); saveS(); draw();
+  }
+  function settings() {
+    const ov = document.createElement('div');
+    ov.className = 'tm-ov tm-set';
+    const opt = (v, cur) => '<option' + (v === cur ? ' selected' : '') + '>' + v + '</option>';
+    const r = []; for (let i = 0; i <= 10; i++) r.push(i);
+    ov.innerHTML = '<div class="tm-setbox"><h2>設定</h2>' +
+      '<label>使うレーン <select id="tm-l0">' + r.map(v => opt(v, S.l0)).join('') + '</select> 〜 <select id="tm-l1">' + r.slice(1).map(v => opt(v, S.l1)).join('') + '</select></label>' +
+      '<p>・ピストル（スタートの合図）でスタート、各レーンのゴールのタッチで、そのレーンのボタンを押します。押した瞬間のタイムが入ります。</p>' +
+      '<p>・手動計時なので、押す人の反応の分だけずれます。パソコンに入れる前に確認画面で見直せます。</p>' +
+      '<p>・1台で全レーンを計っても、レーンごとに1台ずつでも使えます（QRには計ったレーンだけが入ります）。</p>' +
+      '<p>・この画面はインターネットがなくても動きます。選手の名前などのデータはタブレットには入りません。</p>' +
+      '<div class="tm-ovbtns"><button type="button" class="tm-btn big primary" data-o="ok">閉じる</button></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', e => {
+      if (!e.target.closest('[data-o]')) return;
+      const a = +ov.querySelector('#tm-l0').value, b = +ov.querySelector('#tm-l1').value;
+      S.l0 = Math.min(a, b); S.l1 = Math.max(a, b);
+      Object.keys(S.times).forEach(l => { if (+l < S.l0 || +l > S.l1) delete S.times[l]; });
+      saveS(); ov.remove(); draw();
+    });
+  }
+  function onDown(e) {
+    // ゴールは押した瞬間（指が触れた時）に記録する
+    const b = e.target.closest('.tm-lbtn');
+    if (!b || b.disabled || !S.t0) return;
+    const t = tmCs(tmNow() - S.t0), l = +b.dataset.lane;
+    if (S.times[l] !== undefined) return;
+    e.preventDefault();
+    S.times[l] = t; saveS();
+    if (navigator.vibrate) try { navigator.vibrate(30); } catch (er) { /* なし */ }
+    draw();
+  }
+  function onClick(e) {
+    const b = e.target.closest('[data-t]');
+    if (!b || b.disabled) return;
+    const t = b.dataset.t, d = +b.dataset.d || 0;
+    if (t === 'start') { if (S.t0) return; S.t0 = tmNow(); S.times = {}; armed = {}; keepAwake(true); saveS(); draw(); }
+    else if (t === 'cancel') { if (arm('cancel')) { S.t0 = null; S.times = {}; keepAwake(false); saveS(); draw(); } }
+    else if (t === 'x') { const l = b.dataset.l; if (arm('x' + l)) { delete S.times[l]; saveS(); draw(); } }
+    else if (t === 'no') { S.no = Math.max(1, S.no + d); S.heat = 1; saveS(); draw(); }
+    else if (t === 'heat') { S.heat = Math.max(1, S.heat + d); saveS(); draw(); }
+    else if (t === 'qr') { const h = record(); if (h) { S.shown = true; saveS(); draw(); showQR(h); } }
+    else if (t === 'next') next();
+    else if (t === 'set') settings();
+    else if (t === 'hq') { const h = S.hist[+b.dataset.i]; if (h) showQR(h); }
+    else if (t === 'hclear') { if (arm('hclear')) { S.hist = []; saveS(); draw(); } }
+  }
+  function start() {
+    document.documentElement.classList.add('tmode');
+    document.title = 'スイム計時';
+    root = document.createElement('div');
+    root.id = 'timer-root';
+    document.body.appendChild(root);
+    S = loadS();
+    root.addEventListener('pointerdown', onDown);
+    root.addEventListener('click', onClick);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S.t0) { wake = null; keepAwake(true); tick(); } });
+    draw();
+  }
+  return { start, _s: () => S };
+})();
+
+// ---------------------------------------------------------------- パソコン: カメラで読む → 確認 → 公式タイムへ
+function tabletMatch(P) {
+  const row = D.sched.rows.find(r => r.no === P.no && r.name && !r.isBreak);
+  if (!row) return { err: '競技No.' + P.no + ' は進行スケジュールにありません（タブレットの競技No.を確かめてください）' };
+  const name = row.name, relay = C.isRelayName(name), src = relay ? D.rel : D.ind;
+  const items = src.filter(it => it.program === name && it.event && it.heat === P.heat);
+  if (!items.length) return { err: 'No.' + P.no + '「' + name + '」に第' + P.heat + '組はありません' };
+  const opt = { threeDigit: state.settings.threeDigit };
+  const rows = P.times.map(([ln, cs]) => {
+    const it = items.find(i => i.lane === ln) || null;
+    const cur = it ? String((relay ? it.r : it.e).officialTime || '') : '';
+    const pc = cur ? C.parseTime(cur, opt) : null;
+    const same = !!(pc && pc.kind === 'time' && Math.abs(pc.sec - cs / 100) < 0.005);
+    return { ln, cs, txt: C.fmtTime(cs / 100), it, cur, same, on: !!it && !cur };
+  });
+  const missing = items.filter(it => it.lane && !P.times.some(t => t[0] === it.lane));
+  return { name, relay, rows, missing, no: P.no, heat: P.heat, code: P.code };
+}
+function openTabletReader() {
+  let stream = null, alive = true, lastBad = '', paused = false;
+  const appUrl = location.origin + location.pathname.replace(/index\.html$/, '') + '?timer';
+  const det = ('BarcodeDetector' in window) ? (() => { try { return new BarcodeDetector({ formats: ['qr_code'] }); } catch (e) { return null; } })() : null;
+  const cv = document.createElement('canvas'), cx = cv.getContext('2d', { willReadFrequently: true });
+  modal('<h2>タブレットの計測を読み込む</h2>' +
+    '<div class="tr-body"><div class="tr-cam"><video playsinline muted autoplay></video><div class="tr-aim"></div><p class="tr-msg">カメラを準備しています…</p></div>' +
+    '<div class="tr-side"><p class="small">タブレットで「QRを表示」した画面を、このパソコンのカメラに向けてください。読み取ったら、入れる前に内容を確認できます。</p>' +
+      '<label class="field"><span>読めないときは、QRの下のコードを入力</span><span class="tr-row"><input id="tr-code" placeholder="SMB1|…" autocomplete="off" spellcheck="false"><button type="button" class="btn" id="tr-go">読み込む</button></span></label>' +
+      '<details class="tr-help"><summary>タブレットで計測画面を開くには</summary><div class="tr-urlqr">' + QR.toSVG(appUrl, { cls: 'tr-qr' }) + '</div><p class="small">タブレットのカメラでこのQRを読むか、次のアドレスを開きます。<br><code>' + esc(appUrl) + '</code></p><p class="small muted">計測画面は一度開けば、インターネットがなくても動きます。選手の名前などのデータはタブレットに送りません。</p></details>' +
+    '</div></div>' +
+    '<div class="tr-result" hidden></div>' +
+    '<div class="actions"><button class="btn" data-close>閉じる</button></div>', (m, close) => {
+    m.classList.add('tr-modal');
+    const video = m.querySelector('video'), msg = m.querySelector('.tr-msg'), body = m.querySelector('.tr-body'), res = m.querySelector('.tr-result');
+    const setMsg = (t, cls) => { msg.textContent = t; msg.className = 'tr-msg' + (cls ? ' ' + cls : ''); };
+    const stop = () => { alive = false; if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; };
+    const gone = () => !document.body.contains(m);
+    const got = text => {
+      const P = tmParse(text);
+      if (P.err) { if (text !== lastBad) { lastBad = text; setMsg(P.err, 'ng'); } return false; }
+      const R = tabletMatch(P);
+      if (R.err) { if (text !== lastBad) { lastBad = text; setMsg(R.err, 'ng'); } return false; }
+      paused = true; showResult(R); return true;
+    };
+    const showResult = R => {
+      body.hidden = true; res.hidden = false;
+      const who = it => it ? esc(R.relay ? it.teamDisp : it.np.kanji) + '<small>' + esc(R.relay ? it.cat : it.club) + '</small>' : '<span class="muted">（このレーンに選手はいません）</span>';
+      res.innerHTML = '<p class="tr-head"><b>No.' + R.no + '　' + esc(R.name) + '　第' + R.heat + '組</b><span class="pill info">' + R.rows.length + 'レーン</span></p>' +
+        '<table class="t tr-t"><thead><tr><th class="c">入れる</th><th class="c">レーン</th><th>' + (R.relay ? 'チーム' : '氏名') + '</th><th class="c">いまの公式タイム</th><th class="c">タブレット</th></tr></thead><tbody>' +
+        R.rows.map((r, i) => '<tr class="' + (!r.it ? 'emp' : r.same ? 'same' : r.cur ? 'over' : '') + '"><td class="c"><input type="checkbox" data-i="' + i + '"' + (r.on ? ' checked' : '') + (!r.it || r.same ? ' disabled' : '') + ' aria-label="' + r.ln + 'レーンを入れる"></td><td class="c"><span class="lane">' + r.ln + '</span></td><td class="nm">' + who(r.it) + '</td>' +
+          '<td class="c tm">' + (r.cur ? esc(r.cur) : '<span class="muted">未入力</span>') + (r.same ? ' <span class="pill ok">同じ</span>' : r.cur && r.it ? ' <span class="pill warn">上書き</span>' : '') + '</td><td class="c tm"><b>' + esc(r.txt) + '</b></td></tr>').join('') +
+        '</tbody></table>' +
+        (R.missing.length ? '<p class="small muted">タブレットに記録がないレーン: ' + R.missing.map(it => it.lane + 'レーン').join('・') + '（そのままにします）</p>' : '') +
+        (R.rows.some(r => r.cur && r.it && !r.same) ? '<p class="small">「上書き」は、もう公式タイムが入っているレーンです。入れ替えるときだけ印を付けてください。</p>' : '') +
+        '<p class="small muted">タブレットのタイムは手動計時です。おかしな値がないか確かめてから入れてください。</p>' +
+        '<div class="actions"><button type="button" class="btn" id="tr-again">読み直す</button><button type="button" class="btn primary" id="tr-ok">公式タイムに入れる</button></div>';
+      const ok = res.querySelector('#tr-ok');
+      const upd = () => { const n = res.querySelectorAll('input[type=checkbox]:checked').length; ok.disabled = !n; ok.textContent = n ? '公式タイムに入れる（' + n + 'レーン）' : '入れるレーンを選んでください'; };
+      res.querySelectorAll('input[type=checkbox]').forEach(c => c.addEventListener('change', upd)); upd();
+      res.querySelector('#tr-again').addEventListener('click', () => { res.hidden = true; body.hidden = false; paused = false; lastBad = ''; setMsg('タブレットのQRをカメラに向けてください'); });
+      ok.addEventListener('click', () => {
+        const pick = [...res.querySelectorAll('input[type=checkbox]:checked')].map(c => R.rows[+c.dataset.i]).filter(r => r.it);
+        if (!pick.length) return;
+        const did = commit('タブレット計測の反映（No.' + R.no + ' 第' + R.heat + '組）', s => {
+          const arr = R.relay ? s.relays : s.entries;
+          pick.forEach(r => { const o = arr.find(x => x.id === r.it.id); if (o) o.officialTime = r.txt; });
+        }, { allowLocked: true });
+        if (!did) return;
+        ui.prog = R.name; ui.progHeat = R.heat;
+        toast('No.' + R.no + ' 第' + R.heat + '組: ' + pick.length + 'レーンの公式タイムを入れました');
+        res.innerHTML = '<p class="tr-done"><b>入れました</b>　No.' + R.no + ' ' + esc(R.name) + ' 第' + R.heat + '組（' + pick.length + 'レーン）</p>' +
+          '<div class="actions"><button type="button" class="btn" id="tr-close">閉じる</button><button type="button" class="btn primary" id="tr-next">続けて次の組を読む</button></div>';
+        res.querySelector('#tr-close').addEventListener('click', close);
+        res.querySelector('#tr-next').addEventListener('click', () => { res.hidden = true; body.hidden = false; paused = false; lastBad = R.code; setMsg('次の組のQRをカメラに向けてください'); });
+      });
+    };
+    m.querySelector('#tr-go').addEventListener('click', () => { const v = m.querySelector('#tr-code').value; if (v.trim()) got(v); });
+    m.querySelector('#tr-code').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); const v = e.target.value; if (v.trim()) got(v); } });
+    const loop = async () => {
+      if (gone()) { stop(); return; }
+      if (!alive) return;
+      if (!paused && video.readyState >= 2 && video.videoWidth) {
+        const k = Math.min(1, 800 / Math.max(video.videoWidth, video.videoHeight));
+        cv.width = Math.round(video.videoWidth * k); cv.height = Math.round(video.videoHeight * k);
+        cx.drawImage(video, 0, 0, cv.width, cv.height);
+        let text = null;
+        if (det) { try { const r = await det.detect(cv); if (r && r[0]) text = r[0].rawValue; } catch (e) { /* 予備へ */ } }
+        if (text === null) { try { text = QR.decode(cx.getImageData(0, 0, cv.width, cv.height)); } catch (e) { text = null; } }
+        if (text !== null && text !== lastBad) got(text);
+      }
+      setTimeout(loop, 150);
+    };
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { setMsg('このブラウザではカメラを使えません。右のコード入力を使ってください', 'ng'); return; }
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }).then(st => {
+      if (gone()) { st.getTracks().forEach(t => t.stop()); return; }
+      stream = st; video.srcObject = st;
+      const fm = (st.getVideoTracks()[0].getSettings() || {}).facingMode;
+      if (fm !== 'environment') video.classList.add('mirror');
+      video.play().catch(() => {});
+      setMsg('タブレットのQRをカメラに向けてください');
+      loop();
+    }).catch(e => {
+      setMsg((e && e.name === 'NotAllowedError') ? 'カメラの使用が許可されていません。アドレスバーのカメラの設定で許可するか、右のコード入力を使ってください' : 'カメラが見つかりません。右のコード入力を使ってください', 'ng');
+    });
+  });
+}
+
 /* ---------------------------------------------------------------- エントリー用Excel（配布 → 記入 → 締め切り後に読み込み） */
 const EntryForm = (() => {
   // ---- 最小限の xlsx 書き出し（ライブラリ不要・オフライン可。プルダウンの入力規則つき）
@@ -6517,6 +7267,11 @@ function makeSample() {
 /* ---------------------------------------------------------------- 起動 */
 (function boot() {
   load();
+  if (TIMER_MODE) {
+    Timer.start();
+    if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+    return;
+  }
   applyFit();
   view = (location.hash || '#home').slice(1) || 'home';
   if (!VIEWS[view]) view = 'home';
