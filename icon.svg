@@ -1,13 +1,51 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- スイム大会運営ボード: 泳ぐ人（腕・頭）と1本の水の流れ。上の明るい青から深い紺へ -->
+  <!-- スイム大会運営ボード: 透き通った水の水晶玉（白い台の上）。光が上から入り、下にたまって明るく抜ける -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#0E7BE8"/>
-      <stop offset="1" stop-color="#062B6B"/>
+    <radialGradient id="tile" cx=".5" cy=".35" r=".8">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset=".65" stop-color="#F2F6F9"/>
+      <stop offset="1" stop-color="#D9E2EA"/>
+    </radialGradient>
+    <radialGradient id="water" cx=".5" cy=".78" r=".78">
+      <stop offset="0" stop-color="#F2FEFF"/>
+      <stop offset=".28" stop-color="#8DE4F6"/>
+      <stop offset=".62" stop-color="#1E93D6"/>
+      <stop offset="1" stop-color="#083B7E"/>
+    </radialGradient>
+    <radialGradient id="edge" cx=".5" cy=".5" r=".5">
+      <stop offset=".74" stop-color="#042F66" stop-opacity="0"/>
+      <stop offset=".95" stop-color="#042F66" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#042F66" stop-opacity=".5"/>
+    </radialGradient>
+    <radialGradient id="pool" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset=".55" stop-color="#E4FDFF" stop-opacity=".75"/>
+      <stop offset="1" stop-color="#BDF6FF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".9"/>
+      <stop offset=".55" stop-color="#FFFFFF" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
     </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".95"/>
+      <stop offset=".45" stop-color="#FFFFFF" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#DFFBFF" stop-opacity=".85"/>
+    </linearGradient>
+    <filter id="b12" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="12"/></filter>
+    <filter id="b4" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3.5"/></filter>
+    <filter id="b16" x="-40%" y="-60%" width="180%" height="220%"><feGaussianBlur stdDeviation="16"/></filter>
+    <clipPath id="ball"><circle cx="256" cy="246" r="174"/></clipPath>
   </defs>
-  <rect width="512" height="512" fill="url(#bg)"/>
-  <path d="M104 330 C 140 196 264 136 380 182" fill="none" stroke="#FFFFFF" stroke-width="50" stroke-linecap="round"/>
-  <circle cx="392" cy="290" r="50" fill="#FFFFFF"/>
-  <path d="M80 420 C 160 380 240 450 320 410 S 432 390 432 390" fill="none" stroke="#7FE0FF" stroke-width="30" stroke-linecap="round"/>
+  <rect width="512" height="512" fill="url(#tile)"/>
+  <ellipse cx="256" cy="438" rx="148" ry="20" fill="#0A4D8C" opacity=".26" filter="url(#b16)"/>
+  <ellipse cx="256" cy="436" rx="70" ry="9" fill="#5FD0F2" opacity=".35" filter="url(#b12)"/>
+  <circle cx="256" cy="246" r="174" fill="url(#water)"/>
+  <g clip-path="url(#ball)">
+    <ellipse cx="256" cy="378" rx="122" ry="62" fill="url(#pool)" filter="url(#b12)"/>
+    <circle cx="256" cy="246" r="174" fill="url(#edge)"/>
+    <path d="M118 176 C 150 96 362 96 394 176 C 330 150 182 150 118 176 Z" fill="url(#sky)" filter="url(#b4)"/>
+  </g>
+  <ellipse cx="200" cy="126" rx="30" ry="12" fill="#FFFFFF" opacity=".95" transform="rotate(-22 200 126)" filter="url(#b4)"/>
+  <circle cx="256" cy="246" r="172.5" fill="none" stroke="url(#rim)" stroke-width="3"/>
 </svg>

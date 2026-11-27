@@ -5,22 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>スイム大会運営ボード</title>
 <meta name="description" content="水泳大会のエントリー・組分け・進行・記録・速報・証書・表彰をブラウザだけで運営できる無料ツール">
-<meta name="theme-color" content="#0B5BC4">
+<meta name="theme-color" content="#1E93D6">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="スイム運営">
 <meta name="application-name" content="スイム運営">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="icon" href="favicon.ico?v=5" sizes="16x16 32x32">
-<link rel="icon" type="image/png" sizes="32x32" href="app-icon-32.png?v=5">
-<link rel="icon" type="image/png" sizes="192x192" href="app-icon-192.png?v=5">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8IS0tIOOCueOCpOODoOWkp+S8mumBi+WWtuODnOODvOODiTog5rOz44GQ5Lq677yI6IWV44O76aCt77yJ44GoMeacrOOBruawtOOBrua1geOCjOOAguS4iuOBruaYjuOCi+OBhOmdkuOBi+OCiea3seOBhOe0uuOBuCAtLT4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmciIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMEU3QkU4Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA2MkI2QiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9InVybCgjYmcpIi8+CiAgPHBhdGggZD0iTTEwNCAzMzAgQyAxNDAgMTk2IDI2NCAxMzYgMzgwIDE4MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjUwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8Y2lyY2xlIGN4PSIzOTIiIGN5PSIyOTAiIHI9IjUwIiBmaWxsPSIjRkZGRkZGIi8+CiAgPHBhdGggZD0iTTgwIDQyMCBDIDE2MCAzODAgMjQwIDQ1MCAzMjAgNDEwIFMgNDMyIDM5MCA0MzIgMzkwIiBmaWxsPSJub25lIiBzdHJva2U9IiM3RkUwRkYiIHN0cm9rZS13aWR0aD0iMzAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K">
-<link rel="apple-touch-icon" href="app-icon-180.png?v=5">
-<link rel="apple-touch-icon" sizes="180x180" href="app-icon-180.png?v=5">
-<link rel="apple-touch-icon" sizes="167x167" href="app-icon-167.png?v=5">
-<link rel="apple-touch-icon" sizes="152x152" href="app-icon-152.png?v=5">
-<link rel="apple-touch-icon" sizes="120x120" href="app-icon-120.png?v=5">
-<link rel="manifest" href="manifest.webmanifest?v=5">
+<link rel="icon" href="favicon.ico?v=6" sizes="16x16 32x32">
+<link rel="icon" type="image/png" sizes="32x32" href="app-icon-32.png?v=6">
+<link rel="icon" type="image/png" sizes="192x192" href="app-icon-192.png?v=6">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8IS0tIOOCueOCpOODoOWkp+S8mumBi+WWtuODnOODvOODiTog6YCP44GN6YCa44Gj44Gf5rC044Gu5rC05pm2546J77yI55m944GE5Y+w44Gu5LiK77yJ44CC5YWJ44GM5LiK44GL44KJ5YWl44KK44CB5LiL44Gr44Gf44G+44Gj44Gm5piO44KL44GP5oqc44GR44KLIC0tPgogIDxkZWZzPgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJ0aWxlIiBjeD0iLjUiIGN5PSIuMzUiIHI9Ii44Ij4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkZGRkZGIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iLjY1IiBzdG9wLWNvbG9yPSIjRjJGNkY5Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0Q5RTJFQSIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0id2F0ZXIiIGN4PSIuNSIgY3k9Ii43OCIgcj0iLjc4Ij4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjJGRUZGIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iLjI4IiBzdG9wLWNvbG9yPSIjOERFNEY2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iLjYyIiBzdG9wLWNvbG9yPSIjMUU5M0Q2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA4M0I3RSIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iZWRnZSIgY3g9Ii41IiBjeT0iLjUiIHI9Ii41Ij4KICAgICAgPHN0b3Agb2Zmc2V0PSIuNzQiIHN0b3AtY29sb3I9IiMwNDJGNjYiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9Ii45NSIgc3RvcC1jb2xvcj0iIzA0MkY2NiIgc3RvcC1vcGFjaXR5PSIuMzQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQyRjY2IiBzdG9wLW9wYWNpdHk9Ii41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJwb29sIiBjeD0iLjUiIGN5PSIuNSIgcj0iLjUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0b3Atb3BhY2l0eT0iMSIvPgogICAgICA8c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iI0U0RkRGRiIgc3RvcC1vcGFjaXR5PSIuNzUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQkRGNkZGIiBzdG9wLW9wYWNpdHk9IjAiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InNreSIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0b3Atb3BhY2l0eT0iLjkiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0b3Atb3BhY2l0eT0iLjIyIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0ZGRkZGRiIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJyaW0iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkZGRkZGIiBzdG9wLW9wYWNpdHk9Ii45NSIvPgogICAgICA8c3RvcCBvZmZzZXQ9Ii40NSIgc3RvcC1jb2xvcj0iI0ZGRkZGRiIgc3RvcC1vcGFjaXR5PSIuMDgiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjREZGQkZGIiBzdG9wLW9wYWNpdHk9Ii44NSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxmaWx0ZXIgaWQ9ImIxMiIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTIiLz48L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9ImI0IiB4PSItMzAlIiB5PSItMzAlIiB3aWR0aD0iMTYwJSIgaGVpZ2h0PSIxNjAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIzLjUiLz48L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9ImIxNiIgeD0iLTQwJSIgeT0iLTYwJSIgd2lkdGg9IjE4MCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTYiLz48L2ZpbHRlcj4KICAgIDxjbGlwUGF0aCBpZD0iYmFsbCI+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjQ2IiByPSIxNzQiLz48L2NsaXBQYXRoPgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0idXJsKCN0aWxlKSIvPgogIDxlbGxpcHNlIGN4PSIyNTYiIGN5PSI0MzgiIHJ4PSIxNDgiIHJ5PSIyMCIgZmlsbD0iIzBBNEQ4QyIgb3BhY2l0eT0iLjI2IiBmaWx0ZXI9InVybCgjYjE2KSIvPgogIDxlbGxpcHNlIGN4PSIyNTYiIGN5PSI0MzYiIHJ4PSI3MCIgcnk9IjkiIGZpbGw9IiM1RkQwRjIiIG9wYWNpdHk9Ii4zNSIgZmlsdGVyPSJ1cmwoI2IxMikiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNDYiIHI9IjE3NCIgZmlsbD0idXJsKCN3YXRlcikiLz4KICA8ZyBjbGlwLXBhdGg9InVybCgjYmFsbCkiPgogICAgPGVsbGlwc2UgY3g9IjI1NiIgY3k9IjM3OCIgcng9IjEyMiIgcnk9IjYyIiBmaWxsPSJ1cmwoI3Bvb2wpIiBmaWx0ZXI9InVybCgjYjEyKSIvPgogICAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjQ2IiByPSIxNzQiIGZpbGw9InVybCgjZWRnZSkiLz4KICAgIDxwYXRoIGQ9Ik0xMTggMTc2IEMgMTUwIDk2IDM2MiA5NiAzOTQgMTc2IEMgMzMwIDE1MCAxODIgMTUwIDExOCAxNzYgWiIgZmlsbD0idXJsKCNza3kpIiBmaWx0ZXI9InVybCgjYjQpIi8+CiAgPC9nPgogIDxlbGxpcHNlIGN4PSIyMDAiIGN5PSIxMjYiIHJ4PSIzMCIgcnk9IjEyIiBmaWxsPSIjRkZGRkZGIiBvcGFjaXR5PSIuOTUiIHRyYW5zZm9ybT0icm90YXRlKC0yMiAyMDAgMTI2KSIgZmlsdGVyPSJ1cmwoI2I0KSIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI0NiIgcj0iMTcyLjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0idXJsKCNyaW0pIiBzdHJva2Utd2lkdGg9IjMiLz4KPC9zdmc+Cg==">
+<link rel="apple-touch-icon" href="app-icon-180.png?v=6">
+<link rel="apple-touch-icon" sizes="180x180" href="app-icon-180.png?v=6">
+<link rel="apple-touch-icon" sizes="167x167" href="app-icon-167.png?v=6">
+<link rel="apple-touch-icon" sizes="152x152" href="app-icon-152.png?v=6">
+<link rel="apple-touch-icon" sizes="120x120" href="app-icon-120.png?v=6">
+<link rel="manifest" href="manifest.webmanifest?v=6">
 <style>/* Layout: 水面のような色の背景の上に、すりガラスのパネル（上部バー・サイドメニュー・カード）を浮かべる。
    スマホでは下部にガラスのタブバー。操作部品は大きめ（最小 40px）で押しやすく。 */
 :root {
@@ -1484,6 +1484,46 @@ td.evc .ctag { display: flex; width: max-content; margin: 4px 0 0; }
   #main.vin { animation: vin .18s ease-out; }
   @keyframes vin { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 }
+
+/* ===== 2026-11-27d: 印刷済みの印（印刷まとめ） ===== */
+.pmark { flex: 0 0 auto; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-width: 74px; height: 38px; padding: 0 10px; border-radius: 12px; border: 1.5px dashed var(--btn-edge, #c9d2dd); background: transparent; color: var(--muted); font-size: 12px; font-weight: 700; line-height: 1.15; cursor: pointer; white-space: nowrap; }
+.pmark small { font-size: 10px; font-weight: 600; opacity: .85; }
+.pmark.on { border: 0; background: var(--ok-soft, #dff5e7); color: var(--ok, #1d8a4a); }
+.pmark.on.part { background: var(--warn-soft, #fff1d6); color: var(--warn, #a15c00); }
+.pmark.man { box-shadow: inset 0 0 0 1.5px currentColor; }
+.hubrow { display: flex; align-items: center; gap: 8px; }
+.hubrow > label { flex: 1 1 auto; min-width: 0; }
+.hubdone { margin-left: 8px; font-size: 11.5px; vertical-align: middle; }
+/* 判定の数（本部ボードの札・表） */
+.kpi.kjudge { cursor: pointer; text-align: left; font: inherit; color: inherit; border: 0; }
+.kjudge .jrow { display: flex; gap: 10px; font-size: 13px; font-weight: 600; }
+.kjudge .jq { font-style: normal; color: var(--muted); display: inline-flex; align-items: baseline; gap: 3px; white-space: nowrap; }
+.kjudge .jq em { font-style: normal; font-size: 20px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+.jtab { width: 100%; margin: 8px 0; }
+.jtab th, .jtab td { padding: 8px 10px; }
+.jtab td b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+.jtab td small { display: block; font-size: 11px; color: var(--muted); white-space: nowrap; }
+.jtab tr.j-棄権 th, .jtab tr.j-失格 th { color: var(--err, #c0392b); }
+.jtab tr.j-対象外 th { color: var(--warn, #a15c00); }
+/* データ管理: エントリー受付（1 作る → 2 読み込む） */
+.dentry { border: 1.5px solid var(--accent-soft, #d8e8fb); }
+.dsteps { display: grid; gap: 6px; }
+.dstep { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 4px 2px; }
+.dstep > i { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-weight: 800; font-size: 13px; color: #fff; background: var(--accent); }
+.dstep b { display: block; font-size: 14px; }
+.dstep .small { display: block; line-height: 1.35; }
+.dstep .btn.rb { flex: 0 0 auto; }
+.dgrid { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) !important; }
+.dcol { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-content: start; gap: 10px; }
+.dcol > .dentry, .dcol > .dcard:last-child { grid-column: 1 / -1; }
+.dcol .dch .small { display: block; }
+.jtab { table-layout: fixed; } .jtab th:first-child { width: 22%; } .jtab tbody th { background: transparent !important; font-weight: 700; } .jtab thead th { background: transparent; }
+.btn.rb.printed .rbc { position: relative; }
+.btn.rb.printed .rbc::after { content: '✓'; position: absolute; right: -3px; top: -3px; width: 17px; height: 17px; border-radius: 50%; background: var(--ok, #1d8a4a); color: #fff; font-size: 11px; font-weight: 800; line-height: 17px; text-align: center; box-shadow: 0 0 0 2px var(--btn-bg, #fff); }
+.dsteps { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.dstep { grid-template-columns: 26px minmax(0, 1fr) auto; gap: 8px; padding: 2px 0; }
+.dstep b { font-size: 13.5px; }
+.dcol { gap: 8px !important; } .dcol .dcard { padding: 10px 12px !important; } .dcol .dch { margin-bottom: 4px; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -1496,7 +1536,7 @@ td.evc .ctag { display: flex; width: max-content; margin: 4px 0 0; }
 </div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <div id="print-root" class="pgroot"></div>
-<script>const APP_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8IS0tIOOCueOCpOODoOWkp+S8mumBi+WWtuODnOODvOODiTog5rOz44GQ5Lq677yI6IWV44O76aCt77yJ44GoMeacrOOBruawtOOBrua1geOCjOOAguS4iuOBruaYjuOCi+OBhOmdkuOBi+OCiea3seOBhOe0uuOBuCAtLT4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmciIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMEU3QkU4Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA2MkI2QiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9InVybCgjYmcpIi8+CiAgPHBhdGggZD0iTTEwNCAzMzAgQyAxNDAgMTk2IDI2NCAxMzYgMzgwIDE4MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjUwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8Y2lyY2xlIGN4PSIzOTIiIGN5PSIyOTAiIHI9IjUwIiBmaWxsPSIjRkZGRkZGIi8+CiAgPHBhdGggZD0iTTgwIDQyMCBDIDE2MCAzODAgMjQwIDQ1MCAzMjAgNDEwIFMgNDMyIDM5MCA0MzIgMzkwIiBmaWxsPSJub25lIiBzdHJva2U9IiM3RkUwRkYiIHN0cm9rZS13aWR0aD0iMzAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K';</script>
+<script>const APP_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8IS0tIOOCueOCpOODoOWkp+S8mumBi+WWtuODnOODvOODiTog6YCP44GN6YCa44Gj44Gf5rC044Gu5rC05pm2546J77yI55m944GE5Y+w44Gu5LiK77yJ44CC5YWJ44GM5LiK44GL44KJ5YWl44KK44CB5LiL44Gr44Gf44G+44Gj44Gm5piO44KL44GP5oqc44GR44KLIC0tPgogIDxkZWZzPgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJ0aWxlIiBjeD0iLjUiIGN5PSIuMzUiIHI9Ii44Ij4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkZGRkZGIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iLjY1IiBzdG9wLWNvbG9yPSIjRjJGNkY5Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0Q5RTJFQSIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0id2F0ZXIiIGN4PSIuNSIgY3k9Ii43OCIgcj0iLjc4Ij4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRjJGRUZGIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iLjI4IiBzdG9wLWNvbG9yPSIjOERFNEY2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iLjYyIiBzdG9wLWNvbG9yPSIjMUU5M0Q2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA4M0I3RSIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iZWRnZSIgY3g9Ii41IiBjeT0iLjUiIHI9Ii41Ij4KICAgICAgPHN0b3Agb2Zmc2V0PSIuNzQiIHN0b3AtY29sb3I9IiMwNDJGNjYiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9Ii45NSIgc3RvcC1jb2xvcj0iIzA0MkY2NiIgc3RvcC1vcGFjaXR5PSIuMzQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQyRjY2IiBzdG9wLW9wYWNpdHk9Ii41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJwb29sIiBjeD0iLjUiIGN5PSIuNSIgcj0iLjUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0b3Atb3BhY2l0eT0iMSIvPgogICAgICA8c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iI0U0RkRGRiIgc3RvcC1vcGFjaXR5PSIuNzUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQkRGNkZGIiBzdG9wLW9wYWNpdHk9IjAiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InNreSIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0b3Atb3BhY2l0eT0iLjkiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0b3Atb3BhY2l0eT0iLjIyIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0ZGRkZGRiIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJyaW0iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkZGRkZGIiBzdG9wLW9wYWNpdHk9Ii45NSIvPgogICAgICA8c3RvcCBvZmZzZXQ9Ii40NSIgc3RvcC1jb2xvcj0iI0ZGRkZGRiIgc3RvcC1vcGFjaXR5PSIuMDgiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjREZGQkZGIiBzdG9wLW9wYWNpdHk9Ii44NSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxmaWx0ZXIgaWQ9ImIxMiIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTIiLz48L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9ImI0IiB4PSItMzAlIiB5PSItMzAlIiB3aWR0aD0iMTYwJSIgaGVpZ2h0PSIxNjAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIzLjUiLz48L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9ImIxNiIgeD0iLTQwJSIgeT0iLTYwJSIgd2lkdGg9IjE4MCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTYiLz48L2ZpbHRlcj4KICAgIDxjbGlwUGF0aCBpZD0iYmFsbCI+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjQ2IiByPSIxNzQiLz48L2NsaXBQYXRoPgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0idXJsKCN0aWxlKSIvPgogIDxlbGxpcHNlIGN4PSIyNTYiIGN5PSI0MzgiIHJ4PSIxNDgiIHJ5PSIyMCIgZmlsbD0iIzBBNEQ4QyIgb3BhY2l0eT0iLjI2IiBmaWx0ZXI9InVybCgjYjE2KSIvPgogIDxlbGxpcHNlIGN4PSIyNTYiIGN5PSI0MzYiIHJ4PSI3MCIgcnk9IjkiIGZpbGw9IiM1RkQwRjIiIG9wYWNpdHk9Ii4zNSIgZmlsdGVyPSJ1cmwoI2IxMikiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNDYiIHI9IjE3NCIgZmlsbD0idXJsKCN3YXRlcikiLz4KICA8ZyBjbGlwLXBhdGg9InVybCgjYmFsbCkiPgogICAgPGVsbGlwc2UgY3g9IjI1NiIgY3k9IjM3OCIgcng9IjEyMiIgcnk9IjYyIiBmaWxsPSJ1cmwoI3Bvb2wpIiBmaWx0ZXI9InVybCgjYjEyKSIvPgogICAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjQ2IiByPSIxNzQiIGZpbGw9InVybCgjZWRnZSkiLz4KICAgIDxwYXRoIGQ9Ik0xMTggMTc2IEMgMTUwIDk2IDM2MiA5NiAzOTQgMTc2IEMgMzMwIDE1MCAxODIgMTUwIDExOCAxNzYgWiIgZmlsbD0idXJsKCNza3kpIiBmaWx0ZXI9InVybCgjYjQpIi8+CiAgPC9nPgogIDxlbGxpcHNlIGN4PSIyMDAiIGN5PSIxMjYiIHJ4PSIzMCIgcnk9IjEyIiBmaWxsPSIjRkZGRkZGIiBvcGFjaXR5PSIuOTUiIHRyYW5zZm9ybT0icm90YXRlKC0yMiAyMDAgMTI2KSIgZmlsdGVyPSJ1cmwoI2I0KSIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI0NiIgcj0iMTcyLjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0idXJsKCNyaW0pIiBzdHJva2Utd2lkdGg9IjMiLz4KPC9zdmc+Cg==';</script>
 <script>/* ============================================================================
  * スイム大会運営アプリ — 計算エンジン（DOM非依存）
  *  Excel「大会運営ブック」の数式と「表彰者算出マクロ」のロジックを移植
@@ -2636,6 +2676,7 @@ function migrate(s) {
   s.award = Object.assign(C.defaultAward(), s.award || {});
   while (s.award.cats.length < 8) s.award.cats.push({ name: '', mvp: true, exc: true });
   while (s.award.events.length < 15) s.award.events.push({ id: 'ae' + uid(), name: '', baseM: '', baseF: '', mvp: true });
+  if (!s.printed || typeof s.printed !== 'object') s.printed = {};
   s.app = 'swim-meet'; s.schema = 1; s.rev = s.rev || 0;
   return s;
 }
@@ -2972,7 +3013,7 @@ const RB_ACT = {
   printCert: b => /テスト|1枚/.test(b.textContent) ? ['sheetEye', '試し印刷'] : ['printAll', '全部印刷'],
   addlane: ['plus', 'レーン追加'], addEntry: ['plus', '追加'], addRelay: ['plus', '追加'],
   addSched: b => b.dataset.n ? ['plus', '休憩追加'] : ['plus', '行追加'],
-  entryForm: ['table', 'Excel作成'], pasteEntries: ['paste', '貼り付け'],
+  entryForm: ['table', '記入用作成'], pasteEntries: ['paste', '貼り付け'],
   pvToggle: ['eye', 'プレビュー'],
   progStep: b => b.dataset.d === '-1' ? ['prev', '前へ'] : ['next', '次へ'],
   clearOut: ['userOk', '対象外解除'],
@@ -2988,7 +3029,7 @@ const RB_ACT = {
   rename: ['edit', '名前変更'], certOne: ['printOne', '1人印刷'], combineOther: ['merge', '合同にする'], heatLock: b => /ロック中/.test(b.textContent) ? ['lock', 'ロック中'] : ['unlock', '組ロック'],
   hubPick: b => { const t = b.textContent; return /外す/.test(t) ? ['close', '選択解除'] : /記録入り/.test(t) ? ['program', '記録入り'] : /プログラム/.test(t) ? ['program', 'プログラム'] : /記録証/.test(t) ? ['certs', '記録証'] : /賞状/.test(t) ? ['awards', '賞状'] : /速報/.test(t) ? ['flash', '速報'] : /ランキング/.test(t) ? ['ranking', '順位'] : null; }
 };
-const RB_TEXT = [[/記入済み.*読み込む/, ['tableIn', 'Excel読込']], [/バックアップから復元/, ['restore', '復元']], [/Excelファイルを読み込む/, ['tableIn', 'Excel読込']]];
+const RB_TEXT = [[/記入済み.*読み込む/, ['tableIn', '記入済読込']], [/バックアップから復元/, ['restore', '復元']], [/Excelファイルを読み込む/, ['tableIn', 'Excel読込']]];
 const RB_SMALL = new Set(['heatLock', 'hubFocus', 'restoreSnap', 'fix']);   // 表やパネルの中の丸は少し小さく
 function rbSpec(b) {
   const f = RB_ACT[b.dataset.act || ''];
@@ -3030,6 +3071,17 @@ function roundify(root) {
   (root || document).querySelectorAll('.bar:not(.progbar):not(.rbar):not(.frow)').forEach(bar => { if (bar.querySelector(':scope > select, :scope > input, :scope > label > select, :scope > label > input')) bar.classList.add('frow'); });
 }
 // 丸ボタンのある列: 選択欄・検索欄・タブ・情報は、丸の中心の高さにそろえる（ラベルの分だけ下がらない。どの画面も同じ）
+// 各画面の「印刷」ボタン: その印刷物が印刷済みなら ✓ を付ける（いつ印刷したかはボタンの説明に）
+function markPrintButtons() {
+  const keyOf = { printProg: () => (progPrintMode() === 'result' ? 'progr:' : 'prog:') + ui.prog, printFlash: () => 'flash:' + ui.flash, printRank: () => 'rank:' + ui.rankEv + (ui.rankCat ? '|' + ui.rankCat : ''), printSched: () => 'sched', printAwards: () => 'awards', printClubSum: () => 'clubsum' };
+  const m = state.printed || {};
+  document.querySelectorAll('#main [data-act]').forEach(b => {
+    const f = keyOf[b.dataset.act]; if (!f || b.dataset.all === '1') return;
+    let p = null; try { p = m[f()]; } catch (e) { p = null; }
+    b.classList.toggle('printed', !!p);
+    if (p) b.title = '印刷済み（' + fmtDT(p.at) + '）';
+  });
+}
 function fitProgBar() {     // 記録入力の列が入りきらないとき（画面一覧の固定＋プレビューなど）だけ詰める: 丸を小さく・「入力 x/y」を隠す（種目欄と組タブに ✓ が出る）。種目名は切らない
   const pb = document.querySelector('#main .progbar'); if (!pb) return;
   pb.classList.remove('tight'); pb.style.removeProperty('--selneed');
@@ -3117,6 +3169,7 @@ function render() {
   fitProgBar();
   alignBars($('#main'));
   { const aw = $('#main .arr-wrap'); if (aw) bindArrPinch(aw); }
+  markPrintButtons();
   document.documentElement.classList.toggle('final', isFinal());
   if (isFinal()) {      // 確定中: 書き換える欄は押せないように（絞り込み・検索・表示の切り替えは使える）
     $('#main').querySelectorAll('input, select, textarea').forEach(el => { const k = el.dataset.k || ''; if (!/^(ui:|cf:|set:print\.)/.test(k) && !el.closest('.cfil, .pv-side, .pvbar, .modal')) { el.disabled = true; } });
@@ -3725,6 +3778,7 @@ function homeBoard() {
     kpi('次の種目', P.next ? 'No.' + P.next.r.no : '—', P.next ? esc(P.next.r.name) + '・' + C.fmtClock(P.next.r.start) : '') +
     kpi('申込者', d.applicants + '<em> 名</em>', '定員 ' + d.capacity + '・目標 ' + d.target + '（' + (d.diffTarget > 0 ? '+' : '') + d.diffTarget + '）') +
     kpi('競技終了予定', D.sched.end !== null ? C.fmtClock(D.sched.end) : '—', '開始 ' + esc(S.schedule.start)) +
+    (j => '<button type="button" class="kpi kjudge" data-act="judgeShow" title="棄権・失格・対象外の数（押すと1部・2部・合算）"><span>判定（' + (PART ? '2部' : '1部') + '）</span><b class="jrow"><i class="jq">棄権<em>' + (j.ind['棄権'] + j.rel['棄権']) + '</em></i><i class="jq">失格<em>' + (j.ind['失格'] + j.rel['失格']) + '</em></i><i class="jq">対象外<em>' + (j.ind['対象外'] + j.rel['対象外']) + '</em></i></b><small>押すと 1部・2部・合算</small></button>')(judgeCountsOf(D.ind, D.rel)) +
     (P.finished ? '<button class="btn primary kbtn" data-act="go" data-v="awards">表彰者を確認</button>' : cur ? '<button class="btn primary kbtn" data-act="openprog" data-p="' + esc(cur.r.name) + '">記録入力 No.' + cur.r.no + '</button>' : '') + '</div>';
   const ready = '<div class="card rstrip"><b>開催前の確認</b>' + (bad.length ? '<span class="pill warn">要確認 ' + bad.length + '</span>' : '<span class="pill ok">準備OK</span>') +
     '<div class="rchips">' + rd.map(x => '<button class="rchip ' + (x.ok ? 'ok' : x.soft ? 'soft' : 'ng') + '" ' + (x.go ? 'data-act="go" data-v="' + x.go + '"' : 'data-act="' + x.act + '"') + ' title="' + esc(x.t) + '">' + (x.ok ? '✓ ' : '! ') + esc(x.t) + '</button>').join('') + '</div></div>';
@@ -3791,6 +3845,28 @@ function pointsCard() {
 function otherPartState() {
   const k = 'swim-meet-app/state' + (PART ? '' : '@2');
   try { const raw = localStorage.getItem(k); return raw ? migrate(JSON.parse(raw)) : null; } catch (e) { return null; }
+}
+// 判定の数（完泳・棄権・失格・対象外・未入力）。1部・2部・合算（もう一方の部はこのブラウザに保存されているデータ）
+const JUDGE_KINDS = ['完泳', '棄権', '失格', '対象外', '未入力'];
+function judgeCountsOf(ind, rel) {
+  const z = () => Object.fromEntries(JUDGE_KINDS.map(k => [k, 0]));
+  const r = { ind: z(), rel: z() };
+  ind.filter(it => it.event).forEach(it => { if (r.ind[it.status] !== undefined) r.ind[it.status]++; });
+  rel.filter(it => it.event).forEach(it => { if (r.rel[it.status] !== undefined) r.rel[it.status]++; });
+  return r;
+}
+function judgeCounts() {
+  const mine = judgeCountsOf(D.ind, D.rel), o = otherPartState();
+  const other = o ? judgeCountsOf(C.computeIndividuals(o), C.computeRelays(o)) : null;
+  return { p1: PART ? other : mine, p2: PART ? mine : other, mine };
+}
+function judgeTable() {
+  const J = judgeCounts(), v = (c, k) => c.ind[k] + c.rel[k];
+  const td = (c, k) => c ? '<td class="num"><b>' + v(c, k) + '</b><small>個人 ' + c.ind[k] + '・リレー ' + c.rel[k] + '</small></td>' : '<td class="num muted">—</td>';
+  const sum = k => { const a = J.p1, b = J.p2; if (!a && !b) return null; const z = { ind: {}, rel: {} }; z.ind[k] = (a ? a.ind[k] : 0) + (b ? b.ind[k] : 0); z.rel[k] = (a ? a.rel[k] : 0) + (b ? b.rel[k] : 0); return z; };
+  return '<table class="t jtab"><thead><tr><th>判定</th><th class="num">1部</th><th class="num">2部</th><th class="num">合算</th></tr></thead><tbody>' +
+    JUDGE_KINDS.map(k => '<tr class="j-' + k + '"><th>' + k + '</th>' + td(J.p1, k) + td(J.p2, k) + td(sum(k), k) + '</tr>').join('') + '</tbody></table>' +
+    (J.p1 && J.p2 ? '' : '<p class="small muted">' + (J.p1 ? '2部' : '1部') + 'のデータがまだこのブラウザにありません（上部の「' + (J.p1 ? '2' : '1') + '部」に切り替えて読み込むと合算されます）。</p>');
 }
 function clubSums() {
   const o = otherPartState();
@@ -3921,7 +3997,7 @@ VIEWS.entries = () => {
     sel('ui:entEvent', ui.entEvent || '', blankOpt('すべての種目').concat(evs), 'style="max-width:200px"') +
     '<label class="small"><input type="checkbox" data-k="ui:entOnlyIssue" ' + (ui.entOnlyIssue ? 'checked' : '') + '> 要確認の行だけ（' + nIssue + '）</label>' +
     '<span class="grow"></span>' + pager(pages) + '<span class="muted small">' + rows.length + ' / ' + D.ind.length + ' 件</span>' +
-    '<button class="btn" data-act="entryForm">エントリー用Excelを作る</button><label class="btn" ' + (isLocked() ? 'style="opacity:.4;pointer-events:none"' : '') + '>記入済みExcelを読み込む<input type="file" accept=".xlsx,.xlsm,.xls" multiple data-file="entryform" hidden></label>' + '<button class="btn" data-act="pasteEntries" ' + L + '>Excelから貼り付け</button><button class="btn primary" data-act="addEntry" ' + L + '>＋ 1行追加</button></div>' +
+    '<button class="btn" data-act="pasteEntries" ' + L + '>Excelから貼り付け</button><button class="btn primary" data-act="addEntry" ' + L + '>＋ 1行追加</button></div>' +
     (D.ind.length ? '<div class="tablewrap fill" data-fill-id="ent"><table class="t"><thead><tr><th class="num">No</th><th>氏名</th><th>フリガナ</th><th>チーム</th><th>区分</th><th>種目</th><th>エントリー</th><th>公式タイム</th><th>判定</th><th class="c">組</th><th class="c">レーン</th><th class="num">順位</th><th class="num">得点</th><th>状態</th><th></th></tr></thead><tbody>' +
       show.map(it => {
         const e = it.e, iss = D.issuesById.get(it.id) || [];
@@ -4397,13 +4473,16 @@ VIEWS.data = () => {
   const snaps = getSnaps(), selN = (ui.snapSel || []).filter(t => snaps.some(x => x.t === t)).length;
   let used = 0; try { used = (lsGet(KEY) || '').length + (lsGet(SNAP_KEY) || '').length; } catch (e) { /* ignore */ }
   const left = '<div class="dcol">' +
+    '<div class="card dcard dentry"><div class="dch"><h2>エントリー受付（クラブに配るExcel）</h2></div>' +
+      '<div class="dsteps"><div class="dstep"><i>1</i><div><b>エントリー用Excelを作る</b><span class="small muted">区分・種目・クラブを入れた記入用ファイル。各クラブに配ります</span></div><button class="btn primary" data-act="entryForm">エントリー用Excelを作る</button></div>' +
+      '<div class="dstep"><i>2</i><div><b>記入済みExcelを読み込む</b><span class="small muted">返ってきたファイルをまとめて選ぶと、個人・リレーに入ります（複数可）</span></div><label class="btn" ' + (isLocked() ? 'style="opacity:.4;pointer-events:none"' : '') + '>記入済みExcelを読み込む<input type="file" accept=".xlsx,.xlsm,.xls" multiple data-file="entryform" hidden></label></div></div></div>' +
     '<div class="card dcard"><div class="dch"><h2>バックアップ（ファイル）</h2><span class="small muted">最後に書き出し: <b>' + ago(meta.lastBackup) + '</b>・その後の変更 ' + meta.changesSinceBackup + ' 回</span></div>' +
       '<div class="bar"><button class="btn primary" data-act="backup">バックアップを書き出す（.json）</button><label class="btn">バックアップから復元…<input type="file" accept=".json,application/json" data-file="json" hidden></label></div></div>' +
     '<div class="card dcard"><div class="dch"><h2>Excel</h2><span class="small muted">大会運営ブック・表彰者算出ブックを読み込めます（初回だけネット接続が必要）</span></div>' +
       '<div class="bar"><label class="btn primary">Excelファイルを読み込む…<input type="file" accept=".xlsx,.xlsm,.xls" data-file="xlsx" hidden></label><button class="btn" data-act="exportXlsx">結果をExcelに書き出す</button><button class="btn" data-act="exportCsv">エントリーをCSVで書き出す</button></div></div>' +
-    '<div class="card dcard"><div class="dch"><h2>そのほか</h2><span class="small muted">使用容量 約 ' + Math.round(used / 1024) + ' KB / 5,000 KB</span></div>' +
+    '<div class="card dcard" title="別のパソコンへ移すとき: バックアップを書き出す → もう一方で復元。同じパソコンでは1つのタブで作業してください。Ctrl＋Z で元に戻せます"><div class="dch"><h2>そのほか</h2><span class="small muted">使用容量 約 ' + Math.round(used / 1024) + ' KB / 5,000 KB</span></div>' +
       '<div class="bar"><button class="btn" data-act="sample">サンプルデータを読み込む</button><button class="btn" data-act="clearOut" data-all="1">全種目の対象外を解除</button><button class="btn danger" data-act="clearResults">記録（公式タイム・判定）だけ消す</button><button class="btn danger" data-act="resetAll">すべて消して最初から</button></div>' +
-      '<p class="small muted dtip">別のパソコンへ移すとき: 書き出す → もう一方で復元。同じパソコンでは1つのタブで作業してください。<span class="kbd">Ctrl</span>+<span class="kbd">Z</span> 元に戻す</p></div>' +
+      '</div>' +
     '</div>';
   const rows = snaps.map((s2, i) => '<tr class="' + (s2.keep ? 'keep' : '') + '"><td class="ck"><input type="checkbox" data-k="snap:' + s2.t + '" ' + ((ui.snapSel || []).indexOf(s2.t) >= 0 ? 'checked' : '') + ' aria-label="この控えを選ぶ"></td>' +
     '<td class="dt">' + fmtDT(s2.t) + '</td>' +
@@ -4445,12 +4524,12 @@ VIEWS.prints = () => {
   all.forEach(d => { let g = groups.find(x => x.name === d.group); if (!g) groups.push(g = { name: d.group, docs: [] }); g.docs.push(d); });
   const focusName = ui.hubFocus && all.find(d => d.key === ui.hubFocus);
   return '<div class="vhead"><div><h1 class="view">印刷まとめ</h1><p class="lead">大会で使う印刷物をすべて並べています。チェックを入れたものを、上から順に1つの印刷にまとめて出せます。「見る」を押すと、その印刷物だけを右のプレビューで確認できます。</p></div></div>' +
-    '<div class="bar hubbar"><span class="pill ' + (chosen.length ? 'info' : 'mute') + '">選択 ' + chosen.length + '件・A4 ' + pages + '枚</span>' +
+    '<div class="bar hubbar"><span class="pill ' + (chosen.length ? 'info' : 'mute') + '">選択 ' + chosen.length + '件・A4 ' + pages + '枚</span><span class="pill ' + (all.every(d => printedMap()[d.key]) ? 'ok' : 'mute') + '" title="印刷画面を閉じたものに「印刷済み」が付きます。右の印を押すと手で付けたり外したりできます">印刷済み ' + all.filter(d => printedMap()[d.key]).length + ' / ' + all.length + '</span>' +
     '<button class="btn sm" data-act="hubPick" data-v="progs">全種目のプログラム（手書き用）</button><button class="btn sm" data-act="hubPick" data-v="progrs">記録入りプログラムすべて</button><button class="btn sm" data-act="hubPick" data-v="certr">記録証すべて</button><button class="btn sm" data-act="hubPick" data-v="certp">賞状すべて</button><button class="btn sm" data-act="hubPick" data-v="flashes">記録のある速報すべて</button><button class="btn sm" data-act="hubPick" data-v="ranks">ランキングすべて</button><button class="btn sm" data-act="hubPick" data-v="none" ' + (chosen.length ? '' : 'disabled') + '>選択を外す</button>' +
     '<span class="grow"></span><button class="btn primary" data-act="hubPrint" ' + (pages ? '' : 'disabled') + '>' + icon('print', 'ic sm') + '選んだものをまとめて印刷</button></div>' +
     (focusName ? '<div class="notice info"><span class="grow">プレビュー: <b>' + esc(focusName.group + '　' + focusName.title) + '</b> を表示中</span><button class="btn sm" data-act="hubFocus" data-v="">選んだもののプレビューに戻す</button></div>' : '') +
-    '<div class="hubgrid fill" data-fill-id="hub">' + groups.map(g => '<div class="card"><h2>' + esc(g.name) + ' <span class="muted small">' + g.docs.length + '件</span></h2>' +
-      g.docs.map(d => '<div class="hubrow ' + (ui.hubFocus === d.key ? 'focus' : '') + '"><label><input type="checkbox" data-k="hub:' + esc(d.key) + '" ' + (sel.has(d.key) ? 'checked' : '') + '><span class="hubtx"><span class="hubt">' + esc(d.title) + '</span><span class="hubm">' + (d.sub ? esc(d.sub) + '・' : '') + 'A4 ' + d.pages + '枚</span></span></label><button class="btn sm" data-act="hubFocus" data-v="' + esc(d.key) + '">見る</button></div>').join('') + '</div>').join('') + '</div>';
+    '<div class="hubgrid fill" data-fill-id="hub">' + groups.map(g => '<div class="card"><h2>' + esc(g.name) + ' <span class="muted small">' + g.docs.length + '件</span>' + (n => n ? '<span class="pill ' + (n === g.docs.length ? 'ok' : 'info') + ' hubdone">印刷済み ' + n + ' / ' + g.docs.length + '</span>' : '')(g.docs.filter(d => printedMap()[d.key]).length) + '</h2>' +
+      g.docs.map(d => '<div class="hubrow ' + (ui.hubFocus === d.key ? 'focus' : '') + '"><label><input type="checkbox" data-k="hub:' + esc(d.key) + '" ' + (sel.has(d.key) ? 'checked' : '') + '><span class="hubtx"><span class="hubt">' + esc(d.title) + '</span><span class="hubm">' + (d.sub ? esc(d.sub) + '・' : '') + 'A4 ' + d.pages + '枚</span></span></label>' + printedChip(d) + '<button class="btn sm" data-act="hubFocus" data-v="' + esc(d.key) + '">見る</button></div>').join('') + '</div>').join('') + '</div>';
 };
 
 // フレームの選択（表示・非表示／記録証と賞状で分ける・統一／自分の画像）
@@ -4857,6 +4936,12 @@ const ACTIONS = {
     else all.filter(d => d.key.indexOf(v === 'progs' ? 'prog:' : v === 'progrs' ? 'progr:' : v === 'flashes' ? 'flash:' : v === 'certr' ? 'cert:record:' : v === 'certp' ? 'cert:prize:' : 'rank:') === 0).forEach(d => set.add(d.key));
     ui.hubSel = [...set]; ui.hubFocus = ''; render();
   },
+  judgeShow: () => modal('<h2>判定の数（棄権・失格・対象外など）</h2><p class="small muted">エントリーのある個人種目の選手と、リレーのチームを数えています。</p>' + judgeTable() + '<div class="actions"><button class="btn primary" data-close>閉じる</button></div>'),
+  printMark: t => {
+    const k = t.dataset.key, m = printedMap();
+    if (m[k]) delete m[k]; else { const d = hubAll().find(x => x.key === k); m[k] = { at: Date.now(), by: 'manual', n: d ? d.pages : 0, total: d && d.total, full: true }; }
+    state.rev++; save(); render();
+  },
   hubPrint: () => { const sel = new Set(ui.hubSel || []); printDocs(hubAll().filter(d => sel.has(d.key)), '選んだ印刷物をまとめて印刷します'); },
   frPick: t => {
     const kind = ui.certKind === 'prize' ? 'prize' : 'record', f0 = frameCfg(), slot = f0.same ? 'record' : kind;
@@ -5214,7 +5299,7 @@ function docCerts(kind, target, filter, from, to) {
   const relay = target === 'rel', prize = kind === 'prize';
   const list = C.certTargets(state, relay ? D.rel : D.ind, relay, filter || {}, prize);
   const a = Math.max(1, from || 1), b = Math.min(list.length, to || list.length), pick = list.slice(a - 1, b);
-  return { key: 'cert:' + kind + ':' + target, group: '記録証・賞状', title: (prize ? '賞状' : '記録証') + '（' + (relay ? 'リレー' : '個人') + '）', pages: pick.length, sub: '1人1枚', html(limit) { return (limit ? pick.slice(0, limit) : pick).map(it => certHTML(it, relay, prize, 'A4')).join(''); } };
+  return { total: list.length, key: 'cert:' + kind + ':' + target, group: '記録証・賞状', title: (prize ? '賞状' : '記録証') + '（' + (relay ? 'リレー' : '個人') + '）', pages: pick.length, sub: '1人1枚', html(limit) { return (limit ? pick.slice(0, limit) : pick).map(it => certHTML(it, relay, prize, 'A4')).join(''); } };
 }
 // いま開いている画面の印刷物
 function viewDocs() {
@@ -5239,9 +5324,22 @@ function printDocs(docs, msg) {
   // 印刷は拡大・縮小なし（等倍）で行うので、ページの合わせ込みも等倍で測る（端末によって結果が変わらないように）
   const zoomed = FITZ !== 1; if (zoomed) { document.documentElement.style.zoom = ''; FITZR = 1; }
   fitPages(root);
-  setTimeout(() => { try { window.print(); } catch (e) { toast('印刷を開始できませんでした: ' + e.message, 'err'); } if (zoomed) applyFit(); }, 80);
+  setTimeout(() => { let ok = true; try { window.print(); } catch (e) { ok = false; toast('印刷を開始できませんでした: ' + e.message, 'err'); } if (zoomed) applyFit(); if (ok) markPrinted(docs, 'auto'); }, 80);
   const pages = docs.reduce((a, d) => a + d.pages, 0);
   toast((msg || '印刷します') + '（' + (a5 && onlyCert ? 'A5 横' : a5 ? 'A4 縦・証書は A5 横' : 'A4 縦') + '・' + pages + '枚）');
+}
+// ---- 印刷の記録: 印刷画面を閉じたら「印刷済み」にする（取り消した場合も付くので、手で外せる）。元に戻すの対象外・確定ロック中も記録できる
+function printedMap() { return state.printed || (state.printed = {}); }
+function markPrinted(docs, by) {
+  const m = printedMap(), at = Date.now();
+  docs.forEach(d => { if (!d || !d.key) return; const full = d.total === undefined || d.pages >= d.total; m[d.key] = { at, by, n: d.pages, total: d.total, full }; });
+  state.rev++; save(); if (view === 'prints') render();
+}
+function printedChip(d) {
+  const p = printedMap()[d.key];
+  if (!p) return '<button type="button" class="pmark" data-act="printMark" data-key="' + esc(d.key) + '" title="押すと「印刷済み」にします">未印刷</button>';
+  const t = fmtDT(p.at), part = p.full === false ? '一部 ' + p.n + '/' + p.total : '印刷済み';
+  return '<button type="button" class="pmark on' + (p.full === false ? ' part' : '') + (p.by === 'manual' ? ' man' : '') + '" data-act="printMark" data-key="' + esc(d.key) + '" title="' + (p.by === 'manual' ? '手で印を付けました' : '印刷画面を閉じた時刻') + '（押すと外します）">✓ ' + part + '<small>' + t + '</small></button>';
 }
 function printSchedule() { printDocs([docSchedule()], 'スケジュールを印刷します'); }
 function printProgram(all) {
