@@ -1474,7 +1474,7 @@ td.evc .ctag { display: flex; width: max-content; margin: 4px 0 0; }
 .progbar.tight .pk { padding: 0 9px; }
 /* 入れ替え: ピンチで1行の組数を変える */
 .arr-wrap { touch-action: pan-x pan-y; position: relative; }
-.arr-wrap.fixedcols .arr { grid-template-columns: repeat(var(--arrcols, 4), minmax(0, 1fr)) !important; }
+.arr-wrap.fixedcols .arr { grid-template-columns: repeat(auto-fill, minmax(max(220px, calc((100% - (var(--arrcols, 4) - 1) * 10px) / var(--arrcols, 4))), 1fr)) !important; }
 .arr-badge { position: sticky; bottom: 12px; left: 50%; width: max-content; margin: -40px auto 0; padding: 6px 14px; border-radius: 999px; background: rgba(12, 20, 32, .78); color: #fff; font-size: 13px; font-weight: 700; opacity: 0; transform: translateY(6px); transition: opacity .18s, transform .18s; pointer-events: none; z-index: 5; }
 .arr-badge.on { opacity: 1; transform: none; }
 .arr > * { transition: none; }
@@ -1524,6 +1524,36 @@ td.evc .ctag { display: flex; width: max-content; margin: 4px 0 0; }
 .dstep { grid-template-columns: 26px minmax(0, 1fr) auto; gap: 8px; padding: 2px 0; }
 .dstep b { font-size: 13.5px; }
 .dcol { gap: 8px !important; } .dcol .dcard { padding: 10px 12px !important; } .dcol .dch { margin-bottom: 4px; }
+
+/* ===== 2026-11-27e: 変更履歴（データ管理の右の欄のタブ） ===== */
+.dtabs { margin-bottom: 6px; }
+.dtabs .seg { width: 100%; display: flex; } .dtabs .segbtn { flex: 1 1 0; }
+.hlist { display: flex; flex-direction: column; gap: 0; overflow: auto; }
+.hrow1 { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 8px; padding: 7px 4px; border-bottom: 1px solid var(--hairline); }
+.hrow1 time { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: 1px; }
+.hrow1 b { font-size: 13.5px; }
+.hrow1 ul { margin: 3px 0 0; padding-left: 16px; font-size: 12.5px; color: var(--ink); }
+.hrow1 li { line-height: 1.45; overflow-wrap: anywhere; }
+/* 記録証・賞状の手書き用の下線 */
+.cert .hw { display: inline-block; height: .95em; border-bottom: .6pt solid #333; vertical-align: baseline; }
+/* 記録証のプレビューの拡大 */
+.cstage { touch-action: pan-x pan-y; cursor: zoom-in; }
+.cstage.zoomed { overflow: auto !important; justify-content: flex-start; cursor: grab; }
+.cnav .pvzoom { margin-left: 0; }
+/* 長押し・ダブルクリックで、入力欄以外の文字が青く選択されないように */
+body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input, textarea, select, [contenteditable="true"], [contenteditable=""] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+@media print { body { -webkit-user-select: auto; user-select: auto; } }
+/* 入れ替え: 1行の組数を増やしても名前を省略しない（カードの高さが伸びて折り返す） */
+.arr .pcard, .arr .slot-empty, .arr .slot-q { height: auto !important; min-height: 46px !important; overflow: visible !important; }
+.arr.rel .pcard, .arr.rel .slot-empty, .arr.rel .slot-q { height: auto !important; min-height: 72px !important; }
+.arr .pcard .fit { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.25; }
+.arr .pcard .et { white-space: nowrap; align-self: start; }
+.arr .rcard .rc-top { flex-wrap: wrap; row-gap: 2px; }
+.arr .rcard .rc-team { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; overflow-wrap: anywhere; }
+.arr .rcard .rc-mem { display: block !important; -webkit-line-clamp: unset; line-clamp: none; overflow: visible !important; }
+.arr .mgrid .mg { white-space: normal; flex-wrap: wrap; }
+.arr .mgrid .mg > b { overflow: visible !important; text-overflow: clip !important; overflow-wrap: anywhere; word-break: keep-all; }
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -2735,6 +2765,48 @@ function isFinal() { return !!state.settings.finalized; }
 function finalBlocked() { if (!isFinal()) return false; toast('大会確定（ロック）中です。変えるには上部の「確定済み」を押してパスワードで解除してください', 'err'); render(); return true; }
 function pwHash(t) { let h = 2166136261; for (const ch of String(t)) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36); }
 const FINAL_PW = '1sxhzyh';   // パスワードそのものは置かない（ハッシュだけ）
+// ---------------------------------------------------------------- 変更履歴（最初のプログラム作成から大会終了まで。元に戻すでも消えない）
+const HIST_MAX = 2000, HIST_DET = 8, HIST_KEY = 'swim-meet-app/history' + partSuffix;
+let HIST = []; try { HIST = JSON.parse(lsGet(HIST_KEY) || '[]'); if (!Array.isArray(HIST)) HIST = []; } catch (e) { HIST = []; }
+function saveHist() { try { lsSet(HIST_KEY, JSON.stringify(HIST)); } catch (e) { HIST.splice(0, Math.ceil(HIST.length / 4)); try { lsSet(HIST_KEY, JSON.stringify(HIST)); } catch (e2) { /* 容量不足 */ } } }
+const H_FIELD = { name: '氏名', club: 'チーム', team: 'チーム', mark: '記号', cat: '区分', event: '種目', entryTime: 'エントリー', officialTime: '公式タイム', judge: '判定', members: '泳者', seat: '組・レーン' };
+const H_SET = { meetName: '大会名', lanes: 'レーン', categories: '区分', events: '種目', clubs: 'クラブ', schedule: '進行の設定', points: '得点', cert: '記録証', award: '賞状', print: '印刷', combined: '合同', locked: '当日モード', finalized: '大会確定', kanaStyle: 'フリガナ表記', dashboard: '売上・申込', threeDigit: 'タイム入力' };
+function histName(x) { if (!x) return ''; if (x.team !== undefined) return C.str(x.team) + (x.mark ? ' ' + x.mark : ''); return C.str(x.name).split(/[\s　]+/).slice(0, 2).join(' '); }
+function histVal(k, v) {
+  if (k === 'seat') return v && v.h ? v.h + '組' + v.l + 'レーン' : '自動';
+  if (k === 'members') return (v || []).map(m => C.str(m).split(/[\s　]+/).slice(0, 2).join('')).filter(Boolean).join('・') || '—';
+  const t = C.str(v); return t === '' ? '（空欄）' : t;
+}
+function histDiff(a, b) {
+  const out = [];
+  const rows = (A, B, kind) => {
+    const ma = new Map((A || []).map(x => [x.id, x])), mb = new Map((B || []).map(x => [x.id, x]));
+    mb.forEach((x, id) => { const o = ma.get(id); const who = histName(x) || histName(o) || '（名前なし）', ev = C.str(x.event || (o && o.event));
+      if (!o) { out.push(kind + '追加: ' + who + (ev ? '（' + ev + '）' : '')); return; }
+      Object.keys(H_FIELD).forEach(k => { if (!(k in x) && !(k in o)) return; const va = JSON.stringify(o[k] === undefined ? '' : o[k]), vb = JSON.stringify(x[k] === undefined ? '' : x[k]); if (va !== vb) out.push(who + (ev ? '（' + ev + '）' : '') + ': ' + H_FIELD[k] + ' ' + histVal(k, o[k]) + ' → ' + histVal(k, x[k])); }); });
+    ma.forEach((o, id) => { if (!mb.has(id)) out.push(kind + '削除: ' + (histName(o) || '（名前なし）') + (o.event ? '（' + o.event + '）' : '')); });
+  };
+  rows(a.entries, b.entries, '個人'); rows(a.relays, b.relays, 'リレー');
+  const sa = new Map((a.schedule || []).map(x => [x.id, x])), sb = new Map((b.schedule || []).map(x => [x.id, x]));
+  sb.forEach((x, id) => { const o = sa.get(id); if (!o) out.push('進行に追加: ' + C.str(x.name)); else ['name', 'at', 'adj'].forEach(k => { if (C.str(o[k]) !== C.str(x[k])) out.push('進行「' + C.str(x.name || o.name) + '」: ' + ({ name: '名前', at: '開始時刻', adj: '調整（分）' })[k] + ' ' + histVal(k, o[k]) + ' → ' + histVal(k, x[k])); }); });
+  sa.forEach((o, id) => { if (!sb.has(id)) out.push('進行から削除: ' + C.str(o.name)); });
+  if ((a.schedule || []).map(x => x.id).join() !== (b.schedule || []).map(x => x.id).join() && sa.size === sb.size) out.push('進行の順番を変更');
+  const ks = new Set(Object.keys(a.settings || {}).concat(Object.keys(b.settings || {})));
+  ks.forEach(k => { if (JSON.stringify((a.settings || {})[k]) !== JSON.stringify((b.settings || {})[k])) out.push('設定: ' + (H_SET[k] || k) + (k === 'meetName' ? ' ' + histVal(k, a.settings[k]) + ' → ' + histVal(k, b.settings[k]) : '')); });
+  if (JSON.stringify(a.award || {}) !== JSON.stringify(b.award || {})) out.push('表彰（最優秀・優秀選手）のデータ');
+  return out;
+}
+function logHistory(label, beforeJSON, extra) {
+  const h = HIST;
+  let d = [];
+  if (beforeJSON) { try { d = histDiff(JSON.parse(beforeJSON), state); } catch (e) { d = []; } }
+  if (beforeJSON && !d.length && !extra) return;      // 中身が変わっていない（同じ値を入れ直した等）は残さない
+  const det = d.slice(0, HIST_DET); if (d.length > HIST_DET) det.push('ほか ' + (d.length - HIST_DET) + '件');
+  h.push({ t: Date.now(), a: label, d: det, n: d.length, p: PART ? 2 : 1 });
+  if (h.length > HIST_MAX) h.splice(0, h.length - HIST_MAX);
+  saveHist();
+}
+function logEvent(label) { logHistory(label, null, true); }
 function commit(label, fn, opt) {
   opt = opt || {};
   if (isFinal() && !opt.allowFinal) { finalBlocked(); return false; }
@@ -2742,8 +2814,10 @@ function commit(label, fn, opt) {
   undoStack.push({ label, data: serialize() });
   if (undoStack.length > 60) undoStack.shift();
   redoStack = [];
+  let failed = false;
   try { fn(state); }
-  catch (e) { const u = undoStack.pop(); state = migrate(JSON.parse(u.data)); toast('変更を適用できませんでした: ' + e.message, 'err'); }
+  catch (e) { failed = true; const u = undoStack.pop(); state = migrate(JSON.parse(u.data)); toast('変更を適用できませんでした: ' + e.message, 'err'); }
+  if (!failed && !opt.noHist) logHistory(label, undoStack[undoStack.length - 1].data);
   state.rev++;
   meta.changesSinceBackup++; commitsSinceSnap++;
   if (opt.snap) snapshot(opt.snap, true); else snapshot();
@@ -2755,7 +2829,7 @@ function undo() {
   if (!undoStack.length || finalBlocked()) return;
   const u = undoStack.pop();
   redoStack.push({ label: u.label, data: serialize() });
-  state = migrate(JSON.parse(u.data)); state.rev++;
+  { const cur = serialize(); state = migrate(JSON.parse(u.data)); logHistory('元に戻す: ' + u.label, cur, true); } state.rev++;
   save(); recompute(); render();
   toast('取り消しました: ' + u.label);
 }
@@ -2763,7 +2837,7 @@ function redo() {
   if (!redoStack.length || finalBlocked()) return;
   const r = redoStack.pop();
   undoStack.push({ label: r.label, data: serialize() });
-  state = migrate(JSON.parse(r.data)); state.rev++;
+  { const cur = serialize(); state = migrate(JSON.parse(r.data)); logHistory('やり直し: ' + r.label, cur, true); } state.rev++;
   save(); recompute(); render();
   toast('やり直しました: ' + r.label);
 }
@@ -3172,7 +3246,7 @@ function render() {
   markPrintButtons();
   document.documentElement.classList.toggle('final', isFinal());
   if (isFinal()) {      // 確定中: 書き換える欄は押せないように（絞り込み・検索・表示の切り替えは使える）
-    $('#main').querySelectorAll('input, select, textarea').forEach(el => { const k = el.dataset.k || ''; if (!/^(ui:|cf:|set:print\.)/.test(k) && !el.closest('.cfil, .pv-side, .pvbar, .modal')) { el.disabled = true; } });
+    $('#main').querySelectorAll('input, select, textarea').forEach(el => { const k = el.dataset.k || ''; if (!/^(ui:|cf:|set:print\.|set:(cert|award)\.(hand|noRank)$)/.test(k) && !el.closest('.cfil, .pv-side, .pvbar, .modal')) { el.disabled = true; } });
     $('#main').insertAdjacentHTML('afterbegin', '<div class="notice final-note"><span class="grow"><b>大会確定（ロック）中</b>　見る・印刷・書き出しはできます。データは書き換えられません。</span></div>');
   }
   paintNote();
@@ -4171,7 +4245,7 @@ function arrangePanel(p, lanes) {
   const anyFixed = p.items.some(it => it.seatFixed);
   const bar = '';     // 操作（ほかの種目・自動に戻す・合同）は上の1行（arrTools）に
   const head = n => '<h3 class="arr-sep">' + (isCombProg(n) ? '<span class="ctag">合同</span> ' : '') + esc(n) + '</h3>';
-  const cols = ui.arrOther ? (ui.arrCols2 || 0) : (ui.arrCols || 0), cv = cols ? ' fixedcols" style="--arrcols:' + cols : '';   // ピンチで変えた「1行の組数」
+  const cols = ui.arrOther ? (ui.arrCols2 || 0) : (ui.arrCols || 0), cv = cols ? ' fixedcols" style="--arrcols:' + cols + ';--arrmin:220px' : '';   // ピンチで変えた「1行の組数」
   if (!ui.arrOther) return bar + '<div class="arr-wrap fill' + cv + '" data-fill-id="arr">' + arrHeats(p, ui.prog, lanes) + '</div>';
   // 2つの種目を並べるときは、種目を左右に・組は縦に（隣同士で見比べてドラッグ）
   return bar + '<div class="arr-wrap fill arr-cols' + cv + '" data-fill-id="arr"><div class="arr-col">' + head(ui.prog) + arrHeats(p, ui.prog, lanes) + '</div><div class="arr-col">' + head(ui.arrOther) + arrHeats(programData(ui.arrOther), ui.arrOther, lanes) + '</div></div>';
@@ -4275,6 +4349,10 @@ function certData(it, relay, prize) {
   else if (it.status === '棄権' || it.status === '失格') rank = '';
   else if (!C.str((relay ? it.r : it.e).officialTime) || !S.cert.printRecord) rank = '第　　位';
   else rank = it.rank ? '第 ' + it.rank + ' 位' : '';
+  if (W.noRank) rank = '';                 // 順位を印刷しない
+  if (W.hand) {                            // 手書き用: 名前・クラブ・泳者・順位・記録を空欄（下線）にする。種目・大会名などは印刷
+    return { hand: true, title: certTitle(W), name: '', club: relay ? '' : 'クラブ名：', mem1: relay ? '泳者：' : '', mem2: '', rank: W.noRank ? '' : '第　　位', event: '種目： ' + it.cat + ' ' + it.event, record: '記録：', meet: S.meetName, lines: certLines(W), date: C.reiwa(W.date), org: W.organizer };
+  }
   return {
     title: certTitle(W), name: (relay ? it.teamDisp : it.np.kanji) + '  殿', club: !relay && it.club ? 'クラブ名： ' + it.club : '',
     mem1: relay ? [it.memberNames[0].kanji, it.memberNames[1].kanji].filter(Boolean).join('　/　') : '', mem2: relay ? [it.memberNames[2].kanji, it.memberNames[3].kanji].filter(Boolean).join('　/　') : '',
@@ -4289,9 +4367,16 @@ function certHTML(it, relay, prize, paper, preview) {
   const at = (key, txt, extra, html) => { const [top, pt] = L[key]; return '<div class="cl ' + (extra || '') + (html && /<rt>/.test(html) ? ' hasruby' : '') + '" style="left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + pct(top * sc + dy) + ';font-size:' + (pt * sc) + 'pt">' + (html || esc(txt)) + '</div>'; };
   const kana = S.print.certKana !== false;      // 証書の名前の上にフリガナ
   const memH = ms => kana ? ms.filter(m => m.kanji).map(m => '<span class="nw">' + rubyName(m) + '</span>').join('　/　') : '';
-  let h = at('title', d.title, 'title') + at('name', d.name, 'name', !relay && kana && it.np.kana ? rubyName(it.np) + '&ensp;殿' : '');
-  if (relay) h += at('mem1', d.mem1, '', memH(it.memberNames.slice(0, 2))) + at('mem2', d.mem2, '', memH(it.memberNames.slice(2, 4))); else if (d.club) h += at('club', d.club);
-  h += at('rank', d.rank, 'name') + at('event', d.event) + at('record', d.record) + at('meet', d.meet);
+  const hw = mm => '<span class="hw" style="width:' + mm + 'mm"></span>';     // 手書き用の下線
+  let h = at('title', d.title, 'title');
+  if (d.hand) {
+    h += at('name', '', 'name', hw(P === PAPER.A5 ? 70 : 80) + '&ensp;殿');
+    if (relay) h += at('mem1', '', '', '泳者：' + hw(P === PAPER.A5 ? 100 : 120)); else h += at('club', '', '', 'クラブ名：' + hw(P === PAPER.A5 ? 55 : 65));
+  } else {
+    h += at('name', d.name, 'name', !relay && kana && it.np.kana ? rubyName(it.np) + '&ensp;殿' : '');
+    if (relay) h += at('mem1', d.mem1, '', memH(it.memberNames.slice(0, 2))) + at('mem2', d.mem2, '', memH(it.memberNames.slice(2, 4))); else if (d.club) h += at('club', d.club);
+  }
+  h += (d.rank ? at('rank', d.rank, 'name') : '') + at('event', d.event) + (d.hand ? at('record', '', '', '記録：' + hw(P === PAPER.A5 ? 50 : 60)) : at('record', d.record)) + at('meet', d.meet);
   const [lt, lpt, lgap] = L.lines;
   d.lines.forEach((t, i) => { h += '<div class="cl" style="left:' + dx + 'mm;right:' + (-dx) + 'mm;top:' + pct((lt + i * lgap) * sc + dy) + ';font-size:' + (lpt * sc) + 'pt">' + esc(t) + '</div>'; });
   h += at('date', d.date) + at('org', d.org, 'name');
@@ -4349,6 +4434,7 @@ VIEWS.certs = () => {
     '<button class="iconbtn" data-act="certStep" data-d="-1" ' + (cur > 1 ? '' : 'disabled') + ' aria-label="前の人">' + icon('prev') + '</button>' +
     '<div class="cwho">' + (it ? '<b>' + esc(relay ? it.teamDisp : it.np.kanji) + '</b><span>' + cur + ' / ' + list.length + '・' + esc(P.label) + '</span>' : '<span>対象者なし</span>') + '</div>' +
     '<button class="iconbtn" data-act="certStep" data-d="1" ' + (cur && cur < list.length ? '' : 'disabled') + ' aria-label="次の人">' + icon('next') + '</button>' +
+    '<button type="button" class="pvzoom" id="cert-zoom" data-act="certZoomReset" title="押すと元の大きさ（ピンチ・Ctrl＋ホイールで拡大、ダブルクリックで 2倍）" hidden>100%</button>' +
     (it ? '<button class="btn" data-act="certOne" data-i="' + cur + '">この人だけ印刷</button>' : '') + '</div>' +
     '<div class="cstage">' + (it ? '<div class="cpaper-box" data-w="' + P.w + '" data-h="' + P.h + '" style="width:' + P.w + 'mm;height:' + P.h + 'mm">' + certHTML(it, relay, prize, paper, 1) + '</div>' : '<div class="empty">対象者がいません</div>') + '</div></div>';
   // ---- 右: 設定（タブで切り替え。スクロールなしで収まる量に分ける）
@@ -4361,6 +4447,8 @@ VIEWS.certs = () => {
     field('大会主催者名', inp('set:' + wk + '.organizer', W.organizer)) +
     (prize ? '' : field('記録の印字', sel('set:cert.printRecord', S.cert.printRecord ? '1' : '0', [['1', '印字する'], ['0', '手書き用（印字しない）']]))) +
     '</div><div class="cchips">' +
+    '<label class="chip-ck" title="名前・クラブ（泳者）・順位・記録を空欄の下線にして印刷します。種目・大会名・日付などは印刷されます"><input type="checkbox" data-k="set:' + wk + '.hand" ' + (W.hand ? 'checked' : '') + '> 手書き用（名前・記録を空欄）</label>' +
+    '<label class="chip-ck"><input type="checkbox" data-k="set:' + wk + '.noRank" ' + (W.noRank ? 'checked' : '') + '> 順位を印刷しない</label>' +
     (prize ? '' : '<label class="chip-ck"><input type="checkbox" data-k="set:cert.skipPrize" ' + (S.cert.skipPrize ? 'checked' : '') + '> 賞状の人には記録証を出さない</label>') +
     '<label class="chip-ck"><input type="checkbox" data-k="set:print.certKana" ' + (S.print.certKana !== false ? 'checked' : '') + '> 名前にフリガナ</label></div>';
   const adj = k => { const p = S.print || {}; return A5 ? ((p.a5 || {})[k] !== undefined ? p.a5[k] : '') : p[k]; };
@@ -4378,9 +4466,21 @@ function fitCertPrev() {
   const stage = document.querySelector('.cstage'), box = stage && stage.querySelector('.cpaper-box');
   if (!box) return;
   const w = box.offsetWidth, h = box.offsetHeight; if (!w || !h) return;
-  const k = Math.min((stage.clientWidth - 16) / w, (stage.clientHeight - 16) / h);
-  box.style.transform = 'scale(' + Math.max(0.1, k).toFixed(4) + ')';
+  const z = ui.certZoom || 1, k = Math.max(0.1, Math.min((stage.clientWidth - 16) / w, (stage.clientHeight - 16) / h)) * z;
+  box.style.transform = 'scale(' + k.toFixed(4) + ')';
   box.style.marginBottom = (h * k - h) + 'px'; box.style.marginRight = (w * k - w) + 'px';
+  stage.classList.toggle('zoomed', z > 1.01);
+  const zb = document.querySelector('#cert-zoom'); if (zb) { zb.textContent = Math.round(z * 100) + '%'; zb.hidden = z <= 1.01; }
+  if (!stage.__pinch) bindPinch(stage, (f, x, y) => setCertZoom((ui.certZoom || 1) * f, x, y), e => setCertZoom((ui.certZoom || 1) > 1.05 ? 1 : 2.2, e.clientX, e.clientY));
+}
+// 記録証・賞状のプレビュー: ピンチ（Ctrl＋ホイール）で拡大・縮小、ダブルクリックで 2.2倍⇔元の大きさ。押した所を中心に
+function setCertZoom(z, cx, cy) {
+  const stage = document.querySelector('.cstage'); if (!stage) return;
+  const prev = ui.certZoom || 1; z = Math.max(1, Math.min(5, z)); if (Math.abs(z - prev) < 0.001) return;
+  const r = rectL(stage), ax = cx !== undefined ? cx / FITZR - r.left : stage.clientWidth / 2, ay = cy !== undefined ? cy / FITZR - r.top : stage.clientHeight / 2;
+  const sl = stage.scrollLeft, st = stage.scrollTop;
+  ui.certZoom = z; fitCertPrev();
+  const f = z / prev; stage.scrollLeft = (sl + ax) * f - ax; stage.scrollTop = (st + ay) * f - ay;
 }
 
 /* ---------------------------------------------------------------- 最優秀・優秀選手 */
@@ -4489,7 +4589,17 @@ VIEWS.data = () => {
     '<td class="ti"><input class="snapt" data-k="snapt:' + s2.t + '" value="' + esc(s2.title || '') + '" placeholder="' + esc(s2.label || '自動') + '" aria-label="この控えの題名" maxlength="40"></td>' +
     '<td class="num">' + (s2.n || 0) + '名</td>' +
     '<td class="go"><button class="btn sm" data-act="restoreSnap" data-i="' + i + '">この時点に戻す</button></td></tr>').join('');
-  const right = '<div class="card dcard dsnap"><div class="dch"><h2>控え（自動バックアップ）</h2><span class="small muted">5分ごと・大きな操作の前に自動で残ります。題名を付けた控えは自動では消えません</span></div>' +
+  const dtab = ui.dataTab === 'hist' ? 'hist' : 'snap';
+  const tabs = '<div class="dtabs">' + seg('dataTab', [['snap', '控え（バックアップ）'], ['hist', '変更履歴（' + HIST.length + '）']], dtab) + '</div>';
+  if (dtab === 'hist') {
+    const q = C.normKey(ui.histQ || ''), hs = HIST.slice().reverse().filter(h => !q || C.normKey(h.a + ' ' + (h.d || []).join(' ')).indexOf(q) >= 0);
+    const right = '<div class="card dcard dsnap dhist">' + tabs + '<div class="dch"><span class="small muted">最初のプログラム作成から大会が終わるまで、変更・印刷・ロックなどを自動で記録します（元に戻してもこの記録は消えません）。バックアップのファイルにも入ります。</span></div>' +
+      '<div class="snapnew"><input data-k="ui:histQ" value="' + esc(ui.histQ || '') + '" placeholder="名前・種目・操作で探す（例: 山田、公式タイム、印刷）" aria-label="変更履歴を検索"><button class="btn" data-act="histCsv">履歴をCSVで書き出す</button></div>' +
+      (hs.length ? '<div class="dlist hlist">' + hs.slice(0, 300).map(h => '<div class="hrow1"><time>' + fmtDT(h.t) + '</time><div><b>' + esc(h.a) + '</b>' + (h.d && h.d.length ? '<ul>' + h.d.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '') + '</div></div>').join('') + (hs.length > 300 ? '<p class="small muted">ほか ' + (hs.length - 300) + ' 件（CSVにはすべて入ります）</p>' : '') + '</div>'
+        : '<p class="muted">' + (q ? '見つかりませんでした。' : 'まだ記録はありません。変更すると、ここに残ります。') + '</p>') + '</div>';
+    return '<h1 class="view">データ管理・Excel</h1><div class="dgrid fill" data-fill-id="data">' + left + right + '</div>';
+  }
+  const right = '<div class="card dcard dsnap">' + tabs + '<div class="dch"><span class="small muted">5分ごと・大きな操作の前に自動で残ります。題名を付けた控えは自動では消えません</span></div>' +
     '<div class="snapnew"><input data-k="ui:snapTitle" value="' + esc(ui.snapTitle || '') + '" placeholder="題名を付けて今の状態を控える（例: 1部 終了時）" aria-label="控えの題名" maxlength="40"><button class="btn primary" data-act="snapNow">今の状態を控える</button></div>' +
     (snaps.length ? '<div class="tablewrap dlist"><table class="t snapt-t"><thead><tr><th class="ck"><input type="checkbox" data-k="ui:snapAll" ' + (snaps.every(x => (ui.snapSel || []).indexOf(x.t) >= 0) ? 'checked' : '') + ' aria-label="すべて選ぶ"></th><th>日時</th><th>題名（押して書き換え）</th><th class="num">個人</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
       '<div class="dfoot"><span class="small muted">' + snaps.length + ' 件</span><span class="grow"></span><button class="btn sm danger" data-act="delSnaps" ' + (selN ? '' : 'disabled') + '>選んだ控えを削除（' + selN + '件）</button></div>'
@@ -4624,7 +4734,7 @@ function handleValue(el) {
     commit('設定の変更', s => {
       if (path.indexOf('lanes.') === 0) { const i = +path.split('.')[1]; while (s.settings.lanes.length <= i) s.settings.lanes.push(''); s.settings.lanes[i] = v; }
       else setPath(s.settings, path, v);
-    }, { allowLocked: free, allowFinal: /^print\./.test(path) });
+    }, { allowLocked: free, allowFinal: /^print\.|^(cert|award)\.(hand|noRank)$/.test(path) });
     return;
   }
   if (kind === 'dur') {
@@ -4754,7 +4864,7 @@ const ACTIONS = {
     if (finalBlocked()) return;
     const on = !isLocked();
     undoStack.push({ label: '当日モードの切替', data: serialize() });
-    state.settings.locked = on; state.rev++; save(); recompute(); render();
+    state.settings.locked = on; state.rev++; save(); recompute(); logEvent(on ? '当日モードにした' : '当日モードを解除'); render();
     toast(on ? '当日モードにしました。設定・エントリーの変更はできません（記録入力はできます）' : '当日モードを解除しました');
   },
   backup: () => exportJSON(),
@@ -4762,7 +4872,7 @@ const ACTIONS = {
     if (!isFinal()) {
       confirmBox('大会を確定してロックしますか？', '<p>記録・エントリー・設定・表彰のデータを<b>書き換えられなく</b>します（' + (PART ? '2部' : '1部') + 'のデータ）。見る・印刷する・書き出すことはできます。</p><p class="small muted">解除するときはパスワードが必要です。確定の前にバックアップを書き出しておくと安心です。</p>', '確定してロック', () => {
         snapshot('大会確定の前', true);
-        state.settings.finalized = { at: new Date().toISOString() }; state.settings.locked = true; state.rev++;
+        state.settings.finalized = { at: new Date().toISOString() }; state.settings.locked = true; state.rev++; logEvent('大会を確定（ロック）');
         undoStack.length = 0; redoStack.length = 0;      // 「元に戻す」で確定前に戻せないように
         save(); recompute(); render(); toast('大会を確定しました。データは書き換えられません');
       });
@@ -4774,7 +4884,7 @@ const ACTIONS = {
       const inp = m.querySelector('#fin-pw'); setTimeout(() => inp.focus(), 0);
       const go = () => {
         if (pwHash(inp.value) !== FINAL_PW) { m.querySelector('#fin-msg').textContent = 'パスワードが違います'; inp.select(); return; }
-        close(); delete state.settings.finalized; state.rev++; save(); recompute(); render();
+        close(); delete state.settings.finalized; state.rev++; save(); recompute(); logEvent('大会確定を解除（パスワード）'); render();
         toast('確定を解除しました。当日モードは入ったままです（必要なら解除してください）');
       };
       m.querySelector('#fin-ok').addEventListener('click', go);
@@ -4783,7 +4893,7 @@ const ACTIONS = {
   },
   sample: () => {
     if (finalBlocked()) return;
-    const go = () => { snapshot('サンプル読み込み前', true); undoStack.push({ label: 'サンプル読み込み', data: serialize() }); state = migrate(makeSample()); meta.sample = true; state.rev++; save(); recompute(); location.hash = 'home'; render(); toast('サンプルデータを読み込みました（架空の選手です）'); };
+    const go = () => { snapshot('サンプル読み込み前', true); undoStack.push({ label: 'サンプル読み込み', data: serialize() }); state = migrate(makeSample()); meta.sample = true; state.rev++; logEvent('サンプルデータを読み込み'); save(); recompute(); location.hash = 'home'; render(); toast('サンプルデータを読み込みました（架空の選手です）'); };
     if (state.entries.length || state.relays.length) confirmBox('サンプルデータを読み込みますか？', '<p>今のデータはサンプルに置き換わります。今のデータは自動バックアップに控えるので、「データ管理」からいつでも戻せます。</p>', '読み込む', go);
     else go();
   },
@@ -4863,6 +4973,7 @@ const ACTIONS = {
   notes: () => { notesOpen = !notesOpen; notesSeen = Date.now(); paintNote(); },
   notesClose: () => { notesOpen = false; paintNote(); },
   pvZoomReset: () => { ui.pvZoom = 1; applyPvZoom(); },
+  certZoomReset: () => { ui.certZoom = 1; fitCertPrev(); },
   pvSide: () => { navPref.pvSide = navPref.pvSide === 'left' ? 'right' : 'left'; saveNavPref(); render(); },
   progArrange: () => { ui.progArrange = !ui.progArrange; ui.arrSel = null; render(); },
   seatPick: t => {
@@ -4937,6 +5048,12 @@ const ACTIONS = {
     ui.hubSel = [...set]; ui.hubFocus = ''; render();
   },
   judgeShow: () => modal('<h2>判定の数（棄権・失格・対象外など）</h2><p class="small muted">エントリーのある個人種目の選手と、リレーのチームを数えています。</p>' + judgeTable() + '<div class="actions"><button class="btn primary" data-close>閉じる</button></div>'),
+  histCsv: () => {
+    const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+    const rows = [['日時', '部', '操作', '件数', '詳細']].concat(HIST.map(h => [new Date(h.t).toLocaleString('ja-JP'), (h.p || 1) + '部', h.a, h.n || '', (h.d || []).join(' / ')]));
+    download('変更履歴_' + stamp() + '.csv', new Blob(['\ufeff' + rows.map(r => r.map(q).join(',')).join('\r\n')], { type: 'text/csv' }));
+    toast('変更履歴を書き出しました（' + HIST.length + '件）');
+  },
   printMark: t => {
     const k = t.dataset.key, m = printedMap();
     if (m[k]) delete m[k]; else { const d = hubAll().find(x => x.key === k); m[k] = { at: Date.now(), by: 'manual', n: d ? d.pages : 0, total: d && d.total, full: true }; }
@@ -4996,7 +5113,7 @@ const ACTIONS = {
     const s = getSnaps()[+t.dataset.i];
     confirmBox('この時点に戻しますか？', '<p>' + fmtDT(s.t) + '（' + esc(s.label) + '）の状態に戻します。今の状態も自動で控えます。</p>', '戻す', () => {
       snapshot('復元前の状態', true); undoStack.push({ label: '自動バックアップから復元', data: serialize() });
-      state = migrate(JSON.parse(s.data)); state.rev++; save(); recompute(); render(); toast('復元しました', null, 7000, { label: '元に戻す', fn: undo });
+      state = migrate(JSON.parse(s.data)); state.rev++; save(); recompute(); logEvent('控えから復元（' + fmtDT(s.t) + ' ' + (s.title || s.label) + '）'); render(); toast('復元しました', null, 7000, { label: '元に戻す', fn: undo });
     });
   },
   clearResults: () => finalBlocked() || confirmBox('記録だけ消しますか？', '<p>個人・リレーの公式タイムと判定をすべて消します。エントリーや設定は残ります。</p>', '消す', () => {
@@ -5005,7 +5122,7 @@ const ACTIONS = {
   }, { danger: true }),
   resetAll: () => finalBlocked() || confirmBox('すべてのデータを消しますか？', '<p>エントリー・記録・設定・表彰データをすべて消して、最初の状態に戻します。直前の状態は自動バックアップに残ります。</p>', 'すべて消す', () => {
     snapshot('全消去前', true); undoStack.push({ label: '全消去', data: serialize() });
-    state = C.emptyState(); meta.sample = false; state.rev++; save(); recompute(); location.hash = 'home'; render(); toast('すべて消しました', null, 7000, { label: '元に戻す', fn: undo });
+    state = C.emptyState(); meta.sample = false; state.rev++; logEvent('すべてのデータを消去'); save(); recompute(); location.hash = 'home'; render(); toast('すべて消しました', null, 7000, { label: '元に戻す', fn: undo });
   }, { danger: true, typeWord: '削除' })
 };
 
@@ -5333,7 +5450,9 @@ function printedMap() { return state.printed || (state.printed = {}); }
 function markPrinted(docs, by) {
   const m = printedMap(), at = Date.now();
   docs.forEach(d => { if (!d || !d.key) return; const full = d.total === undefined || d.pages >= d.total; m[d.key] = { at, by, n: d.pages, total: d.total, full }; });
-  state.rev++; save(); if (view === 'prints') render();
+  state.rev++; save();
+  if (by === 'auto') { const ts = docs.filter(d => d && d.key).map(d => (d.group ? d.group + '・' : '') + d.title + (d.total !== undefined && d.pages < d.total ? '（' + d.pages + '/' + d.total + '枚）' : '')); if (ts.length) logEvent('印刷: ' + ts.slice(0, 3).join('、') + (ts.length > 3 ? ' ほか' + (ts.length - 3) + '件' : '')); }
+  if (view === 'prints') render();
 }
 function printedChip(d) {
   const p = printedMap()[d.key];
@@ -5450,7 +5569,8 @@ function bindPinch(el, onZoom, onDouble) {
 // 組・レーンの入れ替え: ピンチ（Ctrl＋ホイール）で1行に並べる組の数を増減（広げると大きく少なく、つまむと小さく多く）
 function bindArrPinch(wrap) {
   let acc = 1, badgeT = 0;
-  const side = wrap.classList.contains('arr-cols'), key = side ? 'arrCols2' : 'arrCols', max = side ? 3 : 8;
+  const side = wrap.classList.contains('arr-cols'), key = side ? 'arrCols2' : 'arrCols';
+  const max = Math.max(1, Math.min(side ? 3 : 8, Math.floor((side ? wrap.clientWidth / 2 : wrap.clientWidth) / 220)));   // 1組の幅が 220px より狭くならないように（名前を省略せずに読める幅）
   const now = () => { const g = wrap.querySelector('.arr'); return g ? getComputedStyle(g).gridTemplateColumns.split(' ').filter(Boolean).length : 4; };
   bindPinch(wrap, f => {
     acc *= f; if (acc < 1.22 && acc > 0.82) return;
@@ -5509,9 +5629,10 @@ function download(name, blob) {
   document.body.appendChild(a); a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
 }
+function withHistory() { const o = JSON.parse(serialize()); o.history = HIST; return JSON.stringify(o); }   // バックアップには変更履歴も入れる
 function exportJSON() {
   try {
-    download('大会データ_' + stamp() + '.json', new Blob([serialize()], { type: 'application/json' }));
+    download('大会データ_' + stamp() + '.json', new Blob([withHistory()], { type: 'application/json' }));
     meta.lastBackup = Date.now(); meta.changesSinceBackup = 0; saveMeta(); render();
     toast('バックアップを書き出しました。ダウンロードフォルダを確認してください');
   } catch (e) { toast('書き出せませんでした: ' + e.message, 'err'); }
@@ -5525,7 +5646,7 @@ function importJSON(file) {
     if (!s || s.app !== 'swim-meet' || !Array.isArray(s.entries)) { toast('このアプリのバックアップファイルではありません', 'err'); return; }
     confirmBox('バックアップから復元しますか？', '<p>「' + esc(file.name) + '」: 大会名「' + esc((s.settings || {}).meetName || '') + '」、個人 ' + s.entries.length + '件、リレー ' + (s.relays || []).length + '件。</p><p>今のデータは自動バックアップに控えてから置き換えます。</p>', '復元する', () => {
       snapshot('復元前の状態', true); undoStack.push({ label: 'バックアップから復元', data: serialize() });
-      state = migrate(s); state.rev++; meta.sample = false; save(); recompute(); render(); toast('復元しました', null, 7000, { label: '元に戻す', fn: undo });
+      if (Array.isArray(s.history)) { HIST = s.history.slice(-HIST_MAX); } delete s.history; state = migrate(s); state.rev++; meta.sample = false; save(); recompute(); logEvent('バックアップから復元（' + file.name + '）'); render(); toast('復元しました', null, 7000, { label: '元に戻す', fn: undo });
     });
   };
   fr.onerror = () => toast('ファイルを読めませんでした', 'err');
@@ -5554,7 +5675,7 @@ function importXlsx(file) {
     if (!res) { modal('<h2>読み込めない形式です</h2><p>大会運営ブック（「01_個人エントリー」などのシートがあるもの）、表彰者算出ブック、またはこのアプリが書き出したExcelを選んでください。</p><p class="small muted">シート名: ' + esc(wb.SheetNames.join('、')) + '</p><div class="actions"><button class="btn primary" data-close>閉じる</button></div>'); return; }
     confirmBox(res.title, res.summary, '読み込む', () => {
       snapshot('Excel読み込み前', true); undoStack.push({ label: 'Excelの読み込み', data: serialize() });
-      res.apply(state); state = migrate(state); state.rev++; meta.sample = false; save(); recompute();
+      res.apply(state); state = migrate(state); state.rev++; meta.sample = false; save(); recompute(); logEvent('Excelを読み込み（' + file.name + '）');
       location.hash = res.go || 'home'; render();
       toast('読み込みました。「入力チェック」で内容を確認してください', null, 8000, { label: '元に戻す', fn: undo });
     });
@@ -5829,7 +5950,7 @@ document.addEventListener('change', e => {
   if (el.dataset && el.dataset.k) handleValue(el);
 });
 let searchTimer = null;
-document.addEventListener('compositionend', e => { const el = e.target; if (el.dataset && /^ui:(entQ|relQ|certQ|arrQ)$/.test(el.dataset.k || '')) el.dispatchEvent(new Event('input', { bubbles: true })); });
+document.addEventListener('compositionend', e => { const el = e.target; if (el.dataset && /^ui:(entQ|relQ|certQ|arrQ|histQ)$/.test(el.dataset.k || '')) el.dispatchEvent(new Event('input', { bubbles: true })); });
 document.addEventListener('input', e => {
   const el = e.target;
   if (!el.dataset || !el.dataset.k) return;
@@ -5842,7 +5963,7 @@ document.addEventListener('input', e => {
     if (pv) { pv.textContent = p.kind === 'time' ? C.fmtTime(p.sec) : p.kind === 'special' ? p.special : bad ? p.msg : ''; pv.classList.toggle('bad', bad); pv.classList.toggle('same', !!pv.textContent && pv.textContent === el.value.trim()); el.classList.toggle('nopv', !bad && (!pv.textContent || pv.classList.contains('same'))); }
   }
   if (el.dataset.k === 'ui:snapTitle') ui.snapTitle = el.value;
-  if (el.dataset.k === 'ui:entQ' || el.dataset.k === 'ui:relQ' || el.dataset.k === 'ui:certQ' || el.dataset.k === 'ui:arrQ') {
+  if (el.dataset.k === 'ui:entQ' || el.dataset.k === 'ui:relQ' || el.dataset.k === 'ui:certQ' || el.dataset.k === 'ui:arrQ' || el.dataset.k === 'ui:histQ') {
     clearTimeout(searchTimer);
     if (e.isComposing) return;                 // 日本語の変換中は検索しない（変換が確定してから）
     searchTimer = setTimeout(() => { ui[el.dataset.k.slice(3)] = el.value; ui.entPage = 0; if (el.dataset.k === 'ui:certQ') { ui.certPv = 1; ui.certFrom = 1; ui.certTo = ''; } render(); }, 300);
