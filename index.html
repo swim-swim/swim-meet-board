@@ -2986,9 +2986,13 @@ function load() {
   if (raw) {
     try { state = migrate(JSON.parse(raw)); }
     catch (e) {
-      // 壊れていたら最新のスナップショットから戻す
-      const snaps = getSnaps();
-      if (snaps.length) { state = migrate(JSON.parse(snaps[0].data)); toast('保存データが壊れていたため、' + fmtDT(snaps[0].t) + ' の自動バックアップから復元しました', 'err', 10000); }
+      // 壊れていたら、読める一番新しい自動バックアップから戻す。どれも読めなければ空で起動し、壊れたデータは別に残す（消さない）
+      try { localStorage.setItem(KEY + '/broken', raw); } catch (e2) { /* 容量がなければ残せない */ }
+      const snaps = getSnaps(); let ok = false;
+      for (const sn of (Array.isArray(snaps) ? snaps : [])) {
+        try { state = migrate(JSON.parse(sn.data)); ok = true; setTimeout(() => toast('保存データが壊れていたため、' + fmtDT(sn.t) + ' の自動バックアップから復元しました', 'err', 10000), 0); break; } catch (e3) { /* 次の控えへ */ }
+      }
+      if (!ok) { state = C.emptyState(); setTimeout(() => toast('保存データが壊れていて、自動バックアップも読めませんでした。空の状態で開いています。「データ管理 → バックアップを読み込む」で、書き出したファイルから戻してください', 'err', 20000), 0); }
     }
   }
   try { meta = Object.assign(meta, JSON.parse(lsGet(META_KEY) || '{}')); } catch (e) { /* ignore */ }
@@ -4330,12 +4334,12 @@ VIEWS.settings = () => {
     '<div class="grid g2">' +
     '<div class="card"><h2>大会の基本</h2><div class="fields" style="grid-template-columns:1fr">' +
     field('大会名', inp('set:meetName', S.meetName, L)) + '</div><div class="fields" style="margin-top:10px">' +
-    field('フリガナの表記', sel('set:kanaStyle', S.kanaStyle || 'kata', [['kata', 'カタカナ（サトウ　レン）'], ['hira', 'ひらがな（さとう　れん）']])) +
+    field('フリガナの表記', sel('set:kanaStyle', S.kanaStyle || 'kata', [['kata', 'カタカナ（サトウ）'], ['hira', 'ひらがな（さとう）']])) +
     field('「132.22」のような3桁の数字', sel('set:threeDigit', S.threeDigit, [['mss', '1分32秒22 と読む'], ['sec', '132.22秒 と読む']], L)) +
-    field('組の順番', sel('set:heatSort', S.heatSort || 'slow', [['slow', '遅い組から（従来のExcelと同じ）'], ['fast', '速い組から']], L)) +
-    field('組の分け方', sel('set:heatGroup', S.heatGroup || 'cat', [['cat', '年齢区分ごとに分ける（従来）'], ['event', '区分をまぜて記録順']], L)) +
+    field('組の順番', sel('set:heatSort', S.heatSort || 'slow', [['slow', '遅い組から（従来）'], ['fast', '速い組から']], L)) +
+    field('組の分け方', sel('set:heatGroup', S.heatGroup || 'cat', [['cat', '年齢区分ごと（従来）'], ['event', '区分をまぜて記録順']], L)) +
     field('レーンの割り当て', sel('set:laneOrder', S.laneOrder, [['excel', '従来のExcelと同じ'], ['fast', '組内で速い順に優先レーン']], L)) +
-    field('1人あたりの上限種目数（注意表示）', inp('set:maxEventsPerPerson', S.maxEventsPerPerson, 'inputmode="numeric" ' + L)) +
+    field('1人の上限種目数（注意）', inp('set:maxEventsPerPerson', S.maxEventsPerPerson, 'inputmode="numeric" ' + L)) +
     field('賞状の対象（何位まで）', inp('set:prizeMaxRank', S.prizeMaxRank, 'inputmode="numeric" ' + L)) +
     '</div></div>' +
     '<div class="card"><h2>使用レーン・組分け</h2><p class="small muted">優先順にレーン番号を入れます。使わない欄は空欄にします。組の中で優先①から順に割り当てます。</p><div class="fields">' +
@@ -5424,7 +5428,7 @@ const ACTIONS = {
   },
   judgeShow: () => modal('<h2>判定の数（棄権・失格・対象外など）</h2><p class="small muted">エントリーのある個人種目の選手と、リレーのチームを数えています。</p>' + judgeTable() + '<div class="actions"><button class="btn primary" data-close>閉じる</button></div>'),
   histCsv: () => {
-    const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+    const q = v => { const c = csvCell(v); return c[0] === '"' ? c : '"' + c + '"'; };
     const rows = [['日時', '部', '操作', '件数', '詳細']].concat(HIST.map(h => [new Date(h.t).toLocaleString('ja-JP'), (h.p || 1) + '部', h.a, h.n || '', (h.d || []).join(' / ')]));
     download('変更履歴_' + stamp() + '.csv', new Blob(['\ufeff' + rows.map(r => r.map(q).join(',')).join('\r\n')], { type: 'text/csv' }));
     toast('変更履歴を書き出しました（' + HIST.length + '件）');
@@ -6073,6 +6077,9 @@ function loadXLSX() {
   xlsxLoading = new Promise((res, rej) => {
     const s = document.createElement('script');
     s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    // 改ざん検出（SRI）: 中身が1文字でも違えば実行しない（cdnjs が公開しているハッシュと同じ値）
+    s.integrity = 'sha512-r22gChDnGvBylk90+2e/ycr3RVrDi8DIOkIGNhJlKfuyQM4tIRAI062MaV8sfjQKYVGjOBaZBOA87z+IhZE9DA==';
+    s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer';
     s.onload = () => window.XLSX ? res(window.XLSX) : rej(new Error('読み込み失敗'));
     s.onerror = () => { xlsxLoading = null; rej(new Error('表計算ライブラリを読み込めませんでした。インターネット接続を確認してください（バックアップ・CSVはオフラインでも使えます）')); };
     document.head.appendChild(s);
@@ -6095,10 +6102,16 @@ function importXlsx(file) {
     });
   }).catch(e => toast(e.message, 'err', 9000));
 }
+// CSV の1つの値: Excel で式として動かないよう、= + - @ などで始まる文字には ' を付ける（数字・タイムはそのまま）
+function csvCell(v) {
+  let s = String(v === null || v === undefined ? '' : v);
+  if (/^[=+\-@\t\r]/.test(s) && !/^[-+]?\d+(\.\d+)?$/.test(s)) s = "'" + s;
+  return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
 function exportCsv() {
   const rows = [['氏名', 'チーム名', '区分', '種目名', 'エントリータイム', '公式タイム', '判定', 'プログラム', '組', 'レーン', '公式順位', '得点', '状態']].concat(
     D.ind.map(it => [it.e.name, it.e.club, it.e.cat, it.e.event, it.e.entryTime, it.e.officialTime, it.e.judge, it.program, it.heat || '', it.lane || '', it.rank || '', it.points === null ? '' : it.points, it.status]));
-  const csv = '﻿' + rows.map(r => r.map(v => { const s = String(v === null || v === undefined ? '' : v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }).join(',')).join('\r\n');
+  const csv = '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n');
   download('個人エントリー_' + stamp() + '.csv', new Blob([csv], { type: 'text/csv' }));
   toast('CSVを書き出しました');
 }
