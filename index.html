@@ -1664,6 +1664,85 @@ html.tmode .app, html.tmode #print-root { display: none !important; }
 .btn.rb.rb-s:not(.tround *) { height: auto !important; min-height: 46px !important; }
 .rchips.tight { gap: 4px; } .rchips.tight .rchip { font-size: 11px; padding: 3px 8px; }
 .fields > .field.wide { grid-column: span 2; } .fields > .field.full { grid-column: 1 / -1; }
+/* ---- タブレット計時: 組分け・2人・まとめて送る */
+.tm-sub { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tm-chip { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; background: var(--track); color: var(--ink); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.tm-chip.ok { background: var(--ok-soft); color: var(--ok); }
+.tm-chip.warn { background: var(--warn-soft); color: var(--warn); }
+.tm-flash { padding: 10px 14px; border-radius: 14px; background: var(--accent-soft); color: var(--ink); font-size: 16px; font-weight: 600; }
+.tm-flash.ok { background: var(--ok-soft); color: var(--ok); }
+.tm-evbar { flex-wrap: nowrap; align-items: stretch; }
+.tm-nav { flex: 0 0 auto; width: 64px; min-height: 64px; border: 0; border-radius: 18px; background: var(--accent-soft); color: var(--accent); font-size: 40px; font-weight: 700; line-height: 1; cursor: pointer; }
+.tm-nav:disabled { opacity: .3; cursor: default; }
+.tm-evname { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; column-gap: 14px; row-gap: 2px; padding: 8px 12px; border-radius: 18px; background: var(--glass-strong); text-align: center; }
+.tm-evname small { font-size: 18px; color: var(--muted); font-weight: 700; font-family: var(--font-num); }
+.tm-evname b { font-size: 26px; line-height: 1.2; overflow-wrap: anywhere; }
+.tm-hn { font-size: 30px; font-weight: 800; white-space: nowrap; }
+.tm-hn small { font-size: 16px; font-weight: 600; }
+.tm-none { padding: 18px; border-radius: 18px; background: var(--warn-soft); color: var(--warn); font-size: 18px; font-weight: 600; text-align: center; }
+.tm-lane.off .tm-lbtn { border-style: dashed; border-color: var(--hairline); background: transparent; opacity: .55; }
+.tm-lane.off .tm-lt { font-size: 20px; }
+.tm-btn.arm { background: var(--err) !important; color: #fff !important; border-color: transparent; }
+.tm-hrow .tm-hnm { flex: 1; min-width: 0; color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+.tm-sent { color: var(--ok); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.tm-unsent { color: var(--warn); font-size: 13px; font-weight: 700; white-space: nowrap; }
+.tm-qn { font-size: 14px; color: #555; min-height: 1.2em; }
+.tm-qrt.many { flex-direction: column; align-items: stretch; gap: 4px; max-height: 26vh; overflow: auto; font-size: 16px; }
+.tm-ql { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; justify-content: center; }
+.tm-ql b { font-family: var(--font-ui); font-size: 15px; }
+.tm-scan { background: #000; color: #fff; }
+.tm-cam { position: relative; width: min(92vw, 70vh); width: min(92vw, 70dvh); aspect-ratio: 1; border-radius: 18px; overflow: hidden; background: #111; }
+.tm-cam video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tm-cam video.mirror { transform: scaleX(-1); }
+.tm-aim { position: absolute; inset: 12%; border: 3px solid rgba(255, 255, 255, .85); border-radius: 18px; pointer-events: none; }
+.tm-scanmsg { margin: 0; padding: 8px 14px; border-radius: 12px; background: rgba(255, 255, 255, .15); font-size: 17px; font-weight: 600; text-align: center; max-width: 92vw; }
+.tm-scanmsg.ng { background: rgba(208, 38, 31, .9); }
+.tm-scanhelp { margin: 0; font-size: 14px; opacity: .85; text-align: center; max-width: 92vw; }
+.tm-scan .tm-btn:not(.primary) { background: #f1f3f6; color: #000; }
+.tm-setbox h3 { margin: 16px 0 6px; font-size: 16px; }
+.tm-setrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0; font-size: 16px; font-weight: 600; }
+.tm-seg { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.tm-seg button { min-height: 48px; padding: 8px 14px; border: 1px solid #c9d2dd; border-radius: 12px; background: #fff; color: #000; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; }
+.tm-seg button.on { background: var(--accent); border-color: transparent; color: #fff; }
+.tm-ok { color: var(--ok); } .tm-ng { color: var(--warn); }
+@media (orientation: landscape) and (max-height: 700px) { .tm-scan { flex-direction: row; flex-wrap: wrap; } .tm-cam { width: min(60vw, 70vh); width: min(60vw, 70dvh); } }
+/* パソコン: タブレット計時のダイアログ */
+.tr-tabs { display: flex; gap: 6px; margin: 0 0 12px; }
+.tr-tabs button { flex: 1 1 0; min-height: 44px; border: 1px solid var(--hairline); border-radius: 999px; background: var(--btn-bg); color: var(--ink); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+.tr-tabs button.on { background: var(--accent); color: var(--accent-ink, #fff); border-color: transparent; }
+.tr-pane[hidden] { display: none; }
+.tr-set { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.tr-setqr { background: #fff; border-radius: 14px; padding: 10px; aspect-ratio: 1; }
+.tr-setqr svg { width: 100%; height: 100%; display: block; }
+.tr-setinfo ol { padding-left: 1.3em; margin: 8px 0; }
+.tr-setinfo li { margin: 4px 0; }
+.tr-tw { max-height: 52vh; overflow: auto; }
+.tr-t tr.gh th { text-align: left; background: var(--track); font-size: 14px; padding: 6px 10px; }
+.tr-t tr.gm td { padding: 4px 10px 8px; }
+/* 記録入力: レーンで絞り込み */
+.lanebar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: -2px 0 8px; min-width: 0; }
+.lanebar .lb-t { font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.lanebar .lb-n { white-space: nowrap; }
+.lanebar .seg { flex: 0 0 auto; }
+.lanebar .segbtn { min-height: 34px; padding: 4px 14px; font-size: 14px; }
+table.pt col.c-ev { width: 168px; }
+table.pt.plane { min-width: 900px; }
+table.pt td.ev { vertical-align: middle; }
+table.pt td.ev .one { overflow-wrap: anywhere; }
+table.pt td.ev .sub { color: var(--muted); font-size: 12.5px; }
+/* タブレット計時: 狭い画面でもレーンのボタンが列からはみ出さない */
+.tm-lane, .tm-lbtn { min-width: 0; }
+.tm-ln { font-size: clamp(30px, 8vw, 44px); }
+.tm-lt { min-width: 0; font-size: clamp(22px, 6.4vw, 34px); overflow-wrap: anywhere; }
+@media (max-width: 520px) { .tm-lbtn { gap: 8px; padding: 10px 12px; } .tm-lane:not(.done) .tm-lt { font-size: 15px; } }
+/* レーンで絞った全種目の表: 細い2段の形では、種目・組を各行の上の1段に */
+@container (max-width: 700px) {
+  table.pt.plane { min-width: 0; }
+  table.pt.plane tbody tr { grid-template-areas: "ev ev ev" "ln nm mt" "rk tm jd" !important; height: auto !important; min-height: 0 !important; }
+  table.pt.plane td.ev { grid-area: ev; display: block; height: auto !important; padding: 2px 4px 0 !important; }
+  table.pt.plane td.ev .one { display: inline; }
+  table.pt.plane td.ev .sub { margin-left: 8px; }
+}
 </style>
 <style id="page-style">@page { size: A4 portrait; margin: 15.5mm 7mm }</style>
 </head>
@@ -3419,7 +3498,7 @@ function fitProgram() {
   el.classList.remove('paged');
   fitProgCells(el);
   el.classList.remove('paged'); if (tabs) tabs.hidden = true;
-  if (!tabs) return;
+  if (!tabs || el.classList.contains('lanef')) return;     // レーンで絞り込み中は全部の組を縦に並べる
   const avail = () => (parseFloat(el.style.maxHeight) || (viewH() - rectL(el).top - window.scrollY / FITZR - 16));
   const before = rectL(el).top;
   if (el.scrollHeight <= avail() + 2) return;
@@ -4334,6 +4413,10 @@ VIEWS.program = () => {
   // 1組ずつ表示のときの組（未指定なら、まだ入力していないレーンがある最初の組）
   let curHeat = p.heats.some(h => h.heat === ui.progHeat) ? ui.progHeat : null;
   if (curHeat === null) { const h0 = p.heats.find(h => h.items.some(it => it.status === '未入力')) || p.heats[0]; curHeat = h0 ? h0.heat : null; }
+  // レーンで絞り込み（記録の確かめ用）: この種目の各組のそのレーンだけ、または全種目を通してそのレーンを泳ぐ全員
+  const fl = lanes.indexOf(+ui.progLane) >= 0 ? +ui.progLane : 0, flAll = !!fl && ui.progLaneAll === '1', shownLanes = fl ? [fl] : lanes;
+  const laneBar = ui.prog && p.items.length && !ui.progArrange ? '<div class="lanebar"><span class="lb-t">レーンで絞り込み</span>' + seg('progLane', [[0, 'すべて']].concat(lanes.map(l => [l, l])), fl, 'aria-label="レーン"') +
+    (fl ? seg('progLaneAll', [['0', 'この種目だけ'], ['1', '全種目を通して']], flAll ? '1' : '0') + '<span class="small muted lb-n">' + (flAll ? 'No.順に、' + fl + 'レーンを泳ぐ全員' : '各組の ' + fl + 'レーンだけ') + '</span>' : '') + '</div>' : '';
   return '<div class="vhead"><div><h1 class="view">プログラム作成・記録入力</h1><p class="lead">組・レーンを決めてプログラムを作り（「入れ替え」で手直し・「印刷」で配布用）、当日はここで記録を入力します。公式タイムを入れて Enter で次のレーンへ進みます。棄権・失格は「判定」で選びます（失格でも泳いだタイムは入れられます）。黄色の行は打ち間違いの可能性があります。当日モード中でも入力できます。</p></div></div>' +
     '<div class="bar progbar' + (ui.progArrange ? ' arr' : '') + '"><button class="btn" data-act="progStep" data-d="-1" ' + (idx <= 0 ? 'disabled' : '') + ' aria-label="前の種目">' + '←' + '</button>' +
     sel('ui:prog', ui.prog, opts.map(n => { const s = D.sched.rows.find(r => r.name === n); const its = D.ind.concat(D.rel).filter(it => it.program === n && it.event); const dn = its.filter(it => it.status !== '未入力').length; return [n, (isCombProg(n) ? '［合同］' : '') + (s ? 'No.' + s.no + ' ' : '') + n + (its.length ? (dn === its.length ? '　✓' : dn ? '　' + dn + '/' + its.length : '') : '　（なし）')]; }), 'class="progsel" aria-label="種目"') +
@@ -4346,31 +4429,48 @@ VIEWS.program = () => {
     (ui.prog && p.items.length ? '<div class="prog" style="margin:-4px 0 10px"><i style="width:' + pct + '%"></i></div>' : '') +
     (allDone && ui._doneNote !== ui.prog ? (ui._doneNote = ui.prog, setTimeout(() => toast('「' + ui.prog + '」の記録入力が終わりました', null, 10000, idx < opts.length - 1 ? { label: '次の種目へ', fn: () => ACTIONS.progStep({ dataset: { d: '1' } }) } : null), 0), '') : '') +
     (false ? '<div class="notice ok"><span class="grow">この種目の記録入力が終わりました。</span><button class="btn sm" data-act="printFlash1" data-p="' + esc(ui.prog) + '">速報を印刷</button>' + (idx < opts.length - 1 ? '<button class="btn sm primary" data-act="progStep" data-d="1">次の種目へ →</button>' : '') + '</div>' : '') +
-    (ui.progArrange && ui.prog && p.items.length ? arrangePanel(p, lanes) :
+    laneBar +
+    (ui.progArrange && ui.prog && p.items.length ? arrangePanel(p, lanes) : flAll ? laneAllTable(fl) :
     (p.heats.length > 1 ? '<div class="heattabs" hidden><span class="small muted">組</span>' + seg('progHeat', p.heats.map(h => [h.heat, '第' + h.heat + '組' + (h.items.every(it => it.status !== '未入力') ? ' ✓' : '')]), curHeat) + '</div>' : '') +
     (!ui.prog ? '<div class="card empty">種目がありません。大会設定で種目を登録してください。</div>' :
-      (p.items.length ? '<div class="heats prog-h fill" data-fill-id="prog">' + p.heats.map(h => {
+      (p.items.length ? '<div class="heats prog-h fill' + (fl ? ' lanef' : '') + '" data-fill-id="prog">' + p.heats.map(h => {
         const byLane = new Map(h.items.map(it => [it.lane, it]));
         const noLane = h.items.filter(it => !it.lane);
         const hDone = h.items.every(it => it.status !== '未入力');
         return '<div class="tablewrap pw' + (h.heat === curHeat ? ' cur' : '') + '" data-heat="' + h.heat + '"><table class="t pt' + (p.relay ? ' prel' : '') + '"><colgroup><col class="c-ln"><col><col class="c-mt"><col class="c-tm"><col class="c-jd"><col class="c-rk"></colgroup>' +
           '<thead><tr class="ph"><th colspan="6">第 ' + h.heat + ' 組' + (hDone ? '　<span class="pill ok">✓ 入力済み</span>' : '') + '</th></tr><tr class="pc"><th class="c">レーン</th><th>' + (p.relay ? 'チーム・泳者' : '氏名・チーム') + '</th><th>区分・申込</th><th>公式タイム</th><th>判定</th><th class="c">順位</th></tr></thead><tbody>' +
-          lanes.map(ln => byLane.get(ln)).concat(noLane).map((it, j) => {
-            if (!it) return '<tr class="emp"><td class="c ln"><span class="lane">' + lanes[j] + '</span></td><td colspan="5" class="muted small">（空き）</td></tr>';
-            const pre = (p.relay ? 'rel:' : 'ent:') + it.id + ':';
-            const src = p.relay ? it.r : it.e;
-            const iss = (D.issuesById.get(it.id) || []).filter(x => /タイム|中央値/.test(x.msg));
-            const who = p.relay ? it.teamDisp : it.np.kanji, sub = p.relay ? it.memberText : it.club;
-            const entry = it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '';
-            return '<tr data-row="' + it.id + '" class="' + (iss.length ? 'warn' : '') + '" title="' + esc(iss.map(x => x.msg).join('\n')) + '"><td class="c ln"><span class="lane">' + (it.lane || '?') + '</span></td>' +
-              (p.relay ? '<td class="nm rnm"><div class="one"><b>' + esc(who) + '</b><span class="rcat">' + esc(it.cat) + '</span>' + (iss.length ? ' <span class="pill warn">要確認</span>' : '') + '</div>' + relayGrid(it, true) + '</td>' :
-              '<td class="nm"><div class="one fit"><b>' + rubyName(it.np) + '</b></div><div class="one sub fit">' + (iss.length ? '<span class="pill warn">要確認</span> ' : '') + esc(sub) + '</div></td>') +
-              '<td class="mt"><div class="one fit">' + esc(it.cat) + (it.combined ? ' <span class="ctag" title="合同レース「' + esc(it.combined) + '」で泳ぐ（記録証・順位はエントリー種目のまま）">合同</span>' : '') + (it.event !== ui.prog ? ' <span class="pill mute">' + esc(it.event.split(' ')[0]) + '</span>' : '') + '</div><div class="one sub num">' + (entry ? '申込 ' + entry : '　') + '</div></td>' +
-              '<td class="tm"><div class="tbox">' + timeCell(pre + 'officialTime', src.officialTime, '', 'data-col="prog" aria-label="' + esc(who) + ' 公式タイム"') + '</div></td>' +
-              '<td class="jd">' + judgeBtns(pre + 'judge', src.judge) + '</td><td class="c rk"><b>' + (it.rank ? it.rank + '位' : it.status === '失格' || it.status === '棄権' || it.status === '対象外' ? '<span class="pill ' + (it.status === '失格' ? 'err' : it.status === '対象外' ? 'mute' : 'warn') + '">' + it.status + '</span>' : '') + '</b></td></tr>';
+          shownLanes.map(ln => byLane.get(ln)).concat(fl ? [] : noLane).map((it, j) => {
+            if (!it) return '<tr class="emp"><td class="c ln"><span class="lane">' + shownLanes[j] + '</span></td><td colspan="5" class="muted small">（空き）</td></tr>';
+            return progRow(it, p.relay, ui.prog, '');
           }).join('') + '</tbody></table></div>';
       }).join('') + '</div>' : '<div class="card empty">この種目のエントリーはありません。</div>')));
 };
+// 記録入力の1行（組ごとの表・レーンで絞った全種目の表で使う）。lead: 行頭に足すセル
+function progRow(it, relay, prog, lead) {
+  const pre = (relay ? 'rel:' : 'ent:') + it.id + ':';
+  const src = relay ? it.r : it.e;
+  const iss = (D.issuesById.get(it.id) || []).filter(x => /タイム|中央値/.test(x.msg));
+  const who = relay ? it.teamDisp : it.np.kanji, sub = relay ? it.memberText : it.club;
+  const entry = it.pe.kind === 'time' ? C.fmtTime(it.pe.sec) : '';
+  return '<tr data-row="' + it.id + '" class="' + (iss.length ? 'warn' : '') + '" title="' + esc(iss.map(x => x.msg).join('\n')) + '">' + lead + '<td class="c ln"><span class="lane">' + (it.lane || '?') + '</span></td>' +
+    (relay ? '<td class="nm rnm"><div class="one"><b>' + esc(who) + '</b><span class="rcat">' + esc(it.cat) + '</span>' + (iss.length ? ' <span class="pill warn">要確認</span>' : '') + '</div>' + relayGrid(it, true) + '</td>' :
+    '<td class="nm"><div class="one fit"><b>' + rubyName(it.np) + '</b></div><div class="one sub fit">' + (iss.length ? '<span class="pill warn">要確認</span> ' : '') + esc(sub) + '</div></td>') +
+    '<td class="mt"><div class="one fit">' + esc(it.cat) + (it.combined ? ' <span class="ctag" title="合同レース「' + esc(it.combined) + '」で泳ぐ（記録証・順位はエントリー種目のまま）">合同</span>' : '') + (it.event !== prog ? ' <span class="pill mute">' + esc(it.event.split(' ')[0]) + '</span>' : '') + '</div><div class="one sub num">' + (entry ? '申込 ' + entry : '　') + '</div></td>' +
+    '<td class="tm"><div class="tbox">' + timeCell(pre + 'officialTime', src.officialTime, '', 'data-col="prog" aria-label="' + esc(who) + ' 公式タイム"') + '</div></td>' +
+    '<td class="jd">' + judgeBtns(pre + 'judge', src.judge) + '</td><td class="c rk"><b>' + (it.rank ? it.rank + '位' : it.status === '失格' || it.status === '棄権' || it.status === '対象外' ? '<span class="pill ' + (it.status === '失格' ? 'err' : it.status === '対象外' ? 'mute' : 'warn') + '">' + it.status + '</span>' : '') + '</b></td></tr>';
+}
+// 全種目を通して1つのレーンを泳ぐ全員（No.順）。タイムはここで入力・修正できる
+function laneAllTable(ln) {
+  const rows = [];
+  D.sched.rows.filter(r => r.name && !r.isBreak).forEach(r => {
+    const relay = C.isRelayName(r.name);
+    (relay ? D.rel : D.ind).filter(it => it.program === r.name && it.event && it.lane === ln).sort((a, b) => a.heat - b.heat)
+      .forEach(it => rows.push(progRow(it, relay, r.name, '<td class="ev"><div class="one fit"><b>No.' + r.no + '</b> ' + esc(r.name) + '</div><div class="one sub">第' + it.heat + '組</div></td>')));
+  });
+  return '<div class="heats prog-h fill lanef" data-fill-id="prog"><div class="tablewrap pw cur"><table class="t pt plane"><colgroup><col class="c-ev"><col class="c-ln"><col><col class="c-mt"><col class="c-tm"><col class="c-jd"><col class="c-rk"></colgroup>' +
+    '<thead><tr class="ph"><th colspan="7">' + ln + 'レーン（全種目・No.順）　<span class="small muted">' + rows.length + '件</span></th></tr><tr class="pc"><th>No.・種目・組</th><th class="c">レーン</th><th>氏名・チーム</th><th>区分・申込</th><th>公式タイム</th><th>判定</th><th class="c">順位</th></tr></thead><tbody>' +
+    (rows.length ? rows.join('') : '<tr class="emp"><td colspan="7" class="muted small">このレーンを泳ぐ選手はいません</td></tr>') + '</tbody></table></div></div>';
+}
 // レーンで検索して割り当て: 空きレーンを押す（または検索欄に入れる）→ 候補から「ここへ」
 function arrSearch(p) {
   const t = ui.arrTarget, q = C.normKey(ui.arrQ || '');
@@ -6582,40 +6682,159 @@ const QR = (function () {
 })();
 
 /* ---------------------------------------------------------------- タブレット計時（?timer で開く）とパソコンでの読み込み
-   タブレット: スタートと各レーンのゴールをタップ → 組ごとの QR を表示。
-   パソコン: カメラで QR を読む → 内容を確認して公式タイムへ。データは端末の外へ送らない。 */
+   ① パソコン → タブレット: 組分け（競技No.・種目名・組ごとの使うレーン）を QR で渡す（選手の名前は渡さない）。
+   ② タブレット: 組分けの順に「スタート → ゴールでレーンを押す → 次の組へ」。1人でも、2人でレーンを分けても計れる。
+   ③ タブレット → パソコン: 計った組をまとめて QR で渡す → 確認して公式タイムへ。データは端末の外（インターネット）へ送らない。 */
 const TM_KEY = 'swim-meet-app/timer';
 const tmCs = ms => Math.max(0, Math.floor(ms / 10));
 function tmFmt(cs) { if (!(cs >= 0)) return ''; const m = Math.floor(cs / 6000), r = cs - m * 6000, s = Math.floor(r / 100), c = r % 100; return (m ? m + ':' + String(s).padStart(2, '0') : String(s)) + '.' + String(c).padStart(2, '0'); }
 function tmCheck(s) { let v = 0; for (let i = 0; i < s.length; i++) v = (v + s.charCodeAt(i) * (i + 1)) % 1296; return v.toString(36).toUpperCase().padStart(2, '0'); }
-// コード: SMB1|競技No|組|レーン:1/100秒,…|確認
+function tmHash(s) { let h = 2166136261; for (const ch of String(s)) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36).toUpperCase().padStart(4, '0').slice(-4); }
+const tmLc = l => (+l).toString(36), tmLn = c => parseInt(c, 36);   // レーン 0〜10 を1文字に（10 は a）
+const tmU8 = s => new TextEncoder().encode(String(s)).length;
+const tmNow = () => (performance.timeOrigin || Date.now() - performance.now()) + performance.now();
+const tmRange = ls => { if (!ls || !ls.length) return ''; const a = ls.slice().sort((x, y) => x - y); return a.length === 1 ? a[0] + 'レーン' : a[0] + '〜' + a[a.length - 1] + 'レーン'; };
+
+// 1組だけの古い形（SMB1|競技No|組|レーン:1/100秒,…|確認）。読み込みは今も受け付ける
 function tmCode(no, heat, times) {
   const body = 'SMB1|' + no + '|' + heat + '|' + Object.keys(times).map(Number).sort((a, b) => a - b).map(l => l + ':' + times[l]).join(',');
   return body + '|' + tmCheck(body);
 }
-function tmParse(text) {
-  const t = String(text || '').trim().replace(/[｜]/g, '|').replace(/[：]/g, ':').replace(/[，、]/g, ',').replace(/\s+/g, '');
-  const m = t.match(/^SMB1\|(\d{1,3})\|(\d{1,3})\|((?:\d{1,2}:\d{1,6},?)*)\|([0-9A-Za-z]{2})$/);
-  if (!m) return { err: 'スイム計時のコードではありません' };
-  const body = t.slice(0, t.lastIndexOf('|'));
-  if (tmCheck(body) !== m[4].toUpperCase()) return { err: 'コードの一部が違います（確認の文字が合いません）' };
-  const times = m[3] ? m[3].split(',').filter(Boolean).map(x => x.split(':').map(Number)) : [];
-  return { no: +m[1], heat: +m[2], times, code: t };
+// いまの形: SMB2|組分け|担当・人数・部|担当レーン|No.組:レーン=1/100秒,…;…|確認（何組でもまとめて送れる）
+function tmCode2(meta, heats) {
+  const hs = heats.map(h => h.no + '.' + h.heat + ':' + Object.keys(h.times).map(Number).sort((a, b) => a - b).map(l => l + '=' + h.times[l]).join(',')).join(';');
+  const body = 'SMB2|' + (meta.set || '-') + '|' + (meta.me || 1) + (meta.ppl || 1) + (meta.part || 0) + '|' + (meta.lanes || []).map(tmLc).join('') + '|' + hs;
+  return body + '|' + tmCheck(body);
 }
-const tmNow = () => (performance.timeOrigin || Date.now() - performance.now()) + performance.now();
+function tmParse(text) {
+  const t = String(text || '').trim().replace(/[｜]/g, '|').replace(/[：]/g, ':').replace(/[，、]/g, ',').replace(/[＝]/g, '=').replace(/[；]/g, ';').replace(/\s+/g, '');
+  const body = t.slice(0, t.lastIndexOf('|')), ck = t.slice(t.lastIndexOf('|') + 1).toUpperCase();
+  let m = t.match(/^SMB1\|(\d{1,3})\|(\d{1,3})\|((?:\d{1,2}:\d{1,6},?)*)\|([0-9A-Za-z]{2})$/);
+  if (m) {
+    if (tmCheck(body) !== ck) return { err: 'コードの一部が違います（確認の文字が合いません）' };
+    const times = m[3] ? m[3].split(',').filter(Boolean).map(x => x.split(':').map(Number)) : [];
+    return { v: 1, set: null, me: 1, ppl: 1, part: 0, lanes: null, heats: [{ no: +m[1], heat: +m[2], times }], no: +m[1], heat: +m[2], times, code: t };
+  }
+  m = t.match(/^SMB2\|([0-9A-Z]{4}|-)\|([12])([12])([012])\|([0-9a]*)\|((?:\d{1,3}\.\d{1,3}:(?:\d{1,2}=\d{1,6},?)*;?)*)\|([0-9A-Za-z]{2})$/);
+  if (!m) return { err: 'スイム計時のコードではありません' };
+  if (tmCheck(body) !== ck) return { err: 'コードの一部が違います（確認の文字が合いません）' };
+  const heats = m[6].split(';').filter(Boolean).map(h => { const i = h.indexOf(':'), [no, heat] = h.slice(0, i).split('.').map(Number); return { no, heat, times: h.slice(i + 1).split(',').filter(Boolean).map(x => x.split('=').map(Number)) }; });
+  const h0 = heats[0] || { no: 0, heat: 0, times: [] };
+  return { v: 2, set: m[1] === '-' ? null : m[1], me: +m[2], ppl: +m[3], part: +m[4], lanes: m[5] ? [...m[5]].map(tmLn) : null, heats, no: h0.no, heat: h0.heat, times: h0.times, code: t };
+}
+// 組分け（パソコン → タブレット）: SMS1|識別|部|No~種目名~組ごとのレーン(.区切り);…|確認
+function tmSetCode(set) {
+  const body = 'SMS1|' + set.id + '|' + set.part + '|' + set.ev.map(e => e.no + '~' + String(e.name).replace(/[|~;]/g, ' ') + '~' + e.heats.map(h => h.map(tmLc).join('')).join('.')).join(';');
+  return body + '|' + tmCheck(body);
+}
+function tmParseSet(text) {
+  const t = String(text || ''), m = /^SMS1\|([0-9A-Z]{4})\|([12])\|([\s\S]*)\|([0-9A-Z]{2})$/.exec(t);
+  if (!m) return null;
+  if (tmCheck(t.slice(0, t.lastIndexOf('|'))) !== m[4]) return { err: '組分けのQRの一部が違います。もう一度読み込んでください' };
+  const ev = m[3].split(';').filter(Boolean).map(x => { const [no, name, hs] = x.split('~'); return { no: +no, name: name || '', heats: (hs || '').split('.').map(h => [...h].map(tmLn)) }; });
+  return { id: m[1], part: +m[2], ev };
+}
+// 長いコードは数枚の QR に分けて順に表示する（SMK|識別|何枚目|全部で|中身）。1枚は 106 バイト（型番6・訂正M）に収める
+function tmChunks(text) {
+  if (tmU8(text) <= 100) return [text];
+  const parts = []; let cur = '', n = 0;
+  for (const ch of String(text)) { const b = tmU8(ch); if (n + b > 78) { parts.push(cur); cur = ''; n = 0; } cur += ch; n += b; }
+  if (cur) parts.push(cur);
+  const id = tmHash(text).slice(-3);
+  return parts.map((p, i) => 'SMK|' + id + '|' + (i + 1) + '|' + parts.length + '|' + p);
+}
+function tmJoiner() {     // 分けた QR を集める。全部そろうと { full } を返す
+  const box = new Map();
+  return text => {
+    const k = /^SMK\|([0-9A-Z]{3})\|(\d{1,3})\|(\d{1,3})\|([\s\S]*)$/.exec(String(text || ''));
+    if (!k) return { full: String(text || '') };
+    const n = +k[3]; let e = box.get(k[1]); if (!e || e.n !== n) { e = { n, p: {} }; box.set(k[1], e); }
+    e.p[+k[2]] = k[4];
+    const got = Object.keys(e.p).length; if (got < n) return { got, n };
+    box.delete(k[1]); let s = ''; for (let i = 1; i <= n; i++) s += e.p[i];
+    return { full: s, n };
+  };
+}
+// QR を数枚なら順に切り替えて表示（box が画面から消えたら止まる）
+function qrAnim(box, texts, label, cls) {
+  let i = 0; const svgs = texts.map(t => QR.toSVG(t, { cls: cls || 'tm-qr' }));
+  const show = () => { box.innerHTML = svgs[i]; if (label) label.textContent = texts.length > 1 ? 'QR ' + (i + 1) + ' / ' + texts.length + '（自動で切り替わります）' : ''; };
+  show(); if (texts.length < 2) return;
+  const iv = setInterval(() => { if (!box.isConnected) { clearInterval(iv); return; } i = (i + 1) % texts.length; show(); }, 650);
+}
+// カメラで QR を読み続ける（BarcodeDetector があれば使い、なければ自作の読み取り）。video が画面から消えたら止まる
+function qrCamera(video, onText, onMsg, opt) {
+  opt = opt || {};
+  let stream = null, alive = true, paused = false;
+  const det = ('BarcodeDetector' in window && window.BarcodeDetector) ? (() => { try { return new BarcodeDetector({ formats: ['qr_code'] }); } catch (e) { return null; } })() : null;
+  const cv = document.createElement('canvas'), cx = cv.getContext('2d', { willReadFrequently: true });
+  const stop = () => { alive = false; if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; };
+  const ctl = { stop, pause: v => { paused = !!v; } };
+  const loop = async () => {
+    if (!alive) return;
+    if (!video.isConnected) { stop(); return; }
+    if (!paused && video.readyState >= 2 && video.videoWidth) {
+      const k = Math.min(1, 800 / Math.max(video.videoWidth, video.videoHeight));
+      cv.width = Math.round(video.videoWidth * k); cv.height = Math.round(video.videoHeight * k);
+      cx.drawImage(video, 0, 0, cv.width, cv.height);
+      let text = null;
+      if (det) { try { const r = await det.detect(cv); if (r && r[0]) text = r[0].rawValue; } catch (e) { /* 予備へ */ } }
+      if (text === null) { try { text = QR.decode(cx.getImageData(0, 0, cv.width, cv.height)); } catch (e) { text = null; } }
+      if (text !== null && alive && !paused) onText(text);
+    }
+    setTimeout(loop, 120);
+  };
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { onMsg(opt.noCam || 'このブラウザではカメラを使えません', 'ng'); return ctl; }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }).then(st => {
+    if (!alive || !video.isConnected) { st.getTracks().forEach(t => t.stop()); return; }
+    stream = st; video.srcObject = st;
+    const fm = (st.getVideoTracks()[0].getSettings() || {}).facingMode;
+    if (fm !== 'environment') video.classList.add('mirror');
+    video.play().catch(() => {});
+    onMsg(opt.ready || 'QRをカメラに向けてください');
+    loop();
+  }).catch(e => {
+    onMsg((e && e.name === 'NotAllowedError') ? 'カメラの使用が許可されていません。' + (opt.denied || '') : 'カメラが見つかりません。' + (opt.denied || ''), 'ng');
+  });
+  return ctl;
+}
 
 // ---------------------------------------------------------------- タブレットの画面
 const Timer = (function () {
-  let S, root, raf = 0, wake = null, armed = {};
+  let S, root, raf = 0, wake = null, armed = {}, flash = null, flashT = 0;
   function loadS() {
     let s = null;
     try { s = JSON.parse(localStorage.getItem(TM_KEY) || 'null'); } catch (e) { s = null; }
     s = s && typeof s === 'object' ? s : {};
-    return { no: s.no > 0 ? s.no : 1, heat: s.heat > 0 ? s.heat : 1, l0: s.l0 >= 0 ? s.l0 : 1, l1: s.l1 > 0 ? s.l1 : 6, t0: s.t0 || null, times: s.times && typeof s.times === 'object' ? s.times : {}, hist: Array.isArray(s.hist) ? s.hist : [], shown: !!s.shown };
+    const set = s.set && Array.isArray(s.set.ev) && s.set.ev.length ? s.set : null;
+    return { no: s.no > 0 ? s.no : 1, heat: s.heat > 0 ? s.heat : 1, l0: s.l0 >= 0 ? s.l0 : 1, l1: s.l1 > 0 ? s.l1 : 6, t0: s.t0 || null, times: s.times && typeof s.times === 'object' ? s.times : {},
+      hist: Array.isArray(s.hist) ? s.hist.map(h => Object.assign({ sent: h.sent !== false }, h)) : [], set, ppl: s.ppl === 2 ? 2 : 1, me: s.me === 2 ? 2 : 1, flip: !!s.flip, split: s.split > 0 ? s.split : 0 };
   }
   function saveS() { try { localStorage.setItem(TM_KEY, JSON.stringify(S)); } catch (e) { /* 保存できなくても計測は続ける */ } }
-  const lanes = () => { const a = []; for (let l = Math.min(S.l0, S.l1); l <= Math.max(S.l0, S.l1); l++) a.push(l); return a; };
+  // レーン: プール全体（組分けにあるレーン、なければ設定の範囲）→ 2人のときは前半を1人目・後半を2人目
+  const pool = () => { if (S.set) { const u = new Set(); S.set.ev.forEach(e => e.heats.forEach(h => h.forEach(l => u.add(l)))); return [...u].sort((a, b) => a - b); } const a = []; for (let l = Math.min(S.l0, S.l1); l <= Math.max(S.l0, S.l1); l++) a.push(l); return a; };
+  // 2人のときの境目（1人目は境目のレーンまで）。自動: 組分けの中の選手の数が2人でほぼ同じになる所（中央のレーンほど選手が多いので、番号の半分では偏る）
+  function autoSplit() {
+    const p = pool(); if (p.length < 2) return p[0] || 0;
+    const use = {}; if (S.set) S.set.ev.forEach(e => e.heats.forEach(h => h.forEach(l => { use[l] = (use[l] || 0) + 1; })));
+    let best = null;
+    for (let k = 1; k < p.length; k++) {
+      const a = p.slice(0, k).reduce((t, l) => t + (use[l] || 0), 0), b = p.slice(k).reduce((t, l) => t + (use[l] || 0), 0);
+      const sc = (S.set ? Math.abs(a - b) * 100 : 0) + Math.abs(k - p.length / 2);
+      if (!best || sc < best.sc) best = { sc, k };
+    }
+    return p[best.k - 1];
+  }
+  const splitAt = () => { const p = pool(); return S.split && p.indexOf(S.split) >= 0 && S.split !== p[p.length - 1] ? S.split : autoSplit(); };
+  const mine = () => { const p = pool(); if (S.ppl < 2) return p; const sp = splitAt(); return S.me === 1 ? p.filter(l => l <= sp) : p.filter(l => l > sp); };
+  const ev = () => S.set ? S.set.ev.find(e => e.no === S.no) || null : null;
+  const heatLanes = () => { const e = ev(); return e ? (e.heats[S.heat - 1] || []) : null; };
+  const isActive = l => { const h = heatLanes(); return !h || h.indexOf(l) >= 0; };
+  const order = () => S.set ? S.set.ev.flatMap(e => e.heats.map((h, i) => ({ no: e.no, heat: i + 1 }))) : null;
+  const pos = () => { const o = order(); return o ? o.findIndex(x => x.no === S.no && x.heat === S.heat) : -1; };
   const nTimes = () => Object.keys(S.times).length;
+  const unsent = () => S.hist.filter(h => !h.sent);
+  function note(t, cls) { flash = { t, cls: cls || '' }; clearTimeout(flashT); flashT = setTimeout(() => { flash = null; if (root) draw(); }, 4500); }
   function keepAwake(on) {
     try {
       if (on && !wake && navigator.wakeLock) navigator.wakeLock.request('screen').then(w => { wake = w; w.addEventListener('release', () => { wake = null; }); }).catch(() => {});
@@ -6623,25 +6842,40 @@ const Timer = (function () {
     } catch (e) { /* 対応していない端末 */ }
   }
   function draw() {
-    const run = !!S.t0, n = nTimes();
+    const run = !!S.t0, n = nTimes(), my = mine(), act = my.filter(isActive), e = ev(), o = order(), p = pos();
+    const shown = S.flip ? my.slice().reverse() : my;
     const lane = l => {
       const t = S.times[l];
+      if (!isActive(l)) return '<div class="tm-lane off"><button type="button" class="tm-lbtn" disabled aria-label="' + l + 'レーン（この組は空き）"><span class="tm-ln">' + l + '<small>レーン</small></span><span class="tm-lt">空き</span></button></div>';
       return '<div class="tm-lane' + (t !== undefined ? ' done' : '') + '"><button type="button" class="tm-lbtn" data-lane="' + l + '"' + (run && t === undefined ? '' : ' disabled') + ' aria-label="' + l + 'レーンのゴール"><span class="tm-ln">' + l + '<small>レーン</small></span><span class="tm-lt">' + (t !== undefined ? tmFmt(t) : run ? 'ゴールでタップ' : '—') + '</span></button>' +
         (t !== undefined ? '<button type="button" class="tm-x' + (armed['x' + l] ? ' arm' : '') + '" data-t="x" data-l="' + l + '">' + (armed['x' + l] ? 'もう一度で取消' : '取消') + '</button>' : '') + '</div>';
     };
-    root.innerHTML = '<div class="tm-wrap">' +
-      '<header class="tm-top"><b>スイム計時</b><span class="tm-sub">タップした瞬間のタイムを 1/100 秒で記録します（手動計時）</span><button type="button" class="tm-btn" data-t="set">設定</button></header>' +
-      '<div class="tm-race">' +
+    const race = S.set
+      ? '<div class="tm-race tm-evbar"><button type="button" class="tm-nav" data-t="mv" data-d="-1"' + (run || p <= 0 ? ' disabled' : '') + ' aria-label="前の組">‹</button>' +
+        '<div class="tm-evname">' + (e ? '<small>No.' + e.no + '</small><b>' + esc(e.name) + '</b><span class="tm-hn">第' + S.heat + '組<small> / 全' + e.heats.length + '組</small></span>' : '<b>組分けにない競技です</b>') + '</div>' +
+        '<button type="button" class="tm-nav" data-t="mv" data-d="1"' + (run || p < 0 || p >= o.length - 1 ? ' disabled' : '') + ' aria-label="次の組">›</button></div>'
+      : '<div class="tm-race">' +
         '<div class="tm-step"><small>競技No.</small><button type="button" data-t="no" data-d="-1"' + (run || S.no <= 1 ? ' disabled' : '') + ' aria-label="競技No.を減らす">−</button><b>' + S.no + '</b><button type="button" data-t="no" data-d="1"' + (run ? ' disabled' : '') + ' aria-label="競技No.を増やす">＋</button></div>' +
         '<div class="tm-step"><small>組</small><button type="button" data-t="heat" data-d="-1"' + (run || S.heat <= 1 ? ' disabled' : '') + ' aria-label="組を減らす">−</button><b>' + S.heat + '</b><button type="button" data-t="heat" data-d="1"' + (run ? ' disabled' : '') + ' aria-label="組を増やす">＋</button></div>' +
-      '</div>' +
+      '</div>';
+    const cols = Math.max(1, shown.length);
+    const us = unsent().length, cnt = us + (n && !sameAsSaved() ? 1 : 0);
+    root.innerHTML = '<div class="tm-wrap">' +
+      '<header class="tm-top"><b>スイム計時</b><span class="tm-sub">' +
+        (S.set ? '<span class="tm-chip ok">組分け ' + S.set.id + '（' + S.set.part + '部）</span>' : '<span class="tm-chip warn">組分けなし（No.・組を手で合わせる）</span>') +
+        '<span class="tm-chip">' + (S.ppl === 2 ? (S.me === 1 ? '1人目' : '2人目') + '・' : '') + tmRange(my) + '</span></span>' +
+        '<button type="button" class="tm-btn" data-t="set"' + (run ? ' disabled' : '') + '>設定</button></header>' +
+      (flash ? '<div class="tm-flash ' + flash.cls + '">' + esc(flash.t) + '</div>' : '') +
+      race +
       '<div class="tm-clock" id="tm-clock">' + (run ? tmFmt(tmCs(tmNow() - S.t0)) : '0.00') + '</div>' +
-      (run ? '<button type="button" class="tm-cancel' + (armed.cancel ? ' arm' : '') + '" data-t="cancel">' + (armed.cancel ? 'もう一度押すとスタートを取り消します' : 'スタートを取り消す（フライングなど）') + '</button>'
+      (!act.length ? '<div class="tm-none">この組は、あなたの担当（' + tmRange(my) + '）に泳ぐ選手がいません。「次の組へ」で進んでください。</div>'
+        : run ? '<button type="button" class="tm-cancel' + (armed.cancel ? ' arm' : '') + '" data-t="cancel">' + (armed.cancel ? 'もう一度押すとスタートを取り消します' : 'スタートを取り消す（フライングなど）') + '</button>'
         : '<button type="button" class="tm-start" data-t="start">スタート</button>') +
-      '<div class="tm-lanes" style="--tmcl:' + Math.ceil(lanes().length / Math.ceil(lanes().length / 4)) + ';--tmcp:' + Math.ceil(lanes().length / Math.ceil(lanes().length / 2)) + '">' + lanes().map(lane).join('') + '</div>' +
-      '<div class="tm-foot"><button type="button" class="tm-btn big primary" data-t="qr"' + (n ? '' : ' disabled') + '>QRを表示（' + n + 'レーン）</button><button type="button" class="tm-btn big" data-t="next">次の組へ →</button></div>' +
-      (S.hist.length ? '<details class="tm-hist"><summary>これまでの組（' + S.hist.length + '）— もう一度QRを出せます</summary>' +
-        S.hist.slice().reverse().map((h, i) => '<button type="button" class="tm-hrow" data-t="hq" data-i="' + (S.hist.length - 1 - i) + '"><b>No.' + h.no + ' 第' + h.heat + '組</b><span>' + Object.keys(h.times).length + 'レーン</span><span class="tm-hat">' + new Date(h.at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) + '</span></button>').join('') +
+      '<div class="tm-lanes" style="--tmcl:' + Math.min(cols, Math.ceil(cols / Math.ceil(cols / 4))) + ';--tmcp:' + Math.min(cols, Math.ceil(cols / Math.ceil(cols / 2))) + '">' + shown.map(lane).join('') + '</div>' +
+      '<div class="tm-foot"><button type="button" class="tm-btn big primary' + (armed.next ? ' arm' : '') + '" data-t="next">' + (armed.next ? '押していないレーンあり。もう一度で次へ' : (n ? 'この組を保存して次の組へ →' : '次の組へ →')) + '</button>' +
+        '<button type="button" class="tm-btn big" data-t="send"' + (cnt ? '' : ' disabled') + '>パソコンに送る' + (cnt ? '（' + cnt + '組）' : '') + '</button></div>' +
+      (S.hist.length ? '<details class="tm-hist"><summary>これまでの組（' + S.hist.length + '組' + (us ? '・未送信 ' + us : '') + '）— 1組ずつQRを出し直せます</summary>' +
+        S.hist.slice().reverse().map((h, i) => '<button type="button" class="tm-hrow" data-t="hq" data-i="' + (S.hist.length - 1 - i) + '"><b>No.' + h.no + ' 第' + h.heat + '組</b><span class="tm-hnm">' + esc(h.name || '') + '</span><span>' + Object.keys(h.times).length + 'レーン</span>' + (h.sent ? '<span class="tm-sent">送信済み</span>' : '<span class="tm-unsent">未送信</span>') + '<span class="tm-hat">' + new Date(h.at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) + '</span></button>').join('') +
         '<button type="button" class="tm-btn sm" data-t="hclear">' + (armed.hclear ? 'もう一度押すと消します' : 'この一覧を消す') + '</button></details>' : '') +
       '</div>';
     tick();
@@ -6653,59 +6887,141 @@ const Timer = (function () {
     if (el) el.textContent = tmFmt(tmCs(tmNow() - S.t0));
     raf = requestAnimationFrame(tick);
   }
-  function arm(k) { const was = armed[k]; armed = {}; if (was) return true; armed[k] = 1; setTimeout(() => { if (armed[k]) { delete armed[k]; draw(); } }, 3000); draw(); return false; }
-  function record() {
-    if (!nTimes()) return;
-    const h = { no: S.no, heat: S.heat, times: Object.assign({}, S.times), at: Date.now() };
+  function arm(k) { const was = armed[k]; armed = {}; if (was) { draw(); return true; } armed[k] = 1; setTimeout(() => { if (armed[k]) { delete armed[k]; draw(); } }, 3000); draw(); return false; }
+  const sameAsSaved = () => { const h = S.hist.find(x => x.no === S.no && x.heat === S.heat); return !!h && JSON.stringify(h.times) === JSON.stringify(S.times); };
+  function record() {     // いまの組を「これまでの組」に入れる（同じ内容ならそのまま＝送信済みのまま）
+    if (!nTimes()) return null;
+    const old = S.hist.find(x => x.no === S.no && x.heat === S.heat);
+    if (old && JSON.stringify(old.times) === JSON.stringify(S.times)) return old;
+    const e = ev(), h = { no: S.no, heat: S.heat, name: e ? e.name : '', times: Object.assign({}, S.times), at: Date.now(), sent: false };
     S.hist = S.hist.filter(x => !(x.no === h.no && x.heat === h.heat));
     S.hist.push(h); if (S.hist.length > 300) S.hist = S.hist.slice(-300);
     return h;
   }
-  function showQR(h) {
-    const code = tmCode(h.no, h.heat, h.times);
-    const ov = document.createElement('div');
-    ov.className = 'tm-ov';
-    ov.innerHTML = '<div class="tm-qrbox">' + QR.toSVG(code, { cls: 'tm-qr' }) + '</div>' +
-      '<div class="tm-qrinfo"><b>No.' + h.no + '　第' + h.heat + '組</b><div class="tm-qrt">' + Object.keys(h.times).map(Number).sort((a, b) => a - b).map(l => '<span><small>' + l + '</small>' + tmFmt(h.times[l]) + '</span>').join('') + '</div>' +
-      '<p>パソコンの「組・記録」→「タブレット」でこのQRをカメラに向けてください。</p><code class="tm-code">' + code + '</code></div>' +
-      '<div class="tm-ovbtns"><button type="button" class="tm-btn big" data-o="close">閉じる</button>' + (h.no === S.no && h.heat === S.heat ? '<button type="button" class="tm-btn big primary" data-o="next">次の組へ →</button>' : '') + '</div>';
-    document.body.appendChild(ov);
-    ov.addEventListener('click', e => { const b = e.target.closest('[data-o]'); if (!b) return; ov.remove(); if (b.dataset.o === 'next') next(); });
-  }
+  function moveTo(i) { const o = order(); if (!o || !o.length) return; const x = o[Math.max(0, Math.min(o.length - 1, i))]; S.no = x.no; S.heat = x.heat; }
   function next() {
     record();
-    S.t0 = null; S.times = {}; S.heat++; S.shown = false; armed = {};
+    S.t0 = null; S.times = {}; armed = {};
+    if (S.set) { const o = order(), p = pos(); if (p >= o.length - 1) note('最後の組です。おつかれさまでした。「パソコンに送る」で残りを送ってください'); else moveTo(p + 1); }
+    else S.heat++;
     keepAwake(false); saveS(); draw();
   }
+  function sendQR(list, single) {
+    if (!list.length) return;
+    const code = tmCode2({ set: S.set ? S.set.id : '', me: S.ppl === 2 ? S.me : 1, ppl: S.ppl, part: S.set ? S.set.part : 0, lanes: mine() }, list);
+    const parts = tmChunks(code);
+    const ov = document.createElement('div');
+    ov.className = 'tm-ov';
+    const line = h => '<div class="tm-ql"><b>No.' + h.no + ' 第' + h.heat + '組</b>' + Object.keys(h.times).map(Number).sort((a, b) => a - b).map(l => '<span><small>' + l + '</small>' + tmFmt(h.times[l]) + '</span>').join('') + '</div>';
+    ov.innerHTML = '<div class="tm-qrbox"></div>' +
+      '<div class="tm-qrinfo"><b>' + (list.length === 1 ? 'No.' + list[0].no + '　第' + list[0].heat + '組' : list.length + '組をまとめて') + '</b><div class="tm-qn"></div>' +
+      '<div class="tm-qrt' + (list.length > 1 ? ' many' : '') + '">' + list.map(line).join('') + '</div>' +
+      '<p>パソコンの「組・記録」→「タブレット」→「② タイムを読み込む」で、このQRをカメラに向けてください。' + (parts.length > 1 ? 'QRが ' + parts.length + '枚、自動で切り替わります。パソコンが全部読むまでそのまま向けてください。' : '') + '</p>' +
+      (parts.length === 1 ? '<code class="tm-code">' + esc(code) + '</code>' : '') + '</div>' +
+      '<div class="tm-ovbtns"><button type="button" class="tm-btn big" data-o="close">閉じる</button>' + (single ? '' : '<button type="button" class="tm-btn big primary" data-o="sent">パソコンで読めた（送信済みにする）</button>') + '</div>';
+    document.body.appendChild(ov);
+    qrAnim(ov.querySelector('.tm-qrbox'), parts, ov.querySelector('.tm-qn'));
+    ov.addEventListener('click', ev2 => {
+      const b = ev2.target.closest('[data-o]'); if (!b) return;
+      if (b.dataset.o === 'sent') { list.forEach(h => { h.sent = true; }); saveS(); note(list.length + '組を送信済みにしました', 'ok'); }
+      ov.remove(); draw();
+    });
+  }
+  function send() {
+    const cur = record();       // いまの組も（タイムがあれば）入れる
+    if (cur) saveS();
+    const list = unsent();
+    if (!list.length) { note('未送信の組はありません。「これまでの組」から1組ずつQRを出せます'); draw(); return; }
+    sendQR(list.slice().sort((a, b) => a.no - b.no || a.heat - b.heat), false);
+  }
+  function scanSet(after) {
+    const ov = document.createElement('div');
+    ov.className = 'tm-ov tm-scan';
+    ov.innerHTML = '<div class="tm-cam"><video playsinline muted autoplay></video><div class="tm-aim"></div></div><p class="tm-scanmsg">カメラを準備しています…</p>' +
+      '<p class="tm-scanhelp">パソコンの「組・記録」→「タブレット」→「① 組分けをタブレットへ」のQRを写してください。QRが数枚、自動で切り替わります。全部読めると自動で閉じます。</p>' +
+      '<div class="tm-ovbtns"><button type="button" class="tm-btn big" data-o="close">やめる</button></div>';
+    document.body.appendChild(ov);
+    const msg = ov.querySelector('.tm-scanmsg'), setMsg = (t, cls) => { msg.textContent = t; msg.className = 'tm-scanmsg' + (cls ? ' ' + cls : ''); };
+    const join = tmJoiner();
+    const ctl = qrCamera(ov.querySelector('video'), text => {
+      const j = join(text);
+      if (j.full === undefined) { setMsg('読み取り中… ' + j.got + ' / ' + j.n + '（そのまま向けてください）'); return; }
+      if (/^SMB[12]\|/.test(j.full)) { setMsg('これはタイムのQRです。パソコンの「① 組分けをタブレットへ」のQRを写してください', 'ng'); return; }
+      const st = tmParseSet(j.full);
+      if (!st) { setMsg('組分けのQRではありません', 'ng'); return; }
+      if (st.err) { setMsg(st.err, 'ng'); return; }
+      if (!st.ev.length) { setMsg('組分けに種目がありません（パソコンで組・レーンを作ってください）', 'ng'); return; }
+      ctl.stop(); ov.remove();
+      const same = S.set && S.set.id === st.id;
+      S.set = { id: st.id, part: st.part, ev: st.ev, at: Date.now() };
+      Object.keys(S.times).forEach(l => { if (mine().indexOf(+l) < 0) delete S.times[l]; });
+      if (pos() < 0) {    // 計っていない最初の組へ
+        const done = new Set(S.hist.map(h => h.no + '.' + h.heat)), o = order(), i = o.findIndex(x => !done.has(x.no + '.' + x.heat));
+        moveTo(i < 0 ? 0 : i);
+      }
+      saveS(); note((same ? '同じ組分けを読み込み直しました（' : '組分けを読み込みました（') + st.id + '・' + st.ev.length + '種目・' + o2n(st) + '組）', 'ok');
+      if (after) after(); else draw();
+    }, setMsg, { ready: 'パソコンの組分けのQRをカメラに向けてください', noCam: 'この端末ではカメラを使えません。No.・組を手で合わせて計ってください', denied: '端末の設定でカメラを許可してください' });
+    ov.addEventListener('click', e => { const b = e.target.closest('[data-o]'); if (!b) return; ctl.stop(); ov.remove(); if (after) after(); else draw(); });
+  }
+  const o2n = st => st.ev.reduce((a, e) => a + e.heats.length, 0);
   function settings() {
     const ov = document.createElement('div');
     ov.className = 'tm-ov tm-set';
-    const opt = (v, cur) => '<option' + (v === cur ? ' selected' : '') + '>' + v + '</option>';
-    const r = []; for (let i = 0; i <= 10; i++) r.push(i);
-    ov.innerHTML = '<div class="tm-setbox"><h2>設定</h2>' +
-      '<label>使うレーン <select id="tm-l0">' + r.map(v => opt(v, S.l0)).join('') + '</select> 〜 <select id="tm-l1">' + r.slice(1).map(v => opt(v, S.l1)).join('') + '</select></label>' +
-      '<p>・ピストル（スタートの合図）でスタート、各レーンのゴールのタッチで、そのレーンのボタンを押します。押した瞬間のタイムが入ります。</p>' +
-      '<p>・手動計時なので、押す人の反応の分だけずれます。パソコンに入れる前に確認画面で見直せます。</p>' +
-      '<p>・1台で全レーンを計っても、レーンごとに1台ずつでも使えます（QRには計ったレーンだけが入ります）。</p>' +
-      '<p>・この画面はインターネットがなくても動きます。選手の名前などのデータはタブレットには入りません。</p>' +
-      '<div class="tm-ovbtns"><button type="button" class="tm-btn big primary" data-o="ok">閉じる</button></div></div>';
     document.body.appendChild(ov);
-    ov.addEventListener('click', e => {
-      if (!e.target.closest('[data-o]')) return;
+    const seg = (k, v, list) => '<span class="tm-seg">' + list.map(([val, lab]) => '<button type="button" data-o="' + k + '" data-v="' + val + '" class="' + (String(v) === String(val) ? 'on' : '') + '">' + lab + '</button>').join('') + '</span>';
+    const paint = () => {
+      const opt = (v, cur) => '<option' + (v === cur ? ' selected' : '') + '>' + v + '</option>';
+      const r = []; for (let i = 0; i <= 10; i++) r.push(i);
+      const p = pool(), sp = splitAt(), p1 = p.filter(l => l <= sp), p2 = p.filter(l => l > sp);
+      ov.innerHTML = '<div class="tm-setbox"><h2>設定</h2>' +
+        '<h3>① 組分け（パソコンから）</h3>' +
+        (S.set ? '<p class="tm-ok">読み込み済み: <b>' + S.set.id + '</b>（' + S.set.part + '部・' + S.set.ev.length + '種目・' + o2n(S.set) + '組' + (S.set.at ? '・' + new Date(S.set.at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) : '') + '）</p>' : '<p class="tm-ng">まだ読み込んでいません。読み込むと、競技No.・種目名・組と、選手のいるレーンが自動で出ます（打ち間違いを防げます）。</p>') +
+        '<div class="tm-setrow"><button type="button" class="tm-btn primary" data-o="scan">' + (S.set ? '組分けを読み込み直す' : '組分けを読み込む（カメラ）') + '</button>' + (S.set ? '<button type="button" class="tm-btn" data-o="unset">組分けを使わない</button>' : '') + '</div>' +
+        '<h3>② 計る人数</h3>' +
+        '<div class="tm-setrow">' + seg('ppl', S.ppl, [[1, '1人'], [2, '2人（レーンを分ける）']]) + '</div>' +
+        (S.ppl === 2 ? '<div class="tm-setrow">この端末は ' + seg('me', S.me, [[1, '1人目（' + tmRange(p1) + '）'], [2, '2人目（' + tmRange(p2) + '）']]) + '</div>' +
+          '<div class="tm-setrow">分け方: 1人目は <select id="tm-split"><option value="0"' + (S.split ? '' : ' selected') + '>自動（' + autoSplit() + 'レーンまで）</option>' + p.slice(0, -1).map(l => '<option value="' + l + '"' + (S.split === l ? ' selected' : '') + '>' + l + 'レーンまで</option>').join('') + '</select></div>' +
+          '<p>自動では、組分けの選手の数が2人でほぼ同じになるように分けます（中央のレーンほど選手が多いため）。2台とも同じ組分け・同じ分け方にし、1台を「1人目」、もう1台を「2人目」にします。それぞれ自分の担当レーンだけを押します。パソコンは2台のQRを順に読めば、1つの組にまとまります。</p>' : '') +
+        '<h3>③ ボタンの並び（プールを見た向きに合わせる）</h3>' +
+        '<div class="tm-setrow">' + seg('flip', S.flip ? 1 : 0, [[0, '左が若い番号（1→）'], [1, '右が若い番号（←1）']]) + '</div>' +
+        (S.set ? '' : '<h3>使うレーン（組分けがないとき）</h3><label>レーン <select id="tm-l0">' + r.map(v => opt(v, S.l0)).join('') + '</select> 〜 <select id="tm-l1">' + r.slice(1).map(v => opt(v, S.l1)).join('') + '</select></label>') +
+        '<h3>計り方のこつ</h3>' +
+        '<p>・スタートの合図（ピストル・笛の音ではなく、光や旗が見えるならそれ）で「スタート」、各レーンのゴールのタッチで、そのレーンのボタンを押します。押した瞬間（指が触れた時）のタイムが入ります。</p>' +
+        '<p>・1人で計るのは4レーンくらいまでがおすすめです。ゴールが重なりやすいときは「2人」にしてレーンを分けると、押し間違い・押し忘れが減ります。</p>' +
+        '<p>・パソコンへは毎組でなく、種目の終わりや休憩のときにまとめて送れます。プールサイドは走らず、タブレットは防水ケースやストラップで落とさないようにしてください。</p>' +
+        '<p>・手動計時なので、押す人の反応の分だけずれます。パソコンに入れる前に確認画面で見直せます。念のため紙の記録用紙にも控えると安心です。</p>' +
+        '<p>・この画面はインターネットがなくても動きます。選手の名前はタブレットに入りません。</p>' +
+        '<div class="tm-ovbtns"><button type="button" class="tm-btn big primary" data-o="ok">閉じる</button></div></div>';
+    };
+    const fixLanes = () => { const my = mine(); Object.keys(S.times).forEach(l => { if (my.indexOf(+l) < 0) delete S.times[l]; }); };
+    paint();
+    ov.addEventListener('change', e => {
+      if (e.target.id === 'tm-split') { S.split = +e.target.value || 0; fixLanes(); saveS(); paint(); return; }
+      if (!e.target.closest('#tm-l0, #tm-l1')) return;
       const a = +ov.querySelector('#tm-l0').value, b = +ov.querySelector('#tm-l1').value;
-      S.l0 = Math.min(a, b); S.l1 = Math.max(a, b);
-      Object.keys(S.times).forEach(l => { if (+l < S.l0 || +l > S.l1) delete S.times[l]; });
-      saveS(); ov.remove(); draw();
+      S.l0 = Math.min(a, b); S.l1 = Math.max(a, b); fixLanes(); saveS(); paint();
+    });
+    ov.addEventListener('click', e => {
+      const b = e.target.closest('[data-o]'); if (!b) return;
+      const o = b.dataset.o, v = +b.dataset.v;
+      if (o === 'ok') { ov.remove(); draw(); return; }
+      if (o === 'scan') { ov.remove(); scanSet(() => { draw(); settings(); }); return; }
+      if (o === 'unset') { S.set = null; saveS(); paint(); return; }
+      if (o === 'ppl') S.ppl = v === 2 ? 2 : 1;
+      if (o === 'me') S.me = v === 2 ? 2 : 1;
+      if (o === 'flip') S.flip = v === 1;
+      fixLanes(); saveS(); paint();
     });
   }
   function onDown(e) {
     // ゴールは押した瞬間（指が触れた時）に記録する
     const b = e.target.closest('.tm-lbtn');
-    if (!b || b.disabled || !S.t0) return;
+    if (!b || b.disabled || !S.t0 || !b.dataset.lane) return;
     const t = tmCs(tmNow() - S.t0), l = +b.dataset.lane;
     if (S.times[l] !== undefined) return;
     e.preventDefault();
-    S.times[l] = t; saveS();
+    S.times[l] = t; armed = {}; saveS();
     if (navigator.vibrate) try { navigator.vibrate(30); } catch (er) { /* なし */ }
     draw();
   }
@@ -6718,10 +7034,15 @@ const Timer = (function () {
     else if (t === 'x') { const l = b.dataset.l; if (arm('x' + l)) { delete S.times[l]; saveS(); draw(); } }
     else if (t === 'no') { S.no = Math.max(1, S.no + d); S.heat = 1; saveS(); draw(); }
     else if (t === 'heat') { S.heat = Math.max(1, S.heat + d); saveS(); draw(); }
-    else if (t === 'qr') { const h = record(); if (h) { S.shown = true; saveS(); draw(); showQR(h); } }
-    else if (t === 'next') next();
+    else if (t === 'mv') { if (S.t0) return; moveTo(pos() + d); armed = {}; saveS(); draw(); }
+    else if (t === 'next') {
+      const left = S.t0 ? mine().filter(l => isActive(l) && S.times[l] === undefined).length : 0;
+      if (left && !arm('next')) return;     // 押していないレーンがあるときは、もう一度押して確かめる
+      next();
+    }
+    else if (t === 'send') send();
     else if (t === 'set') settings();
-    else if (t === 'hq') { const h = S.hist[+b.dataset.i]; if (h) showQR(h); }
+    else if (t === 'hq') { const h = S.hist[+b.dataset.i]; if (h) sendQR([h], true); }
     else if (t === 'hclear') { if (arm('hclear')) { S.hist = []; saveS(); draw(); } }
   }
   function start() {
@@ -6731,21 +7052,36 @@ const Timer = (function () {
     root.id = 'timer-root';
     document.body.appendChild(root);
     S = loadS();
+    if (S.set && pos() < 0) moveTo(0);
     root.addEventListener('pointerdown', onDown);
     root.addEventListener('click', onClick);
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S.t0) { wake = null; keepAwake(true); tick(); } });
     draw();
   }
-  return { start, _s: () => S };
+  return { start, _s: () => S, _draw: () => draw(), _mine: () => mine() };
 })();
 
-// ---------------------------------------------------------------- パソコン: カメラで読む → 確認 → 公式タイムへ
+// ---------------------------------------------------------------- パソコン: 組分けを渡す／カメラで読む → 確認 → 公式タイムへ
+function tabletSetData() {     // 組分け: 進行スケジュールの順に、競技No.・種目名・組ごとの選手のいるレーン（名前は入れない）
+  const ev = [];
+  D.sched.rows.filter(r => r.name && !r.isBreak && r.no).forEach(r => {
+    if (ev.some(e => e.no === r.no)) return;
+    const src = C.isRelayName(r.name) ? D.rel : D.ind;
+    const its = src.filter(it => it.program === r.name && it.event && it.heat && it.lane);
+    if (!its.length) return;
+    const mh = Math.max(...its.map(it => it.heat)), heats = [];
+    for (let h = 1; h <= mh; h++) heats.push([...new Set(its.filter(it => it.heat === h).map(it => it.lane))].sort((a, b) => a - b));
+    ev.push({ no: r.no, name: r.name, heats });
+  });
+  const part = PART ? 2 : 1;
+  return { id: tmHash(part + JSON.stringify(ev)), part, ev };
+}
 function tabletMatch(P) {
   const row = D.sched.rows.find(r => r.no === P.no && r.name && !r.isBreak);
-  if (!row) return { err: '競技No.' + P.no + ' は進行スケジュールにありません（タブレットの競技No.を確かめてください）' };
+  if (!row) return { err: '競技No.' + P.no + ' は進行スケジュールにありません（タブレットの競技No.を確かめてください）', no: P.no, heat: P.heat };
   const name = row.name, relay = C.isRelayName(name), src = relay ? D.rel : D.ind;
   const items = src.filter(it => it.program === name && it.event && it.heat === P.heat);
-  if (!items.length) return { err: 'No.' + P.no + '「' + name + '」に第' + P.heat + '組はありません' };
+  if (!items.length) return { err: 'No.' + P.no + '「' + name + '」に第' + P.heat + '組はありません', no: P.no, heat: P.heat, name };
   const opt = { threeDigit: state.settings.threeDigit };
   const rows = P.times.map(([ln, cs]) => {
     const it = items.find(i => i.lane === ln) || null;
@@ -6754,94 +7090,109 @@ function tabletMatch(P) {
     const same = !!(pc && pc.kind === 'time' && Math.abs(pc.sec - cs / 100) < 0.005);
     return { ln, cs, txt: C.fmtTime(cs / 100), it, cur, same, on: !!it && !cur };
   });
-  const missing = items.filter(it => it.lane && !P.times.some(t => t[0] === it.lane));
-  return { name, relay, rows, missing, no: P.no, heat: P.heat, code: P.code };
+  const mineL = it => !P.lanes || P.lanes.indexOf(it.lane) >= 0;
+  const missing = items.filter(it => it.lane && mineL(it) && !P.times.some(t => t[0] === it.lane));
+  const others = [...new Set(items.filter(it => it.lane && !mineL(it)).map(it => it.lane))].sort((a, b) => a - b);
+  return { name, relay, rows, missing, others, no: P.no, heat: P.heat, code: P.code };
 }
-function openTabletReader() {
-  let stream = null, alive = true, lastBad = '', paused = false;
+function tabletMatchAll(P) {
+  if (P.part && P.part !== (PART ? 2 : 1)) return { err: 'このタブレットは' + P.part + '部の組分けで計っています。上部の「' + P.part + '部」に切り替えてから読み込んでください' };
+  const groups = P.heats.map(h => tabletMatch({ no: h.no, heat: h.heat, times: h.times, lanes: P.lanes, code: P.code }));
+  if (!groups.length) return { err: 'タイムが入っていません' };
+  if (groups.every(g => g.err)) return { err: groups.length === 1 ? groups[0].err : '読み込める組がありません（' + groups[0].err + '）' };
+  const cur = P.set ? tabletSetData().id : null;
+  return { groups, P, stale: !!(P.set && P.set !== cur), cur, code: P.code };
+}
+function openTabletReader(tab) {
+  let ctl = null, lastBad = '', lastDone = '', paused = false;
   const appUrl = location.origin + location.pathname.replace(/index\.html$/, '') + '?timer';
-  const det = ('BarcodeDetector' in window) ? (() => { try { return new BarcodeDetector({ formats: ['qr_code'] }); } catch (e) { return null; } })() : null;
-  const cv = document.createElement('canvas'), cx = cv.getContext('2d', { willReadFrequently: true });
-  modal('<h2>タブレットの計測を読み込む</h2>' +
-    '<div class="tr-body"><div class="tr-cam"><video playsinline muted autoplay></video><div class="tr-aim"></div><p class="tr-msg">カメラを準備しています…</p></div>' +
-    '<div class="tr-side"><p class="small">タブレットで「QRを表示」した画面を、このパソコンのカメラに向けてください。読み取ったら、入れる前に内容を確認できます。</p>' +
-      '<label class="field"><span>読めないときは、QRの下のコードを入力</span><span class="tr-row"><input id="tr-code" placeholder="SMB1|…" autocomplete="off" spellcheck="false"><button type="button" class="btn" id="tr-go">読み込む</button></span></label>' +
-      '<details class="tr-help"><summary>タブレットで計測画面を開くには</summary><div class="tr-urlqr">' + QR.toSVG(appUrl, { cls: 'tr-qr' }) + '</div><p class="small">タブレットのカメラでこのQRを読むか、次のアドレスを開きます。<br><code>' + esc(appUrl) + '</code></p><p class="small muted">計測画面は一度開けば、インターネットがなくても動きます。選手の名前などのデータはタブレットに送りません。</p></details>' +
+  const SET = tabletSetData(), setCode = tmSetCode(SET), setParts = tmChunks(setCode), nHeats = SET.ev.reduce((a, e) => a + e.heats.length, 0);
+  modal('<h2>タブレット計時</h2>' +
+    '<div class="tr-tabs" role="tablist"><button type="button" data-tab="set" role="tab">① 組分けをタブレットへ</button><button type="button" data-tab="read" role="tab">② タイムを読み込む</button></div>' +
+    '<div class="tr-pane" data-pane="set" hidden><div class="tr-set"><div class="tr-setqr"></div><div class="tr-setinfo">' +
+      (SET.ev.length ? '<p class="tr-head"><b>組分け ' + SET.id + '</b><span class="pill info">' + SET.part + '部・' + SET.ev.length + '種目・' + nHeats + '組</span></p><p class="tr-qn small muted"></p>' +
+        '<ol class="small"><li>タブレットで計時画面を開き、「設定」→「組分けを読み込む」を押します。</li><li>このQRにタブレットのカメラを向けます。QRが ' + setParts.length + '枚、自動で切り替わり、全部読めるとタブレットの画面が閉じます。</li><li>2人で計るときは、2台とも読み込み、設定で「2人」→「1人目」「2人目」を選びます（レーンを前半・後半に分けます）。</li><li>組・レーンを入れ替えたら、もう一度読み込みます（違う組分けで計ったタイムは、読み込むときに注意が出ます）。</li></ol>' +
+        '<p class="small muted">タブレットに渡すのは、競技No.・種目名・組ごとの使うレーンだけです。選手の名前は渡しません。</p>'
+        : '<p class="small">組・レーンがまだありません。進行スケジュールとエントリーを入れると、ここに組分けのQRが出ます。</p>') +
+      '<details class="tr-help"><summary>タブレットで計時画面を開くには</summary><div class="tr-urlqr">' + QR.toSVG(appUrl, { cls: 'tr-qr' }) + '</div><p class="small">タブレットのカメラでこのQRを読むか、次のアドレスを開きます。<br><code>' + esc(appUrl) + '</code></p><p class="small muted">計時画面は一度開けば、インターネットがなくても動きます。</p></details>' +
+    '</div></div></div>' +
+    '<div class="tr-pane" data-pane="read"><div class="tr-body"><div class="tr-cam"><video playsinline muted autoplay></video><div class="tr-aim"></div><p class="tr-msg">カメラを準備しています…</p></div>' +
+    '<div class="tr-side"><p class="small">タブレットで「パソコンに送る」を押して出たQRを、このパソコンのカメラに向けてください。何組分でもまとめて読めます（QRが数枚のときは自動で切り替わります）。2人で計ったときは、2台のQRを順に読みます。読み取ったら、入れる前に内容を確認できます。</p>' +
+      '<label class="field"><span>読めないときは、QRの下のコードを入力</span><span class="tr-row"><input id="tr-code" placeholder="SMB2|…" autocomplete="off" spellcheck="false"><button type="button" class="btn" id="tr-go">読み込む</button></span></label>' +
     '</div></div>' +
-    '<div class="tr-result" hidden></div>' +
+    '<div class="tr-result" hidden></div></div>' +
     '<div class="actions"><button class="btn" data-close>閉じる</button></div>', (m, close) => {
     m.classList.add('tr-modal');
     const video = m.querySelector('video'), msg = m.querySelector('.tr-msg'), body = m.querySelector('.tr-body'), res = m.querySelector('.tr-result');
     const setMsg = (t, cls) => { msg.textContent = t; msg.className = 'tr-msg' + (cls ? ' ' + cls : ''); };
-    const stop = () => { alive = false; if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; };
-    const gone = () => !document.body.contains(m);
-    const got = text => {
-      const P = tmParse(text);
-      if (P.err) { if (text !== lastBad) { lastBad = text; setMsg(P.err, 'ng'); } return false; }
-      const R = tabletMatch(P);
-      if (R.err) { if (text !== lastBad) { lastBad = text; setMsg(R.err, 'ng'); } return false; }
-      paused = true; showResult(R); return true;
+    const join = tmJoiner();
+    const showTab = k => {
+      m.querySelectorAll('.tr-tabs button').forEach(b => { const on = b.dataset.tab === k; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+      m.querySelectorAll('.tr-pane').forEach(p => { p.hidden = p.dataset.pane !== k; });
+      if (ctl) ctl.pause(k !== 'read' || paused);
+      if (k === 'set' && !m.querySelector('.tr-setqr svg') && SET.ev.length) qrAnim(m.querySelector('.tr-setqr'), setParts, m.querySelector('.tr-qn'), 'tr-qr');
     };
-    const showResult = R => {
+    m.querySelector('.tr-tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
+    const bad = (text, t) => { if (text !== lastBad) { lastBad = text; setMsg(t, 'ng'); } };
+    const got = text => {
+      if (paused) return false;
+      const j = join(text);
+      if (j.full === undefined) { setMsg('QRを読み取り中… ' + j.got + ' / ' + j.n + '（そのまま向けてください）'); return false; }
+      const full = j.full;
+      if (full === lastDone) { setMsg('このQRは読み込み済みです。次のQRを向けてください'); return false; }
+      if (/^SMS1\|/.test(full)) { bad(full, 'これは組分けのQR（タブレットで読むもの）です。タブレットの「パソコンに送る」のQRを向けてください'); return false; }
+      const P = tmParse(full);
+      if (P.err) { bad(full, P.err); return false; }
+      const R = tabletMatchAll(P);
+      if (R.err) { bad(full, R.err); return false; }
+      paused = true; if (ctl) ctl.pause(true); showResult(R, full); return true;
+    };
+    const resume = t => { res.hidden = true; body.hidden = false; paused = false; lastBad = ''; if (ctl) ctl.pause(false); setMsg(t); };
+    const showResult = (R, full) => {
       body.hidden = true; res.hidden = false;
-      const who = it => it ? esc(R.relay ? it.teamDisp : it.np.kanji) + '<small>' + esc(R.relay ? it.cat : it.club) + '</small>' : '<span class="muted">（このレーンに選手はいません）</span>';
-      res.innerHTML = '<p class="tr-head"><b>No.' + R.no + '　' + esc(R.name) + '　第' + R.heat + '組</b><span class="pill info">' + R.rows.length + 'レーン</span></p>' +
-        '<table class="t tr-t"><thead><tr><th class="c">入れる</th><th class="c">レーン</th><th>' + (R.relay ? 'チーム' : '氏名') + '</th><th class="c">いまの公式タイム</th><th class="c">タブレット</th></tr></thead><tbody>' +
-        R.rows.map((r, i) => '<tr class="' + (!r.it ? 'emp' : r.same ? 'same' : r.cur ? 'over' : '') + '"><td class="c"><input type="checkbox" data-i="' + i + '"' + (r.on ? ' checked' : '') + (!r.it || r.same ? ' disabled' : '') + ' aria-label="' + r.ln + 'レーンを入れる"></td><td class="c"><span class="lane">' + r.ln + '</span></td><td class="nm">' + who(r.it) + '</td>' +
-          '<td class="c tm">' + (r.cur ? esc(r.cur) : '<span class="muted">未入力</span>') + (r.same ? ' <span class="pill ok">同じ</span>' : r.cur && r.it ? ' <span class="pill warn">上書き</span>' : '') + '</td><td class="c tm"><b>' + esc(r.txt) + '</b></td></tr>').join('') +
-        '</tbody></table>' +
-        (R.missing.length ? '<p class="small muted">タブレットに記録がないレーン: ' + R.missing.map(it => it.lane + 'レーン').join('・') + '（そのままにします）</p>' : '') +
-        (R.rows.some(r => r.cur && r.it && !r.same) ? '<p class="small">「上書き」は、もう公式タイムが入っているレーンです。入れ替えるときだけ印を付けてください。</p>' : '') +
+      const P = R.P, rows = [];
+      const who = (g, it) => it ? esc(g.relay ? it.teamDisp : it.np.kanji) + '<small>' + esc(g.relay ? it.cat : it.club) + '</small>' : '<span class="muted">（このレーンに選手はいません）</span>';
+      R.groups.forEach((g, gi) => {
+        rows.push('<tr class="gh"><th colspan="5">No.' + g.no + '　' + esc(g.name || '') + '　第' + g.heat + '組' + (g.err ? '　<span class="pill err">読み込めません</span>' : '') + '</th></tr>');
+        if (g.err) { rows.push('<tr class="gm"><td colspan="5" class="small">' + esc(g.err) + '</td></tr>'); return; }
+        g.rows.forEach((r, i) => rows.push('<tr class="' + (!r.it ? 'emp' : r.same ? 'same' : r.cur ? 'over' : '') + '"><td class="c"><input type="checkbox" data-g="' + gi + '" data-i="' + i + '"' + (r.on ? ' checked' : '') + (!r.it || r.same ? ' disabled' : '') + ' aria-label="第' + g.heat + '組 ' + r.ln + 'レーンを入れる"></td><td class="c"><span class="lane">' + r.ln + '</span></td><td class="nm">' + who(g, r.it) + '</td>' +
+          '<td class="c tm">' + (r.cur ? esc(r.cur) : '<span class="muted">未入力</span>') + (r.same ? ' <span class="pill ok">同じ</span>' : r.cur && r.it ? ' <span class="pill warn">上書き</span>' : '') + '</td><td class="c tm"><b>' + esc(r.txt) + '</b></td></tr>'));
+        const nt = [];
+        if (g.missing.length) nt.push('タブレットに記録がないレーン: ' + g.missing.map(it => it.lane).join('・') + '（棄権・押し忘れ？ そのままにします）');
+        if (g.others.length) nt.push(g.others.join('・') + 'レーンはもう1人の担当です（そちらのタブレットのQRで入れます）');
+        if (nt.length) rows.push('<tr class="gm"><td colspan="5" class="small muted">' + nt.join('<br>') + '</td></tr>');
+      });
+      const label = R.groups.length === 1 ? 'No.' + R.groups[0].no + ' 第' + R.groups[0].heat + '組' : R.groups.length + '組';
+      res.innerHTML = '<p class="tr-head"><b>タブレットの計測　' + label + '</b>' + (P.ppl === 2 ? '<span class="pill info">' + P.me + '人目・' + tmRange(P.lanes) + '</span>' : '') + (P.set ? '<span class="pill ' + (R.stale ? 'warn' : 'ok') + '">組分け ' + P.set + '</span>' : P.v === 2 ? '<span class="pill mute">組分けなし（手で合わせた No.・組）</span>' : '') + '</p>' +
+        (R.stale ? '<div class="notice warn">このタブレットの組分け（' + P.set + '）は、いまの組・レーン（' + R.cur + '）と違います。組・レーンを入れ替えた後に、タブレットで読み込み直していない可能性があります。氏名とレーンが合っているか確かめてから入れてください。</div>' : '') +
+        '<div class="tr-tw"><table class="t tr-t"><thead><tr><th class="c">入れる</th><th class="c">レーン</th><th>氏名・チーム</th><th class="c">いまの公式タイム</th><th class="c">タブレット</th></tr></thead><tbody>' + rows.join('') + '</tbody></table></div>' +
+        (R.groups.some(g => !g.err && g.rows.some(r => r.cur && r.it && !r.same)) ? '<p class="small">「上書き」は、もう公式タイムが入っているレーンです。入れ替えるときだけ印を付けてください。</p>' : '') +
         '<p class="small muted">タブレットのタイムは手動計時です。おかしな値がないか確かめてから入れてください。</p>' +
         '<div class="actions"><button type="button" class="btn" id="tr-again">読み直す</button><button type="button" class="btn primary" id="tr-ok">公式タイムに入れる</button></div>';
       const ok = res.querySelector('#tr-ok');
-      const upd = () => { const n = res.querySelectorAll('input[type=checkbox]:checked').length; ok.disabled = !n; ok.textContent = n ? '公式タイムに入れる（' + n + 'レーン）' : '入れるレーンを選んでください'; };
+      const upd = () => { const n = res.querySelectorAll('input[type=checkbox]:checked').length, any = res.querySelectorAll('input[type=checkbox]:not(:disabled)').length; ok.disabled = !n; ok.textContent = n ? '公式タイムに入れる（' + n + 'レーン）' : any ? '入れるレーンを選んでください' : '入れるレーンはありません（すべて入力済み）'; };
       res.querySelectorAll('input[type=checkbox]').forEach(c => c.addEventListener('change', upd)); upd();
-      res.querySelector('#tr-again').addEventListener('click', () => { res.hidden = true; body.hidden = false; paused = false; lastBad = ''; setMsg('タブレットのQRをカメラに向けてください'); });
+      res.querySelector('#tr-again').addEventListener('click', () => resume('タブレットのQRをカメラに向けてください'));
       ok.addEventListener('click', () => {
-        const pick = [...res.querySelectorAll('input[type=checkbox]:checked')].map(c => R.rows[+c.dataset.i]).filter(r => r.it);
+        const pick = [...res.querySelectorAll('input[type=checkbox]:checked')].map(c => ({ g: R.groups[+c.dataset.g], r: R.groups[+c.dataset.g].rows[+c.dataset.i] })).filter(x => x.r.it);
         if (!pick.length) return;
-        const did = commit('タブレット計測の反映（No.' + R.no + ' 第' + R.heat + '組）', s => {
-          const arr = R.relay ? s.relays : s.entries;
-          pick.forEach(r => { const o = arr.find(x => x.id === r.it.id); if (o) o.officialTime = r.txt; });
+        const did = commit('タブレット計測の反映（' + (R.groups.length === 1 ? 'No.' + R.groups[0].no + ' 第' + R.groups[0].heat + '組' : R.groups.filter(g => !g.err).map(g => 'No.' + g.no + '-' + g.heat).join('・')) + '）', s => {
+          pick.forEach(({ g, r }) => { const o = (g.relay ? s.relays : s.entries).find(x => x.id === r.it.id); if (o) o.officialTime = r.txt; });
         }, { allowLocked: true });
         if (!did) return;
-        ui.prog = R.name; ui.progHeat = R.heat;
-        toast('No.' + R.no + ' 第' + R.heat + '組: ' + pick.length + 'レーンの公式タイムを入れました');
-        res.innerHTML = '<p class="tr-done"><b>入れました</b>　No.' + R.no + ' ' + esc(R.name) + ' 第' + R.heat + '組（' + pick.length + 'レーン）</p>' +
-          '<div class="actions"><button type="button" class="btn" id="tr-close">閉じる</button><button type="button" class="btn primary" id="tr-next">続けて次の組を読む</button></div>';
+        const last = pick[pick.length - 1].g; ui.prog = last.name; ui.progHeat = last.heat;
+        lastDone = full;
+        toast(label + ': ' + pick.length + 'レーンの公式タイムを入れました');
+        res.innerHTML = '<p class="tr-done"><b>入れました</b>　' + esc(label) + '（' + pick.length + 'レーン）</p>' +
+          '<div class="actions"><button type="button" class="btn" id="tr-close">閉じる</button><button type="button" class="btn primary" id="tr-next">続けて読む</button></div>';
         res.querySelector('#tr-close').addEventListener('click', close);
-        res.querySelector('#tr-next').addEventListener('click', () => { res.hidden = true; body.hidden = false; paused = false; lastBad = R.code; setMsg('次の組のQRをカメラに向けてください'); });
+        res.querySelector('#tr-next').addEventListener('click', () => resume('次のQR（もう1人のタブレット・次の組）をカメラに向けてください'));
       });
     };
-    m.querySelector('#tr-go').addEventListener('click', () => { const v = m.querySelector('#tr-code').value; if (v.trim()) got(v); });
-    m.querySelector('#tr-code').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); const v = e.target.value; if (v.trim()) got(v); } });
-    const loop = async () => {
-      if (gone()) { stop(); return; }
-      if (!alive) return;
-      if (!paused && video.readyState >= 2 && video.videoWidth) {
-        const k = Math.min(1, 800 / Math.max(video.videoWidth, video.videoHeight));
-        cv.width = Math.round(video.videoWidth * k); cv.height = Math.round(video.videoHeight * k);
-        cx.drawImage(video, 0, 0, cv.width, cv.height);
-        let text = null;
-        if (det) { try { const r = await det.detect(cv); if (r && r[0]) text = r[0].rawValue; } catch (e) { /* 予備へ */ } }
-        if (text === null) { try { text = QR.decode(cx.getImageData(0, 0, cv.width, cv.height)); } catch (e) { text = null; } }
-        if (text !== null && text !== lastBad) got(text);
-      }
-      setTimeout(loop, 150);
-    };
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { setMsg('このブラウザではカメラを使えません。右のコード入力を使ってください', 'ng'); return; }
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }).then(st => {
-      if (gone()) { st.getTracks().forEach(t => t.stop()); return; }
-      stream = st; video.srcObject = st;
-      const fm = (st.getVideoTracks()[0].getSettings() || {}).facingMode;
-      if (fm !== 'environment') video.classList.add('mirror');
-      video.play().catch(() => {});
-      setMsg('タブレットのQRをカメラに向けてください');
-      loop();
-    }).catch(e => {
-      setMsg((e && e.name === 'NotAllowedError') ? 'カメラの使用が許可されていません。アドレスバーのカメラの設定で許可するか、右のコード入力を使ってください' : 'カメラが見つかりません。右のコード入力を使ってください', 'ng');
-    });
+    m.querySelector('#tr-go').addEventListener('click', () => { const v = m.querySelector('#tr-code').value; if (v.trim()) { paused = false; got(v); } });
+    m.querySelector('#tr-code').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); const v = e.target.value; if (v.trim()) { paused = false; got(v); } } });
+    ctl = qrCamera(video, text => { if (text !== lastBad) got(text); }, setMsg, { ready: 'タブレットのQRをカメラに向けてください', noCam: 'このブラウザではカメラを使えません。右のコード入力を使ってください', denied: 'アドレスバーのカメラの設定で許可するか、右のコード入力を使ってください' });
+    showTab(tab === 'set' ? 'set' : 'read');
   });
 }
 
